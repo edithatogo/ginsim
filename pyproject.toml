@@ -10,7 +10,7 @@ dependencies = [
   "numpy>=1.26",
   "polars>=0.20.0",  # Faster than pandas
   
-  # Probabilistic programming (simplified - just numpyro)
+  # Probabilistic programming
   "numpyro>=0.15.0",
   "optax>=0.2.2",
   "jaxopt>=0.8.3",
@@ -48,6 +48,7 @@ dev = [
   "pytest-cov>=4.0",
   "pytest-xdist>=3.5",  # Parallel testing
   "pytest-mock>=3.12",
+  "pytest-timeout>=2.2",
   "hypothesis>=6.97",  # Property-based testing
   "mutmut>=2.4",  # Mutation testing
   "ruff>=0.3.0",
@@ -57,10 +58,27 @@ dev = [
 ]
 
 profiling = [
-  "py-spy>=0.3.14",  # Sampling profiler
-  "line_profiler>=4.1",
-  "memray>=1.11",  # Memory profiler
+  # CPU Profilers
+  "py-spy>=0.3.14",  # Sampling profiler (works with JAX)
+  "pyinstrument>=4.6",  # Call stack profiler
+  "scalene>=1.5.40",  # CPU+GPU+memory profiler (SOTA)
+  "line_profiler>=4.1",  # Line-by-line timing
+  
+  # Memory Profilers
+  "memray>=1.11",  # Memory profiler with flame graphs
+  "tracemalloc-debug>=0.1",  # Python memory tracing
+  
+  # Visualization
   "snakeviz>=2.2.0",  # cProfile viewer
+  "speedscope>=0.0.1",  # Interactive flame graphs
+]
+
+coverage = [
+  "coverage>=7.4",  # Core coverage
+  "coverage-badge>=1.1",  # Coverage badges
+  "diff-cover>=8.0",  # Coverage on diffs
+  "pytest-cov>=4.0",
+  "covdefaults>=2.3",  # Sensible coverage defaults
 ]
 
 validation = [
@@ -92,12 +110,12 @@ line-length = 100
 target-version = "py310"
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "N", "W", "UP", "ANN", "B", "C4", "SIM"]
-ignore = ["E501", "ANN101", "ANN102"]  # Line length, self/cls type hints
+select = ["E", "F", "I", "N", "W", "UP", "ANN", "B", "C4", "SIM", "PERF"]
+ignore = ["E501", "ANN101", "ANN102"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["ANN", "S101"]  # No type hints in tests, allow assert
-"scripts/*" = ["ANN"]  # No type hints in scripts
+"tests/*" = ["ANN", "S101"]
+"scripts/*" = ["ANN"]
 
 [tool.pyright]
 pythonVersion = "3.10"
@@ -108,27 +126,25 @@ reportUnknownParameterType = false
 reportUnknownVariableType = false
 reportUnknownMemberType = false
 reportUnknownArgumentType = false
-exclude = [
-  "**/tests/**",
-  "**/scripts/**",
-  ".venv",
-  "outputs",
-]
+exclude = ["**/tests/**", "**/scripts/**", ".venv", "outputs"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-v --cov=src --cov-report=term-missing -n auto"
+addopts = "-v --cov=src --cov-report=term-missing --cov-report=xml -n auto"
 filterwarnings = ["ignore::DeprecationWarning"]
 markers = [
   "slow: marks tests as slow (deselect with '-m \"not slow\"')",
   "property: property-based tests with hypothesis",
+  "mutation: mutation tests",
 ]
+timeout = 300  # 5 minute default timeout
 
 [tool.hypothesis]
 database = ".hypothesis/examples"
 deadline = 500
 max_examples = 100
 suppress_health_check = ["too_slow"]
+report_multiple_bugs = true
 
 [tool.mutmut]
 runner = "pytest -x"
@@ -141,6 +157,16 @@ dict_synonyms = ["Partial", "NamedTuple"]
 [tool.coverage.run]
 source = ["src"]
 branch = true
+parallel = true
+concurrency = ["multiprocessing", "thread"]
+sigterm = true
+plugins = ["covdefaults"]
+
+[tool.coverage.paths]
+source = [
+  "src/",
+  "*/site-packages/",
+]
 
 [tool.coverage.report]
 exclude_lines = [
@@ -151,7 +177,23 @@ exclude_lines = [
   "if __name__ == .__main__.:",
   "if TYPE_CHECKING:",
   "@abstractmethod",
+  "class .*\\bProtocol\\):",
 ]
+
+show_missing = true
+precision = 2
+fail_under = 85.0
+
+[tool.coverage.html]
+directory = "outputs/coverage_html"
+title = "Coverage Report"
+
+[tool.coverage.xml]
+output = "coverage.xml"
+
+[tool.diff_cover]
+compare_branch = "origin/main"
+diff_range_notation = ".."
 
 [tool.hydra]
 output_subdir = ".hydra"

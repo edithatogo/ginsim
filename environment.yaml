@@ -10,7 +10,7 @@ dependencies:
   - jax>=0.4.25
   - jaxlib>=0.4.25
   - numpy>=1.26
-  - polars>=0.20.0  # Faster than pandas
+  - polars>=0.20.0
   
   # Probabilistic programming
   - numpyro>=0.15.0
@@ -51,6 +51,8 @@ dependencies:
   - pytest>=8.0
   - pytest-cov>=4.0
   - pytest-xdist>=3.5
+  - pytest-mock>=3.12
+  - pytest-timeout>=2.2
   - hypothesis>=6.97
   - mutmut>=2.4
   
@@ -59,9 +61,18 @@ dependencies:
   - pyright>=1.1.350
   - pre-commit>=3.6
   
-  # Profiling
+  # Profiling (SOTA)
+  - py-spy>=0.3.14
+  - pyinstrument>=4.6
+  - scalene>=1.5.40
   - line_profiler>=4.1
   - memray>=1.11
+  - snakeviz>=2.2.0
+  
+  # Coverage
+  - coverage>=7.4
+  - coverage-badge>=1.1
+  - diff-cover>=8.0
   
   # Jupyter (optional)
   - jupyterlab>=4.0
@@ -70,6 +81,7 @@ dependencies:
   
   - pip:
     - -e .
-    - uv>=0.1.0  # Ultra-fast pip replacement
-    - py-spy>=0.3.14  # Sampling profiler
-    - snakeviz>=2.2.0  # cProfile viewer
+    - uv>=0.1.0
+    - speedscope>=0.0.1
+    - covdefaults>=2.3
+    - tracemalloc-debug>=0.1

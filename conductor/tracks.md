@@ -6,7 +6,7 @@ This registry is the index of Conductor tracks for this repository.
 
 | Track ID | Title | Status | Link |
 |---|---|---|---|
-| gdpe_0003_model_implementation | Model implementation and policy analysis | 🟡 Phase 2 Complete | [index](./tracks/gdpe_0003_model_implementation/index.md) |
+| gdpe_0003_model_implementation | Model implementation and policy analysis | 🟡 Phase 3 Complete | [index](./tracks/gdpe_0003_model_implementation/index.md) |
 
 ## Archived Tracks
 

@@ -1,0 +1,24 @@
+{
+  "title": "Genetic Discrimination Policy Economic Evaluation",
+  "description": "A reproducible modelling framework to quantify the economic and welfare impacts of policies that restrict genetic discrimination, with comparative analysis for Australia and Aotearoa New Zealand.",
+  "creators": [
+    {
+      "name": "Mordaunt, Dylan A.",
+      "affiliation": "Victoria University of Wellington",
+      "orcid": "https://orcid.org/0000-0002-9775-0603"
+    }
+  ],
+  "keywords": [
+    "genetic discrimination",
+    "health economics",
+    "insurance markets",
+    "Bayesian decision analysis",
+    "value of information",
+    "policy evaluation",
+    "Australia",
+    "New Zealand"
+  ],
+  "license": "MIT",
+  "upload_type": "software",
+  "access_right": "open"
+}

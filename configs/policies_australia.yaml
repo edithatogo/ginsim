@@ -1,0 +1,34 @@
+# Australia (life insurance): policy rulesets for genetic testing protections
+# Notes:
+# - FSC moratorium introduced July 2019 with financial limits (see HGSA consumer resource).
+# - Australian Government introduced a bill (Nov 2025) to ban use of protected genetic information in life insurance underwriting.
+
+jurisdiction: australia
+domain: life_insurance
+policies:
+  status_quo:
+    description: "Pre-reform baseline; insurers may request and use genetic test results subject to general law and industry practices."
+    allow_genetic_test_results: true
+    allow_family_history: true
+    predictive_only: false
+    sum_insured_caps: null
+    enforcement_strength: baseline
+
+  fsc_moratorium_2019_limits:
+    description: "Industry moratorium limits disclosure/use of adverse genetic test results below specific caps (toy encoding)."
+    allow_genetic_test_results: limited
+    allow_family_history: true
+    predictive_only: true
+    sum_insured_caps:
+      death_or_tpd: 500000
+      trauma: 200000
+      income_protection_monthly: 4000
+    enforcement_strength: industry
+
+  proposed_statutory_ban_bill_2025:
+    description: "Proposed statutory prohibition on using protected genetic information for life insurance contract decisions (bill introduced Nov 2025; verify current status)."
+    allow_genetic_test_results: false
+    allow_family_history: true
+    predictive_only: true
+    sum_insured_caps: null
+    enforcement_strength: statutory

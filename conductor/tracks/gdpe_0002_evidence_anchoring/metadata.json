@@ -1,0 +1,16 @@
+{
+  "track_id": "gdpe_0002_evidence_anchoring",
+  "title": "Evidence register + calibration plan for AU/NZ",
+  "type": "research",
+  "status": "in_progress",
+  "created_utc": "2026-03-03T00:00:00Z",
+  "updated_utc": "2026-03-03T15:00:00Z",
+  "phases_completed": 3,
+  "phases_total": 5,
+  "phase_1_complete": true,
+  "phase_1_review_date": "2026-03-03",
+  "phase_2_complete": true,
+  "phase_2_review_date": "2026-03-03",
+  "phase_3_complete": true,
+  "phase_3_review_date": "2026-03-03"
+}

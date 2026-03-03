@@ -1,0 +1,411 @@
+# Calibration Targets and Prior Distributions
+# Track: gdpe_0002_evidence_anchoring - Phase 2
+# Last updated: 2026-03-03
+# Jurisdiction: Australia
+
+---
+# =============================================================================
+# MODULE A: BEHAVIOUR / DETERRENCE
+# =============================================================================
+
+module_a_calibration:
+  description: |
+    Calibration targets for genetic testing behaviour and deterrence effects.
+    Parameters govern how policy regimes affect perceived discrimination risk
+    and subsequently testing uptake.
+
+  parameters:
+    # Baseline testing uptake (no discrimination concerns)
+    baseline_testing_uptake:
+      calibration_target:
+        value: 0.52
+        source: "ettema_genetic_testing_uptake_2021"
+        jurisdiction: "Netherlands"
+        notes: "Cascade testing uptake in families with known mutations"
+        uncertainty: "95% CI: 0.48-0.56"
+      
+      prior:
+        distribution: "Beta"
+        parameters:
+          alpha: 462
+          beta: 426
+        mean: 0.52
+        sd: 0.02
+        rationale: |
+          Moderate quality evidence. Narrow SD reflects precise estimate.
+          Assumes similar baseline in AU population.
+
+    # Deterrence elasticity (proportion avoiding testing due to insurance concerns)
+    deterrence_elasticity:
+      calibration_target:
+        value: 0.18
+        source: "mcguire_perceived_discrimination_testing_2019"
+        jurisdiction: "United States"
+        notes: "Proportion reporting insurance concerns affected testing decision"
+        uncertainty: "95% CI: 0.11-0.25"
+      
+      prior:
+        distribution: "Beta"
+        parameters:
+          alpha: 22.5
+          beta: 102.5
+        mean: 0.18
+        sd: 0.035
+        rationale: |
+          Low quality evidence (cross-sectional, US not AU).
+          Moderate SD reflects uncertainty about AU generalizability.
+
+    # Moratorium effect (reduction in deterrence under moratorium)
+    moratorium_effect:
+      calibration_target:
+        value: 0.15
+        source: "taylor_australia_genetic_discrimination_2021"
+        jurisdiction: "Australia"
+        notes: "Estimated reduction in deterrence post-moratorium (qualitative converted)"
+        uncertainty: "Wide uncertainty due to qualitative source"
+      
+      prior:
+        distribution: "Beta"
+        parameters:
+          alpha: 12
+          beta: 68
+        mean: 0.15
+        sd: 0.04
+        rationale: |
+          Very low quality evidence (case series, qualitative).
+          Wide SD reflects high uncertainty.
+          Direct AU context partially offsets quality concerns.
+
+  # EVPPI groupings
+  evppi_groupings:
+    high_priority:
+      - deterrence_elasticity
+      - moratorium_effect
+      rationale: "Key policy drivers; high uncertainty; direct impact on outcomes"
+    
+    medium_priority:
+      - baseline_testing_uptake
+      rationale: "Well-estimated but important for absolute levels"
+
+---
+# =============================================================================
+# MODULE C: INSURANCE EQUILIBRIUM
+# =============================================================================
+
+module_c_calibration:
+  description: |
+    Calibration targets for insurance market equilibrium.
+    Parameters govern adverse selection, demand responses, and premium impacts.
+
+  parameters:
+    # Adverse selection elasticity (premium increase per 10% increase in informed high-risks)
+    adverse_selection_elasticity:
+      calibration_target:
+        value: 0.08
+        source: "hersch_viscusi_insurance_discrimination_2019"
+        jurisdiction: "United States"
+        notes: "Theoretical model estimate"
+        uncertainty: "Sensitivity range: 0.03-0.15"
+      
+      prior:
+        distribution: "Normal"
+        parameters:
+          mean: 0.08
+          sd: 0.04
+        truncation:
+          lower: 0
+          upper: null
+        rationale: |
+          Low quality evidence (modelling study, US market).
+          Truncated normal ensures positive values.
+          Moderate SD reflects theoretical uncertainty.
+
+    # Demand elasticity for high-risk individuals (change in take-up post-positive test)
+    demand_elasticity_high_risk:
+      calibration_target:
+        value: -0.22
+        source: "armstrong_genetic_testing_insurance_2020"
+        jurisdiction: "United States"
+        notes: "BRCA mutation carriers (n=340)"
+        uncertainty: "95% CI: -0.35 to -0.09"
+      
+      prior:
+        distribution: "Normal"
+        parameters:
+          mean: -0.22
+          sd: 0.08
+        truncation:
+          lower: null
+          upper: 0
+        rationale: |
+          Low quality evidence (retrospective, US market).
+          Truncated normal ensures negative elasticity.
+          SD reflects empirical uncertainty.
+
+    # Baseline premium loading for genetic conditions
+    baseline_loading:
+      calibration_target:
+        value: 0.15
+        source: "fsc_moratorium_2019"
+        jurisdiction: "Australia"
+        notes: "Average loading under FSC moratorium caps"
+        uncertainty: "Industry estimate: 10-25%"
+      
+      prior:
+        distribution: "Normal"
+        parameters:
+          mean: 0.15
+          sd: 0.06
+        truncation:
+          lower: 0
+          upper: null
+        rationale: |
+          Very low quality evidence (industry report).
+          Direct AU context valuable.
+          Wide SD reflects reporting uncertainty.
+
+  # EVPPI groupings
+  evppi_groupings:
+    high_priority:
+      - adverse_selection_elasticity
+      - demand_elasticity_high_risk
+      rationale: "Structural parameters; high uncertainty; major policy drivers"
+    
+    medium_priority:
+      - baseline_loading
+      rationale: "AU-specific but low quality; important for absolute levels"
+
+---
+# =============================================================================
+# MODULE D: PROXY SUBSTITUTION
+# =============================================================================
+
+module_d_calibration:
+  description: |
+    Calibration targets for proxy substitution effects.
+    Parameters govern underwriting accuracy when genetic information is restricted.
+
+  parameters:
+    # Family history sensitivity for mutation detection
+    family_history_sensitivity:
+      calibration_target:
+        value: 0.68
+        source: "tabor_family_history_proxy_2018"
+        jurisdiction: "United States"
+        notes: "Diagnostic accuracy study (n=523)"
+        uncertainty: "95% CI: 0.62-0.74"
+      
+      prior:
+        distribution: "Beta"
+        parameters:
+          alpha: 357
+          beta: 168
+        mean: 0.68
+        sd: 0.03
+        rationale: |
+          Moderate quality evidence (diagnostic accuracy study).
+          Narrow SD reflects precise estimate.
+          Assumes similar accuracy in AU context.
+
+    # Proxy substitution rate (proportion of genetic risk captured by proxies)
+    proxy_substitution_rate:
+      calibration_target:
+        value: 0.40
+        source: "lowenstein_genetic_discrimination_insurance_2021"
+        jurisdiction: "Multiple"
+        notes: "Narrative review synthesis"
+        uncertainty: "Wide uncertainty: 0.20-0.60"
+      
+      prior:
+        distribution: "Beta"
+        parameters:
+          alpha: 20
+          beta: 30
+        mean: 0.40
+        sd: 0.10
+        rationale: |
+          Very low quality evidence (narrative review).
+          Very wide SD reflects high uncertainty.
+          Key driver of moratorium effectiveness.
+
+  # EVPPI groupings
+  evppi_groupings:
+    high_priority:
+      - proxy_substitution_rate
+      rationale: "Very high uncertainty; major impact on policy effectiveness"
+    
+    medium_priority:
+      - family_history_sensitivity
+      rationale: "Well-estimated but less policy-sensitive"
+
+---
+# =============================================================================
+# MODULE E: PASS-THROUGH / MARKET STRUCTURE
+# =============================================================================
+
+module_e_calibration:
+  description: |
+    Calibration targets for market structure and pass-through effects.
+    Parameters govern incidence of genetic information costs.
+
+  parameters:
+    # Pass-through rate (proportion of risk costs passed to consumers)
+    pass_through_rate:
+      calibration_target:
+        value: 0.75
+        source: "finkelstein_insurance_market_structure_2019"
+        jurisdiction: "United States"
+        notes: "Empirical analysis of insurance markets"
+        uncertainty: "95% CI: 0.60-0.90"
+      
+      prior:
+        distribution: "Beta"
+        parameters:
+          alpha: 60
+          beta: 20
+        mean: 0.75
+        sd: 0.05
+        rationale: |
+          Moderate quality evidence (empirical).
+          Moderate SD reflects market variation.
+          AU market concentration may differ.
+
+  # EVPPI groupings
+  evppi_groupings:
+    medium_priority:
+      - pass_through_rate
+      rationale: "Moderate EVPPI expected; affects incidence but not direction"
+
+---
+# =============================================================================
+# MODULE F: DATA QUALITY EXTERNALITY
+# =============================================================================
+
+module_f_calibration:
+  description: |
+    Calibration targets for data quality externalities.
+    Parameters govern research participation effects.
+
+  parameters:
+    # Research participation elasticity
+    research_participation_elasticity:
+      calibration_target:
+        value: -0.10
+        source: "blevins_genomic_data_bias_2020"
+        jurisdiction: "International"
+        notes: "Cross-sectional analysis (n=15000)"
+        uncertainty: "95% CI: -0.15 to -0.05"
+      
+      prior:
+        distribution: "Normal"
+        parameters:
+          mean: -0.10
+          sd: 0.03
+        truncation:
+          lower: null
+          upper: 0
+        rationale: |
+          Low quality evidence (cross-sectional).
+          Narrow SD reflects precise estimate.
+          Assumes similar effect in AU context.
+
+  # EVPPI groupings
+  evppi_groupings:
+    low_priority:
+      - research_participation_elasticity
+      rationale: "Low-moderate EVPPI; secondary outcome"
+
+---
+# =============================================================================
+# ENFORCEMENT AND COMPLIANCE
+# =============================================================================
+
+enforcement_calibration:
+  description: |
+    Calibration targets for enforcement effectiveness.
+    Parameters govern compliance with policy regimes.
+
+  parameters:
+    # Enforcement effectiveness (compliance rate)
+    enforcement_effectiveness:
+      calibration_target:
+        value: 0.50
+        source: "fsc_moratorium_2019"
+        jurisdiction: "Australia"
+        notes: "Industry self-regulation; limited enforcement power"
+        uncertainty: "Very wide: 0.20-0.80"
+      
+      prior:
+        distribution: "Beta"
+        parameters:
+          alpha: 10
+          beta: 10
+        mean: 0.50
+        sd: 0.16
+        rationale: |
+          Very low quality evidence (policy document).
+          Very wide SD (uninformative prior) reflects high uncertainty.
+          Key uncertainty for policy effectiveness.
+
+    # Complaint rate (per 100 genetic tests)
+    complaint_rate:
+      calibration_target:
+        value: 0.02
+        source: "taylor_australia_genetic_discrimination_2021"
+        jurisdiction: "Australia"
+        notes: "Case series (12 cases); likely under-reporting"
+        uncertainty: "Wide: 0.005-0.05"
+      
+      prior:
+        distribution: "Beta"
+        parameters:
+          alpha: 2
+          beta: 98
+        mean: 0.02
+        sd: 0.014
+        rationale: |
+          Very low quality evidence (case series).
+          Wide SD reflects under-reporting uncertainty.
+
+  # EVPPI groupings
+  evppi_groupings:
+    high_priority:
+      - enforcement_effectiveness
+      rationale: "Very high uncertainty; policy-relevant; major impact"
+    
+    medium_priority:
+      - complaint_rate
+      rationale: "Low base rate; less impact on main outcomes"
+
+---
+# =============================================================================
+# SUMMARY: AUSTRALIA PRIORS
+# =============================================================================
+
+australia_priors_summary:
+  total_parameters: 12
+  
+  by_quality:
+    moderate: 3
+    low: 4
+    very_low: 5
+  
+  by_evpppi_priority:
+    high: 6
+    medium: 5
+    low: 1
+  
+  key_uncertainties:
+    - enforcement_effectiveness (SD: 0.16)
+    - proxy_substitution_rate (SD: 0.10)
+    - moratorium_effect (SD: 0.04)
+  
+  evidence_to_prior_mapping:
+    direct_conversion: 5
+    expert_elicitation_style: 7
+    notes: |
+      7 parameters use wide priors reflecting very low quality evidence.
+      All conversions documented with explicit rationale.
+
+---
+# END OF AUSTRALIA CALIBRATION TARGETS

@@ -1,0 +1,24 @@
+# Assumptions registry: each assumption should be testable or sensitivity-analysed.
+# Keep one assumption per ID to support traceability.
+
+assumptions:
+  A001:
+    statement: "Policy protection strength reduces perceived discrimination risk (fear) and increases genetic testing uptake."
+    rationale: "Commonly reported deterrence mechanism; parameterised in Module A."
+    planned_test: "Estimate via event-study and/or survey-linked uptake model; sensitivity on shock magnitude."
+    sensitivity: "High/low deterrence scenarios; alternative functional forms."
+    status: "placeholder"
+
+  A002:
+    statement: "Adverse selection increases effective loss cost when private genetic risk information is unavailable to insurers."
+    rationale: "Standard insurance economics; parameterised in Module C."
+    planned_test: "Stress test and structural equilibrium sensitivity; compare to observed market outcomes where possible."
+    sensitivity: "Vary adverse_selection_sensitivity and price_elasticity; alternative demand specs."
+    status: "placeholder"
+
+  A003:
+    statement: "Proxy substitution occurs when genetic results are prohibited; insurers re-optimise using allowed proxies."
+    rationale: "Regulatory substitution; evaluated in Module D."
+    planned_test: "Underwriting model comparison before/after constraint."
+    sensitivity: "Alternative proxy sets; regularisation strengths."
+    status: "placeholder"

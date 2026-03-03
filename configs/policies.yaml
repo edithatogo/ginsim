@@ -1,0 +1,31 @@
+# Policy rulesets are expressed as constraints on information use and product design levers.
+# These are placeholders. Replace with jurisdiction-specific definitions.
+
+policies:
+  status_quo:
+    allow_genetic_test_results: true
+    allow_family_history: true
+    sum_insured_cap: null
+    predictive_only: false
+    enforcement_strength: "baseline"
+
+  moratorium:
+    allow_genetic_test_results: "limited"
+    allow_family_history: true
+    sum_insured_cap: 500000
+    predictive_only: true
+    enforcement_strength: "industry"
+
+  partial_ban:
+    allow_genetic_test_results: false
+    allow_family_history: true
+    sum_insured_cap: 1000000
+    predictive_only: true
+    enforcement_strength: "statutory"
+
+  total_ban:
+    allow_genetic_test_results: false
+    allow_family_history: true
+    sum_insured_cap: null
+    predictive_only: true
+    enforcement_strength: "statutory"

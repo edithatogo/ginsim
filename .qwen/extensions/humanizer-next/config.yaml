@@ -1,0 +1,24 @@
+# Humanizer-next Configuration
+
+## Default Settings
+tone: academic
+audience: researchers
+check_references_on_phase_complete: true
+auto_fix_common_issues: true
+doi_validation: true
+journal_standardization: full
+
+## Reference Validation
+doi_resolution_check: false  # Set true to validate DOIs against CrossRef
+require_orcids: false  # Require ORCIDs for all authors
+max_author_list: 10  # Truncate author lists >10 with "et al."
+
+## Writing Style
+prefer_active_voice: true  # For methods sections
+hedging_required: true  # Use appropriate uncertainty language
+sentence_length_target: 20  # Average words per sentence
+paragraph_length_target: 5  # Average sentences per paragraph
+
+## Integration
+conductor_phase_gate: true  # Block phase completion if critical issues found
+auto_commit_fixes: false  # Auto-commit reference fixes

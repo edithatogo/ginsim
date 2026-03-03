@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use this software or associated research outputs, please cite it as below."
+title: "Genetic Discrimination Policy Economic Evaluation"
+abstract: "A reproducible modelling framework to quantify the economic and welfare impacts of policies that restrict genetic discrimination, with comparative analysis for Australia and Aotearoa New Zealand."
+type: software
+version: 0.1.0
+doi: "10.5281/zenodo.TODO"  # Update after Zenodo deposit
+date-released: 2026-03-03
+url: "https://github.com/YOUR_USERNAME/genetic-discrimination-policy-econ"
+repository-code: "https://github.com/YOUR_USERNAME/genetic-discrimination-policy-econ"
+keywords:
+  - genetic discrimination
+  - health economics
+  - insurance markets
+  - Bayesian decision analysis
+  - value of information
+  - policy evaluation
+  - Australia
+  - New Zealand
+authors:
+  - family-names: "Mordaunt"
+    given-names: "Dylan A."
+    orcid: "https://orcid.org/0000-0002-9775-0603"
+    affiliation: "Victoria University of Wellington"
+    country: "NZ"
+license: MIT
+references:
+  - type: article
+    title: "Integrated Economic Evaluation of Policy Options to Restrict Genetic Discrimination"
+    journal: "TODO"  # Add after publication
+    doi: "TODO"

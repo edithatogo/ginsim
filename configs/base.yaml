@@ -1,0 +1,20 @@
+seed: 20260302
+n_posterior_draws: 2000
+n_policy_mc: 20000
+
+# Toggle modules depending on data availability.
+modules:
+  behavior: true
+  clinical: true
+  insurance_equilibrium: true
+  proxy_substitution: true
+  passthrough: true
+  data_quality: true
+
+# Placeholder paths. Replace with real data sources.
+data_paths:
+  testing_timeseries: "data/processed/testing_timeseries.parquet"
+  survey: "data/processed/survey.parquet"
+  insurance_aggregates: "data/processed/insurance_aggregates.parquet"
+
+market_hhi: 0.2

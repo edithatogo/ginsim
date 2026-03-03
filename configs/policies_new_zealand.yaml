@@ -1,0 +1,34 @@
+# Aotearoa New Zealand (life insurance): policy rulesets for genetic testing protections
+# Notes:
+# - No equivalent moratorium reported by HGSA; insurers may ask about predictive and diagnostic genetic tests.
+# - Advocacy groups (e.g., AGenDA) have called for reforms; configure comparators accordingly.
+
+jurisdiction: new_zealand
+domain: life_insurance
+policies:
+  status_quo:
+    description: "Baseline; insurers can ask applicants to disclose genetic testing outcomes (predictive and diagnostic) and use them in underwriting (verify scope)."
+    allow_genetic_test_results: true
+    allow_family_history: true
+    predictive_only: false
+    sum_insured_caps: null
+    enforcement_strength: baseline
+
+  illustrative_moratorium:
+    description: "Illustrative NZ moratorium comparator (not currently in place); adjust caps if adopted."
+    allow_genetic_test_results: limited
+    allow_family_history: true
+    predictive_only: true
+    sum_insured_caps:
+      death_or_tpd: 500000
+      trauma: 200000
+      income_protection_monthly: 4000
+    enforcement_strength: industry_or_statutory
+
+  illustrative_statutory_ban:
+    description: "Illustrative statutory ban comparator for NZ; intended for scenario analysis and policy appraisal."
+    allow_genetic_test_results: false
+    allow_family_history: true
+    predictive_only: true
+    sum_insured_caps: null
+    enforcement_strength: statutory

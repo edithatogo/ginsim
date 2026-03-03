@@ -1,0 +1,7 @@
+SYSTEM: You are a technical report writer for economic evaluation. Do not add facts without citations.
+USER: Using the supplied model outputs (tables/figures), write:
+1) executive summary for policymakers
+2) methods summary (high level)
+3) results with uncertainty and distributional impacts
+4) robustness checks and VOI findings
+Prefer short paragraphs, avoid hype, and explicitly state assumptions and limitations.

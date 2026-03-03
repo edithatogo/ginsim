@@ -1,0 +1,458 @@
+# New Zealand Evidence Register
+# Evidence base for genetic discrimination policy modelling
+# Last updated: 2026-03-03
+# Track: gdpe_0002_evidence_anchoring - Phase 1
+
+---
+# =============================================================================
+# MODULE A: BEHAVIOUR / DETERRENCE
+# =============================================================================
+
+module_a_behaviour_deterrence:
+  description: |
+    Evidence on how perceived or actual genetic discrimination affects
+    decisions to undergo genetic testing in New Zealand.
+
+  evidence_items:
+    - evidence_id: "NZ_behav_001"
+      parameter: "testing_uptake_elasticity"
+      citation: "mcguire_perceived_discrimination_testing_2019"
+      study_design: "Cross-sectional survey"
+      jurisdiction: "United States"
+      population: "Adults considering predictive genetic testing (n=1,250)"
+      sample_size: 1250
+      
+      # Quality assessment (GRADE-adapted)
+      initial_grade: "D"  # Cross-sectional
+      directness: "Very Indirect"  # US, not NZ; different health system
+      precision: "Moderate"
+      consistency: "Consistent"
+      risk_of_bias: "Moderate"
+      final_grade: "Very Low"
+      
+      # Effect estimate (same as AU but lower confidence)
+      point_estimate: 0.18
+      confidence_interval_lower: 0.08
+      confidence_interval_upper: 0.35
+      measure_type: "Proportion avoiding testing due to insurance concerns"
+      
+      # Prior conversion
+      prior_distribution: "Beta"
+      prior_alpha: 18
+      prior_beta: 82
+      prior_rationale: |
+        Very low quality for NZ context.
+        US data may not generalize to NZ with different insurance structure.
+        Wider variance than AU to reflect greater uncertainty.
+      
+      notes: |
+        No NZ-specific evidence available.
+        ACC scheme may reduce insurance concerns vs AU.
+        Private life insurance market smaller than AU.
+
+    - evidence_id: "NZ_behav_002"
+      parameter: "deterrence_effect_nz"
+      citation: "hrc_nz_genetic_discrimination_2020"
+      study_design: "Inquiry report with submissions"
+      jurisdiction: "New Zealand"
+      population: "NZ adults with genetic conditions"
+      sample_size: 78  # Submissions received
+      
+      # Quality assessment
+      initial_grade: "E"  # Inquiry submissions
+      directness: "Direct"  # NZ context
+      precision: "Low"  # Qualitative data
+      consistency: "Consistent"  # Aligns with international
+      risk_of_bias: "High"  # Self-selected submissions
+      final_grade: "Very Low"
+      
+      # Effect estimate (qualitative converted)
+      point_estimate: 0.12
+      confidence_interval_lower: 0.05
+      confidence_interval_upper: 0.25
+      measure_type: "Estimated proportion reporting insurance concerns"
+      
+      # Prior conversion
+      prior_distribution: "Beta"
+      prior_alpha: 10
+      prior_beta: 73
+      prior_rationale: |
+        Very low quality evidence.
+        Direct NZ context but qualitative and self-selected.
+      
+      notes: |
+        Key NZ evidence source.
+        Human Rights Commission inquiry (2020).
+        Qualitative findings; quantitative conversion uncertain.
+
+  # Synthesis for Module A
+  synthesis:
+    baseline_testing_uptake:
+      point: 0.52
+      prior: "Beta(462, 426)"
+      source: "ettema_genetic_testing_uptake_2021 (extrapolated)"
+    
+    deterrence_elasticity:
+      point: 0.12
+      prior: "Beta(18, 82)"
+      source: "mcguire_perceived_discrimination_testing_2019 (adapted)"
+    
+    nz_specific_effect:
+      point: 0.12
+      prior: "Beta(10, 73)"
+      source: "hrc_nz_genetic_discrimination_2020"
+    
+    evidence_gaps:
+      - "No NZ quantitative studies on testing behaviour"
+      - "No discrete choice experiments for NZ population"
+      - "Limited evidence on Māori and Pacific perspectives"
+      - "ACC scheme impact on deterrence unknown"
+      - "Private insurance market dynamics differ from AU"
+    
+    voi_priorities:
+      - "Testing uptake elasticity (very high EVPPI expected for NZ)"
+      - "Cultural differences in testing decisions"
+      - "ACC vs private insurance trade-offs"
+
+---
+# =============================================================================
+# MODULE C: INSURANCE EQUILIBRIUM
+# =============================================================================
+
+module_c_insurance_equilibrium:
+  description: |
+    Evidence on adverse selection and premium impacts in NZ insurance market.
+
+  evidence_items:
+    - evidence_id: "NZ_ins_001"
+      parameter: "adverse_selection_elasticity"
+      citation: "hersch_viscusi_insurance_discrimination_2019"
+      study_design: "Economic modelling"
+      jurisdiction: "United States"
+      population: "Theoretical insurance market"
+      
+      # Quality assessment
+      initial_grade: "E"
+      directness: "Very Indirect"  # US model, NZ market different
+      precision: "Moderate"
+      consistency: "Consistent"
+      risk_of_bias: "Moderate"
+      final_grade: "Very Low"
+      
+      # Effect estimate
+      point_estimate: 0.06
+      confidence_interval_lower: 0.02
+      confidence_interval_upper: 0.12
+      measure_type: "Premium increase per 10% increase in informed high-risks"
+      
+      # Prior conversion
+      prior_distribution: "Normal"
+      prior_mean: 0.06
+      prior_sd: 0.04
+      prior_rationale: |
+        Very low quality for NZ.
+        Smaller market may have different dynamics.
+      
+      notes: |
+        NZ life insurance market smaller and more concentrated.
+        May have different adverse selection dynamics.
+
+    - evidence_id: "NZ_ins_002"
+      parameter: "market_concentration_nz"
+      citation: "hrc_nz_genetic_discrimination_2020"
+      study_design: "Industry analysis"
+      jurisdiction: "New Zealand"
+      population: "NZ life insurance market"
+      
+      # Quality assessment
+      initial_grade: "E"
+      directness: "Direct"
+      precision: "Low"
+      consistency: "Unknown"
+      risk_of_bias: "Moderate"
+      final_grade: "Very Low"
+      
+      # Market structure
+      top_4_share: 0.75
+      number_of_insurers: 12
+      foreign_owned_share: 0.85
+      
+      notes: |
+        Highly concentrated market.
+        Most insurers Australian-owned.
+        May follow AU policy decisions.
+
+  # Synthesis for Module C
+  synthesis:
+    adverse_selection_elasticity:
+      point: 0.06
+      prior: "Normal(0.06, 0.04) truncated [0, ∞)"
+      source: "hersch_viscusi_insurance_discrimination_2019 (adapted)"
+    
+    market_concentration:
+      top_4_share: 0.75
+      source: "hrc_nz_genetic_discrimination_2020"
+    
+    evidence_gaps:
+      - "No NZ empirical data on adverse selection"
+      - "Market concentration effects unknown"
+      - "Cross-Tasman insurer behaviour uncertain"
+    
+    voi_priorities:
+      - "Adverse selection elasticity (high EVPPI)"
+      - "Market structure effects"
+
+---
+# =============================================================================
+# MODULES D-F (Abbreviated - Similar to AU with NZ Adaptations)
+# =============================================================================
+
+module_d_proxy_substitution:
+  synthesis:
+    family_history_sensitivity:
+      point: 0.68
+      prior: "Beta(357, 168)"
+      source: "tabor_family_history_proxy_2018 (extrapolated)"
+    
+    proxy_substitution_rate:
+      point: 0.40
+      prior: "Beta(20, 30)"
+      source: "lowenstein_genetic_discrimination_insurance_2021"
+    
+    notes: "No NZ-specific evidence; use AU priors with wider variance"
+
+module_e_pass_through:
+  synthesis:
+    pass_through_rate:
+      point: 0.70
+      prior: "Beta(50, 21)"
+      source: "finkelstein_insurance_market_structure_2019 (adapted)"
+    
+    notes: |
+      Higher concentration may reduce pass-through.
+      Limited NZ evidence.
+
+module_f_data_quality:
+  synthesis:
+    research_participation_elasticity:
+      point: -0.10
+      prior: "Normal(-0.10, 0.04)"
+      source: "blevins_genomic_data_bias_2020 (adapted)"
+    
+    notes: |
+      NZ genomics research infrastructure smaller.
+      Potential for greater impact from participation changes.
+
+---
+# =============================================================================
+# ENFORCEMENT AND COMPLIANCE
+# =============================================================================
+
+enforcement_compliance:
+  description: |
+    Evidence on enforcement mechanisms for genetic discrimination in NZ.
+
+  evidence_items:
+    - evidence_id: "NZ_enf_001"
+      parameter: "enforcement_effectiveness"
+      citation: "hrc_nz_genetic_discrimination_2020"
+      study_design: "Inquiry report"
+      jurisdiction: "New Zealand"
+      
+      # Quality assessment
+      initial_grade: "E"
+      directness: "Direct"
+      precision: "Low"
+      risk_of_bias: "Moderate"
+      final_grade: "Very Low"
+      
+      # Current regime assessment
+      current_mechanism: "Human Rights Act complaints"
+      complaints_per_year: 2  # Approximate from inquiry
+      successful_resolutions: 1  # Approximate
+      
+      notes: |
+        No specific genetic discrimination legislation.
+        General disability discrimination provisions apply.
+        Low complaint numbers may reflect under-reporting.
+
+  synthesis:
+    enforcement_mechanism: "Human Rights Act 1993 (disability grounds)"
+    complaints_annual: 2
+    enforcement_effectiveness:
+      point: 0.40
+      prior: "Beta(8, 12)"
+      source: "hrc_nz_genetic_discrimination_2020"
+    
+    evidence_gaps:
+      - "No genetic discrimination-specific legislation"
+      - "Complaint numbers very low (under-reporting likely)"
+      - "No data on resolution outcomes"
+      - "Awareness of rights uncertain"
+
+---
+# =============================================================================
+# POLICY TIMELINE - NEW ZEALAND
+# =============================================================================
+
+policy_timeline:
+  jurisdiction: "New Zealand"
+  
+  key_events:
+    - date: "2020-08-01"
+      event: "Human Rights Commission Inquiry Report released"
+      type: "Inquiry"
+      description: |
+        HRC report on genetic discrimination in insurance.
+        Recommendations for legislative change.
+    
+    - date: "2021-02-15"
+      event: "Government response to HRC inquiry"
+      type: "Government"
+      description: |
+        Government noted existing Human Rights Act protections.
+        No commitment to specific genetic discrimination legislation.
+    
+    - date: "2019-07-01"
+      event: "FSC Australia moratorium commences"
+      type: "Industry (cross-Tasman)"
+      description: |
+        Australian FSC moratorium affects NZ insurers with AU parent companies.
+        NZ subsidiaries generally follow AU policy.
+    
+    - date: "2022-06-30"
+      event: "NZ Insurance Council statement"
+      type: "Industry"
+      description: |
+        NZ Insurance Council notes members follow AU moratorium for consistency.
+        No separate NZ moratorium established.
+  
+  current_regime:
+    type: "Human Rights Act (disability discrimination) + industry practice"
+    legislation: "Human Rights Act 1993"
+    grounds: "Disability (includes genetic predisposition)"
+    enforcement: "Human Rights Commission complaints process"
+    industry_practice: "Follows Australian FSC moratorium (informal)"
+    caps:
+      note: "No formal NZ caps; AU FSC caps applied by some insurers"
+  
+  proposed_regimes:
+    - name: "Genetic discrimination-specific legislation"
+      status: "Recommended by HRC (2020)"
+      description: "Amend Human Rights Act to explicitly include genetic information"
+      government_position: "Under consideration"
+    
+    - name: "Formal NZ moratorium"
+      status: "Industry preference"
+      description: "Adopt Australian FSC moratorium formally in NZ"
+      industry_position: "Supported by Insurance Council"
+
+---
+# =============================================================================
+# DATA ACCESS - NEW ZEALAND
+# =============================================================================
+
+data_access:
+  jurisdiction: "New Zealand"
+  
+  available_datasets:
+    - dataset_id: "NZ_testing_001"
+      name: "National Genetic Testing Database"
+      custodian: "National Health Board / Lablink"
+      type: "Administrative"
+      coverage: "Publicly funded genetic tests"
+      time_period: "2010-present"
+      access_conditions: "Research application to NHB"
+      limitations: "Private testing not captured; limited clinical data"
+    
+    - dataset_id: "NZ_insurance_001"
+      name: "Prudential insurance statistics"
+      custodian: "Reserve Bank of New Zealand"
+      type: "Aggregate"
+      coverage: "Life insurance industry"
+      time_period: "2015-present"
+      access_conditions: "Public aggregate data"
+      limitations: "No genetic-specific breakdowns"
+    
+    - dataset_id: "NZ_clinical_001"
+      name: "New Zealand Cancer Registry"
+      custodian: "Ministry of Health"
+      type: "Registry"
+      coverage: "All cancer diagnoses"
+      time_period: "1994-present"
+      access_conditions: "Health Quality & Safety Commission approval"
+      limitations: "No genetic testing linkage"
+    
+    - dataset_id: "NZ_survey_001"
+      name: "New Zealand Health Survey"
+      custodian: "Ministry of Health"
+      type: "Survey"
+      coverage: "Nationally representative"
+      time_period: "Annual"
+      access_conditions: "Statistics NZ DataLab"
+      limitations: "No genetic testing questions"
+  
+  data_gaps:
+    - "No linked genetic testing + insurance data"
+    - "No patient-reported discrimination data"
+    - "Limited Māori health data sovereignty frameworks applied"
+    - "Private genetic testing not captured"
+  
+  data_linkage_opportunities:
+    - "IDM (Integrated Data Infrastructure) linkage possible"
+    - "Cancer registry + genetic testing (research projects)"
+    - "Survey linkage (e.g., SoFIE, GSOA)"
+  
+  governance_notes: |
+    Health Information Privacy Code 2020 applies.
+    Māori Data Sovereignty principles (Te Mana Raraunga) increasingly important.
+    Privacy Act 2020 governs personal information.
+    IDM access requires Statistics NZ approval.
+    Genetic information considered highly sensitive.
+  
+  maori_data_sovereignty:
+    principles: "Te Mana Raraunga - Māori Data Sovereignty Network"
+    key_principles:
+      - "Māori have an inherent right to control Māori data"
+      - "Data about Māori should be used for Māori benefit"
+      - "Māori governance over data collection and use"
+    implications: |
+      Research involving Māori genetic data requires:
+      - Māori governance involvement
+      - Clear benefit to Māori
+      - Adherence to tikanga (Māori protocols)
+      - Partnership with iwi/Māori organizations
+
+---
+# =============================================================================
+# NZ-SPECIFIC CONSIDERATIONS
+# =============================================================================
+
+nz_specific_considerations:
+  
+  health_system_differences:
+    - "ACC covers injury-related disability (not genetic conditions)"
+    - "Public health system provides genetic testing (limited private market)"
+    - "Smaller private life insurance market vs Australia"
+    - "Pharmac influences medicine access (not directly relevant)"
+  
+  cultural_considerations:
+    - "Whakapapa (genealogy) has cultural significance beyond genetics"
+    - "Māori perspectives on genetic information may differ"
+    - "Collective vs individual decision-making in some communities"
+    - "Historical research exploitation creates trust issues"
+  
+  market_differences:
+    - "Life insurance penetration lower than Australia"
+    - "Most insurers are Australian-owned subsidiaries"
+    - "Policy tends to follow Australian developments"
+    - "Smaller market = less data for analysis"
+  
+  regulatory_differences:
+    - "No genetic discrimination-specific legislation"
+    - "Human Rights Act covers disability (includes genetic)"
+    - "Health and Disability Commissioner has limited jurisdiction"
+    - "Privacy Act 2020 includes genetic information"
+
+---
+# END OF NEW ZEALAND EVIDENCE REGISTER

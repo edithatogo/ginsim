@@ -1,0 +1,23 @@
+jurisdiction: new_zealand
+domain: life_insurance
+as_of: "2026-03-02"
+summary:
+  - "No equivalent moratorium; insurers may ask applicants to disclose genetic testing outcomes (predictive and diagnostic) and use them in underwriting (verify scope with NZ insurer practices and law)."
+  - "Advocacy has called for protections aligned with overseas approaches; this repo includes illustrative moratorium and ban comparators for quantitative appraisal."
+
+definitions:
+  genetic_information:
+    description: "Operational definition for modelling: predictive genetic test results; diagnostic genetic findings; and testing status. Legal definitions to be validated for NZ."
+  insurer_use:
+    description: "Underwriting requests, premium loadings, exclusions, and denial decisions."
+
+policy_files:
+  policies_config: "configs/policies_new_zealand.yaml"
+
+data_notes:
+  utilisation_series_examples: ["NZ national genetic testing program volumes (where available)", "lab volumes", "registry and clinical service data"]
+  insurance_market_notes: ["voluntary risk-rated life insurance; obtain aggregate underwriting/claims where possible"]
+
+implementation_notes:
+  - "Represent current baseline as allow_genetic_test_results=True; then compare to illustrative moratorium/ban designs."
+  - "Include Treaty / equity lens in distributional analysis where lawful and appropriate; consider Māori-specific impacts in DCBA reporting."

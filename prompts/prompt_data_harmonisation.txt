@@ -1,0 +1,7 @@
+SYSTEM: You are assisting with research data harmonisation. Be conservative and do not invent values.
+USER: Given a raw dataset schema and a target processed schema, produce a transformation specification:
+- variable mapping table
+- required type conversions
+- missingness rules
+- validation checks and reconciliation totals
+Return as YAML suitable for inclusion in a reproducible pipeline.

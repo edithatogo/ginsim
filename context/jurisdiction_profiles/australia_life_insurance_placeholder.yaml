@@ -1,0 +1,31 @@
+# Example jurisdiction profile (placeholder): Australia – life insurance (genetic tests)
+# Replace with authoritative definitions and rule details.
+
+jurisdiction: "Australia"
+domain: "Life insurance"
+definitions:
+  genetic_information:
+    includes:
+      - "predictive genetic test results"
+      - "genomic sequencing variants used for risk prediction"
+    excludes:
+      - "non-genetic biomarkers"
+      - "purely diagnostic findings (define per statute)"
+  family_history:
+    permitted: true
+policy_mapping:
+  status_quo:
+    allow_genetic_test_results: true
+    sum_insured_cap: null
+  moratorium:
+    allow_genetic_test_results: "limited"
+    sum_insured_cap: 500000
+  partial_ban:
+    allow_genetic_test_results: false
+    sum_insured_cap: 1000000
+  total_ban:
+    allow_genetic_test_results: false
+    sum_insured_cap: null
+data_notes:
+  insurance_market_structure: "concentrated"
+  proxy_variables_common: ["family_history", "age", "sex", "postcode", "occupation"]

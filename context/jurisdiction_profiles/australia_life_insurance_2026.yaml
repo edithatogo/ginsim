@@ -1,0 +1,30 @@
+jurisdiction: australia
+domain: life_insurance
+as_of: "2026-03-02"
+summary:
+  - "Industry moratorium on disclosure/use of genetic test results for life insurance applications below specified financial limits."
+  - "Statutory ban has been proposed via Treasury Laws Amendment (Genetic Testing Protections in Life Insurance and Other Measures) Bill 2025 (introduced Nov 2025; status should be verified at time of analysis)."
+
+definitions:
+  protected_genetic_information:
+    description: "Draft bill definition covers whether a person (or genetic relative) has undergone/intends to undergo/recommended testing and results of testing; usually excludes clinical diagnosis informed by genetics (verify final enacted wording)."
+  genetic_relative:
+    description: "Genetic relative concept used in draft bill; specify operationalisation in data/feature schema."
+  life_insurance_contract_decision:
+    description: "Draft bill captures decisions about entering into, varying, extending, reinstating, and terms of life insurance contracts."
+
+moratorium_limits_example:
+  death_or_tpd: 500000
+  trauma: 200000
+  income_protection_monthly: 4000
+
+policy_files:
+  policies_config: "configs/policies_australia.yaml"
+
+data_notes:
+  utilisation_series_examples: ["Medicare MBS genetic testing items", "lab volumes", "registry enrolments"]
+  insurance_market_notes: ["risk-rated voluntary life insurance; consider CALI/FSC market coverage", "reinsurance arrangements important"]
+
+implementation_notes:
+  - "Map policy levers to model constraints: allow_genetic_test_results, predictive_only, caps, enforcement_strength."
+  - "Explicitly model exception pathways (voluntary disclosure of favourable results; diagnosed conditions)."

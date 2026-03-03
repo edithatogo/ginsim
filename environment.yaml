@@ -1,0 +1,65 @@
+name: genetic-discrimination-policy-econ
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - pip>=23.0
+  
+  # Core numerical
+  - jax>=0.4.25
+  - jaxlib>=0.4.25
+  - numpy>=1.26
+  - pandas>=2.2
+  
+  # Probabilistic programming
+  - numpyro>=0.15.0
+  - blackjax>=1.1.0
+  
+  # Optimization
+  - optax>=0.2.2
+  - jaxopt>=0.8.3
+  
+  # Config management
+  - pyyaml>=6.0
+  - pydantic>=2.6
+  - hydra-core>=1.3
+  
+  # Game theory / economics
+  - nashpy>=0.0.32
+  - quantecon>=0.8.0
+  - networkx>=3.0
+  
+  # Visualization
+  - matplotlib>=3.8
+  - seaborn>=0.13
+  
+  # Reporting
+  - python-docx>=1.1
+  - reportlab>=4.0
+  - tabulate>=0.9
+  
+  # Workflow
+  - snakemake>=8.0
+  - dvc>=3.0
+  
+  # Testing
+  - pytest>=8.0
+  - pytest-cov>=4.0
+  
+  # Code quality
+  - ruff>=0.3.0
+  - mypy>=1.8
+  - pre-commit>=3.6
+  
+  # Bibliography
+  - bibtexparser>=1.4
+  - requests>=2.31
+  - habanero>=1.2
+  
+  # Jupyter (optional)
+  - jupyterlab>=4.0
+  - ipykernel>=6.0
+  
+  - pip:
+    - -e .

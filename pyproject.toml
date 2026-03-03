@@ -1,17 +1,10 @@
 [project]
 name = "genetic-discrimination-policy-econ"
-version = "0.1.0"
+version = "0.2.0"
 description = "JAX-first scaffold for integrated economic evaluation of genetic discrimination policy options"
 requires-python = ">=3.10"
 dependencies = [
-  "matplotlib>=3.8",
-  "tabulate>=0.9",
-  "python-docx>=1.1",
-  "reportlab>=4.0",
-  "numpy>=1.26",
-  "pandas>=2.2",
-  "pyyaml>=6.0",
-  "pydantic>=2.6",
+  # Core numerical stack
   "jax>=0.4.25",
   "jaxlib>=0.4.25",
   "numpyro>=0.15.0",
@@ -22,20 +15,74 @@ dependencies = [
   "equinox>=0.11.3",
   "chex>=0.1.86",
   "jaxtyping>=0.2.25",
+  
+  # Data + config
+  "numpy>=1.26",
+  "pandas>=2.2",
+  "pyyaml>=6.0",
+  "pydantic>=2.6",
+  "hydra-core>=1.3",  # Config management
+  
+  # Game theory / economics
+  "nashpy>=0.0.32",
+  "quantecon>=0.8.0",
+  "networkx>=3.0",
+  
+  # Reporting
+  "matplotlib>=3.8",
+  "tabulate>=0.9",
+  "python-docx>=1.1",
+  "reportlab>=4.0",
 ]
 
 [project.optional-dependencies]
 dev = [
   "pytest>=8.0",
+  "pytest-cov>=4.0",
   "ruff>=0.3.0",
+  "mypy>=1.8",
+  "pre-commit>=3.6",
 ]
 
 validation = [
   "bibtex-tidy>=1.0",
   "bibtexparser>=1.4",
   "requests>=2.31",
-  "habanero>=1.2",  # CrossRef API access
+  "habanero>=1.2",
+]
+
+workflow = [
+  "snakemake>=8.0",
+  "dvc>=3.0",
+  "mlflow>=2.0",
+]
+
+container = [
+  # Docker dependencies handled via Dockerfile
 ]
 
 [tool.ruff]
 line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+ignore = ["E501"]  # Line length handled by formatter
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_return_any = true
+warn_unused_ignores = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --cov=src --cov-report=term-missing"
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.hydra]
+output_subdir = ".hydra"
+run.dir = "outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}"

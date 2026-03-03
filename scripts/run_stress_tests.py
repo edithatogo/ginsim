@@ -82,7 +82,7 @@ def load_base_config(jurisdiction: str = 'australia') -> dict:
     
     if not config_path.exists():
         # Return minimal config if file doesn't exist
-        print(f"Warning: Config file not found, using minimal config")
+        print("Warning: Config file not found, using minimal config")
         return {
             'jurisdiction': jurisdiction,
             'module_a_calibration': {'parameters': {}},
@@ -196,12 +196,12 @@ def run_stress_test(scenario_name: str, scenario_config: dict, jurisdiction: str
     issues = validate_outputs(results, scenario_name)
     
     if issues:
-        print(f"⚠️  Validation issues found:")
+        print("⚠️  Validation issues found:")
         for issue in issues:
             print(f"   - {issue}")
         results['validation_issues'] = issues
     else:
-        print(f"✅ Validation passed")
+        print("✅ Validation passed")
     
     results['scenario'] = scenario_name
     results['description'] = scenario_config['description']
@@ -375,7 +375,7 @@ def main():
         f.write(summary)
     
     print(f"\n{'='*60}")
-    print(f"Stress tests complete!")
+    print("Stress tests complete!")
     print(f"Results saved to: {output_dir}")
     print(f"Summary: {summary_file}")
     print(f"{'='*60}")

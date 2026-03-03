@@ -84,7 +84,7 @@ def compute_expected_penalty(
     return expected_penalty
 
 
-@jit
+# Don't use @jit - uses pydantic models
 def compute_violation_benefit(
     params: ModelParameters,
     policy: PolicyConfig,
@@ -147,7 +147,7 @@ def compute_compliance_decision(
     return compliance_prob
 
 
-@jit
+# Don't use @jit - uses pydantic models
 def compute_compliance_equilibrium(
     params: ModelParameters,
     policy: PolicyConfig,
@@ -197,7 +197,7 @@ def compute_compliance_equilibrium(
     )
 
 
-@jit
+# Don't use @jit - uses pydantic models
 def compute_enforcement_effect(
     params: ModelParameters,
     baseline_policy: PolicyConfig,
@@ -234,7 +234,7 @@ def compute_enforcement_effect(
     }
 
 
-@jit
+# Don't use @jit - uses pydantic models and has optimization loop
 def compute_optimal_enforcement(
     params: ModelParameters,
     policy: PolicyConfig,

@@ -150,7 +150,7 @@ def zero_profit_premium(
     return compute_risk_premium(risk_probability, sum_insured, loading)
 
 
-@jit
+# Don't use @jit - uses pydantic models
 def separating_equilibrium(
     params: ModelParameters,
     risk_high: float = 0.3,
@@ -211,7 +211,7 @@ def separating_equilibrium(
     )
 
 
-@jit
+# Don't use @jit - uses pydantic models
 def pooling_equilibrium(
     params: ModelParameters,
     risk_high: float = 0.3,
@@ -314,7 +314,7 @@ def pooling_equilibrium(
     )
 
 
-@jit
+# Don't use @jit - uses pydantic models
 def compute_equilibrium(
     params: ModelParameters,
     policy: PolicyConfig,
@@ -358,7 +358,7 @@ def compute_equilibrium(
     return equilibrium
 
 
-@jit
+# Don't use @jit - uses pydantic models
 def compute_premium_divergence(
     params: ModelParameters,
     baseline_policy: PolicyConfig,

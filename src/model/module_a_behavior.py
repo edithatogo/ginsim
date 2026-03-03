@@ -145,7 +145,7 @@ def compute_testing_probability(
     return probability
 
 
-@jit
+# Don't use @jit - has boolean conditional
 def compute_testing_uptake(
     baseline_testing_uptake: float,
     deterrence_elasticity: float,

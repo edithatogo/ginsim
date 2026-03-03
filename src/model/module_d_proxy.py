@@ -38,7 +38,7 @@ class UnderwritingAccuracy:
     mispricing_error: Float[Array, ""]
 
 
-@jit
+# Don't use @jit - has boolean conditional on traced value
 def compute_risk_score(
     features: Dict[str, Float[Array, ""]],
     weights: Dict[str, Float[Array, ""]],
@@ -146,8 +146,10 @@ def compute_underwriting_accuracy(
     
     tpr_values, fpr_values = vmap(compute_tpr_fpr)(thresholds)
     
-    # AUC via trapezoidal integration
-    auc = jnp.trapz(tpr_values, fpr_values)
+    # AUC via trapezoidal integration (jnp.trapz deprecated, use manual)
+    auc = 0.0
+    for i in range(len(fpr_values) - 1):
+        auc += 0.5 * (fpr_values[i + 1] - fpr_values[i]) * (tpr_values[i + 1] + tpr_values[i])
     
     return UnderwritingAccuracy(
         auc=auc,
@@ -298,7 +300,7 @@ def compute_proxy_substitution_effect(
     }
 
 
-@jit
+# Don't use @jit - uses pydantic models
 def compute_family_history_accuracy(
     params: ModelParameters,
     family_history_positive: Float[Array, "n"],

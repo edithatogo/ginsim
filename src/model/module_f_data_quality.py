@@ -82,7 +82,7 @@ def compute_participation_probability(
     return participation_prob
 
 
-@jit
+# Don't use @jit - uses pydantic models
 def compute_participation_rate(
     params: ModelParameters,
     policy: PolicyConfig,
@@ -203,7 +203,7 @@ def compute_selection_bias(
     return bias
 
 
-@jit
+# Don't use @jit - uses pydantic models
 def compute_data_quality_externality(
     params: ModelParameters,
     baseline_policy: PolicyConfig,

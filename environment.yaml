@@ -10,11 +10,10 @@ dependencies:
   - jax>=0.4.25
   - jaxlib>=0.4.25
   - numpy>=1.26
-  - pandas>=2.2
+  - polars>=0.20.0  # Faster than pandas
   
   # Probabilistic programming
   - numpyro>=0.15.0
-  - blackjax>=1.1.0
   
   # Optimization
   - optax>=0.2.2
@@ -29,6 +28,11 @@ dependencies:
   - nashpy>=0.0.32
   - quantecon>=0.8.0
   - networkx>=3.0
+  
+  # CLI and output
+  - typer>=0.9.0
+  - rich>=13.7.0
+  - tqdm>=4.66.0
   
   # Visualization
   - matplotlib>=3.8
@@ -46,20 +50,26 @@ dependencies:
   # Testing
   - pytest>=8.0
   - pytest-cov>=4.0
+  - pytest-xdist>=3.5
+  - hypothesis>=6.97
+  - mutmut>=2.4
   
   # Code quality
   - ruff>=0.3.0
-  - mypy>=1.8
+  - pyright>=1.1.350
   - pre-commit>=3.6
   
-  # Bibliography
-  - bibtexparser>=1.4
-  - requests>=2.31
-  - habanero>=1.2
+  # Profiling
+  - line_profiler>=4.1
+  - memray>=1.11
   
   # Jupyter (optional)
   - jupyterlab>=4.0
   - ipykernel>=6.0
+  - ipython>=8.20
   
   - pip:
     - -e .
+    - uv>=0.1.0  # Ultra-fast pip replacement
+    - py-spy>=0.3.14  # Sampling profiler
+    - snakeviz>=2.2.0  # cProfile viewer

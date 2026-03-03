@@ -7,8 +7,11 @@ dependencies = [
   # Core numerical stack
   "jax>=0.4.25",
   "jaxlib>=0.4.25",
+  "numpy>=1.26",
+  "polars>=0.20.0",  # Faster than pandas
+  
+  # Probabilistic programming (simplified - just numpyro)
   "numpyro>=0.15.0",
-  "blackjax>=1.1.0",
   "optax>=0.2.2",
   "jaxopt>=0.8.3",
   "distrax>=0.1.5",
@@ -16,17 +19,20 @@ dependencies = [
   "chex>=0.1.86",
   "jaxtyping>=0.2.25",
   
-  # Data + config
-  "numpy>=1.26",
-  "pandas>=2.2",
+  # Config management
   "pyyaml>=6.0",
   "pydantic>=2.6",
-  "hydra-core>=1.3",  # Config management
+  "hydra-core>=1.3",
   
   # Game theory / economics
   "nashpy>=0.0.32",
   "quantecon>=0.8.0",
   "networkx>=3.0",
+  
+  # CLI and output
+  "typer>=0.9.0",
+  "rich>=13.7.0",
+  "tqdm>=4.66.0",
   
   # Reporting
   "matplotlib>=3.8",
@@ -37,11 +43,24 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+  "uv>=0.1.0",  # Ultra-fast package installer
   "pytest>=8.0",
   "pytest-cov>=4.0",
+  "pytest-xdist>=3.5",  # Parallel testing
+  "pytest-mock>=3.12",
+  "hypothesis>=6.97",  # Property-based testing
+  "mutmut>=2.4",  # Mutation testing
   "ruff>=0.3.0",
-  "mypy>=1.8",
+  "pyright>=1.1.350",  # Faster than mypy
   "pre-commit>=3.6",
+  "ipython>=8.20",
+]
+
+profiling = [
+  "py-spy>=0.3.14",  # Sampling profiler
+  "line_profiler>=4.1",
+  "memray>=1.11",  # Memory profiler
+  "snakeviz>=2.2.0",  # cProfile viewer
 ]
 
 validation = [
@@ -54,34 +73,85 @@ validation = [
 workflow = [
   "snakemake>=8.0",
   "dvc>=3.0",
-  "mlflow>=2.0",
 ]
 
-container = [
-  # Docker dependencies handled via Dockerfile
-]
+[project.scripts]
+run-model = "scripts.run_model:main"
+run-stress-tests = "scripts.run_stress_tests:main"
+run-voi = "scripts.run_voi:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
 
 [tool.ruff]
 line-length = 100
 target-version = "py310"
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "N", "W", "UP"]
-ignore = ["E501"]  # Line length handled by formatter
+select = ["E", "F", "I", "N", "W", "UP", "ANN", "B", "C4", "SIM"]
+ignore = ["E501", "ANN101", "ANN102"]  # Line length, self/cls type hints
 
-[tool.mypy]
-python_version = "3.10"
-strict = true
-warn_return_any = true
-warn_unused_ignores = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-check_untyped_defs = true
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["ANN", "S101"]  # No type hints in tests, allow assert
+"scripts/*" = ["ANN"]  # No type hints in scripts
+
+[tool.pyright]
+pythonVersion = "3.10"
+pythonPlatform = "All"
+typeCheckingMode = "strict"
+reportMissingTypeStubs = false
+reportUnknownParameterType = false
+reportUnknownVariableType = false
+reportUnknownMemberType = false
+reportUnknownArgumentType = false
+exclude = [
+  "**/tests/**",
+  "**/scripts/**",
+  ".venv",
+  "outputs",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-v --cov=src --cov-report=term-missing"
+addopts = "-v --cov=src --cov-report=term-missing -n auto"
 filterwarnings = ["ignore::DeprecationWarning"]
+markers = [
+  "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+  "property: property-based tests with hypothesis",
+]
+
+[tool.hypothesis]
+database = ".hypothesis/examples"
+deadline = 500
+max_examples = 100
+suppress_health_check = ["too_slow"]
+
+[tool.mutmut]
+runner = "pytest -x"
+tests_dir = "tests/"
+paths_to_mutate = "src/"
+backup = false
+use_patch = true
+dict_synonyms = ["Partial", "NamedTuple"]
+
+[tool.coverage.run]
+source = ["src"]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+  "pragma: no cover",
+  "def __repr__",
+  "raise AssertionError",
+  "raise NotImplementedError",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+  "@abstractmethod",
+]
 
 [tool.hydra]
 output_subdir = ".hydra"

@@ -22,8 +22,13 @@ from .parameters import ModelParameters, PolicyConfig
 
 @jit
 def compute_perceived_penalty(
-    params: ModelParameters,
-    policy: PolicyConfig,
+    adverse_selection_elasticity: float,
+    baseline_loading: float,
+    allow_genetic_test_results: bool,
+    enforcement_strength: float,
+    enforcement_effectiveness: float,
+    moratorium_effect: float,
+    sum_insured_caps: dict | None = None,
 ) -> Float[Array, ""]:
     """
     Compute perceived discrimination penalty under policy regime.
@@ -35,28 +40,33 @@ def compute_perceived_penalty(
     - Policy protections
     
     Args:
-        params: Model parameters
-        policy: Policy configuration
+        adverse_selection_elasticity: Adverse selection elasticity
+        baseline_loading: Baseline premium loading
+        allow_genetic_test_results: Whether genetic tests are allowed
+        enforcement_strength: Enforcement strength (0-1)
+        enforcement_effectiveness: Enforcement effectiveness
+        moratorium_effect: Moratorium effect size
+        sum_insured_caps: Sum insured caps by product type
         
     Returns:
         Perceived penalty (higher = more deterrence)
     """
     # Base penalty from adverse selection
-    base_penalty = params.adverse_selection_elasticity * params.baseline_loading
+    base_penalty = adverse_selection_elasticity * baseline_loading
     
     # Policy reduces penalty based on:
     # 1. Information restrictions
     # 2. Enforcement effectiveness
     
-    info_restriction = 1.0 if policy.allow_genetic_test_results else 0.0
-    enforcement_factor = policy.enforcement_strength * params.enforcement_effectiveness
+    info_restriction = 1.0 if allow_genetic_test_results else 0.0
+    enforcement_factor = enforcement_strength * enforcement_effectiveness
     
     # Penalty reduction from policy
     penalty_reduction = info_restriction * enforcement_factor
     
     # Apply moratorium effect if applicable
-    if not policy.allow_genetic_test_results and policy.sum_insured_caps is not None:
-        penalty_reduction += params.moratorium_effect
+    if not allow_genetic_test_results and sum_insured_caps is not None:
+        penalty_reduction += moratorium_effect
     
     # Final perceived penalty
     perceived_penalty = base_penalty * (1.0 - penalty_reduction)
@@ -64,8 +74,22 @@ def compute_perceived_penalty(
     return perceived_penalty
 
 
-@jit
-def compute_testing_utility(
+# Convenience wrapper that accepts ModelParameters and PolicyConfig
+def compute_perceived_penalty_wrapper(
+    params: ModelParameters,
+    policy: PolicyConfig,
+) -> float:
+    """Wrapper that accepts pydantic models."""
+    penalty = compute_perceived_penalty(
+        params.adverse_selection_elasticity,
+        params.baseline_loading,
+        policy.allow_genetic_test_results,
+        policy.enforcement_strength,
+        params.enforcement_effectiveness,
+        params.moratorium_effect,
+        policy.sum_insured_caps,
+    )
+    return float(penalty)
     benefits: Float[Array, ""],
     perceived_penalty: Float[Array, ""],
     individual_characteristics: Dict[str, Float[Array, ""]] | None = None,

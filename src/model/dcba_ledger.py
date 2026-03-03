@@ -155,7 +155,7 @@ def apply_distributional_weight(
     return welfare_impact * weight
 
 
-@jit
+# Don't use @jit - returns dataclass which JAX doesn't support
 def compute_dcba(
     testing_uptake: Float[Array, ""],
     baseline_uptake: Float[Array, ""],

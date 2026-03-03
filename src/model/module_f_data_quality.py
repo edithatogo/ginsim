@@ -1,74 +1,307 @@
 """
-Module F: Data-quality externality (selection bias and tool performance)
+Module F: Data Quality Externality model.
 
-Scaffold module: replace placeholders with jurisdiction-specific, data-driven implementations.
+Implements public goods game for research participation.
 
-Design goals:
-- Pure functions compatible with JAX transforms (jit, vmap, scan).
-- Deterministic randomness via explicit PRNG keys.
-- Vectorized computations where possible.
+Strategic Game: Participation as Public Good
+- Players: Individuals (participation decisions), Researchers, Health system
+- Mechanism: Participation improves dataset representativeness and future tools
+- Equilibrium: Participation rate as function of privacy protections
 """
+
 from __future__ import annotations
 
+from typing import Dict, Tuple
 from dataclasses import dataclass
-from typing import Dict, Any
+import jax.numpy as jnp
+from jax import jit, vmap
+from jaxtyping import Array, Float
 
-try:
-    import jax
-    import jax.numpy as jnp
-except Exception as e:
-    raise ImportError(
-        "JAX (and jaxlib) must be installed to run this module. "
-        "Install platform-appropriate jaxlib and rerun."
-    ) from e
+from .parameters import ModelParameters, PolicyConfig
 
-@dataclass(frozen=True)
-class DataQualityParams:
-    # Toy selection model parameters
-    base_participation_logit: float
-    fear_sensitivity: float
-    # Toy prediction performance parameters
-    base_auc: float
-    auc_sensitivity: float  # how representativeness affects AUC
-    noise_sd: float = 0.01
 
-def participation_prob(fear: jnp.ndarray, params: DataQualityParams) -> jnp.ndarray:
-    logits = params.base_participation_logit - params.fear_sensitivity * fear
-    return jax.nn.sigmoid(logits)
+@dataclass
+class DataQualityMetrics:
+    """
+    Data quality metrics.
+    
+    Attributes:
+        participation_rate: Proportion participating in research
+        representativeness: How representative the sample is
+        predictive_performance: Performance of models trained on data
+        selection_bias: Measure of selection bias
+    """
+    participation_rate: Float[Array, ""]
+    representativeness: Float[Array, ""]
+    predictive_performance: Float[Array, ""]
+    selection_bias: Float[Array, ""]
 
-def effective_representativeness(p_participate: jnp.ndarray, weights: jnp.ndarray | None = None) -> jnp.ndarray:
-    """
-    Proxy for representativeness: mean participation probability, optionally weighted.
-    Replace with proper selection-bias diagnostics (e.g., covariate balance metrics).
-    """
-    if weights is None:
-        return jnp.mean(p_participate)
-    return jnp.sum(weights * p_participate) / (jnp.sum(weights) + 1e-8)
 
-def simulate_auc(key: jax.Array, repr_score: jnp.ndarray, params: DataQualityParams) -> jnp.ndarray:
+@jit
+def compute_participation_probability(
+    privacy_protections: Float[Array, ""],
+    social_benefit: Float[Array, ""],
+    privacy_concern: Float[Array, ""],
+    elasticity: float = -0.10,
+) -> Float[Array, ""]:
     """
-    Toy mapping: better representativeness improves AUC.
+    Compute probability of research participation.
+    
+    Participation decision based on:
+    - Privacy protections (positive effect)
+    - Perceived social benefit (positive effect)
+    - Privacy concerns (negative effect)
+    
+    Args:
+        privacy_protections: Strength of privacy protections (0-1)
+        social_benefit: Perceived social benefit (0-1)
+        privacy_concern: Individual privacy concern (0-1)
+        elasticity: Elasticity of participation w.r.t. protections
+        
+    Returns:
+        Participation probability
     """
-    auc = params.base_auc + params.auc_sensitivity * (repr_score - 0.5)
-    auc = jnp.clip(auc, 0.5, 0.99)
-    auc = auc + params.noise_sd * jax.random.normal(key)
-    return jnp.clip(auc, 0.5, 0.99)
+    # Base participation rate
+    base_rate = 0.5
+    
+    # Effect of privacy protections
+    protection_effect = elasticity * (1.0 - privacy_protections)
+    
+    # Effect of social benefit
+    benefit_effect = 0.2 * social_benefit
+    
+    # Effect of privacy concerns
+    concern_effect = -0.3 * privacy_concern
+    
+    # Final participation probability
+    participation_prob = base_rate + protection_effect + benefit_effect + concern_effect
+    
+    # Bound [0, 1]
+    participation_prob = jnp.clip(participation_prob, 0.0, 1.0)
+    
+    return participation_prob
 
-def run_module(key: jax.Array, policy: Dict[str, Any], fear: jnp.ndarray, params: DataQualityParams) -> Dict[str, Any]:
+
+@jit
+def compute_participation_rate(
+    params: ModelParameters,
+    policy: PolicyConfig,
+    n_individuals: int = 1000,
+    rng_key: Array | None = None,
+) -> Float[Array, ""]:
     """
-    fear: array capturing perceived discrimination risk (latent or measured).
-    Policy changes fear via a simple policy-intensity mapping (placeholder).
+    Compute aggregate research participation rate.
+    
+    Args:
+        params: Model parameters
+        policy: Policy configuration
+        n_individuals: Number of individuals to simulate
+        rng_key: Optional RNG key
+        
+    Returns:
+        Participation rate
     """
-    policy_name = policy.get("name", "status_quo")
-    policy_intensity = jnp.array(
-        0.0 if policy_name == "status_quo" else
-        0.5 if policy_name == "moratorium" else
-        0.8 if policy_name == "partial_ban" else
-        1.0
+    # Privacy protections from policy
+    if not policy.allow_genetic_test_results:
+        privacy_protections = policy.enforcement_strength
+    else:
+        privacy_protections = 0.2  # Low protections if information allowed
+    
+    # Social benefit (assumed constant)
+    social_benefit = 0.6
+    
+    # Simulate heterogeneous privacy concerns
+    if rng_key is not None:
+        privacy_concerns = jr.uniform(rng_key, (n_individuals,))
+    else:
+        privacy_concerns = jnp.linspace(0, 1, n_individuals)
+    
+    # Compute participation probabilities
+    participation_probs = compute_participation_probability(
+        privacy_protections=privacy_protections,
+        social_benefit=social_benefit,
+        privacy_concern=privacy_concerns,
+        elasticity=params.research_participation_elasticity,
     )
-    # Policy reduces fear (toy); real implementation uses Module A estimates.
-    fear_cf = jnp.clip(fear * (1.0 - 0.4 * policy_intensity), 0.0, 1.0)
-    p_part = participation_prob(fear_cf, params)
-    repr_score = effective_representativeness(p_part)
-    auc = simulate_auc(key, repr_score, params)
-    return {"repr_score": repr_score, "auc": auc, "mean_participation": jnp.mean(p_part)}
+    
+    # Aggregate participation rate
+    participation_rate = jnp.mean(participation_probs)
+    
+    return participation_rate
+
+
+@jit
+def compute_representativeness(
+    participation_rate: Float[Array, ""],
+    selection_bias_parameter: float = 0.5,
+) -> Float[Array, ""]:
+    """
+    Compute sample representativeness as function of participation.
+    
+    Representativeness decreases with selection bias.
+    
+    Args:
+        participation_rate: Participation rate
+        selection_bias_parameter: Strength of selection bias
+        
+    Returns:
+        Representativeness score (0-1)
+    """
+    # Representativeness increases with participation
+    representativeness = participation_rate ** (1.0 - selection_bias_parameter)
+    
+    return representativeness
+
+
+@jit
+def compute_predictive_performance(
+    representativeness: Float[Array, ""],
+    baseline_performance: float = 0.8,
+    max_performance: float = 0.95,
+) -> Float[Array, ""]:
+    """
+    Compute predictive performance as function of data quality.
+    
+    Args:
+        representativeness: Sample representativeness
+        baseline_performance: Performance with minimal data
+        max_performance: Maximum achievable performance
+        
+    Returns:
+        Predictive performance metric
+    """
+    # Performance increases with representativeness
+    performance = baseline_performance + (max_performance - baseline_performance) * representativeness
+    
+    return performance
+
+
+@jit
+def compute_selection_bias(
+    participation_rate: Float[Array, ""],
+    high_risk_participation_ratio: float = 0.8,
+) -> Float[Array, ""]:
+    """
+    Compute selection bias metric.
+    
+    Selection bias occurs when high-risk individuals participate
+    at different rates than low-risk individuals.
+    
+    Args:
+        participation_rate: Overall participation rate
+        high_risk_participation_ratio: Ratio of high-risk to low-risk participation
+        
+    Returns:
+        Selection bias metric (0 = no bias, 1 = maximum bias)
+    """
+    # Selection bias increases as ratio deviates from 1
+    bias = jnp.abs(1.0 - high_risk_participation_ratio)
+    
+    # Scale by participation rate (low participation → more bias)
+    bias = bias * (1.0 - participation_rate)
+    
+    return bias
+
+
+@jit
+def compute_data_quality_externality(
+    params: ModelParameters,
+    baseline_policy: PolicyConfig,
+    reform_policy: PolicyConfig,
+) -> Dict[str, Float[Array, ""]]:
+    """
+    Compute data quality externality of policy change.
+    
+    Policy changes affect participation, which affects data quality,
+    which affects future predictive tools (externality).
+    
+    Args:
+        params: Model parameters
+        baseline_policy: Baseline policy
+        reform_policy: Reform policy
+        
+    Returns:
+        Dictionary with data quality metrics for both policies
+    """
+    # Compute participation rates
+    participation_baseline = compute_participation_rate(params, baseline_policy)
+    participation_reform = compute_participation_rate(params, reform_policy)
+    
+    # Compute representativeness
+    representativeness_baseline = compute_representativeness(participation_baseline)
+    representativeness_reform = compute_representativeness(participation_reform)
+    
+    # Compute predictive performance
+    performance_baseline = compute_predictive_performance(representativeness_baseline)
+    performance_reform = compute_predictive_performance(representativeness_reform)
+    
+    # Compute selection bias
+    bias_baseline = compute_selection_bias(participation_baseline)
+    bias_reform = compute_selection_bias(participation_reform)
+    
+    return {
+        'participation_baseline': participation_baseline,
+        'participation_reform': participation_reform,
+        'representativeness_baseline': representativeness_baseline,
+        'representativeness_reform': representativeness_reform,
+        'performance_baseline': performance_baseline,
+        'performance_reform': performance_reform,
+        'selection_bias_baseline': bias_baseline,
+        'selection_bias_reform': bias_reform,
+    }
+
+
+@jit
+def compute_research_value_loss(
+    performance_baseline: Float[Array, ""],
+    performance_reform: Float[Array, ""],
+    annual_research_value: float = 1e6,  # $1M annual value
+    discount_rate: float = 0.03,
+    time_horizon: int = 10,
+) -> Float[Array, ""]:
+    """
+    Compute present value of research value loss.
+    
+    Args:
+        performance_baseline: Performance under baseline
+        performance_reform: Performance under reform
+        annual_research_value: Annual value of research
+        discount_rate: Discount rate
+        time_horizon: Time horizon in years
+        
+    Returns:
+        Present value of research value loss
+    """
+    # Performance loss
+    performance_loss = performance_baseline - performance_reform
+    
+    # Annual value loss
+    annual_loss = performance_loss * annual_research_value
+    
+    # Present value (geometric series)
+    if discount_rate > 0:
+        pv_factor = (1 - (1 + discount_rate) ** (-time_horizon)) / discount_rate
+    else:
+        pv_factor = time_horizon
+    
+    present_value_loss = annual_loss * pv_factor
+    
+    return present_value_loss
+
+
+# Convenience function
+def get_standard_participation_parameters() -> Dict[str, float]:
+    """
+    Get standard parameters for participation model.
+    
+    Returns:
+        Dictionary with standard parameter values
+    """
+    return {
+        'base_participation': 0.5,
+        'privacy_elasticity': -0.10,
+        'social_benefit': 0.6,
+        'annual_research_value': 1e6,
+        'discount_rate': 0.03,
+        'time_horizon': 10,
+    }

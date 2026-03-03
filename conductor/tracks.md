@@ -4,7 +4,9 @@ This registry is the index of Conductor tracks for this repository.
 
 ## Active Tracks
 
-*No active tracks. All tracks completed.*
+| Track ID | Title | Status | Link |
+|---|---|---|---|
+| gdpe_0003_model_implementation | Model implementation and policy analysis | 🟡 Planned | [index](./tracks/gdpe_0003_model_implementation/index.md) |
 
 ## Archived Tracks
 

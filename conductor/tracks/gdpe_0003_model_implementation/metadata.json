@@ -1,0 +1,11 @@
+{
+  "track_id": "gdpe_0003_model_implementation",
+  "title": "Model Implementation and Policy Analysis",
+  "type": "research_implementation",
+  "status": "planned",
+  "created_utc": "2026-03-03T00:00:00Z",
+  "updated_utc": "2026-03-03T00:00:00Z",
+  "dependencies": ["gdpe_0002_evidence_anchoring"],
+  "estimated_duration_weeks": 8,
+  "phases_total": 5
+}

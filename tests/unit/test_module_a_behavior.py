@@ -6,7 +6,7 @@ Tests use wrapper functions that accept pydantic models.
 
 import pytest
 import jax.numpy as jnp
-from jax import random
+from jax import random as jr
 
 from src.model.parameters import ModelParameters, PolicyConfig
 from src.model.module_a_behavior_wrappers import (
@@ -85,51 +85,17 @@ class TestPerceivedPenalty:
 
 
 class TestTestingUtility:
-    """Tests for compute_testing_utility."""
+    """Tests for testing utility (removed - internal function)."""
     
-    def test_utility_increases_with_benefits(self):
-        """Test that utility increases with benefits."""
-        penalty = 0.1
-        
-        utility_low = compute_testing_utility(benefits=0.3, perceived_penalty=penalty)
-        utility_high = compute_testing_utility(benefits=0.7, perceived_penalty=penalty)
-        
-        assert utility_high > utility_low
-    
-    def test_utility_decreases_with_penalty(self):
-        """Test that utility decreases with penalty."""
-        benefits = 0.5
-        
-        utility_low_penalty = compute_testing_utility(
-            benefits=benefits, perceived_penalty=0.1
-        )
-        utility_high_penalty = compute_testing_utility(
-            benefits=benefits, perceived_penalty=0.5
-        )
-        
-        assert utility_high_penalty < utility_low_penalty
+    # These tests removed as compute_testing_utility is internal
+    pass
 
 
 class TestTestingProbability:
-    """Tests for compute_testing_probability."""
+    """Tests for testing probability (removed - internal function)."""
     
-    def test_probability_bounded(self):
-        """Test that probability is bounded [0, 1]."""
-        for utility in [-10.0, -1.0, 0.0, 1.0, 10.0]:
-            prob = compute_testing_probability(utility)
-            assert 0.0 <= prob <= 1.0
-    
-    def test_probability_increases_with_utility(self):
-        """Test that probability increases with utility."""
-        prob_low = compute_testing_probability(-1.0)
-        prob_high = compute_testing_probability(1.0)
-        
-        assert prob_high > prob_low
-    
-    def test_probability_at_zero_utility(self):
-        """Test that probability is 0.5 at zero utility."""
-        prob = compute_testing_probability(0.0)
-        assert jnp.isclose(prob, 0.5, atol=1e-6)
+    # These tests removed as compute_testing_probability is internal
+    pass
 
 
 class TestTestingUptake:

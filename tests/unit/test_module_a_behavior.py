@@ -1,5 +1,7 @@
 """
 Unit tests for Module A: Behavior / Deterrence.
+
+Tests use wrapper functions that accept pydantic models.
 """
 
 import pytest
@@ -7,10 +9,8 @@ import jax.numpy as jnp
 from jax import random
 
 from src.model.parameters import ModelParameters, PolicyConfig
-from src.model.module_a_behavior import (
+from src.model.module_a_behavior_wrappers import (
     compute_perceived_penalty,
-    compute_testing_utility,
-    compute_testing_probability,
     compute_testing_uptake,
     compute_policy_effect,
     get_standard_policies,

@@ -1,8 +1,8 @@
 """
-Module A: Behavior / Deterrence model.
+Module A: Behavior / Deterrence model - CORE JIT-compiled functions.
 
-Implements discrete choice model for genetic testing behavior under
-perceived discrimination risk.
+This module contains the core JIT-compiled functions that work with JAX arrays.
+Use module_a_behavior_wrappers.py for user-facing functions that accept pydantic models.
 
 Strategic Game: Testing Participation under Penalty Risk
 - Players: Individuals, Insurers (downstream penalty), Policymakers
@@ -17,10 +17,10 @@ import jax.numpy as jnp
 from jax import jit, vmap
 from jaxtyping import Array, Float
 
-from .parameters import ModelParameters, PolicyConfig
+from .parameters import PolicyConfig
 
 
-@jit
+# Don't use @jit here - boolean arguments don't work with JIT
 def compute_perceived_penalty(
     adverse_selection_elasticity: float,
     baseline_loading: float,
@@ -70,7 +70,7 @@ def compute_perceived_penalty(
     
     # Final perceived penalty
     perceived_penalty = base_penalty * (1.0 - penalty_reduction)
-    
+
     return perceived_penalty
 
 
@@ -90,6 +90,10 @@ def compute_perceived_penalty_wrapper(
         policy.sum_insured_caps,
     )
     return float(penalty)
+
+
+@jit
+def compute_testing_utility(
     benefits: Float[Array, ""],
     perceived_penalty: Float[Array, ""],
     individual_characteristics: Dict[str, Float[Array, ""]] | None = None,
@@ -143,7 +147,9 @@ def compute_testing_probability(
 
 @jit
 def compute_testing_uptake(
-    params: ModelParameters,
+    baseline_testing_uptake: float,
+    deterrence_elasticity: float,
+    moratorium_effect: float,
     policy: PolicyConfig,
     benefits_mean: float = 0.5,
     benefits_sd: float = 0.1,
@@ -160,18 +166,28 @@ def compute_testing_uptake(
     4. Aggregates to population-level uptake
     
     Args:
-        params: Model parameters
+        baseline_testing_uptake: Baseline testing uptake
+        deterrence_elasticity: Deterrence elasticity
+        moratorium_effect: Moratorium effect size
         policy: Policy configuration
         benefits_mean: Mean perceived benefits of testing
-        benefits_sd: Standard deviation of benefits (heterogeneity)
+        benefits_sd: Standard deviation of benefits
         n_individuals: Number of individuals to simulate
-        rng_key: Optional RNG key for benefit simulation
+        rng_key: Optional RNG key
         
     Returns:
         Aggregate testing uptake rate (0-1)
     """
     # Compute perceived penalty
-    perceived_penalty = compute_perceived_penalty(params, policy)
+    perceived_penalty = compute_perceived_penalty(
+        deterrence_elasticity,
+        0.15,  # baseline_loading
+        policy.allow_genetic_test_results,
+        policy.enforcement_strength,
+        0.5,  # enforcement_effectiveness
+        moratorium_effect,
+        policy.sum_insured_caps,
+    )
     
     # Simulate heterogeneous benefits
     if rng_key is not None:
@@ -198,7 +214,9 @@ def compute_testing_uptake(
 
 @jit
 def compute_policy_effect(
-    params: ModelParameters,
+    baseline_testing_uptake: float,
+    deterrence_elasticity: float,
+    moratorium_effect: float,
     baseline_policy: PolicyConfig,
     reform_policy: PolicyConfig,
 ) -> Dict[str, Float[Array, ""]]:
@@ -206,9 +224,11 @@ def compute_policy_effect(
     Compute effect of policy reform on testing uptake.
     
     Args:
-        params: Model parameters
-        baseline_policy: Baseline policy (e.g., status quo)
-        reform_policy: Reform policy (e.g., moratorium, ban)
+        baseline_testing_uptake: Baseline testing uptake
+        deterrence_elasticity: Deterrence elasticity
+        moratorium_effect: Moratorium effect size
+        baseline_policy: Baseline policy configuration
+        reform_policy: Reform policy configuration
         
     Returns:
         Dictionary with:
@@ -218,8 +238,18 @@ def compute_policy_effect(
         - relative_effect: Relative change in uptake
     """
     # Compute uptake under both policies
-    baseline_uptake = compute_testing_uptake(params, baseline_policy)
-    reform_uptake = compute_testing_uptake(params, reform_policy)
+    baseline_uptake = compute_testing_uptake(
+        baseline_testing_uptake,
+        deterrence_elasticity,
+        moratorium_effect,
+        baseline_policy,
+    )
+    reform_uptake = compute_testing_uptake(
+        baseline_testing_uptake,
+        deterrence_elasticity,
+        moratorium_effect,
+        reform_policy,
+    )
     
     # Compute effects
     absolute_effect = reform_uptake - baseline_uptake

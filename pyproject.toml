@@ -55,6 +55,15 @@ dev = [
   "pyright>=1.1.350",  # Faster than mypy
   "pre-commit>=3.6",
   "ipython>=8.20",
+  
+  # Runtime type checking
+  "beartype>=0.18.0",  # O(1) runtime type checking
+  
+  # Data classes
+  "attrs>=23.2.0",  # JAX-compatible data classes
+  
+  # Serialization
+  "msgspec>=0.18.0",  # Fast serialization/validation
 ]
 
 profiling = [

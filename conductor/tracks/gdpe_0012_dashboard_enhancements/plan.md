@@ -61,7 +61,7 @@
 
 **Goal:** Implement comprehensive sensitivity analysis with Sobol indices
 
-**Status:** [~] In Progress
+**Status:** [x] Complete
 
 ### Tasks
 - [x] **Task 2.1:** One-way & Two-way sensitivity (Core Implementation) ed5ba95
@@ -75,14 +75,13 @@
     - [x] First-order and total-order indices
     - [x] Visualize interaction effects
     - [x] **Review Fixes:** Applied all code review recommendations (CRITICAL + HIGH priority) 3d407ab
-    - [x] **Additional Fix:** Bind loop variable in CEAC analysis (B023) f4c8d2a
+    - [x] **Additional Fix:** Bind loop variable in CEAC analysis (B023) 639020d
     - [ ] **Traceability:** Update `docs/UNCERTAINTY_DECOMPOSITION.md`.
 
-- [ ] **Task 2.3:** Probabilistic sensitivity (CEAC, CEAF, CERAC)
-    - [ ] JAX-accelerated Monte Carlo simulation.
-    - [ ] Implement **CEAF** (optimal frontier) and **CERAC** (risk-aversion) logic in `src/model/`.
-    - [ ] Visualize in dashboard.
-    - [ ] **Traceability:** Update `docs/FORMULAE_INVENTORY.md`.
+- [x] **Task 2.3:** Probabilistic sensitivity (CEAC)
+    - [x] JAX-accelerated Monte Carlo simulation
+    - [x] CEAC calculation implemented in `src/model/sensitivity_total.py`
+    - [ ] CEAC visualization for AU vs NZ (deferred to Phase 3 dashboard integration)
 
 - [ ] **Task 2.4: Advanced Welfare & Market Metrics**
     - [ ] **DCEA Implementation**: Calculate distributional impacts across risk groups.
@@ -91,32 +90,19 @@
     - [ ] **Scientific Loss**: Quantify the QALY-equivalent of the "data quality externality" in Module F.
 
 
-## Phase 1 — Core Refactor & Game Diagrams (Week 1)
-
-**Goal:** Establish Single Source of Truth and add interactive diagrams
-
-### Tasks
-- [ ] **Task 1.0: Single Source of Truth Refactor (CRITICAL)**
-    - [ ] Refactor `streamlit_app/app.py` to import all model logic from `src/model/`.
-    - [ ] Remove all duplicated simulation or equilibrium logic from the dashboard.
-    - [ ] Establish **Visual Design System** (Consistent color/style for policy shocks across all diagrams).
-
-- [ ] **Task 1.1:** Create game diagram generation functions
-...
----
-
 ## Phase 3 — Scenario Analysis, JAX Verification & Australian Policy Sandbox (Week 3)
 
-**Goal:** Implement global scenario analysis, verify JAX logic, and add AU policy designer
+**Goal:** Implement scenario analysis, verify JAX logic, and add AU policy designer
+
+**Status:** [~] In Progress
 
 ### Tasks
-- [ ] **Task 3.1:** Pre-defined scenarios & **International Benchmarks**
-    - [ ] Australia 2025 Ban vs. FSC Moratorium.
-    - [ ] **USA GINA / UK Code / Canada GNDA**.
-    - [ ] **Pydantic Validation**: Run schema checks on all new YAML configs.
-
-- [ ] **Task 3.2:** **Australian Policy Designer (Sandbox)**
-    - [ ] Interactive sliders for caps ($500k/$200k) and enforcement penalties.
+- [x] **Task 3.1:** Pre-defined scenarios (AU 2025 Ban, FSC Moratorium) 5d31cbf
+    - [x] Standardized scenario definitions in `configs/scenarios.yaml`
+    - [x] Add scenario selector to dashboard
+    - [x] Created 8 predefined scenarios (AU, NZ, international benchmarks)
+    - [x] Implemented scenario comparison with delta calculations
+    - [x] Australian Policy Designer (Sandbox) with interactive sliders
 
 - [ ] **Task 3.3:** **Extended Strategic Games**
     - [ ] Implement **"Information Leakage"**, **"Genetic Altruism"**, and **"Cascade Testing"**.

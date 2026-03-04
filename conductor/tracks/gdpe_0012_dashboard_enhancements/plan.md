@@ -75,6 +75,7 @@
     - [x] First-order and total-order indices
     - [x] Visualize interaction effects
     - [x] **Review Fixes:** Applied all code review recommendations (CRITICAL + HIGH priority) 3d407ab
+    - [x] **Additional Fix:** Bind loop variable in CEAC analysis (B023) f4c8d2a
     - [ ] **Traceability:** Update `docs/UNCERTAINTY_DECOMPOSITION.md`.
 
 - [ ] **Task 2.3:** Probabilistic sensitivity (CEAC, CEAF, CERAC)

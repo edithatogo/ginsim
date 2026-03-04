@@ -4,7 +4,9 @@ This registry is the index of Conductor tracks for this repository.
 
 ## Active Tracks
 
-*No active tracks. All tracks completed.*
+| Track ID | Title | Status | Link |
+|---|---|---|---|
+| gdpe_0005_game_validation | Game validation and documentation | 🟡 New | [index](./tracks/gdpe_0005_game_validation/index.md) |
 
 ## Archived Tracks
 

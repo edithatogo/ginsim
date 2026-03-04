@@ -319,6 +319,43 @@
         "date-parts": [[2012]]
       },
       "DOI": "10.1016/j.jval.2012.04.013"
+    },
+    {
+      "id": "strong2015",
+      "type": "article-journal",
+      "title": "Probabilistic Sensitivity Analysis and Value of Information",
+      "author": [
+        {
+          "family": "Strong",
+          "given": "Mark"
+        }
+      ],
+      "container-title": "Medical Decision Making",
+      "volume": "35",
+      "issue": "7",
+      "page": "859-871",
+      "issued": {
+        "date-parts": [[2015]]
+      },
+      "DOI": "10.1177/0272989X15585094"
+    },
+    {
+      "id": "claxton2004",
+      "type": "article-journal",
+      "title": "The Value of Information: Population Health and Research Priorities",
+      "author": [
+        {
+          "family": "Claxton",
+          "given": "Karl"
+        }
+      ],
+      "container-title": "Health Economics",
+      "volume": "13",
+      "page": "227-239",
+      "issued": {
+        "date-parts": [[2004]]
+      },
+      "DOI": "10.1002/hec.874"
     }
   ]
 }

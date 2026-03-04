@@ -350,12 +350,15 @@ def ceac_analysis(
     effects_all = []
 
     for policy_params_set in policy_params:
+        # Create a closure that binds the current policy_params_set
+        def make_eval_single(pps):
+            def eval_single(params):
+                cost, effect = model_func(params, pps)
+                return cost, effect
+            return eval_single
 
-        def eval_single(params):
-            cost, effect = model_func(params, policy_params_set)
-            return cost, effect
-
-        costs, effects = jax.vmap(eval_single)(param_draws)
+        eval_fn = make_eval_single(policy_params_set)
+        costs, effects = jax.vmap(eval_fn)(param_draws)
         costs_all.append(costs)
         effects_all.append(effects)
 

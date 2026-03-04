@@ -61,8 +61,10 @@
 
 **Goal:** Implement comprehensive sensitivity analysis with Sobol indices
 
+**Status:** [~] In Progress
+
 ### Tasks
-- [ ] **Task 2.1:** One-way & Two-way sensitivity (Core Implementation)
+- [~] **Task 2.1:** One-way & Two-way sensitivity (Core Implementation)
     - [ ] Implement tornado and heat map logic in `src/model/`
     - [ ] Link dashboard UI to these core functions
 

@@ -13,7 +13,9 @@
 ## Data + config
 - pandas, numpy
 - PyYAML for configs
-- pydantic for schema validation
+- pydantic for schema validation (external API)
+- attrs for JAX-compatible data classes (internal state)
+- msgspec for fast serialization (config I/O)
 
 ## Reporting
 - matplotlib for figures
@@ -24,7 +26,11 @@
 - pytest
 - ruff (lint)
 - black (format)
-- mypy (optional; or pyright externally)
+- pyright (strict typing)
+- beartype (runtime type checking)
+- chex (JAX testing utilities)
+- attrs (immutable data classes)
+- msgspec (fast serialization)
 
 ## Determinism
 - Set random seeds when feasible.

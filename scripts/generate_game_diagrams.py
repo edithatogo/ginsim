@@ -12,6 +12,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+import numpy as np
 
 # Colorblind-safe palette (Okabe-Ito)
 COLORS = {
@@ -353,6 +354,270 @@ def generate_enforcement_diagram(output_dir: Path, dpi: int, formats: list):
     save_figure(fig, output_dir / 'enforcement_compliance', dpi, formats)
 
 
+def generate_equilibrium_concepts_diagram(output_dir: Path, dpi: int, formats: list):
+    """Generate comprehensive equilibrium concepts diagram."""
+    print("Generating Equilibrium Concepts diagram...")
+    
+    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+    fig.suptitle('Equilibrium Concepts Across Games', fontsize=16, fontweight='bold')
+    
+    # Module A: Nash Equilibrium
+    ax = axes[0, 0]
+    ax.set_xlim(0, 10)
+    ax.set_ylim(0, 10)
+    ax.set_title('Module A: Nash Equilibrium', fontsize=12, fontweight='bold')
+    
+    # Best response curves
+    x = np.linspace(0, 10, 100)
+    br1 = 8 - 0.6 * x  # Individual BR
+    br2 = 6 - 0.4 * x  # Insurer BR
+    
+    ax.plot(x, br1, '-', color=COLORS['blue'], linewidth=2, label='Individual BR')
+    ax.plot(x, br2, '--', color=COLORS['vermilion'], linewidth=2, label='Insurer BR')
+    ax.fill_between(x, 0, br1, alpha=0.2, color=COLORS['blue'])
+    ax.fill_between(x, 0, br2, alpha=0.2, color=COLORS['vermilion'])
+    
+    # Equilibrium point
+    eq_x, eq_y = 5, 5
+    ax.plot(eq_x, eq_y, 'o', color=COLORS['black'], markersize=12, label='Nash Equilibrium')
+    ax.annotate(f'NE\n({eq_x:.1f}, {eq_y:.1f})', xy=(eq_x, eq_y), xytext=(eq_x+0.5, eq_y+0.5),
+               fontsize=10, fontweight='bold')
+    
+    ax.set_xlabel('Testing Uptake', fontsize=10)
+    ax.set_ylabel('Premium Level', fontsize=10)
+    ax.legend(loc='upper right', fontsize=9)
+    ax.grid(True, alpha=0.3)
+    
+    # Module C: Separating vs Pooling
+    ax = axes[0, 1]
+    ax.set_xlim(0, 10)
+    ax.set_ylim(0, 10)
+    ax.set_title('Module C: Separating vs Pooling Equilibrium', fontsize=12, fontweight='bold')
+    
+    # Separating equilibrium
+    sep_rect = patches.Rectangle((1, 5.5), 3.5, 3, linewidth=2, edgecolor=COLORS['bluish_green'],
+                                  facecolor=COLORS['bluish_green'], alpha=0.2)
+    ax.add_patch(sep_rect)
+    ax.text(2.75, 7, 'Separating', fontsize=11, fontweight='bold', ha='center',
+            color=COLORS['bluish_green'])
+    ax.text(2.75, 6.3, 'Full Information', fontsize=9, ha='center')
+    ax.text(2.75, 5.8, 'Different Premiums', fontsize=9, ha='center')
+    
+    # Pooling equilibrium
+    pool_rect = patches.Rectangle((5.5, 5.5), 3.5, 3, linewidth=2, edgecolor=COLORS['orange'],
+                                   facecolor=COLORS['orange'], alpha=0.2)
+    ax.add_patch(pool_rect)
+    ax.text(7.25, 7, 'Pooling', fontsize=11, fontweight='bold', ha='center',
+            color=COLORS['orange'])
+    ax.text(7.25, 6.3, 'No Information', fontsize=9, ha='center')
+    ax.text(7.25, 5.8, 'Same Premium', fontsize=9, ha='center')
+    
+    # Policy constraint arrow
+    ax.annotate('', xy=(7.25, 4.5), xytext=(2.75, 4.5),
+                arrowprops=dict(arrowstyle='->', color=COLORS['black'], linewidth=2))
+    ax.text(5, 4.8, 'Policy Constraint', fontsize=10, ha='center', va='bottom')
+    
+    ax.set_xlim(0, 10)
+    ax.set_ylim(0, 10)
+    ax.set_axis_off()
+    
+    # Module D: Constrained Optimization
+    ax = axes[1, 0]
+    ax.set_xlim(0, 10)
+    ax.set_ylim(0, 10)
+    ax.set_title('Module D: Constrained Proxy Optimization', fontsize=12, fontweight='bold')
+    
+    # Feasible region
+    feasible = patches.Polygon([[2, 2], [8, 2], [8, 6], [4, 8], [2, 6]],
+                                closed=True, linewidth=2, edgecolor=COLORS['blue'],
+                                facecolor=COLORS['blue'], alpha=0.2)
+    ax.add_patch(feasible)
+    
+    # Constraint boundary
+    ax.plot([2, 4, 8], [6, 8, 6], '--', color=COLORS['vermilion'], linewidth=2,
+            label='Information Constraint')
+    
+    # Optimal point
+    ax.plot(6, 5, 'o', color=COLORS['vermilion'], markersize=12, label='Optimal Proxy Mix')
+    ax.annotate('Optimal', xy=(6, 5), xytext=(6.5, 5.5), fontsize=10, fontweight='bold')
+    
+    ax.set_xlabel('Proxy 1 Weight', fontsize=10)
+    ax.set_ylabel('Proxy 2 Weight', fontsize=10)
+    ax.legend(loc='upper right', fontsize=9)
+    ax.grid(True, alpha=0.3)
+    
+    # Module F: Public Good Equilibrium
+    ax = axes[1, 1]
+    ax.set_xlim(0, 10)
+    ax.set_ylim(0, 10)
+    ax.set_title('Module F: Public Good Participation Equilibrium', fontsize=12, fontweight='bold')
+    
+    # Participation curve
+    x = np.linspace(0, 10, 100)
+    participation = 8 * (1 - np.exp(-0.5 * x))  # Concave participation function
+    ax.plot(x, participation, '-', color=COLORS['bluish_green'], linewidth=2,
+            label='Participation Rate')
+    
+    # Social optimum
+    ax.plot(7, 6.5, 'o', color=COLORS['orange'], markersize=12, label='Social Optimum')
+    ax.annotate('Social Optimum', xy=(7, 6.5), xytext=(7.5, 7), fontsize=10, fontweight='bold')
+    
+    # Private equilibrium
+    ax.plot(4, 4.5, 'o', color=COLORS['vermilion'], markersize=12, label='Private Equilibrium')
+    ax.annotate('Private NE', xy=(4, 4.5), xytext=(4.5, 5), fontsize=10, fontweight='bold')
+    
+    # Externality gap
+    ax.annotate('', xy=(7, 6.5), xytext=(4, 4.5),
+                arrowprops=dict(arrowstyle='<->', color=COLORS['black'], linewidth=2))
+    ax.text(5.8, 5.7, 'Externality', fontsize=10, ha='center', va='bottom',
+            style='italic')
+    
+    ax.set_xlabel('Policy Strength', fontsize=10)
+    ax.set_ylabel('Participation Rate', fontsize=10)
+    ax.legend(loc='lower right', fontsize=9)
+    ax.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    save_figure(fig, output_dir / 'equilibrium_concepts', dpi, formats)
+
+
+def generate_payoff_matrices_diagram(output_dir: Path, dpi: int, formats: list):
+    """Generate payoff matrices for games where applicable."""
+    print("Generating Payoff Matrices diagram...")
+    
+    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+    fig.suptitle('Payoff Matrices', fontsize=16, fontweight='bold')
+    
+    # Module A: Testing Decision Payoff Matrix
+    ax = axes[0, 0]
+    ax.set_xlim(0, 10)
+    ax.set_ylim(0, 10)
+    ax.set_axis_off()
+    ax.set_title('Module A: Testing Decision (Simplified)', fontsize=12, fontweight='bold')
+    
+    # 2x2 matrix
+    matrix_data = [
+        ['Test', 'No Test'],
+        ['High Benefit\n-Low Penalty', 'Status Quo'],
+        ['Low Benefit\n-High Penalty', 'No Change']
+    ]
+    
+    table = ax.table(cellText=matrix_data,
+                     colLabels=['Strategy', 'Payoff'],
+                     cellLoc='center',
+                     loc='center',
+                     colWidths=[0.3, 0.6])
+    table.auto_set_font_size(False)
+    table.set_fontsize(10)
+    table.scale(1.2, 1.5)
+    
+    # Color cells
+    table[(0, 0)].set_facecolor(COLORS['blue'])
+    table[(0, 1)].set_facecolor(COLORS['blue'])
+    table[(1, 0)].set_facecolor(COLORS['bluish_green'])
+    table[(1, 1)].set_facecolor(COLORS['gray'])
+    table[(2, 0)].set_facecolor(COLORS['vermilion'])
+    table[(2, 1)].set_facecolor(COLORS['gray'])
+    
+    # Enforcement: Compliance Payoff Matrix
+    ax = axes[0, 1]
+    ax.set_xlim(0, 10)
+    ax.set_ylim(0, 10)
+    ax.set_axis_off()
+    ax.set_title('Enforcement: Compliance Game', fontsize=12, fontweight='bold')
+    
+    # 2x2 compliance matrix
+    matrix_data = [
+        ['', 'Regulator: Monitor', 'Regulator: Ignore'],
+        ['Insurer: Comply', '0, -C', '0, 0'],
+        ['Insurer: Violate', '-P, R-C', 'B, -D']
+    ]
+    
+    table = ax.table(cellText=matrix_data,
+                     colLabels=['', 'Monitor', 'Ignore'],
+                     cellLoc='center',
+                     loc='center',
+                     colWidths=[0.25, 0.35, 0.35])
+    table.auto_set_font_size(False)
+    table.set_fontsize(9)
+    table.scale(1.2, 1.5)
+    
+    # Color cells
+    for i in range(3):
+        table[(i, 0)].set_facecolor(COLORS['vermilion'])
+        table[(i, 1)].set_facecolor(COLORS['blue'])
+        table[(i, 2)].set_facecolor(COLORS['blue'])
+    
+    # Add parameter explanations
+    ax.text(5, -0.5, 'C=Monitoring Cost, P=Penalty, R=Reputation, B=Violation Benefit, D=Damage',
+            fontsize=8, ha='center', va='top', style='italic')
+    
+    # Module C: Information Regimes
+    ax = axes[1, 0]
+    ax.set_xlim(0, 10)
+    ax.set_ylim(0, 10)
+    ax.set_axis_off()
+    ax.set_title('Module C: Information Regimes & Equilibrium Type', fontsize=12, fontweight='bold')
+    
+    regimes_data = [
+        ['Regime', 'Information', 'Equilibrium'],
+        ['Status Quo', 'Full', 'Separating'],
+        ['Moratorium', 'Partial', 'Mixed'],
+        ['Ban', 'None', 'Pooling']
+    ]
+    
+    table = ax.table(cellText=regimes_data,
+                     colLabels=['Policy', 'Available', 'Type'],
+                     cellLoc='center',
+                     loc='center',
+                     colWidths=[0.3, 0.3, 0.3])
+    table.auto_set_font_size(False)
+    table.set_fontsize(10)
+    table.scale(1.2, 1.5)
+    
+    # Color by regime
+    table[(0, 0)].set_facecolor(COLORS['blue'])
+    table[(0, 1)].set_facecolor(COLORS['blue'])
+    table[(0, 2)].set_facecolor(COLORS['blue'])
+    table[(1, 0)].set_facecolor(COLORS['orange'])
+    table[(1, 1)].set_facecolor(COLORS['orange'])
+    table[(1, 2)].set_facecolor(COLORS['orange'])
+    table[(2, 0)].set_facecolor(COLORS['vermilion'])
+    table[(2, 1)].set_facecolor(COLORS['vermilion'])
+    table[(2, 2)].set_facecolor(COLORS['vermilion'])
+    
+    # Module D: Proxy Accuracy
+    ax = axes[1, 1]
+    ax.set_xlim(0, 10)
+    ax.set_ylim(0, 10)
+    ax.set_axis_off()
+    ax.set_title('Module D: Proxy Substitution Accuracy', fontsize=12, fontweight='bold')
+    
+    # ROC-style curve
+    x = np.linspace(0, 1, 100)
+    tpr = 0.68 + 0.25 * (1 - np.exp(-3 * x))  # Sensitivity curve
+    fpr = x
+    
+    ax.plot(fpr, tpr, '-', color=COLORS['blue'], linewidth=2, label=f'Proxy ROC (AUC={0.72:.2f})')
+    ax.plot([0, 1], [0, 1], '--', color=COLORS['gray'], linewidth=1, label='Random')
+    
+    # Operating point
+    ax.plot(0.25, 0.68, 'o', color=COLORS['vermilion'], markersize=12, label='Operating Point')
+    ax.annotate(f'Sensitivity: 0.68\nSpecificity: {1-0.25:.2f}',
+               xy=(0.25, 0.68), xytext=(0.35, 0.55), fontsize=9,
+               arrowprops=dict(arrowstyle='->', color=COLORS['black']))
+    
+    ax.set_xlabel('False Positive Rate (1-Specificity)', fontsize=10)
+    ax.set_ylabel('True Positive Rate (Sensitivity)', fontsize=10)
+    ax.legend(loc='lower right', fontsize=9)
+    ax.grid(True, alpha=0.3)
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    
+    plt.tight_layout()
+    save_figure(fig, output_dir / 'payoff_matrices', dpi, formats)
+
+
 def main():
     parser = argparse.ArgumentParser(description='Generate game structure diagrams')
     parser.add_argument('--output', type=str, default='outputs/figures/games',
@@ -378,9 +643,14 @@ def main():
     generate_module_e_diagram(output_dir, args.dpi, args.formats)
     generate_module_f_diagram(output_dir, args.dpi, args.formats)
     generate_enforcement_diagram(output_dir, args.dpi, args.formats)
+    generate_equilibrium_concepts_diagram(output_dir, args.dpi, args.formats)
+    generate_payoff_matrices_diagram(output_dir, args.dpi, args.formats)
     
     print("=" * 60)
-    print(f"✓ All 6 game structure diagrams generated in {output_dir}")
+    print(f"✓ All 8 game diagrams generated in {output_dir}")
+    print("  - 6 game structure diagrams")
+    print("  - 1 equilibrium concepts diagram")
+    print("  - 1 payoff matrices diagram")
     print("=" * 60)
 
 

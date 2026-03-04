@@ -10,11 +10,7 @@ Comprehensive sensitivity analysis including:
 
 import streamlit as st
 
-st.set_page_config(
-    page_title="Sensitivity Analysis",
-    page_icon="📊",
-    layout="wide"
-)
+st.set_page_config(page_title="Sensitivity Analysis", page_icon="📊", layout="wide")
 
 st.title("📊 Sensitivity Analysis")
 st.markdown("""

@@ -11,11 +11,7 @@ Comprehensive scenario analysis including:
 
 import streamlit as st
 
-st.set_page_config(
-    page_title="Scenario Analysis",
-    page_icon="🎯",
-    layout="wide"
-)
+st.set_page_config(page_title="Scenario Analysis", page_icon="🎯", layout="wide")
 
 st.title("🎯 Scenario Analysis")
 st.markdown("""

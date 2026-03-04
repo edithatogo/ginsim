@@ -6,9 +6,11 @@ This registry is the index of Conductor tracks for this repository.
 
 | Track ID | Title | Status | Link |
 |---|---|---|---|
-| gdpe_0011_streamlit_e2e | Streamlit dashboard E2E testing + gin-sim repo | 🟡 New | [index](./tracks/gdpe_0011_streamlit_e2e/index.md) |
+| gdpe_0011_streamlit_e2e | Streamlit dashboard E2E testing + gin-sim repo | 🟡 In Progress | [index](./tracks/gdpe_0011_streamlit_e2e/index.md) |
 
 ## Planned Tracks
+
+*No planned tracks.*
 
 ## Archived Tracks
 

@@ -11,28 +11,24 @@ Comprehensive sensitivity analysis including:
 
 import sys
 from pathlib import Path
-from io import BytesIO
 
 # Add project root to path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-import streamlit as st
-import numpy as np
 import jax.numpy as jnp
-import matplotlib.pyplot as plt
 import plotly.graph_objects as go
+import streamlit as st
 
 # Import from core model
 from src.model.sensitivity_total import (
+    sobol_sensitivity,
     tornado_sensitivity,
     twoway_sensitivity,
-    sobol_sensitivity,
-    run_comprehensive_sensitivity,
 )
+from src.model.module_a_behavior import get_standard_policies
 from src.model.parameters import ModelParameters
 from src.model.pipeline import evaluate_single_policy
-from src.model.module_a_behavior import get_standard_policies
 
 # Page configuration
 st.set_page_config(
@@ -44,11 +40,14 @@ st.set_page_config(
 
 # Title
 st.title("📊 Comprehensive Sensitivity Analysis")
-st.markdown("""
+st.markdown(
+    """
 **Powered by JAX/XLA acceleration**
 
-Explore how uncertainty in model parameters affects policy outcomes through multiple sensitivity analysis methods.
-""")
+Explore how uncertainty in model parameters affects policy outcomes
+through multiple sensitivity analysis methods.
+"""
+)
 
 # Sidebar for analysis configuration
 st.sidebar.header("⚙️ Analysis Configuration")
@@ -63,14 +62,29 @@ analysis_type = st.sidebar.selectbox(
 # Parameter selection
 st.sidebar.subheader("Parameters to Analyze")
 
-# Get default parameters
-params = ModelParameters()
+# Get default parameters from ModelParameters to avoid hardcoded values
+params_model = ModelParameters()
 param_options = {
-    "Baseline Testing Uptake": ("baseline_testing_uptake", float(params.baseline_testing_uptake)),
-    "Deterrence Elasticity": ("deterrence_elasticity", float(params.deterrence_elasticity)),
-    "Moratorium Effect": ("moratorium_effect", float(params.moratorium_effect)),
-    "High Risk Premium": ("high_risk_premium", float(params.high_risk_premium)),
-    "Low Risk Premium": ("low_risk_premium", float(params.low_risk_premium)),
+    "Baseline Testing Uptake": (
+        "baseline_testing_uptake",
+        float(params_model.baseline_testing_uptake),
+    ),
+    "Deterrence Elasticity": (
+        "deterrence_elasticity",
+        float(params_model.deterrence_elasticity),
+    ),
+    "Moratorium Effect": (
+        "moratorium_effect",
+        float(params_model.moratorium_effect),
+    ),
+    "High Risk Premium": (
+        "high_risk_premium",
+        float(params_model.high_risk_premium),
+    ),
+    "Low Risk Premium": (
+        "low_risk_premium",
+        float(params_model.low_risk_premium),
+    ),
 }
 
 selected_params = st.sidebar.multiselect(
@@ -117,38 +131,38 @@ def run_sensitivity_cached(
     policy_name: str,
 ) -> dict:
     """Run sensitivity analysis with caching."""
-    # Build base params array
+    # Get default parameters from ModelParameters to avoid hardcoded values
+    params_model = ModelParameters()
     base_params_dict = {
-        "baseline_testing_uptake": 0.52,
-        "deterrence_elasticity": 0.18,
-        "moratorium_effect": 0.15,
-        "high_risk_premium": 0.08,
-        "low_risk_premium": 0.03,
+        "baseline_testing_uptake": float(params_model.baseline_testing_uptake),
+        "deterrence_elasticity": float(params_model.deterrence_elasticity),
+        "moratorium_effect": float(params_model.moratorium_effect),
+        "high_risk_premium": float(params_model.high_risk_premium),
+        "low_risk_premium": float(params_model.low_risk_premium),
     }
-    
-    # Convert to JAX array
+
+    # Convert to JAX array - simplified parameter mapping
     param_indices = []
     param_names = []
     base_values = []
-    
-    param_keys_list = list(param_keys)
-    for key in param_keys_list:
+
+    for key in param_keys:
         if key in param_options:
-            attr_name, _ = param_options[key]
+            attr_name, default_value = param_options[key]
             if attr_name in base_params_dict:
                 param_indices.append(len(base_values))
                 param_names.append(key)
                 base_values.append(base_params_dict[attr_name])
-    
+
     if not base_values:
         return {"error": "No valid parameters selected"}
-    
+
     base_params = jnp.array(base_values)
-    
+
     # Define model function
     policies = get_standard_policies()
     policy = policies.get(policy_name.lower().replace(" ", "_"), policies["status_quo"])
-    
+
     def model_func(params_array):
         """Wrapper to evaluate model with JAX."""
         # Create ModelParameters with varied values
@@ -156,16 +170,17 @@ def run_sensitivity_cached(
         for i, key in enumerate(param_names):
             attr_name, _ = param_options[key]
             params_dict[attr_name] = float(params_array[i])
-        
+
         try:
             eval_params = ModelParameters(**params_dict)
             result = evaluate_single_policy(eval_params, policy)
             return float(result.testing_uptake)
-        except Exception:
-            return 0.0
-    
+        except Exception as e:
+            st.error(f"Model evaluation failed: {e}")
+            return float("nan")
+
     results = {}
-    
+
     if analysis_type in ["Tornado (One-Way)", "Run All"]:
         tornado = tornado_sensitivity(
             model_func,
@@ -175,7 +190,7 @@ def run_sensitivity_cached(
             range_pct=range_pct,
         )
         results["tornado"] = tornado
-    
+
     if analysis_type in ["Sobol (Global)", "Run All"]:
         sobol = sobol_sensitivity(
             model_func,
@@ -185,7 +200,7 @@ def run_sensitivity_cached(
             n_samples=min(n_samples, 1000),  # Cap for caching
         )
         results["sobol"] = sobol
-    
+
     if analysis_type in ["Heat Map (Two-Way)", "Run All"] and len(param_names) >= 2:
         heatmap = twoway_sensitivity(
             model_func,
@@ -198,7 +213,7 @@ def run_sensitivity_cached(
         )
         results["heatmap"] = heatmap
         results["heatmap_params"] = (param_names[0], param_names[1])
-    
+
     return results
 
 
@@ -221,7 +236,7 @@ else:
 # Display results
 if "sensitivity_results" in st.session_state:
     results = st.session_state["sensitivity_results"]
-    
+
     if "error" in results:
         st.error(results["error"])
     else:
@@ -229,34 +244,27 @@ if "sensitivity_results" in st.session_state:
         if "tornado" in results:
             st.divider()
             st.subheader("📊 Tornado Diagram (One-Way Sensitivity)")
-            
+
             tornado = results["tornado"]
-            
+
             # Create tornado plot
             fig = go.Figure()
-            
+
             y_labels = [r.parameter for r in tornado]
-            base_values = [r.base_value for r in tornado]
             low_outcomes = [r.low_outcome for r in tornado]
             high_outcomes = [r.high_outcome for r in tornado]
-            
-            # Calculate bar lengths relative to center
-            max_range = max(
-                max(abs(max(high_outcomes) - min(low_outcomes))),
-                0.01,
-            )
-            
+
             fig.add_trace(
                 go.Bar(
                     y=y_labels,
-                    x=[h - l for h, l in zip(high_outcomes, low_outcomes)],
-                    base=[l for l in low_outcomes],
+                    x=[high - low for high, low in zip(high_outcomes, low_outcomes)],
+                    base=list(low_outcomes),
                     orientation="h",
                     marker_color=["#3498db"] * len(tornado),
                     name="Outcome Range",
                 )
             )
-            
+
             fig.update_layout(
                 title="Parameter Sensitivity (Tornado Diagram)",
                 xaxis_title="Testing Uptake",
@@ -265,9 +273,9 @@ if "sensitivity_results" in st.session_state:
                 height=400,
                 showlegend=False,
             )
-            
+
             st.plotly_chart(fig, use_container_width=True)
-            
+
             # Tornado results table
             st.expander("📋 View Tornado Data").dataframe(
                 {
@@ -278,21 +286,21 @@ if "sensitivity_results" in st.session_state:
                     "Sensitivity": [f"{r.sensitivity_magnitude:.4f}" for r in tornado],
                 }
             )
-        
+
         # Sobol Indices
         if "sobol" in results:
             st.divider()
             st.subheader("🌐 Sobol Global Sensitivity Indices")
-            
+
             sobol = results["sobol"]
-            
+
             # Create Sobol plot
             fig = go.Figure()
-            
+
             y_labels = [r.parameter for r in sobol]
             first_order = [float(r.first_order) for r in sobol]
             total_order = [float(r.total_order) for r in sobol]
-            
+
             fig.add_trace(
                 go.Bar(
                     y=y_labels,
@@ -302,7 +310,7 @@ if "sensitivity_results" in st.session_state:
                     marker_color="#3498db",
                 )
             )
-            
+
             fig.add_trace(
                 go.Bar(
                     y=y_labels,
@@ -313,7 +321,7 @@ if "sensitivity_results" in st.session_state:
                     opacity=0.7,
                 )
             )
-            
+
             fig.update_layout(
                 title="Sobol Sensitivity Indices",
                 xaxis_title="Sensitivity Index",
@@ -322,9 +330,9 @@ if "sensitivity_results" in st.session_state:
                 barmode="overlay",
                 height=400,
             )
-            
+
             st.plotly_chart(fig, use_container_width=True)
-            
+
             # Explanation
             with st.expander("📖 Understanding Sobol Indices"):
                 st.markdown("""
@@ -332,38 +340,36 @@ if "sensitivity_results" in st.session_state:
                 - Measures the main effect of each parameter
                 - Shows how much variance is explained by that parameter alone
                 - Range: 0 (no effect) to 1 (dominant effect)
-                
+
                 **Total-Order Index (S_Ti):**
                 - Measures total contribution including interactions
                 - Shows parameter's main effect + all interaction effects
                 - If S_Ti >> S_i: parameter has strong interactions
-                
+
                 **Interpretation:**
                 - High S_i: Parameter is important on its own
                 - High S_Ti but low S_i: Parameter matters through interactions
                 - Low both: Parameter has minimal impact
                 """)
-            
+
             # Sobol results table
             st.expander("📋 View Sobol Data").dataframe(
                 {
                     "Parameter": [r.parameter for r in sobol],
                     "First-Order (S_i)": [f"{float(r.first_order):.3f}" for r in sobol],
                     "Total-Order (S_Ti)": [f"{float(r.total_order):.3f}" for r in sobol],
-                    "Interactions": [
-                        f"{float(r.total_order - r.first_order):.3f}" for r in sobol
-                    ],
+                    "Interactions": [f"{float(r.total_order - r.first_order):.3f}" for r in sobol],
                 }
             )
-        
+
         # Heat Map
         if "heatmap" in results:
             st.divider()
             st.subheader("🔥 Two-Way Sensitivity Heat Map")
-            
+
             heatmap = results["heatmap"]
             param_names = results["heatmap_params"]
-            
+
             # Create heat map
             fig = go.Figure(
                 data=go.Heatmap(
@@ -374,16 +380,16 @@ if "sensitivity_results" in st.session_state:
                     colorbar=dict(title="Testing Uptake"),
                 )
             )
-            
+
             fig.update_layout(
                 title=f"Interaction: {param_names[0]} × {param_names[1]}",
                 xaxis_title=param_names[1],
                 yaxis_title=param_names[0],
                 height=500,
             )
-            
+
             st.plotly_chart(fig, use_container_width=True)
-            
+
             # Heat map stats
             col1, col2, col3 = st.columns(3)
             with col1:
@@ -396,19 +402,20 @@ if "sensitivity_results" in st.session_state:
 else:
     # Placeholder content
     st.info("👈 Configure analysis parameters in the sidebar and click 'Run Sensitivity Analysis'")
-    
+
     # Example output
     st.markdown("""
     ### What is Sensitivity Analysis?
-    
+
     Sensitivity analysis helps understand how uncertainty in model inputs affects outputs:
-    
-    - **Tornado Diagrams**: Show which parameters have the largest impact when varied individually
+
+    - **Tornado Diagrams**: Show which parameters have the largest impact
     - **Heat Maps**: Visualize how two parameters interact to affect outcomes
-    - **Sobol Indices**: Decompose output variance into contributions from each parameter and their interactions
-    
+    - **Sobol Indices**: Decompose output variance into contributions
+      from each parameter and their interactions
+
     ### Why Use JAX?
-    
+
     JAX acceleration enables:
     - ⚡ **Fast computation**: Vectorized operations on GPU/TPU
     - 🎯 **Accurate gradients**: Automatic differentiation for advanced analysis

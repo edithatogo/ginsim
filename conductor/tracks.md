@@ -4,11 +4,13 @@ This registry is the index of Conductor tracks for this repository.
 
 ## Active Tracks
 
-*No active tracks. All tracks completed.*
+| Track ID | Title | Status | Link |
+|---|---|---|---|
+| gdpe_0012_dashboard_enhancements | Dashboard enhancements (diagrams, sensitivity, JAX verification) | 🟡 New | [index](./tracks/gdpe_0012_dashboard_enhancements/index.md) |
 
 ## Planned Tracks
 
-*No planned tracks. All tracks complete.*
+*No planned tracks.*
 
 ## Archived Tracks
 

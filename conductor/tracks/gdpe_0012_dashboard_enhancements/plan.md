@@ -64,17 +64,45 @@
 **Status:** [~] In Progress
 
 ### Tasks
-- [~] **Task 2.1:** One-way & Two-way sensitivity (Core Implementation)
-    - [ ] Implement tornado and heat map logic in `src/model/`
-    - [ ] Link dashboard UI to these core functions
+- [x] **Task 2.1:** One-way & Two-way sensitivity (Core Implementation) ed5ba95
+    - [x] Implement tornado and heat map logic in `src/model/`
+    - [x] Link dashboard UI to these core functions
+    - [x] Created `src/model/sensitivity_total.py` with JAX-accelerated functions
+    - [x] Created Streamlit page with interactive visualizations
 
-- [ ] **Task 2.2:** Global Sensitivity (Sobol Indices)
-    - [ ] **NEW:** Implement Sobol index calculation using JAX/XLA
-    - [ ] Visualize interaction effects in AU policy context
+- [x] **Task 2.2:** Global Sensitivity (Sobol Indices) ed5ba95
+    - [x] Implement Sobol index calculation using JAX/XLA
+    - [x] First-order and total-order indices
+    - [x] Visualize interaction effects
+    - [x] **Review Fixes:** Applied all code review recommendations (CRITICAL + HIGH priority) 3d407ab
+    - [ ] **Traceability:** Update `docs/UNCERTAINTY_DECOMPOSITION.md`.
 
-- [ ] **Task 2.3:** Probabilistic sensitivity (CEAC)
-    - [ ] JAX-accelerated Monte Carlo simulation
-    - [ ] CEAC visualization for AU vs NZ
+- [ ] **Task 2.3:** Probabilistic sensitivity (CEAC, CEAF, CERAC)
+    - [ ] JAX-accelerated Monte Carlo simulation.
+    - [ ] Implement **CEAF** (optimal frontier) and **CERAC** (risk-aversion) logic in `src/model/`.
+    - [ ] Visualize in dashboard.
+    - [ ] **Traceability:** Update `docs/FORMULAE_INVENTORY.md`.
+
+- [ ] **Task 2.4: Advanced Welfare & Market Metrics**
+    - [ ] **DCEA Implementation**: Calculate distributional impacts across risk groups.
+    - [ ] **Market Tipping Points**: Calculate the % population drop-off (uninsured rate) per $ increase in premium.
+    - [ ] **Enforcement ROI**: Model the net benefit of increasing `enforcement_strength` vs. administrative cost.
+    - [ ] **Scientific Loss**: Quantify the QALY-equivalent of the "data quality externality" in Module F.
+
+
+## Phase 1 — Core Refactor & Game Diagrams (Week 1)
+
+**Goal:** Establish Single Source of Truth and add interactive diagrams
+
+### Tasks
+- [ ] **Task 1.0: Single Source of Truth Refactor (CRITICAL)**
+    - [ ] Refactor `streamlit_app/app.py` to import all model logic from `src/model/`.
+    - [ ] Remove all duplicated simulation or equilibrium logic from the dashboard.
+    - [ ] Establish **Visual Design System** (Consistent color/style for policy shocks across all diagrams).
+
+- [ ] **Task 1.1:** Create game diagram generation functions
+...
+---
 
 ## Phase 3 — Scenario Analysis, JAX Verification & Australian Policy Sandbox (Week 3)
 
@@ -82,27 +110,24 @@
 
 ### Tasks
 - [ ] **Task 3.1:** Pre-defined scenarios & **International Benchmarks**
-    - [ ] Australia 2025 Ban vs. FSC Moratorium
-    - [ ] **USA GINA**: Health-only baseline
-    - [ ] **UK Code**: High-cap Huntington's exception
-    - [ ] **Canada GNDA**: Criminal non-disclosure
+    - [ ] Australia 2025 Ban vs. FSC Moratorium.
+    - [ ] **USA GINA / UK Code / Canada GNDA**.
+    - [ ] **Pydantic Validation**: Run schema checks on all new YAML configs.
 
 - [ ] **Task 3.2:** **Australian Policy Designer (Sandbox)**
-    - [ ] Interactive sliders for caps ($500k/$200k) and enforcement penalties
+    - [ ] Interactive sliders for caps ($500k/$200k) and enforcement penalties.
 
 - [ ] **Task 3.3:** **Extended Strategic Games**
-    - [ ] **NEW:** Implement **"Information Leakage"** proxy-bypass logic
-    - [ ] **NEW:** Implement **"Genetic Altruism"** research participation impact
-    - [ ] **NEW:** Implement **"Cascade Testing"** family deterrence impact
+    - [ ] Implement **"Information Leakage"**, **"Genetic Altruism"**, and **"Cascade Testing"**.
+    - [ ] **Traceability:** Update `docs/GAME_DESCRIPTIONS.md` with new game logic.
 
 - [ ] **Task 3.4:** Comparative **"Delta" View**
-    - [ ] Side-by-side policy comparison with automatic Net Welfare Gain calculation
+    - [ ] Side-by-side policy comparison with automatic Net Welfare Gain calculation.
 
-- [ ] **Task 3.5:** JAX/XLA "Single Source of Truth" & Dashboard Finalization
-    - [ ] Refactor dashboard to import directly from `src/model/`
-    - [ ] Add tooltips for international policy terms
-
-
+- [ ] **Task 3.5:** JAX/XLA Performance & Dashboard Finalization
+    - [ ] **Performance Benchmarking**: Establish baseline (NumPy) vs. JAX/XLA speedup report.
+    - [ ] Final verification of JAX/XLA "Single Source of Truth" implementation.
+    - [ ] Add tooltips for international policy terms.
 
 
 **Phase Completion:**

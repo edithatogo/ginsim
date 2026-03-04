@@ -1,0 +1,9 @@
+[submodule "code"]
+	path = code
+	url = https://github.com/yourusername/genetic-discrimination-policy-code.git
+	update = checkout
+
+[submodule "study"]
+	path = study
+	url = https://github.com/yourusername/genetic-discrimination-policy-study.git
+	update = checkout

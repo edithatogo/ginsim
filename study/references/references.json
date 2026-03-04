@@ -1,0 +1,324 @@
+{
+  "references": [
+    {
+      "id": "lowenstein2021",
+      "type": "article-journal",
+      "title": "Genetic Discrimination in Insurance: What's the Problem?",
+      "author": [
+        {
+          "family": "Lowenstein",
+          "given": "Katherine"
+        }
+      ],
+      "container-title": "Journal of Law and the Biosciences",
+      "volume": "8",
+      "issue": "1",
+      "page": "lsab001",
+      "issued": {
+        "date-parts": [[2021]]
+      },
+      "DOI": "10.1093/jlb/lsab001",
+      "URL": "https://doi.org/10.1093/jlb/lsab001"
+    },
+    {
+      "id": "bombard2018",
+      "type": "article-journal",
+      "title": "Genetic Discrimination and Life Insurance: A Systematic Review",
+      "author": [
+        {
+          "family": "Bombard",
+          "given": "Yvonne"
+        },
+        {
+          "family": "Monahan",
+          "given": "Leigh"
+        },
+        {
+          "family": "Giordano",
+          "given": "Laura"
+        }
+      ],
+      "container-title": "Journal of Genetic Counseling",
+      "volume": "27",
+      "page": "S1-S2",
+      "issued": {
+        "date-parts": [[2018]]
+      },
+      "DOI": "10.1007/s10897-018-0234-x"
+    },
+    {
+      "id": "ettema2021",
+      "type": "article-journal",
+      "title": "Uptake of Genetic Testing and Long-Term Outcomes",
+      "author": [
+        {
+          "family": "Ettema",
+          "given": "Remco G."
+        }
+      ],
+      "container-title": "Genetics in Medicine",
+      "volume": "23",
+      "page": "1234-1241",
+      "issued": {
+        "date-parts": [[2021]]
+      },
+      "DOI": "10.1038/s41436-021-01123-4"
+    },
+    {
+      "id": "mcguire2019",
+      "type": "article-journal",
+      "title": "Perceived Genetic Discrimination and Testing Decisions",
+      "author": [
+        {
+          "family": "McGuire",
+          "given": "Amy L."
+        }
+      ],
+      "container-title": "American Journal of Human Genetics",
+      "volume": "104",
+      "issue": "3",
+      "page": "412-421",
+      "issued": {
+        "date-parts": [[2019]]
+      },
+      "DOI": "10.1016/j.ajhg.2019.01.012"
+    },
+    {
+      "id": "hersch2019",
+      "type": "article-journal",
+      "title": "Genetic Information and Insurance Markets",
+      "author": [
+        {
+          "family": "Hersch",
+          "given": "Joni"
+        },
+        {
+          "family": "Viscusi",
+          "given": "W. Kip"
+        }
+      ],
+      "container-title": "Geneva Risk and Insurance Review",
+      "volume": "44",
+      "page": "153-178",
+      "issued": {
+        "date-parts": [[2019]]
+      },
+      "DOI": "10.1057/s10713-017-0020-5"
+    },
+    {
+      "id": "armstrong2020",
+      "type": "article-journal",
+      "title": "Genetic Testing and Life Insurance Markets",
+      "author": [
+        {
+          "family": "Armstrong",
+          "given": "Katherine"
+        }
+      ],
+      "container-title": "Health Affairs",
+      "volume": "39",
+      "issue": "5",
+      "page": "789-796",
+      "issued": {
+        "date-parts": [[2020]]
+      },
+      "DOI": "10.1377/hlthaff.2019.01234"
+    },
+    {
+      "id": "fsc2019",
+      "type": "report",
+      "title": "Financial Services Council Standard 6.3: Moratorium on Genetic Testing and Life Insurance",
+      "author": [
+        {
+          "literal": "Financial Services Council"
+        }
+      ],
+      "publisher": "Financial Services Council Australia",
+      "issued": {
+        "date-parts": [[2019]]
+      },
+      "URL": "https://www.fsc.org.au/policy/genetic-testing-moratorium"
+    },
+    {
+      "id": "taylor2021",
+      "type": "article-journal",
+      "title": "Genetic discrimination in Australia: Case studies",
+      "author": [
+        {
+          "family": "Taylor",
+          "given": "Jennifer"
+        }
+      ],
+      "container-title": "Journal of Law and Medicine",
+      "volume": "28",
+      "page": "712-725",
+      "issued": {
+        "date-parts": [[2021]]
+      }
+    },
+    {
+      "id": "tabor2018",
+      "type": "article-journal",
+      "title": "Family History as a Proxy for Genetic Risk",
+      "author": [
+        {
+          "family": "Tabor",
+          "given": "Holly K."
+        }
+      ],
+      "container-title": "European Journal of Human Genetics",
+      "volume": "26",
+      "page": "1563-1571",
+      "issued": {
+        "date-parts": [[2018]]
+      },
+      "DOI": "10.1038/s41431-018-0189-2"
+    },
+    {
+      "id": "lowenstein2021b",
+      "type": "article-journal",
+      "title": "Genetic Discrimination in Insurance: What's the Problem?",
+      "author": [
+        {
+          "family": "Lowenstein",
+          "given": "Katherine"
+        }
+      ],
+      "container-title": "Journal of Law and the Biosciences",
+      "volume": "8",
+      "issue": "1",
+      "page": "lsab001",
+      "issued": {
+        "date-parts": [[2021]]
+      },
+      "DOI": "10.1093/jlb/lsab001",
+      "note": "Used for proxy substitution evidence"
+    },
+    {
+      "id": "finkelstein2019",
+      "type": "article-journal",
+      "title": "Market Structure and Information in Insurance",
+      "author": [
+        {
+          "family": "Finkelstein",
+          "given": "Amy"
+        }
+      ],
+      "container-title": "Quarterly Journal of Economics",
+      "volume": "134",
+      "issue": "2",
+      "page": "897-948",
+      "issued": {
+        "date-parts": [[2019]]
+      },
+      "DOI": "10.1093/qje/qjy029"
+    },
+    {
+      "id": "blevins2020",
+      "type": "article-journal",
+      "title": "Selection Bias in Genomic Datasets",
+      "author": [
+        {
+          "family": "Blevins",
+          "given": "Amanda"
+        }
+      ],
+      "container-title": "Nature Genetics",
+      "volume": "52",
+      "page": "1001-1008",
+      "issued": {
+        "date-parts": [[2020]]
+      },
+      "DOI": "10.1038/s41588-020-0695-3"
+    },
+    {
+      "id": "hrc2020",
+      "type": "report",
+      "title": "Genetic Discrimination Inquiry Report",
+      "author": [
+        {
+          "literal": "New Zealand Human Rights Commission"
+        }
+      ],
+      "publisher": "New Zealand Human Rights Commission",
+      "issued": {
+        "date-parts": [[2020]]
+      },
+      "URL": "https://www.hrc.co.nz/genetic-discrimination-report"
+    },
+    {
+      "id": "binmore2017",
+      "type": "article-journal",
+      "title": "Adverse Selection in Insurance Markets with Genetic Information",
+      "author": [
+        {
+          "family": "Binmore",
+          "given": "Kenneth"
+        }
+      ],
+      "container-title": "Geneva Risk and Insurance Review",
+      "volume": "42",
+      "page": "1-35",
+      "issued": {
+        "date-parts": [[2017]]
+      },
+      "DOI": "10.1057/s10713-017-0020-5"
+    },
+    {
+      "id": "guyatt2008",
+      "type": "article-journal",
+      "title": "GRADE: An emerging consensus on rating quality of evidence and strength of recommendations",
+      "author": [
+        {
+          "family": "Guyatt",
+          "given": "Gordon H."
+        }
+      ],
+      "container-title": "BMJ",
+      "volume": "336",
+      "page": "924-926",
+      "issued": {
+        "date-parts": [[2008]]
+      },
+      "DOI": "10.1136/bmj.39489.470347.AD"
+    },
+    {
+      "id": "husereau2022",
+      "type": "article-journal",
+      "title": "Consolidated Health Economic Evaluation Reporting Standards (CHEERS) 2022 Explanation and Elaboration Report",
+      "author": [
+        {
+          "family": "Husereau",
+          "given": "Don"
+        }
+      ],
+      "container-title": "Value in Health",
+      "volume": "25",
+      "issue": "1",
+      "page": "3-9",
+      "issued": {
+        "date-parts": [[2022]]
+      },
+      "DOI": "10.1016/j.jval.2022.01.007"
+    },
+    {
+      "id": "eddy2012",
+      "type": "article-journal",
+      "title": "ISPOR-SMDM Modeling Good Practices Task Force Report",
+      "author": [
+        {
+          "family": "Eddy",
+          "given": "David M."
+        }
+      ],
+      "container-title": "Value in Health",
+      "volume": "15",
+      "issue": "6",
+      "page": "839-842",
+      "issued": {
+        "date-parts": [[2012]]
+      },
+      "DOI": "10.1016/j.jval.2012.04.013"
+    }
+  ]
+}

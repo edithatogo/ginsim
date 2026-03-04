@@ -24,28 +24,28 @@ class TestComputeEVPI:
     def test_returns_positive_evpi(self):
         """Test that EVPI is non-negative."""
         net_benefits = np.array([
-            [100, 80],
-            [120, 90],
-            [110, 85],
+            [100.0, 80.0],
+            [120.0, 90.0],
+            [110.0, 85.0],
         ])
         
-        optimal = np.mean([100, 120, 110])  # Policy 1
+        optimal = float(np.mean([100.0, 120.0, 110.0]))  # Policy 1
         evpi = compute_evpi(net_benefits, optimal)
         
-        assert evpi >= 0
+        assert evpi >= 0.0
     
     def test_evpi_zero_when_no_uncertainty(self):
         """Test that EVPI is zero when no uncertainty."""
         net_benefits = np.array([
-            [100, 80],
-            [100, 80],
-            [100, 80],
+            [100.0, 80.0],
+            [100.0, 80.0],
+            [100.0, 80.0],
         ])
         
-        optimal = 100
+        optimal = 100.0
         evpi = compute_evpi(net_benefits, optimal)
         
-        chex.assert_near(evpi, 0.0, atol=1e-6)
+        chex.assert_equal(evpi, 0.0)
 
 
 class TestComputeEVPPi:
@@ -73,9 +73,9 @@ class TestIdentifyResearchPriority:
     def test_returns_highest_evppi(self):
         """Test that highest EVPPI group is identified."""
         evppi = {
-            'group1': 100,
-            'group2': 200,
-            'group3': 150,
+            'group1': 100.0,
+            'group2': 200.0,
+            'group3': 150.0,
         }
         
         priority = identify_research_priority(evppi)
@@ -109,8 +109,8 @@ class TestFormatVOIResult:
     def test_returns_string(self):
         """Test that formatting returns a string."""
         result = VOIResult(
-            evpi=1000,
-            evppi={'group1': 500, 'group2': 300},
+            evpi=1000.0,
+            evppi={'group1': 500.0, 'group2': 300.0},
             total_uncertainty=0.05,
             research_priority='group1',
         )

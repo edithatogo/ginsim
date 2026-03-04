@@ -57,7 +57,7 @@ def compute_evpi(
     
     evpi = expected_max - max_expected
     
-    return max(0, evpi)  # EVPI cannot be negative
+    return max(0.0, float(evpi))  # EVPI cannot be negative, ensure float return
 
 
 def compute_evppi(

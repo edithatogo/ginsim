@@ -34,7 +34,26 @@
 - [x] Export functionality working
 
 **Phase Completion:**
-- [ ] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md) 7e0db93
+
+---
+
+## Phase 1.5 — Review Fixes
+
+**Goal:** Address code review findings
+
+### Tasks
+- [x] **Task 1.4:** Apply review suggestions
+    - [x] Fix unused variables (gauge_y, feedback_arrow)
+    - [x] Add 15 unit tests for game diagram generation
+    - [x] Add conftest.py for pytest configuration
+    - [x] Format code with ruff
+    - [x] All tests passing
+
+**Acceptance criteria:**
+- [x] All linting issues resolved or documented
+- [x] Test coverage added (15 tests)
+- [x] All tests passing
 
 ---
 
@@ -57,25 +76,30 @@
 
 ## Phase 3 — Scenario Analysis, JAX Verification & Australian Policy Sandbox (Week 3)
 
-**Goal:** Implement scenario analysis, verify JAX logic, and add AU policy designer
+**Goal:** Implement global scenario analysis, verify JAX logic, and add AU policy designer
 
 ### Tasks
-- [ ] **Task 3.1:** Pre-defined scenarios (AU 2025 Ban, FSC Moratorium)
-    - [ ] Standardized scenario definitions in `configs/`
+- [ ] **Task 3.1:** Pre-defined scenarios & **International Benchmarks**
+    - [ ] Australia 2025 Ban vs. FSC Moratorium
+    - [ ] **USA GINA**: Health-only baseline
+    - [ ] **UK Code**: High-cap Huntington's exception
+    - [ ] **Canada GNDA**: Criminal non-disclosure
 
 - [ ] **Task 3.2:** **Australian Policy Designer (Sandbox)**
-    - [ ] Real-time "Policy Sandbox" for adjusting caps and enforcement
+    - [ ] Interactive sliders for caps ($500k/$200k) and enforcement penalties
 
-- [ ] **Task 3.3:** **The "Information Leakage" Game**
-    - [ ] **NEW:** Implement proxy-bypass logic in Module D
-    - [ ] Add dashboard scenario for Leakage Impact
+- [ ] **Task 3.3:** **Extended Strategic Games**
+    - [ ] **NEW:** Implement **"Information Leakage"** proxy-bypass logic
+    - [ ] **NEW:** Implement **"Genetic Altruism"** research participation impact
+    - [ ] **NEW:** Implement **"Cascade Testing"** family deterrence impact
 
 - [ ] **Task 3.4:** Comparative **"Delta" View**
-    - [ ] Implement dynamic policy comparison UI
+    - [ ] Side-by-side policy comparison with automatic Net Welfare Gain calculation
 
-- [ ] **Task 3.5:** JAX/XLA "Single Source of Truth"
-    - [ ] **Refactor dashboard to import from `src/model/`**
-    - [ ] Final verification and benchmarks
+- [ ] **Task 3.5:** JAX/XLA "Single Source of Truth" & Dashboard Finalization
+    - [ ] Refactor dashboard to import directly from `src/model/`
+    - [ ] Add tooltips for international policy terms
+
 
 
 

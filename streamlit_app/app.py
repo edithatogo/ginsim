@@ -162,10 +162,12 @@ with tab2:
         xaxis_title="Policy",
         yaxis_title="Testing Uptake",
         yaxis=dict(tickformat='.0%'),
-        showlegend=False
+        showlegend=False,
+        width=700,
+        height=500
     )
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, use_container_width=False, width=700)
     
     # Sensitivity analysis
     st.subheader("Sensitivity Analysis")
@@ -188,10 +190,12 @@ with tab2:
         title="Sensitivity to Deterrence Elasticity",
         xaxis_title="Deterrence Elasticity",
         yaxis_title="Testing Uptake",
-        yaxis=dict(tickformat='.0%')
+        yaxis=dict(tickformat='.0%'),
+        width=700,
+        height=500
     )
     
-    st.plotly_chart(fig2, use_container_width=True)
+    st.plotly_chart(fig2, use_container_width=False, width=700)
 
 with tab3:
     st.header("Policy Comparison")
@@ -212,13 +216,14 @@ with tab3:
     comparison_df = pd.DataFrame(comparison_data)
     st.table(comparison_df)
     
-    # Download button
-    csv = comparison_df.to_csv(index=False)
+    # Download button (fixed for pandas compatibility)
+    csv = comparison_df.to_csv(index=False, encoding='utf-8')
     st.download_button(
         label="📥 Download Comparison (CSV)",
         data=csv,
         file_name="policy_comparison.csv",
-        mime="text/csv"
+        mime="text/csv",
+        help="Download policy comparison data as CSV"
     )
 
 with tab4:

@@ -480,6 +480,142 @@
         "date-parts": [[2021]]
       },
       "URL": "https://www.naic.org/complaint-index-2021.htm"
+    },
+    {
+      "id": "rothschild1976",
+      "type": "article-journal",
+      "title": "Equilibrium in Competitive Insurance Markets: An Essay on the Economics of Imperfect Information",
+      "author": [
+        {
+          "family": "Rothschild",
+          "given": "Michael"
+        },
+        {
+          "family": "Stiglitz",
+          "given": "Joseph"
+        }
+      ],
+      "container-title": "Quarterly Journal of Economics",
+      "volume": "90",
+      "issue": "4",
+      "page": "629-649",
+      "issued": {
+        "date-parts": [[1976]]
+      },
+      "DOI": "10.2307/1885326"
+    },
+    {
+      "id": "wilson1977",
+      "type": "article-journal",
+      "title": "A Model of Insurance Markets with Incomplete Information",
+      "author": [
+        {
+          "family": "Wilson",
+          "given": "Charles"
+        }
+      ],
+      "container-title": "Journal of Economic Theory",
+      "volume": "16",
+      "issue": "2",
+      "page": "167-207",
+      "issued": {
+        "date-parts": [[1977]]
+      },
+      "DOI": "10.1016/0022-0531(77)90106-7"
+    },
+    {
+      "id": "pauly1974",
+      "type": "article-journal",
+      "title": "Overinsurance and Public Provision of Insurance: The Roles of Moral Hazard and Adverse Selection",
+      "author": [
+        {
+          "family": "Pauly",
+          "given": "Mark V."
+        }
+      ],
+      "container-title": "Quarterly Journal of Economics",
+      "volume": "88",
+      "issue": "1",
+      "page": "44-62",
+      "issued": {
+        "date-parts": [[1974]]
+      },
+      "DOI": "10.2307/1886195"
+    },
+    {
+      "id": "arrow1963",
+      "type": "article-journal",
+      "title": "Uncertainty and the Welfare Economics of Medical Care",
+      "author": [
+        {
+          "family": "Arrow",
+          "given": "Kenneth J."
+        }
+      ],
+      "container-title": "American Economic Review",
+      "volume": "53",
+      "issue": "5",
+      "page": "941-973",
+      "issued": {
+        "date-parts": [[1963]]
+      }
+    },
+    {
+      "id": "akerlof1970",
+      "type": "article-journal",
+      "title": "The Market for 'Lemons': Quality Uncertainty and the Market Mechanism",
+      "author": [
+        {
+          "family": "Akerlof",
+          "given": "George A."
+        }
+      ],
+      "container-title": "Quarterly Journal of Economics",
+      "volume": "84",
+      "issue": "3",
+      "page": "488-500",
+      "issued": {
+        "date-parts": [[1970]]
+      },
+      "DOI": "10.2307/1879431"
+    },
+    {
+      "id": "spence1973",
+      "type": "article-journal",
+      "title": "Job Market Signaling",
+      "author": [
+        {
+          "family": "Spence",
+          "given": "Michael"
+        }
+      ],
+      "container-title": "Quarterly Journal of Economics",
+      "volume": "87",
+      "issue": "3",
+      "page": "355-374",
+      "issued": {
+        "date-parts": [[1973]]
+      },
+      "DOI": "10.2307/1882010"
+    },
+    {
+      "id": "riley2001",
+      "type": "article-journal",
+      "title": "Silver Signals: Twenty-Five Years of Screening and Signaling",
+      "author": [
+        {
+          "family": "Riley",
+          "given": "John G."
+        }
+      ],
+      "container-title": "Journal of Economic Literature",
+      "volume": "39",
+      "issue": "2",
+      "page": "432-478",
+      "issued": {
+        "date-parts": [[2001]]
+      },
+      "DOI": "10.1257/jel.39.2.432"
     }
   ]
 }

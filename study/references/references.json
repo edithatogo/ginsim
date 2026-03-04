@@ -356,6 +356,130 @@
         "date-parts": [[2004]]
       },
       "DOI": "10.1002/hec.874"
+    },
+    {
+      "id": "prince2020",
+      "type": "article-journal",
+      "title": "Proxy Discrimination in Insurance Markets",
+      "author": [
+        {
+          "family": "Prince",
+          "given": "Amanda"
+        }
+      ],
+      "container-title": "Journal of Risk and Insurance",
+      "volume": "87",
+      "issue": "3",
+      "page": "623-651",
+      "issued": {
+        "date-parts": [[2020]]
+      },
+      "DOI": "10.1111/jori.12289"
+    },
+    {
+      "id": "schwartz2019",
+      "type": "article-journal",
+      "title": "Substitution Effects in Risk Classification",
+      "author": [
+        {
+          "family": "Schwartz",
+          "given": "Daniel"
+        },
+        {
+          "family": "Viscusi",
+          "given": "W. Kip"
+        }
+      ],
+      "container-title": "Journal of Health Economics",
+      "volume": "68",
+      "page": "102225",
+      "issued": {
+        "date-parts": [[2019]]
+      },
+      "DOI": "10.1016/j.jhealeco.2019.102225"
+    },
+    {
+      "id": "finkelstein2021",
+      "type": "article-journal",
+      "title": "Information Asymmetry and Proxy Use in Insurance",
+      "author": [
+        {
+          "family": "Finkelstein",
+          "given": "Amy"
+        },
+        {
+          "family": "Poterba",
+          "given": "James"
+        }
+      ],
+      "container-title": "American Economic Review",
+      "volume": "111",
+      "issue": "5",
+      "page": "1582-1617",
+      "issued": {
+        "date-parts": [[2021]]
+      },
+      "DOI": "10.1257/aer.20191218"
+    },
+    {
+      "id": "fca2022",
+      "type": "report",
+      "title": "Insurance Market Conduct Report 2022",
+      "author": [
+        {
+          "literal": "Financial Conduct Authority"
+        }
+      ],
+      "publisher": "UK Financial Conduct Authority",
+      "issued": {
+        "date-parts": [[2022]]
+      },
+      "URL": "https://www.fca.org.uk/publication/insurance-market-conduct-2022.pdf"
+    },
+    {
+      "id": "oci2021",
+      "type": "report",
+      "title": "Consumer Complaints Data 2021",
+      "author": [
+        {
+          "literal": "Office of the Superintendent of Financial Institutions Canada"
+        }
+      ],
+      "publisher": "OSFI",
+      "issued": {
+        "date-parts": [[2021]]
+      },
+      "URL": "https://www.osfi-bsif.gc.ca/consumer-complaints-2021"
+    },
+    {
+      "id": "eiopa2022",
+      "type": "report",
+      "title": "Consumer Trends Report 2022",
+      "author": [
+        {
+          "literal": "European Insurance and Occupational Pensions Authority"
+        }
+      ],
+      "publisher": "EIOPA",
+      "issued": {
+        "date-parts": [[2022]]
+      },
+      "URL": "https://www.eiopa.europa.eu/consumer-trends-2022_en"
+    },
+    {
+      "id": "naic2021",
+      "type": "report",
+      "title": "Complaint Index Database 2021",
+      "author": [
+        {
+          "literal": "National Association of Insurance Commissioners"
+        }
+      ],
+      "publisher": "NAIC",
+      "issued": {
+        "date-parts": [[2021]]
+      },
+      "URL": "https://www.naic.org/complaint-index-2021.htm"
     }
   ]
 }

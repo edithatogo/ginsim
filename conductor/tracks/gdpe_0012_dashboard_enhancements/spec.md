@@ -80,6 +80,14 @@ This track implements comprehensive enhancements to the gin-sim Streamlit dashbo
 
 ## 3. Functional Requirements
 
+### 3.0 Core Integration (CRITICAL)
+
+- [ ] **FR0.1:** Refactor dashboard to import from `src/model/pipeline.py`
+- [ ] **FR0.2:** Remove all duplicated logic from dashboard
+- [ ] **FR0.3:** Add `@st.cache_data` for model computations
+- [ ] **FR0.4:** Verify JAX/XLA backend usage
+- [ ] **FR0.5:** Add JAX consistency tests (≥10 tests)
+
 ### 3.1 Game Diagrams
 
 - [ ] **FR1:** Display 6 game structure diagrams
@@ -104,7 +112,19 @@ This track implements comprehensive enhancements to the gin-sim Streamlit dashbo
 - [ ] **FR14:** Scenario comparison table
 - [ ] **FR15:** Stress testing interface
 
-### 3.4 JAX/XLA Verification
+### 3.5 Module Integration
+
+- [ ] **FR21:** Display Module A outputs (Behavior/Deterrence)
+- [ ] **FR22:** Display Module C outputs (Insurance Equilibrium)
+- [ ] **FR23:** Display Module D outputs (Proxy Substitution)
+- [ ] **FR24:** Display Module E outputs (Pass-Through)
+- [ ] **FR25:** Display Module F outputs (Data Quality)
+- [ ] **FR26:** Display Enforcement outputs (Compliance)
+- [ ] **FR27:** Integrate full pipeline evaluation
+- [ ] **FR28:** Add VOI/EVPPI analysis tab
+- [ ] **FR29:** Add jurisdiction selection (Australia vs New Zealand)
+
+### 3.6 Performance
 
 - [ ] **FR16:** Verify JAX backend usage
 - [ ] **FR17:** Verify XLA acceleration
@@ -141,6 +161,7 @@ This track implements comprehensive enhancements to the gin-sim Streamlit dashbo
 
 ## 5. Acceptance Criteria
 
+- [ ] **AC0:** Dashboard imports from `src/model/` (no duplicated logic)
 - [ ] **AC1:** All 6 game diagrams displayed and interactive
 - [ ] **AC2:** Comprehensive sensitivity analysis (one-way, two-way, probabilistic)
 - [ ] **AC3:** Comprehensive scenario analysis (≥5 pre-defined + custom)
@@ -148,6 +169,9 @@ This track implements comprehensive enhancements to the gin-sim Streamlit dashbo
 - [ ] **AC5:** Performance acceptable (< 5s load, < 2s rendering)
 - [ ] **AC6:** All new features tested (≥20 new tests)
 - [ ] **AC7:** Documentation complete
+- [ ] **AC8:** All 6 modules accessible (A, C, D, E, F, Enforcement)
+- [ ] **AC9:** VOI/EVPPI analysis working
+- [ ] **AC10:** JAX verification tests pass (≥10 tests)
 
 ---
 
@@ -163,12 +187,16 @@ This track implements comprehensive enhancements to the gin-sim Streamlit dashbo
 
 | ID | Deliverable | Format | Location |
 |----|-------------|--------|----------|
-| D1 | Game diagrams module | Python | `streamlit_app/pages/game_diagrams.py` |
-| D2 | Enhanced sensitivity analysis | Python | `streamlit_app/pages/sensitivity.py` |
-| D3 | Scenario analysis module | Python | `streamlit_app/pages/scenarios.py` |
-| D4 | JAX verification tests | Python | `tests/verification/test_jax_consistency.py` |
-| D5 | Updated README | Markdown | `gin-sim/README.md` |
-| D6 | Verification report | Markdown | `docs/JAX_VERIFICATION_REPORT.md` |
+| D0 | Refactored dashboard app | Python | `streamlit_app/app.py` |
+| D1 | Game diagrams module | Python | `streamlit_app/pages/1_Game_Diagrams.py` |
+| D2 | Enhanced sensitivity analysis | Python | `streamlit_app/pages/2_Sensitivity.py` |
+| D3 | Scenario analysis module | Python | `streamlit_app/pages/3_Scenarios.py` |
+| D4 | VOI analysis module | Python | `streamlit_app/pages/4_VOI_Analysis.py` |
+| D5 | UI components library | Python | `streamlit_app/components/` |
+| D6 | JAX verification tests | Python | `tests/verification/test_jax_consistency.py` |
+| D7 | Updated README | Markdown | `gin-sim/README.md` |
+| D8 | JAX verification report | Markdown | `docs/JAX_VERIFICATION_REPORT.md` |
+| D9 | Updated requirements | TXT | `streamlit_app/requirements.txt` |
 
 ---
 

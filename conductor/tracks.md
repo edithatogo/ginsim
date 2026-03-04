@@ -4,7 +4,9 @@ This registry is the index of Conductor tracks for this repository.
 
 ## Active Tracks
 
-*No active tracks. All tracks completed.*
+| Track ID | Title | Status | Link |
+|---|---|---|---|
+| gdpe_0006_formulae_verification | Formulae verification and documentation | 🟡 In Progress | [index](./tracks/gdpe_0006_formulae_verification/index.md) |
 
 ## Planned Tracks
 

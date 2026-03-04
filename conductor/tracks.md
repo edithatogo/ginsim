@@ -6,7 +6,7 @@ This registry is the index of Conductor tracks for this repository.
 
 | Track ID | Title | Status | Link |
 |---|---|---|---|
-| gdpe_0012_dashboard_enhancements | Dashboard enhancements (diagrams, sensitivity, JAX verification) | 🟡 New | [index](./tracks/gdpe_0012_dashboard_enhancements/index.md) |
+| gdpe_0012_dashboard_enhancements | Dashboard enhancements (diagrams, sensitivity, JAX verification) | ⏳ In Progress | [index](./tracks/gdpe_0012_dashboard_enhancements/index.md) |
 | gdpe_0013_external_validation | External Validation (Expert Review & Cross-Validation) | ⏳ In Progress | [index](./tracks/gdpe_0013_external_validation/index.md) |
 
 ## Planned Tracks

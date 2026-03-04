@@ -13,21 +13,26 @@ Formalize the model's external validation through simulated expert face-validity
 ## 2. Scope
 
 ### Phase 1: Simulated Expert Face-Validity Review
-- **Experts:** Simulate feedback from 3 distinct expert personas:
+- **Experts:** Simulate feedback from 4 distinct expert personas:
     1. **Health Economist:** Focus on QALYs, welfare aggregation, and VOI.
     2. **Insurance Actuary:** Focus on adverse selection, pooling vs. separating equilibria, and premium setting.
     3. **Genetic Policy Expert:** Focus on deterrence, moratorium effects, and privacy/discrimination.
+    4. **Indigenous Data Governance Specialist:** Review handling of proxy data (Module D) and implications for Māori and Aboriginal/Torres Strait Islander equity in AU/NZ models.
 - **Protocol:** Use `protocols/face_validity_review_package.md` to generate structured feedback.
 - **Deliverable:** Consolidated Expert Review Report and Action Log.
 
-### Phase 2: Empirical Cross-Validation
+### Phase 2: Empirical Cross-Validation & Australian Prior Audit
 - **Comparison:** Cross-validate model outputs against 5 key studies:
     1. **Hersch & Viscusi (2019):** Adverse selection in life insurance.
     2. **Bombard et al. (2018):** Deterrence effects of genetic discrimination.
     3. **Taylor et al. (2021):** Australian insurance market behavior.
     4. **Armstrong et al. (2020):** Genetic testing uptake under different regimes.
     5. **Lowenstein (2021):** Comparative policy analysis.
-- **Deliverable:** Cross-Validation Report (`docs/CROSS_VALIDATION_REPORT.md`).
+- **Australian Prior Audit:**
+    - Perform a sensitivity audit on **Australia-specific priors** (`AU_behav_001` and `AU_ins_003`).
+    - Verify if the direction of Australian policy advice (Ban vs. Moratorium) is stable across the 95% credible intervals of these priors.
+- **Deliverable:** Cross-Validation & Prior Sensitivity Report.
+
 
 ### Phase 3: Final Synthesis & Publication Readiness
 - **Integration:** Update model assumptions, priors, or structure based on validation findings.

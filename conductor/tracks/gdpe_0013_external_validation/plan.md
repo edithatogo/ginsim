@@ -23,22 +23,27 @@
 
 - [ ] **Task 1.3:** Persona definition and review simulation (Genetic Policy Expert)
   - Simulate expert persona: Legal/Policy expert on genetic discrimination
-  - Evaluate Module A (behavioral deterrence) and enforcement mechanisms
+  - Evaluate Module A (behavioral deterrence) and enforcement mechanisms (AU 2025 Ban vs FSC)
   - Return structured feedback based on `protocols/face_validity_review_package.md`
 
-- [ ] **Task 1.4:** Consolidated validation report
-  - Integrate all 3 expert reports into a final document
+- [ ] **Task 1.4:** Persona definition (Indigenous Data Governance Specialist)
+  - Simulate expert persona: Specialist in Māori and Aboriginal/Torres Strait Islander data sovereignty
+  - Review Module D (Proxy) implications for equity and "information leakage"
+  - Evaluate commitment to Indigenous data principles in documentation
+
+- [ ] **Task 1.5:** Consolidated validation report & **Action Log**
+  - Integrate all 4 expert reports into a final document
   - Create Action Log of recommended changes or justifications
 
 **Acceptance criteria:**
-- 3 structured expert review reports generated
+- 4 structured expert review reports generated (including Indigenous Governance)
 - Consolidated Expert Review Report and Action Log completed
 
 ---
 
-## Phase 2 — Empirical Cross-Validation (Week 2)
+## Phase 2 — Empirical Cross-Validation & Australian Prior Audit (Week 2)
 
-**Goal:** Validate model outputs against published studies
+**Goal:** Validate model outputs against published studies and audit AU priors
 
 ### Tasks
 - [ ] **Task 2.1:** Data extraction and comparison (Adverse Selection)
@@ -49,17 +54,24 @@
   - Extract quantitative targets from Bombard et al. (2018)
   - Compare model deterrence elasticity and testing uptake
 
-- [ ] **Task 2.3:** Data extraction and comparison (Market Behavior)
+- [ ] **Task 2.3:** Data extraction and comparison (Australian Market Behavior)
   - Extract quantitative targets from Taylor et al. (2021) and Armstrong et al. (2020)
-  - Compare Australian market behavior and policy impacts
+  - Compare Australian market behavior and policy impacts (FSC Moratorium vs Baseline)
 
-- [ ] **Task 2.4:** Cross-validation report
+- [ ] **Task 2.4:** **Australian Prior Audit**
+  - Perform sensitivity audit on **AU-specific priors** (`AU_behav_001` and `AU_ins_003`)
+  - Determine if the "Preferred Policy" (Ban vs. Moratorium) flips at the prior extremes (95% CrI)
+  - Document stability of advice in AU context
+
+- [ ] **Task 2.5:** Cross-validation & Audit report
   - Document overall agreement/discrepancies
-  - Explain discrepancies based on model assumptions or context
+  - Explain discrepancies and document AU policy advice stability
 
 **Acceptance criteria:**
 - Cross-validation against 5 studies documented
+- Australian prior audit complete with stability findings
 - Discrepancies addressed and justified
+
 
 ---
 

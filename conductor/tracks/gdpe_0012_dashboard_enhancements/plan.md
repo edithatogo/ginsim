@@ -74,9 +74,9 @@
 
 ---
 
-## Phase 3 — Scenario Analysis & JAX Verification (Week 3)
+## Phase 3 — Scenario Analysis, JAX Verification & Australian Policy Sandbox (Week 3)
 
-**Goal:** Implement scenario analysis and verify JAX logic
+**Goal:** Implement scenario analysis, verify JAX logic, and add AU policy designer
 
 ### Tasks
 - [ ] **Task 3.1:** Pre-defined scenarios
@@ -84,35 +84,36 @@
     - [ ] Worst case policy
     - [ ] Current policy (baseline)
     - [ ] International comparisons (≥2)
+    - [ ] **Australia 2025 Ban Impact** (Pre-defined transition scenario)
 
-- [ ] **Task 3.2:** Custom scenarios
+- [ ] **Task 3.2:** Custom scenarios & **Australian Policy Designer**
     - [ ] Scenario creation interface
+    - [ ] **AU Sandbox**: Sliders for `enforcement_strength` and financial caps ($500k Life / $200k TPD)
     - [ ] Save scenarios
     - [ ] Load scenarios
-    - [ ] Scenario comparison table
 
-- [ ] **Task 3.3:** Stress testing
-    - [ ] Extreme parameter values
-    - [ ] Boundary condition testing
-    - [ ] Model robustness verification
+- [ ] **Task 3.3:** Comparative **"Delta" View**
+    - [ ] Implement side-by-side policy comparison logic
+    - [ ] Calculate Net Welfare Gain/Loss dynamically
+    - [ ] Visualize incremental premium impacts
 
-- [ ] **Task 3.4:** JAX/XLA verification
-    - [ ] Verify JAX backend usage
-    - [ ] Verify XLA acceleration
-    - [ ] Performance benchmarks
+- [ ] **Task 3.4:** JAX/XLA verification & **Dynamic Glossary**
+    - [ ] Verify JAX backend usage and performance
+    - [ ] **Glossary Integration**: Add tooltips for terms from `context/data_dictionary_template.md` (e.g., "FSC", "Statutory Penalties")
     - [ ] Consistency tests with model
 
-- [ ] **Task 3.5:** Create dashboard page
+- [ ] **Task 3.5:** Create dashboard pages
     - [ ] New page: `pages/scenarios.py`
     - [ ] Scenario management interface
-    - [ ] Comparison visualization
+    - [ ] Comparison visualization (Delta View)
 
 **Acceptance criteria:**
-- ≥5 pre-defined scenarios
-- Custom scenario creation working
-- Stress testing complete
+- ≥6 pre-defined scenarios (including AU 2025 Ban)
+- Australian Policy Designer (Sandbox) working
+- Delta View calculating incremental impacts correctly
 - JAX verification complete
-- Documentation complete
+- Dynamic glossary tooltips active
+
 
 **Phase Completion:**
 - [ ] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)

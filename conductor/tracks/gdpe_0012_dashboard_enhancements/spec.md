@@ -53,9 +53,11 @@ This track implements comprehensive enhancements to the gin-sim Streamlit dashbo
    - Worst case policy
    - Current policy (baseline)
    - International comparisons
+   - **Australia 2025 Ban Impact** (Transition from industry moratorium to statutory prohibition)
 
-2. **Custom Scenarios**
+2. **Custom Scenarios & Policy Sandbox**
    - User-defined parameter sets
+   - **Australian Policy Designer**: Sliders for `enforcement_strength` and `sum_insured_caps` (specifically for $500k/$200k caps)
    - Save/load scenarios
    - Scenario comparison
 
@@ -64,7 +66,12 @@ This track implements comprehensive enhancements to the gin-sim Streamlit dashbo
    - Boundary condition testing
    - Model robustness verification
 
-### 2.4 JAX/XLA Logic Verification
+4. **Comparative "Delta" View**
+   - Side-by-side policy contrast (e.g., Ban vs. Moratorium)
+   - Automatic calculation of Net Welfare Gain/Loss
+   - Incremental Premium Impact visualization
+
+### 2.4 JAX/XLA Logic Verification & Dynamic Glossary
 
 1. **Backend Verification**
    - Verify dashboard uses same JAX functions as model
@@ -75,6 +82,11 @@ This track implements comprehensive enhancements to the gin-sim Streamlit dashbo
    - Compare dashboard outputs with model outputs
    - Verify numerical accuracy
    - Test edge cases
+
+3. **Dynamic Glossary & Tooltips**
+   - Integrate `context/data_dictionary_template.md`
+   - Interactive tooltips for Australian terms (FSC, Statutory Penalties, Adverse Selection Elasticity)
+
 
 ---
 

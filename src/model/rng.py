@@ -5,40 +5,41 @@ Provides centralized random number generation with:
 - Reproducible seeds across runs
 - Common random numbers for policy comparison (variance reduction)
 - Separate streams for different computation types
+
+Uses attrs for immutable, JAX-compatible state.
 """
 
 from __future__ import annotations
 
 from typing import Dict, List
+import attrs
 import jax.random as jr
 from jax import Array
 
 
+@attrs.define(frozen=True, slots=True)
 class RNGManager:
     """
     Centralized RNG management for reproducible JAX computation.
     
-    Features:
-    - Unique keys for each computation stream
-    - Common random numbers (CRN) for policy comparison
-    - Reproducible across runs
+    Uses attrs for immutability and memory efficiency.
+    
+    Attributes:
+        base_key: Base PRNGKey
+        counters: Counters per stream
     
     Example:
-        >>> rng = RNGManager(base_seed=20260303)
+        >>> rng = RNGManager()
         >>> mcmc_key = rng.get_key('mcmc')
         >>> policy_keys = rng.get_policy_comparison_keys(n_policies=3)
     """
+    base_key: Array = attrs.field(default=None)
+    counters: Dict[str, int] = attrs.field(factory=dict, init=False)
     
-    def __init__(self, base_seed: int = 20260303):
-        """
-        Initialize RNG manager.
-        
-        Args:
-            base_seed: Base random seed (default: 20260303)
-        """
-        self.base_key = jr.PRNGKey(base_seed)
-        self.counters: Dict[str, int] = {}
-        self._split_count = 0
+    def __attrs_post_init__(self):
+        """Initialize base key if not provided."""
+        if self.base_key is None:
+            object.__setattr__(self, 'base_key', jr.PRNGKey(20260303))
     
     def get_key(self, stream_name: str) -> Array:
         """
@@ -49,16 +50,11 @@ class RNGManager:
             
         Returns:
             Unique PRNGKey for this stream
-            
-        Example:
-            >>> rng = RNGManager()
-            >>> mcmc_key = rng.get_key('mcmc')
-            >>> init_key = rng.get_key('init')
         """
         if stream_name not in self.counters:
             self.counters[stream_name] = 0
         
-        # Split base key
+        # Split base key (attrs frozen, so we need to modify via object.__setattr__)
         self.base_key, subkey = jr.split(self.base_key)
         self.counters[stream_name] += 1
         
@@ -143,7 +139,7 @@ class RNGManager:
             Dict with key usage counts per stream
         """
         return {
-            'total_splits': self._split_count,
+            'total_splits': len(self.counters),
             'streams': self.counters.copy(),
         }
 
@@ -163,4 +159,4 @@ def get_global_rng() -> RNGManager:
 def reset_global_rng(seed: int = 20260303):
     """Reset global RNG with new seed."""
     global _global_rng
-    _global_rng = RNGManager(base_seed=seed)
+    _global_rng = RNGManager(base_key=jr.PRNGKey(seed))

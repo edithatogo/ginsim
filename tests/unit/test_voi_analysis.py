@@ -1,9 +1,12 @@
 """
 Unit tests for VOI analysis.
+
+Uses chex for JAX-specific testing utilities.
 """
 
 import pytest
 import numpy as np
+import chex
 
 from src.model.voi_analysis import (
     compute_evpi,
@@ -42,7 +45,7 @@ class TestComputeEVPI:
         optimal = 100
         evpi = compute_evpi(net_benefits, optimal)
         
-        assert evpi == 0
+        chex.assert_near(evpi, 0.0, atol=1e-6)
 
 
 class TestComputeEVPPi:

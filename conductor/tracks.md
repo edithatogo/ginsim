@@ -4,7 +4,9 @@ This registry is the index of Conductor tracks for this repository.
 
 ## Active Tracks
 
-*No active tracks. All tracks completed.*
+| Track ID | Title | Status | Link |
+|---|---|---|---|
+| gdpe_0009_streamlit_dashboard | Streamlit dashboard with GitHub sync | 🟡 In Progress | [index](./tracks/gdpe_0009_streamlit_dashboard/index.md) |
 
 ## Planned Tracks
 

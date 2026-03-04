@@ -7,6 +7,11 @@ This registry is the index of Conductor tracks for this repository.
 | Track ID | Title | Status | Link |
 |---|---|---|---|
 | gdpe_0005_game_validation | Game validation and documentation | 🟡 New | [index](./tracks/gdpe_0005_game_validation/index.md) |
+| gdpe_0006_formulae_verification | Formulae verification and documentation | 🟡 New | [index](./tracks/gdpe_0006_formulae_verification/index.md) |
+| gdpe_0007_game_execution | Game execution (individual + hybrid) | 🟡 New | [index](./tracks/gdpe_0007_game_execution/index.md) |
+| gdpe_0008_testing_strategy | Comprehensive testing (>95% coverage) | 🟡 New | [index](./tracks/gdpe_0008_testing_strategy/index.md) |
+| gdpe_0009_streamlit_dashboard | Streamlit dashboard with GitHub sync | 🟡 New | [index](./tracks/gdpe_0009_streamlit_dashboard/index.md) |
+| gdpe_0010_final_repo_check | Final repository check | 🟡 New | [index](./tracks/gdpe_0010_final_repo_check/index.md) |
 
 ## Archived Tracks
 

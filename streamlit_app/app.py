@@ -39,6 +39,14 @@ Interactive exploration of policy impacts on genetic testing uptake, insurance m
 **Uses core JAX-accelerated model for all computations.**
 """)
 
+# Navigation to new pages
+st.info("""
+**🎯 New Features:**
+- 🎮 [Game Diagrams](/1_Game_Diagrams) - Visualize the 6 game-theoretic modules
+- 📊 [Sensitivity Analysis](/2_Sensitivity) - Comprehensive sensitivity and uncertainty analysis
+- 🎯 [Scenario Analysis](/3_Scenarios) - Compare policy scenarios and use the Australian Policy Sandbox
+""")
+
 # Sidebar for parameter adjustment
 st.sidebar.header("⚙️ Model Parameters")
 

@@ -10,28 +10,28 @@
 **Goal:** Add interactive game structure diagrams to dashboard
 
 ### Tasks
-- [ ] **Task 1.1:** Create game diagram generation functions
-    - [ ] Module A diagram (Behavior/Deterrence)
-    - [ ] Module C diagram (Insurance Equilibrium)
-    - [ ] Module D diagram (Proxy Substitution)
-    - [ ] Module E diagram (Pass-Through)
-    - [ ] Module F diagram (Data Quality)
-    - [ ] Enforcement diagram (Compliance)
+- [x] **Task 1.1:** Create game diagram generation functions
+    - [x] Module A diagram (Behavior/Deterrence)
+    - [x] Module C diagram (Insurance Equilibrium)
+    - [x] Module D diagram (Proxy Substitution)
+    - [x] Module E diagram (Pass-Through)
+    - [x] Module F diagram (Data Quality)
+    - [x] Enforcement diagram (Compliance)
 
-- [ ] **Task 1.2:** Create dashboard page for diagrams
-    - [ ] New page: `pages/game_diagrams.py`
-    - [ ] Navigation from main page
-    - [ ] Interactive elements
+- [x] **Task 1.2:** Create dashboard page for diagrams
+    - [x] New page: `pages/game_diagrams.py`
+    - [x] Navigation from main page
+    - [x] Interactive elements
 
-- [ ] **Task 1.3:** Add export functionality
-    - [ ] PNG export
-    - [ ] SVG export
-    - [ ] Download buttons
+- [x] **Task 1.3:** Add export functionality
+    - [x] PNG export
+    - [x] SVG export
+    - [x] Download buttons
 
 **Acceptance criteria:**
-- All 6 game diagrams displayed
-- Interactive elements working
-- Export functionality working
+- [x] All 6 game diagrams displayed
+- [x] Interactive elements working
+- [x] Export functionality working
 
 **Phase Completion:**
 - [ ] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
@@ -40,79 +40,43 @@
 
 ## Phase 2 — Comprehensive Sensitivity Analysis (Week 2)
 
-**Goal:** Implement comprehensive sensitivity analysis features
+**Goal:** Implement comprehensive sensitivity analysis with Sobol indices
 
 ### Tasks
-- [ ] **Task 2.1:** One-way sensitivity (tornado diagrams)
-    - [ ] Tornado diagram generation
-    - [ ] Interactive parameter selection
-    - [ ] Real-time updates
+- [ ] **Task 2.1:** One-way & Two-way sensitivity (Core Implementation)
+    - [ ] Implement tornado and heat map logic in `src/model/`
+    - [ ] Link dashboard UI to these core functions
 
-- [ ] **Task 2.2:** Two-way sensitivity (heat maps)
-    - [ ] Heat map generation
-    - [ ] Parameter pair selection
-    - [ ] Interactive exploration
+- [ ] **Task 2.2:** Global Sensitivity (Sobol Indices)
+    - [ ] **NEW:** Implement Sobol index calculation using JAX/XLA
+    - [ ] Visualize interaction effects in AU policy context
 
 - [ ] **Task 2.3:** Probabilistic sensitivity (CEAC)
-    - [ ] Monte Carlo simulation
-    - [ ] CEAC generation
-    - [ ] Uncertainty visualization
-
-- [ ] **Task 2.4:** Create dashboard page
-    - [ ] New page: `pages/sensitivity.py`
-    - [ ] Tab navigation for different analyses
-    - [ ] Export functionality
-
-**Acceptance criteria:**
-- One-way sensitivity working
-- Two-way sensitivity working
-- Probabilistic sensitivity working
-- All visualizations interactive
-
-**Phase Completion:**
-- [ ] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
-
----
+    - [ ] JAX-accelerated Monte Carlo simulation
+    - [ ] CEAC visualization for AU vs NZ
 
 ## Phase 3 — Scenario Analysis, JAX Verification & Australian Policy Sandbox (Week 3)
 
 **Goal:** Implement scenario analysis, verify JAX logic, and add AU policy designer
 
 ### Tasks
-- [ ] **Task 3.1:** Pre-defined scenarios
-    - [ ] Best case policy
-    - [ ] Worst case policy
-    - [ ] Current policy (baseline)
-    - [ ] International comparisons (≥2)
-    - [ ] **Australia 2025 Ban Impact** (Pre-defined transition scenario)
+- [ ] **Task 3.1:** Pre-defined scenarios (AU 2025 Ban, FSC Moratorium)
+    - [ ] Standardized scenario definitions in `configs/`
 
-- [ ] **Task 3.2:** Custom scenarios & **Australian Policy Designer**
-    - [ ] Scenario creation interface
-    - [ ] **AU Sandbox**: Sliders for `enforcement_strength` and financial caps ($500k Life / $200k TPD)
-    - [ ] Save scenarios
-    - [ ] Load scenarios
+- [ ] **Task 3.2:** **Australian Policy Designer (Sandbox)**
+    - [ ] Real-time "Policy Sandbox" for adjusting caps and enforcement
 
-- [ ] **Task 3.3:** Comparative **"Delta" View**
-    - [ ] Implement side-by-side policy comparison logic
-    - [ ] Calculate Net Welfare Gain/Loss dynamically
-    - [ ] Visualize incremental premium impacts
+- [ ] **Task 3.3:** **The "Information Leakage" Game**
+    - [ ] **NEW:** Implement proxy-bypass logic in Module D
+    - [ ] Add dashboard scenario for Leakage Impact
 
-- [ ] **Task 3.4:** JAX/XLA verification & **Dynamic Glossary**
-    - [ ] Verify JAX backend usage and performance
-    - [ ] **Glossary Integration**: Add tooltips for terms from `context/data_dictionary_template.md` (e.g., "FSC", "Statutory Penalties")
-    - [ ] Consistency tests with model
+- [ ] **Task 3.4:** Comparative **"Delta" View**
+    - [ ] Implement dynamic policy comparison UI
 
-- [ ] **Task 3.5:** Create dashboard pages
-    - [ ] New page: `pages/scenarios.py`
-    - [ ] Scenario management interface
-    - [ ] Comparison visualization (Delta View)
+- [ ] **Task 3.5:** JAX/XLA "Single Source of Truth"
+    - [ ] **Refactor dashboard to import from `src/model/`**
+    - [ ] Final verification and benchmarks
 
-**Acceptance criteria:**
-- ≥6 pre-defined scenarios (including AU 2025 Ban)
-- Australian Policy Designer (Sandbox) working
-- Delta View calculating incremental impacts correctly
-- JAX verification complete
-- Dynamic glossary tooltips active
 
 
 **Phase Completion:**

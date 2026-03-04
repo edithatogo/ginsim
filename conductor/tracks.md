@@ -4,7 +4,9 @@ This registry is the index of Conductor tracks for this repository.
 
 ## Active Tracks
 
-*No active tracks. All tracks completed.*
+| Track ID | Title | Status | Link |
+|---|---|---|---|
+| gdpe_0008_testing_strategy | Comprehensive testing (>95% coverage) | 🟡 In Progress | [index](./tracks/gdpe_0008_testing_strategy/index.md) |
 
 ## Planned Tracks
 

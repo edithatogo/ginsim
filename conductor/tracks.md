@@ -4,9 +4,7 @@ This registry is the index of Conductor tracks for this repository.
 
 ## Active Tracks
 
-| Track ID | Title | Status | Link |
-|---|---|---|---|
-| gdpe_0014_repo_professionalization | Repository Professionalization & Remote Monitoring | [x] Completed | [index](./tracks/gdpe_0014_repo_professionalization/index.md) |
+*No active tracks. All tracks complete.*
 
 ## Planned Tracks
 
@@ -16,6 +14,7 @@ This registry is the index of Conductor tracks for this repository.
 
 | Track ID | Title | Status | Link |
 |---|---|---|---|
+| gdpe_0014_repo_professionalization | Repository Professionalization & Remote Monitoring | ✅ Complete | [archived](./archive/gdpe_0014_repo_professionalization/index.md) |
 | gdpe_0013_external_validation | External Validation & Historical Concordance | ✅ Complete | [archived](./archive/gdpe_0013_external_validation/index.md) |
 | gdpe_0012_dashboard_enhancements | Dashboard enhancements (diagrams, sensitivity, JAX verification) | ✅ Complete | [archived](./archive/gdpe_0012_dashboard_enhancements/index.md) |
 | gdpe_0011_streamlit_e2e | Streamlit dashboard E2E testing + gin-sim repo | ✅ Complete | [archived](./archive/gdpe_0011_streamlit_e2e/index.md) |
@@ -34,5 +33,5 @@ This registry is the index of Conductor tracks for this repository.
 
 ## 🎉 ALL TRACKS COMPLETE
 
-**Total Tracks:** 13/13  
+**Total Tracks:** 14/14  
 **Repository Status:** Publication Ready (SOTA) ✅

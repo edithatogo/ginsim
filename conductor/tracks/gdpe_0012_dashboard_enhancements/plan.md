@@ -105,9 +105,12 @@
     - [x] Australian Policy Designer (Sandbox) with interactive sliders
     - [x] **Review Fixes:** Added 8 unit tests for scenario analysis module 874fc0e
 
-- [ ] **Task 3.3:** **Extended Strategic Games**
-    - [ ] Implement **"Information Leakage"**, **"Genetic Altruism"**, and **"Cascade Testing"**.
-    - [ ] **Traceability:** Update `docs/GAME_DESCRIPTIONS.md` with new game logic.
+- [x] **Task 3.3:** Extended Strategic Games f34d5c3
+    - [x] Implement **Information Leakage** game (proxy-bypass logic)
+    - [x] Implement **Genetic Altruism** game (family-influenced decisions)
+    - [x] Implement **Cascade Testing** game (sequential family testing)
+    - [x] Create interactive Streamlit page for all three games
+    - [ ] **Traceability:** Update `docs/GAME_DESCRIPTIONS.md` with new game logic
 
 - [ ] **Task 3.4:** Comparative **"Delta" View**
     - [ ] Side-by-side policy comparison with automatic Net Welfare Gain calculation.

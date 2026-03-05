@@ -508,3 +508,40 @@ This log tracks key modelling, methodological, and infrastructure decisions with
 ---
 
 **END OF DECISION LOG**
+
+## Decisions from External Validation (Track gdpe_0013)
+
+## Decision: Dual-Horizon Welfare Reporting (Conflict Resolution)
+- **Date:** 2026-03-05
+- **Track:** gdpe_0013_external_validation
+- **Category:** Methods/Policy
+- **Context:** Resolving conflict between Health Economist (long-term QALYs) and Policy Expert (3-year budget cycles)
+- **Options considered:**
+  - Option A: Prioritize long-term welfare (Standard HTA approach)
+  - Option B: Prioritize political time-horizons (Budget Impact Analysis)
+  - Option C: Multi-period reporting (Dual-Horizon)
+- **Decision:** Option C — Multi-period reporting
+- **Rationale:** 
+  - Acknowledges both the scientific reality of long-term health gains and the political reality of short-term costs.
+  - Improves persuasiveness to Treasury while maintaining HTA rigor.
+- **Impact:** DCBA ledger must be updated to output Year 3 and Year 20 metrics.
+- **Review date:** Before Phase 3 synthesis
+
+---
+
+## Decision: Equity-First ML re-optimization (Conflict Resolution)
+- **Date:** 2026-03-05
+- **Track:** gdpe_0013_external_validation
+- **Category:** Methods/Equity
+- **Context:** Resolving conflict between Actuary (ML optimality) and Indigenous Specialist (Algorithmic Fairness)
+- **Options considered:**
+  - Option A: Use standard global ML optimization (Actuary preference)
+  - Option B: Prohibit proxy re-optimization in model (Policy preference)
+  - Option C: Adversarial fairness audit with group-specific noise (Equity preference)
+- **Decision:** Option C — Adversarial fairness audit
+- **Rationale:** 
+  - Allows the model to simulate realistic insurer behavior (adversarial re-optimization) but forces visibility into the disproportionate impact on sparse-data groups.
+  - Aligns with SOTA Algorithmic Fairness literature.
+- **Impact:** Module D must include data-quality quintile reporting.
+- **Review date:** Before Phase 3 synthesis
+

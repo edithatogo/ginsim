@@ -1,12 +1,12 @@
 """
 DCBA (Distributional Cost-Benefit Analysis) Ledger.
 
-Aggregates welfare impacts across stakeholders.
+Aggregates welfare impacts across stakeholders with time dynamics.
 """
 
 from __future__ import annotations
 
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 from dataclasses import dataclass
 import jax.numpy as jnp
 from jax import jit
@@ -25,6 +25,7 @@ class DCBAResult:
         health_benefits: Health benefits (QALYs)
         fiscal_impact: Fiscal impact (government)
         distributional_weight: Distributional weight applied
+        time_horizon: Time horizon in years
     """
     net_welfare: Float[Array, ""]
     consumer_surplus: Float[Array, ""]
@@ -32,6 +33,7 @@ class DCBAResult:
     health_benefits: Float[Array, ""]
     fiscal_impact: Float[Array, ""]
     distributional_weight: Float[Array, ""]
+    time_horizon: int
 
 
 @jit
@@ -41,23 +43,9 @@ def compute_consumer_surplus(
     baseline_premium: Float[Array, ""],
     value_of_testing: float = 100.0,
 ) -> Float[Array, ""]:
-    """
-    Compute consumer surplus change.
-    
-    Consumer surplus = value_of_testing * uptake - premium_change
-    
-    Args:
-        testing_uptake: Testing uptake rate
-        insurance_premium: Premium under policy
-        baseline_premium: Premium under baseline
-        value_of_testing: Per-person value of testing
-        
-    Returns:
-        Consumer surplus change
-    """
+    """Compute consumer surplus change."""
     premium_change = insurance_premium - baseline_premium
     surplus = testing_uptake * value_of_testing - premium_change
-    
     return surplus
 
 
@@ -66,16 +54,7 @@ def compute_producer_surplus(
     insurer_profits: Float[Array, ""],
     baseline_profits: Float[Array, ""],
 ) -> Float[Array, ""]:
-    """
-    Compute producer (insurer) surplus change.
-    
-    Args:
-        insurer_profits: Insurer profits under policy
-        baseline_profits: Insurer profits under baseline
-        
-    Returns:
-        Producer surplus change
-    """
+    """Compute producer surplus change."""
     return insurer_profits - baseline_profits
 
 
@@ -85,26 +64,29 @@ def compute_health_benefits(
     baseline_uptake: Float[Array, ""],
     qaly_per_test: float = 0.01,
     value_per_qaly: float = 50000.0,
+    time_horizon: int = 20,
+    discount_rate: float = 0.03,
 ) -> Float[Array, ""]:
     """
-    Compute health benefits from testing.
+    Compute health benefits with time discounting.
     
-    Health benefits = (uptake - baseline) * qaly_per_test * value_per_qaly
-    
-    Args:
-        testing_uptake: Testing uptake under policy
-        baseline_uptake: Testing uptake under baseline
-        qaly_per_test: QALYs gained per test
-        value_per_qaly: Monetary value per QALY
-        
-    Returns:
-        Health benefits (monetized)
+    In the short term (e.g. Year 3), health benefits are lower as
+    screening/prevention takes time to manifest as QALY gains.
     """
     uptake_change = testing_uptake - baseline_uptake
-    qaly_gain = uptake_change * qaly_per_test
+    
+    # Time-dependent manifestation factor (Scientific Power logic)
+    # Year 3: 20% of lifetime benefits manifested
+    # Year 20: 100% of lifetime benefits manifested
+    manifestation_factor = jnp.minimum(time_horizon / 20.0, 1.0)
+    
+    qaly_gain = uptake_change * qaly_per_test * manifestation_factor
     health_benefit = qaly_gain * value_per_qaly
     
-    return health_benefit
+    # Discount back to present
+    discount_factor = (1 + discount_rate) ** (-time_horizon / 2) # Mid-point discount
+    
+    return health_benefit * discount_factor
 
 
 @jit
@@ -113,49 +95,31 @@ def compute_fiscal_impact(
     baseline_uptake: Float[Array, ""],
     cost_per_test: float = 500.0,
     health_savings_per_test: float = 200.0,
+    setup_cost: float = 1e6,
+    time_horizon: int = 20,
 ) -> Float[Array, ""]:
     """
-    Compute fiscal impact (government).
+    Compute fiscal impact with setup costs.
     
-    Fiscal impact = cost_of_testing - health_savings
-    
-    Args:
-        testing_uptake: Testing uptake under policy
-        baseline_uptake: Testing uptake under baseline
-        cost_per_test: Government cost per test
-        health_savings_per_test: Health system savings per test
-        
-    Returns:
-        Fiscal impact (negative = cost, positive = savings)
+    Short-term (Year 3) is dominated by setup costs.
+    Long-term (Year 20) is dominated by cumulative savings.
     """
     uptake_change = testing_uptake - baseline_uptake
-    testing_cost = uptake_change * cost_per_test
-    health_savings = uptake_change * health_savings_per_test
     
-    fiscal_impact = health_savings - testing_cost
+    # Recurring costs/savings
+    annual_testing_cost = uptake_change * cost_per_test
+    annual_health_savings = uptake_change * health_savings_per_test * (time_horizon / 20.0)
+    
+    total_recurring = (annual_health_savings - annual_testing_cost) * time_horizon
+    
+    # Front-loaded setup costs (only in year 1-3)
+    effective_setup = setup_cost if time_horizon >= 1 else 0.0
+    
+    fiscal_impact = total_recurring - effective_setup
     
     return fiscal_impact
 
 
-@jit
-def apply_distributional_weight(
-    welfare_impact: Float[Array, ""],
-    weight: float = 1.0,
-) -> Float[Array, ""]:
-    """
-    Apply distributional weight to welfare impact.
-    
-    Args:
-        welfare_impact: Unweighted welfare impact
-        weight: Distributional weight (>1 favors disadvantaged)
-        
-    Returns:
-        Weighted welfare impact
-    """
-    return welfare_impact * weight
-
-
-# Don't use @jit - returns dataclass which JAX doesn't support
 def compute_dcba(
     testing_uptake: Float[Array, ""],
     baseline_uptake: Float[Array, ""],
@@ -164,73 +128,46 @@ def compute_dcba(
     insurer_profits: Float[Array, ""],
     baseline_profits: Float[Array, ""],
     distributional_weight: float = 1.0,
+    time_horizon: int = 20,
 ) -> DCBAResult:
-    """
-    Compute full DCBA ledger.
+    """Compute full DCBA ledger for a specific time horizon."""
+    consumer_surplus = compute_consumer_surplus(testing_uptake, insurance_premium, baseline_premium)
+    producer_surplus = compute_producer_surplus(insurer_profits, baseline_profits)
+    health_benefits = compute_health_benefits(testing_uptake, baseline_uptake, time_horizon=time_horizon)
+    fiscal_impact = compute_fiscal_impact(testing_uptake, baseline_uptake, time_horizon=time_horizon)
     
-    Args:
-        testing_uptake: Testing uptake under policy
-        baseline_uptake: Testing uptake under baseline
-        insurance_premium: Premium under policy
-        baseline_premium: Premium under baseline
-        insurer_profits: Insurer profits under policy
-        baseline_profits: Insurer profits under baseline
-        distributional_weight: Distributional weight
-        
-    Returns:
-        DCBAResult object
-    """
-    # Compute components
-    consumer_surplus = compute_consumer_surplus(
-        testing_uptake,
-        insurance_premium,
-        baseline_premium,
-    )
-    
-    producer_surplus = compute_producer_surplus(
-        insurer_profits,
-        baseline_profits,
-    )
-    
-    health_benefits = compute_health_benefits(
-        testing_uptake,
-        baseline_uptake,
-    )
-    
-    fiscal_impact = compute_fiscal_impact(
-        testing_uptake,
-        baseline_uptake,
-    )
-    
-    # Net welfare
-    net_welfare = consumer_surplus + producer_surplus + health_benefits + fiscal_impact
-    
-    # Apply distributional weight
-    weighted_welfare = apply_distributional_weight(net_welfare, distributional_weight)
+    net_welfare = (consumer_surplus * time_horizon) + producer_surplus + health_benefits + fiscal_impact
+    weighted_welfare = net_welfare * distributional_weight
     
     return DCBAResult(
         net_welfare=weighted_welfare,
-        consumer_surplus=consumer_surplus,
+        consumer_surplus=consumer_surplus * time_horizon,
         producer_surplus=producer_surplus,
         health_benefits=health_benefits,
         fiscal_impact=fiscal_impact,
         distributional_weight=jnp.array(distributional_weight),
+        time_horizon=time_horizon,
     )
 
 
-def format_dcba_result(result: DCBAResult) -> str:
-    """
-    Format DCBA result for display.
+def compute_dual_horizon_dcba(
+    **kwargs
+) -> Dict[str, DCBAResult]:
+    """Compute DCBA for both short-term (Year 3) and long-term (Year 20)."""
+    res_3 = compute_dcba(**kwargs, time_horizon=3)
+    res_20 = compute_dcba(**kwargs, time_horizon=20)
     
-    Args:
-        result: DCBAResult object
-        
-    Returns:
-        Formatted string
-    """
+    return {
+        "short_term": res_3,
+        "long_term": res_20
+    }
+
+
+def format_dcba_result(result: DCBAResult) -> str:
+    """Format DCBA result for display."""
     lines = [
         "=" * 60,
-        "DCBA (Distributional Cost-Benefit Analysis) Ledger",
+        f"DCBA Ledger (Horizon: {result.time_horizon} years)",
         "=" * 60,
         f"Consumer Surplus:    ${float(result.consumer_surplus):>12,.2f}",
         f"Producer Surplus:    ${float(result.producer_surplus):>12,.2f}",
@@ -241,5 +178,4 @@ def format_dcba_result(result: DCBAResult) -> str:
         f"Distributional Weight: {float(result.distributional_weight):.2f}x",
         "=" * 60,
     ]
-    
     return "\n".join(lines)

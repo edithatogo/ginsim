@@ -11,7 +11,7 @@ Parameters are separated into:
 from __future__ import annotations
 
 from typing import Dict, List, Optional, Tuple
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, ConfigDict
 import yaml
 from pathlib import Path
 
@@ -22,6 +22,16 @@ class ModelParameters(BaseModel):
     
     All parameters are derived from evidence registers (gdpe_0002).
     """
+    model_config = ConfigDict(
+        extra='forbid',
+        json_schema_extra={
+            'example': {
+                'baseline_testing_uptake': 0.52,
+                'deterrence_elasticity': 0.18,
+                'jurisdiction': 'australia',
+            }
+        }
+    )
     
     # =========================================================================
     # Module A: Behavior / Deterrence
@@ -147,22 +157,13 @@ class ModelParameters(BaseModel):
         if v not in ['australia', 'new_zealand']:
             raise ValueError("jurisdiction must be 'australia' or 'new_zealand'")
         return v
-    
-    class Config:
-        extra = 'forbid'  # Catch typos in parameter names
-        json_schema_extra = {
-            'example': {
-                'baseline_testing_uptake': 0.52,
-                'deterrence_elasticity': 0.18,
-                'jurisdiction': 'australia',
-            }
-        }
 
 
 class HyperParameters(BaseModel):
     """
     Computational and MCMC hyperparameters.
     """
+    model_config = ConfigDict(extra='forbid')
     
     # MCMC settings
     n_draws: int = Field(
@@ -205,15 +206,13 @@ class HyperParameters(BaseModel):
         gt=1.0,
         description="R-hat convergence threshold"
     )
-    
-    class Config:
-        extra = 'forbid'
 
 
 class PolicyConfig(BaseModel):
     """
     Policy regime encoding.
     """
+    model_config = ConfigDict(extra='forbid')
     
     name: str = Field(
         ...,
@@ -257,8 +256,17 @@ class PolicyConfig(BaseModel):
         description="Maximum penalty for violations"
     )
     
-    class Config:
-        extra = 'forbid'
+    penalty_type: str = Field(
+        default="civil",
+        description="Type of penalty ('civil' or 'criminal')"
+    )
+    
+    @field_validator('penalty_type')
+    @classmethod
+    def validate_penalty_type(cls, v: str) -> str:
+        if v not in ['civil', 'criminal']:
+            raise ValueError("penalty_type must be 'civil' or 'criminal'")
+        return v
 
 
 def load_parameters(config_path: str | Path) -> ModelParameters:

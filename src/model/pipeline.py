@@ -62,7 +62,6 @@ class PolicyEvaluationResult:
     all_metrics: Dict
 
 
-@jit
 def evaluate_single_policy(
     params: ModelParameters,
     policy: PolicyConfig,
@@ -101,6 +100,7 @@ def evaluate_single_policy(
         'premium_low_risk': insurance_eq.premium_low_risk,
         'avg_premium': (insurance_eq.premium_high_risk + insurance_eq.premium_low_risk) / 2,
         'risk_rating': insurance_eq.premium_high_risk - insurance_eq.premium_low_risk,
+        'uninsured_rate': insurance_eq.uninsured_rate,
     }
     
     # =========================================================================

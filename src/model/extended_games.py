@@ -56,30 +56,23 @@ def information_leakage_game(
     
     Even with genetic testing bans, insurers may reconstruct risk
     using family history, medical records, and other proxies.
-    
-    Args:
-        baseline_uptake: Baseline testing uptake without discrimination
-        ban_effectiveness: How effective the ban is (0-1)
-        proxy_accuracy: How accurately proxies predict genetic risk (0-1)
-        insurer_inference_strength: Insurer's ability to use proxies (0-1)
-    
-    Returns:
-        InformationLeakageResult with leakage metrics
     """
     # Reconstruction accuracy = proxy accuracy × insurer inference strength
     reconstruction_accuracy = proxy_accuracy * insurer_inference_strength
     
     # Bypass rate = how much of the ban is circumvented
-    # Higher reconstruction → higher bypass
-    bypass_rate = reconstruction_accuracy * (1 - ban_effectiveness)
+    # AL_1.2.1: Non-linear bypass acceleration at high accuracy
+    threshold = 0.7
+    base_bypass = reconstruction_accuracy * (1 - ban_effectiveness)
+    acceleration = jnp.where(reconstruction_accuracy > threshold, 1.5, 1.0)
+    bypass_rate = jnp.clip(base_bypass * acceleration, 0.0, 1.0)
     
     # Effective uptake = baseline + (ban effect reduced by leakage)
-    ban_boost = 0.20  # 20% increase from ban (example value)
+    ban_boost = 0.20  # 20% increase from ban
     effective_uptake = baseline_uptake + ban_boost * (1 - bypass_rate)
     
     # Welfare loss from leakage
-    # Leakage reduces the effectiveness of the ban
-    welfare_loss = bypass_rate * 50000  # Example: $50k loss per bypass point
+    welfare_loss = bypass_rate * 50000
     
     return InformationLeakageResult(
         reconstruction_accuracy=float(reconstruction_accuracy),
@@ -94,24 +87,19 @@ def genetic_altruism_game(
     family_risk_level: Float[Array, ""],
     altruism_strength: Float[Array, ""],
     family_size: Float[Array, ""],
+    kinship_multiplier: float = 1.0,
 ) -> GeneticAltruismResult:
     """
     Model genetic testing decisions influenced by family altruism.
     
-    Individuals may get tested not just for themselves, but to help
-    family members make informed decisions.
-    
     Args:
-        baseline_uptake: Baseline testing uptake for self-interest
-        family_risk_level: Family's genetic risk level (0-1)
-        altruism_strength: Strength of altruistic motivation (0-1)
-        family_size: Number of family members who could benefit
-    
-    Returns:
-        GeneticAltruismResult with altruism metrics
+        kinship_multiplier: Corrects Western nuclear bias (AL_1.4.1)
     """
+    # Effective family size accounts for collective structures (Whānau)
+    effective_family_size = family_size * kinship_multiplier
+    
     # Altruism coefficient = how much family influences decision
-    altruism_coefficient = altruism_strength * jnp.minimum(family_size / 5, 1.0)
+    altruism_coefficient = altruism_strength * jnp.minimum(effective_family_size / 5, 2.0)
     
     # Family testing rate increases with risk and altruism
     family_testing_rate = baseline_uptake * (1 + altruism_coefficient * family_risk_level)
@@ -119,10 +107,9 @@ def genetic_altruism_game(
     # Spillover effect: non-tested family members benefit from information
     spillover_effect = altruism_coefficient * family_risk_level * 0.1
     
-    # Welfare impact from altruism
-    # Positive: better family decisions
-    # Negative: potential anxiety from family risk knowledge
-    welfare_impact = spillover_effect * 100000 - altruism_coefficient * 5000
+    # Welfare impact from altruism (AL_1.1.1: Threshold behavior)
+    scientific_power = 1.0 / (1.0 + jnp.exp(-10.0 * (spillover_effect - 0.1)))
+    welfare_impact = scientific_power * 100000 - altruism_coefficient * 5000
     
     return GeneticAltruismResult(
         family_testing_rate=float(family_testing_rate),
@@ -139,31 +126,21 @@ def cascade_testing_game(
     average_family_size: Float[Array, ""],
     cost_per_test: Float[Array, ""],
     detection_yield: Float[Array, ""],
+    kinship_multiplier: float = 1.0,
 ) -> CascadeTestingResult:
     """
     Model cascade testing within families.
-    
-    After an index case is identified, family members are contacted
-    and offered testing, creating a cascade effect.
-    
-    Args:
-        index_case_rate: Rate of initial (index) testers
-        family_contact_rate: Fraction of families successfully contacted
-        uptake_after_contact: Testing uptake after family contact
-        average_family_size: Average number of testable family members
-        cost_per_test: Cost per genetic test
-        detection_yield: Probability of detecting mutation per test
-    
-    Returns:
-        CascadeTestingResult with cascade metrics
     """
     # Assume 1000 population for calculation
     population = 1000
     index_cases = int(index_case_rate * population)
     
+    # Effective family size accounts for collective structures (AL_1.4.1)
+    effective_family_size = average_family_size * kinship_multiplier
+    
     # Secondary cases from cascade
     eligible_families = index_cases * family_contact_rate
-    testable_relatives = eligible_families * (average_family_size - 1)  # Exclude index
+    testable_relatives = eligible_families * (effective_family_size - 1)  # Exclude index
     secondary_cases = int(testable_relatives * uptake_after_contact)
     
     # Total tests
@@ -171,7 +148,7 @@ def cascade_testing_game(
     
     # Cost-effectiveness
     total_cost = total_tests * cost_per_test
-    detections = index_cases * detection_yield + secondary_cases * detection_yield * 0.5  # Lower yield in cascade
+    detections = index_cases * detection_yield + secondary_cases * detection_yield * 0.5
     cost_effectiveness = total_cost / jnp.maximum(detections, 1)
     
     return CascadeTestingResult(
@@ -187,15 +164,7 @@ def cascade_testing_game(
 def run_extended_games_batch(
     params_batch: Dict[str, Float[Array, "batch"]],
 ) -> Dict[str, Float[Array, "batch"]]:
-    """
-    Run all extended games in batch for efficiency.
-    
-    Args:
-        params_batch: Dictionary of parameter arrays for batch processing
-        
-    Returns:
-        Dictionary of result arrays for all games
-    """
+    """Run all extended games in batch for efficiency."""
     # Information Leakage
     leakage_result = vmap(lambda **kwargs: information_leakage_game(**kwargs))(
         baseline_uptake=params_batch.get("baseline_uptake", jnp.array([0.5])),
@@ -210,6 +179,7 @@ def run_extended_games_batch(
         family_risk_level=params_batch.get("family_risk", jnp.array([0.3])),
         altruism_strength=params_batch.get("altruism_strength", jnp.array([0.5])),
         family_size=params_batch.get("family_size", jnp.array([4.0])),
+        kinship_multiplier=params_batch.get("kinship_multiplier", jnp.array([1.0])),
     )
     
     # Cascade Testing
@@ -220,6 +190,7 @@ def run_extended_games_batch(
         average_family_size=params_batch.get("family_size", jnp.array([4.0])),
         cost_per_test=params_batch.get("test_cost", jnp.array([500.0])),
         detection_yield=params_batch.get("detection_yield", jnp.array([0.1])),
+        kinship_multiplier=params_batch.get("kinship_multiplier", jnp.array([1.0])),
     )
     
     return {
@@ -250,17 +221,7 @@ def format_extended_games_results(
     altruism: GeneticAltruismResult,
     cascade: CascadeTestingResult,
 ) -> str:
-    """
-    Format extended games results as markdown table.
-    
-    Args:
-        leakage: Information leakage result
-        altruism: Genetic altruism result
-        cascade: Cascade testing result
-        
-    Returns:
-        Formatted markdown string
-    """
+    """Format extended games results as markdown table."""
     lines = []
     lines.append("## Extended Strategic Games Results\n")
     

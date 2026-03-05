@@ -116,13 +116,14 @@ def compute_violation_benefit(
     
     benefit = base_benefit * benefit_multiplier
     
-    return benefit
+    return jnp.array(benefit)
 
 
 @jit
 def compute_compliance_decision(
     violation_benefit: Float[Array, ""],
     expected_penalty: Float[Array, ""],
+    is_criminal: bool = False,
 ) -> Float[Array, ""]:
     """
     Compute probability of compliance (vs violation).
@@ -130,15 +131,15 @@ def compute_compliance_decision(
     Insurer complies if expected penalty > violation benefit.
     Uses smooth decision function (logit).
     
-    Args:
-        violation_benefit: Benefit from violating
-        expected_penalty: Expected penalty if caught
-        
-    Returns:
-        Compliance probability
+    Criminal penalties have a "qualitative shift" in deterrence.
     """
+    # Adjust penalty effectiveness for criminal status
+    # Criminal record is a significant additional deterrent beyond the fine
+    qualitative_multiplier = jnp.where(is_criminal, 2.0, 1.0)
+    effective_penalty = expected_penalty * qualitative_multiplier
+    
     # Net benefit of violation
-    net_benefit = violation_benefit - expected_penalty
+    net_benefit = violation_benefit - effective_penalty
     
     # Logit decision function
     scale = 5.0  # Decision sharpness
@@ -166,22 +167,27 @@ def compute_compliance_equilibrium(
     """
     # Detection probability
     detection_prob = compute_detection_probability(
-        policy.enforcement_strength,
-        monitoring_intensity,
+        jnp.array(policy.enforcement_strength),
+        jnp.array(monitoring_intensity),
     )
     
     # Expected penalty
     expected_pen = compute_expected_penalty(
         policy.penalty_max,
         detection_prob,
-        params.enforcement_effectiveness,
+        jnp.array(params.enforcement_effectiveness),
     )
     
     # Violation benefit
     violation_ben = compute_violation_benefit(params, policy)
     
     # Compliance decision
-    compliance_prob = compute_compliance_decision(violation_ben, expected_pen)
+    is_criminal = policy.penalty_type == "criminal"
+    compliance_prob = compute_compliance_decision(
+        jnp.array(violation_ben), 
+        expected_pen, 
+        is_criminal=is_criminal
+    )
     
     # Violation rate
     violation_rate = 1.0 - compliance_prob
@@ -270,6 +276,7 @@ def compute_optimal_enforcement(
             sum_insured_caps=policy.sum_insured_caps,
             enforcement_strength=enf_strength,
             penalty_max=policy.penalty_max,
+            penalty_type=policy.penalty_type,
         )
         
         # Compute compliance
@@ -299,6 +306,7 @@ def compute_optimal_enforcement(
         sum_insured_caps=policy.sum_insured_caps,
         enforcement_strength=optimal_enforcement,
         penalty_max=policy.penalty_max,
+        penalty_type=policy.penalty_type,
     )
     
     optimal_outcome = compute_compliance_equilibrium(params, optimal_policy)

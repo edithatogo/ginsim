@@ -1,7 +1,7 @@
 """
 Module A: Behavior / Deterrence model - CORE JIT-compiled functions.
 
-This module contains the core JIT-compiled functions that work with JAX arrays.
+This module contains the core functions that work with JAX arrays.
 Use module_a_behavior_wrappers.py for user-facing functions that accept pydantic models.
 
 Strategic Game: Testing Participation under Penalty Risk
@@ -12,8 +12,9 @@ Strategic Game: Testing Participation under Penalty Risk
 
 from __future__ import annotations
 
-from typing import Dict, Tuple
+from typing import Dict, Tuple, List, Any
 import jax.numpy as jnp
+import jax.random as jr
 from jax import jit, vmap
 from jaxtyping import Array, Float
 
@@ -71,12 +72,12 @@ def compute_perceived_penalty(
     # Final perceived penalty
     perceived_penalty = base_penalty * (1.0 - penalty_reduction)
 
-    return perceived_penalty
+    return jnp.array(perceived_penalty)
 
 
 # Convenience wrapper that accepts ModelParameters and PolicyConfig
 def compute_perceived_penalty_wrapper(
-    params: ModelParameters,
+    params: Any,
     policy: PolicyConfig,
 ) -> float:
     """Wrapper that accepts pydantic models."""
@@ -92,25 +93,16 @@ def compute_perceived_penalty_wrapper(
     return float(penalty)
 
 
-@jit
 def compute_testing_utility(
-    benefits: Float[Array, ""],
+    benefits: Float[Array, "..."],
     perceived_penalty: Float[Array, ""],
-    individual_characteristics: Dict[str, Float[Array, ""]] | None = None,
-) -> Float[Array, ""]:
+    individual_characteristics: Dict[str, Float[Array, "..."]] | None = None,
+) -> Float[Array, "..."]:
     """
     Compute utility of genetic testing.
     
     Utility function:
         U(test) = benefits - perceived_penalty + individual_factors
-    
-    Args:
-        benefits: Perceived benefits of testing (health, information)
-        perceived_penalty: Perceived discrimination penalty
-        individual_characteristics: Optional individual-level factors
-        
-    Returns:
-        Utility of testing
     """
     # Base utility
     utility = benefits - perceived_penalty
@@ -123,22 +115,14 @@ def compute_testing_utility(
     return utility
 
 
-@jit
 def compute_testing_probability(
-    utility: Float[Array, ""],
+    utility: Float[Array, "..."],
     scale: float = 1.0,
-) -> Float[Array, ""]:
+) -> Float[Array, "..."]:
     """
     Compute probability of testing given utility (logit model).
     
     P(test) = exp(scale * utility) / (1 + exp(scale * utility))
-    
-    Args:
-        utility: Utility of testing
-        scale: Scale parameter (higher = more deterministic choice)
-        
-    Returns:
-        Probability of testing
     """
     scaled_utility = utility * scale
     probability = jnp.exp(scaled_utility) / (1.0 + jnp.exp(scaled_utility))
@@ -147,9 +131,7 @@ def compute_testing_probability(
 
 # Don't use @jit - has boolean conditional
 def compute_testing_uptake(
-    baseline_testing_uptake: float,
-    deterrence_elasticity: float,
-    moratorium_effect: float,
+    params: Any,
     policy: PolicyConfig,
     benefits_mean: float = 0.5,
     benefits_sd: float = 0.1,
@@ -159,16 +141,8 @@ def compute_testing_uptake(
     """
     Compute aggregate testing uptake under policy regime.
     
-    This function:
-    1. Computes perceived penalty for policy regime
-    2. Simulates heterogeneous benefits across individuals
-    3. Computes testing probability for each individual
-    4. Aggregates to population-level uptake
-    
     Args:
-        baseline_testing_uptake: Baseline testing uptake
-        deterrence_elasticity: Deterrence elasticity
-        moratorium_effect: Moratorium effect size
+        params: Model parameters (ModelParameters)
         policy: Policy configuration
         benefits_mean: Mean perceived benefits of testing
         benefits_sd: Standard deviation of benefits
@@ -180,12 +154,12 @@ def compute_testing_uptake(
     """
     # Compute perceived penalty
     perceived_penalty = compute_perceived_penalty(
-        deterrence_elasticity,
-        0.15,  # baseline_loading
+        params.adverse_selection_elasticity,
+        params.baseline_loading,
         policy.allow_genetic_test_results,
         policy.enforcement_strength,
-        0.5,  # enforcement_effectiveness
-        moratorium_effect,
+        params.enforcement_effectiveness,
+        params.moratorium_effect,
         policy.sum_insured_caps,
     )
     
@@ -211,45 +185,18 @@ def compute_testing_uptake(
     
     return uptake
 
-
-@jit
 def compute_policy_effect(
-    baseline_testing_uptake: float,
-    deterrence_elasticity: float,
-    moratorium_effect: float,
+    params: Any,
     baseline_policy: PolicyConfig,
     reform_policy: PolicyConfig,
 ) -> Dict[str, Float[Array, ""]]:
+
     """
     Compute effect of policy reform on testing uptake.
-    
-    Args:
-        baseline_testing_uptake: Baseline testing uptake
-        deterrence_elasticity: Deterrence elasticity
-        moratorium_effect: Moratorium effect size
-        baseline_policy: Baseline policy configuration
-        reform_policy: Reform policy configuration
-        
-    Returns:
-        Dictionary with:
-        - baseline_uptake: Testing uptake under baseline
-        - reform_uptake: Testing uptake under reform
-        - absolute_effect: Absolute change in uptake
-        - relative_effect: Relative change in uptake
     """
     # Compute uptake under both policies
-    baseline_uptake = compute_testing_uptake(
-        baseline_testing_uptake,
-        deterrence_elasticity,
-        moratorium_effect,
-        baseline_policy,
-    )
-    reform_uptake = compute_testing_uptake(
-        baseline_testing_uptake,
-        deterrence_elasticity,
-        moratorium_effect,
-        reform_policy,
-    )
+    baseline_uptake = compute_testing_uptake(params, baseline_policy)
+    reform_uptake = compute_testing_uptake(params, reform_policy)
     
     # Compute effects
     absolute_effect = reform_uptake - baseline_uptake
@@ -263,34 +210,18 @@ def compute_policy_effect(
     }
 
 
-# Vectorized version for batch evaluation
-_compute_testing_uptake_batch = vmap(
-    compute_testing_uptake,
-    in_axes=(None, 0, None, None, None, None),
-    out_axes=0,
-)
-
-
-@jit
 def evaluate_multiple_policies(
-    params: ModelParameters,
-    policies: list[PolicyConfig],
+    params: Any,
+    policies: List[PolicyConfig],
     **kwargs,
-) -> Float[Array, "n_policies"]:
+) -> Dict[str, Float[Array, ""]]:
     """
-    Evaluate testing uptake for multiple policies (vectorized).
-    
-    Uses vmap for efficient batch evaluation.
-    
-    Args:
-        params: Model parameters
-        policies: List of policy configurations
-        **kwargs: Additional arguments for compute_testing_uptake
-        
-    Returns:
-        Array of uptake rates for each policy
+    Evaluate testing uptake for multiple policies.
     """
-    return _compute_testing_uptake_batch(params, policies, **kwargs)
+    results = {}
+    for policy in policies:
+        results[policy.name] = compute_testing_uptake(params, policy, **kwargs)
+    return results
 
 
 # Convenience function for common scenarios

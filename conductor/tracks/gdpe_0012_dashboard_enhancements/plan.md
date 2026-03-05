@@ -76,7 +76,7 @@
     - [x] Visualize interaction effects
     - [x] **Review Fixes:** Applied all code review recommendations (CRITICAL + HIGH priority) 3d407ab
     - [x] **Additional Fix:** Bind loop variable in CEAC analysis (B023) 639020d
-    - [ ] **Traceability:** Update `docs/UNCERTAINTY_DECOMPOSITION.md`.
+    - [x] **Traceability:** Update `docs/UNCERTAINTY_DECOMPOSITION.md`
 
 - [x] **Task 2.3:** Probabilistic sensitivity (CEAC)
     - [x] JAX-accelerated Monte Carlo simulation
@@ -114,7 +114,7 @@
     - [x] Implement **Genetic Altruism** game (family-influenced decisions)
     - [x] Implement **Cascade Testing** game (sequential family testing)
     - [x] Create interactive Streamlit page for all three games
-    - [ ] **Traceability:** Update `docs/GAME_DESCRIPTIONS.md` with new game logic
+    - [x] **Traceability:** Update `docs/GAME_DESCRIPTIONS.md` with new game logic
 
 - [x] **Task 3.4:** Comparative "Delta" View 76cbe01
     - [x] Side-by-side policy comparison with automatic Net Welfare Gain calculation

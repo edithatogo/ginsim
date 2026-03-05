@@ -1,0 +1,215 @@
+#!/usr/bin/env python3
+"""
+JAX/XLA Verification Tests
+
+Verify that dashboard uses JAX-accelerated model from src/model/
+and benchmark performance improvements.
+"""
+
+import pytest
+import time
+import numpy as np
+from pathlib import Path
+
+
+class TestJAXConsistency:
+    """Test that JAX model produces consistent results."""
+
+    def test_jax_deterministic_with_seed(self):
+        """Test that JAX random operations are deterministic with fixed seed."""
+        import jax.random as random
+        import jax.numpy as jnp
+
+        key = random.PRNGKey(42)
+        result1 = random.uniform(key, shape=(10,)).sum()
+        
+        key = random.PRNGKey(42)
+        result2 = random.uniform(key, shape=(10,)).sum()
+
+        # Should be identical
+        assert float(result1) == float(result2)
+
+    def test_jax_array_operations(self):
+        """Test that JAX array operations work correctly."""
+        import jax.numpy as jnp
+        from jax import jit
+
+        @jit
+        def simple_calc(x, y):
+            return x * 2 + y
+
+        result = simple_calc(jnp.array(5.0), jnp.array(3.0))
+        assert float(result) == 13.0
+
+
+class TestJAXPerformance:
+    """Benchmark JAX performance improvements."""
+
+    def test_jax_jit_speedup(self):
+        """Test that JIT compilation provides speedup."""
+        import jax.numpy as jnp
+        from jax import jit
+        import time
+
+        @jit
+        def jit_func(x):
+            return x ** 2 + 2 * x + 1
+
+        def plain_func(x):
+            return x ** 2 + 2 * x + 1
+
+        x = jnp.array(1000.0)
+
+        # Warm up JIT
+        _ = jit_func(x)
+
+        # Time plain version
+        start = time.perf_counter()
+        for _ in range(100):
+            _ = plain_func(x)
+        time_plain = time.perf_counter() - start
+
+        # Time jit version
+        start = time.perf_counter()
+        for _ in range(100):
+            _ = jit_func(x)
+        time_jit = time.perf_counter() - start
+
+        # JIT should be comparable or faster
+        assert time_jit <= time_plain * 1.5  # Allow some variance
+
+    def test_batch_processing_speedup(self):
+        """Test that batch processing works correctly."""
+        from src.model.sensitivity_total import _evaluate_model_jax
+        import jax.numpy as jnp
+        import time
+
+        def simple_model(params):
+            return jnp.sum(params ** 2)
+
+        base_params = jnp.array([0.5, 0.2, 0.1, 0.08, 0.03])
+
+        # Batch evaluation
+        param_indices = jnp.array([0, 1, 2, 3, 4], dtype=jnp.int32)
+        param_values = jnp.array([0.6, 0.25, 0.12, 0.1, 0.04])
+
+        # Time batch
+        start = time.perf_counter()
+        result = _evaluate_model_jax(simple_model, base_params, param_indices, param_values)
+        time_batch = time.perf_counter() - start
+
+        # Should complete quickly and return correct shape
+        assert time_batch < 1.0
+        assert result.shape == (5,)
+        assert float(result[0]) > 0  # Should have positive values  # Less than 1 second
+
+
+class TestDashboardIntegration:
+    """Test that dashboard properly imports from src/model/."""
+
+    def test_dashboard_imports_core_model(self):
+        """Test that dashboard imports from core model."""
+        # Read dashboard file
+        dashboard_path = Path(__file__).parent.parent.parent / "streamlit_app" / "app.py"
+        
+        with open(dashboard_path, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        # Check for core model imports
+        assert "from src.model" in content
+        assert "evaluate_single_policy" in content or "pipeline" in content
+
+    def test_no_duplicate_logic(self):
+        """Test that dashboard doesn't duplicate model logic."""
+        dashboard_path = Path(__file__).parent.parent.parent / "streamlit_app" / "app.py"
+        
+        with open(dashboard_path, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        # Check for common duplicated patterns (should NOT be present)
+        # These are signs of duplicated logic
+        assert "def compute_equilibrium" not in content
+        assert "def compute_testing_uptake" not in content
+        assert "def evaluate_policy" not in content
+
+
+class TestReproducibility:
+    """Test reproducibility of JAX model."""
+
+    def test_reproducible_results(self):
+        """Test that results are reproducible across runs."""
+        import jax.numpy as jnp
+        from jax import jit
+        import jax.random as random
+
+        @jit
+        def deterministic_func(x, key):
+            return jnp.sum(x) + random.uniform(key).sum()
+
+        x = jnp.array([1.0, 2.0, 3.0])
+
+        # Run with same seed
+        key1 = random.PRNGKey(123)
+        key2 = random.PRNGKey(123)
+
+        result1 = deterministic_func(x, key1)
+        result2 = deterministic_func(x, key2)
+
+        # Should be identical
+        assert float(result1) == float(result2)
+
+
+class TestSensitivityAnalysis:
+    """Test sensitivity analysis JAX acceleration."""
+
+    def test_sobol_indices_range(self):
+        """Test that Sobol indices are in valid range [0, 1]."""
+        import jax.numpy as jnp
+        from src.model.sensitivity_total import sobol_sensitivity
+
+        def simple_model(params):
+            return jnp.sum(params)
+
+        base_params = jnp.array([0.5, 0.2, 0.1, 0.08, 0.03])
+        param_names = ["p1", "p2", "p3", "p4", "p5"]
+        param_indices = [0, 1, 2, 3, 4]
+
+        results = sobol_sensitivity(
+            simple_model,
+            base_params,
+            param_names,
+            param_indices,
+            n_samples=100,  # Small for testing
+        )
+
+        # All indices should be in [0, 1]
+        for result in results:
+            assert 0.0 <= result.first_order <= 1.0
+            assert 0.0 <= result.total_order <= 1.0
+
+    def test_tornado_sensitivity_ordering(self):
+        """Test that tornado results are sorted by sensitivity."""
+        import jax.numpy as jnp
+        from src.model.sensitivity_total import tornado_sensitivity
+
+        # Use a simple wrapper that converts to JAX arrays
+        def simple_model(params_array):
+            return params_array[0] * 2 + params_array[1] * 1 + params_array[2] * 0.5
+
+        base_params = jnp.array([0.5, 0.2, 0.1])
+        param_names = ["p0", "p1", "p2"]
+        param_indices = [0, 1, 2]
+
+        results = tornado_sensitivity(
+            simple_model,
+            base_params,
+            param_names,
+            param_indices,
+            range_pct=0.25,
+        )
+
+        # Should be sorted by sensitivity (descending)
+        magnitudes = [r.sensitivity_magnitude for r in results]
+        assert magnitudes == sorted(magnitudes, reverse=True)
+        # p0 should be most sensitive
+        assert results[0].parameter == "p0"

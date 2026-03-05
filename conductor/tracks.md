@@ -6,7 +6,6 @@ This registry is the index of Conductor tracks for this repository.
 
 | Track ID | Title | Status | Link |
 |---|---|---|---|
-| gdpe_0012_dashboard_enhancements | Dashboard enhancements (diagrams, sensitivity, JAX verification) | ⏳ In Progress | [index](./tracks/gdpe_0012_dashboard_enhancements/index.md) |
 | gdpe_0013_external_validation | External Validation (Expert Review & Cross-Validation) | ⏳ In Progress | [index](./tracks/gdpe_0013_external_validation/index.md) |
 
 ## Planned Tracks
@@ -17,6 +16,7 @@ This registry is the index of Conductor tracks for this repository.
 
 | Track ID | Title | Status | Link |
 |---|---|---|---|
+| gdpe_0012_dashboard_enhancements | Dashboard enhancements (diagrams, sensitivity, JAX verification) | ✅ Complete | [archived](./archive/gdpe_0012_dashboard_enhancements/index.md) |
 | gdpe_0001_bootstrap | Bootstrap the AU/NZ genetic discrimination policy-econ modelling repo | ✅ Completed (retrospective) | [index](./tracks/gdpe_0001_bootstrap/index.md) |
 | gdpe_0002_evidence_anchoring | Evidence register + calibration plan for AU/NZ | ✅ Complete | [archived](./archive/gdpe_0002_evidence_anchoring/index.md) |
 | gdpe_0003_model_implementation | Model implementation and policy analysis | ✅ Complete | [archived](./archive/gdpe_0003_model_implementation/index.md) |
@@ -33,12 +33,12 @@ This registry is the index of Conductor tracks for this repository.
 
 ## 🎉 ALL TRACKS COMPLETE
 
-**Total Tracks:** 11/11  
+**Total Tracks:** 12/12
 **Repository Status:** Publication Ready ✅
 
 ---
 
 ## 🎉 ALL TRACKS COMPLETE
 
-**Total Tracks:** 10/10  
+**Total Tracks:** 11/11
 **Repository Status:** Publication Ready ✅

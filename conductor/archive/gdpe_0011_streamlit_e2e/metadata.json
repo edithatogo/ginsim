@@ -1,8 +1,0 @@
-{
-  "track_id": "gdpe_0011_streamlit_e2e",
-  "type": "feature",
-  "status": "in_progress",
-  "created_at": "2026-03-03T00:00:00Z",
-  "updated_at": "2026-03-03T00:00:00Z",
-  "description": "Comprehensive E2E testing for Streamlit dashboard + gin-sim GitHub repo creation"
-}

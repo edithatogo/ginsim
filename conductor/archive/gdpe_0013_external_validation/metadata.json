@@ -1,7 +1,0 @@
-{
-  "track_id": "gdpe_0013_external_validation",
-  "title": "External Validation (Expert Review & Cross-Validation)",
-  "status": "Active",
-  "dependencies": ["gdpe_0002_evidence_anchoring", "gdpe_0003_model_implementation"],
-  "started_at": "2026-03-04"
-}

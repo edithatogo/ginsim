@@ -1,8 +1,0 @@
-{
-  "track_id": "gdpe_0009_streamlit_dashboard",
-  "type": "feature",
-  "status": "new",
-  "created_at": "2026-03-03T00:00:00Z",
-  "updated_at": "2026-03-03T00:00:00Z",
-  "description": "Build Streamlit dashboard with GitHub auto-sync for Streamlit Cloud deployment"
-}

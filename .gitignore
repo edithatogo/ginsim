@@ -62,6 +62,19 @@ data/raw/
 data/processed/*.csv
 data/processed/*.parquet
 
+# Research meta-data and working folders (not for remote)
+conductor/
+archive/
+context/reflexive_journal/
+docs/expert_reviews/
+docs/EXTERNAL_VALIDATION_ACTION_LOG.md
+
+# Tool caches
+.ruff_cache/
+.pytest_cache/
+.qwen/
+.streamlit/config.toml
+
 # Posterior samples (large files)
 outputs/posterior_samples/*.npy
 outputs/posterior_samples/*.csv

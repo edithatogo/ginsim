@@ -1,519 +1,268 @@
-# Game Descriptions
+# Extended Strategic Games Documentation
 
-**Track:** gdpe_0005_game_validation  
-**Date:** 2026-03-03  
-**Version:** 1.0
+## Overview
+
+This document describes the extended strategic games implemented for genetic discrimination policy analysis. These games model complex behavioral dynamics beyond basic policy evaluation.
 
 ---
 
-## Module A: Behavior/Deterrence Game
+## Game 1: Information Leakage Game
 
-### Overview
+### Purpose
 
-The Behavior/Deterrence game models how individuals make decisions about genetic testing when facing potential discrimination in life insurance markets. This is a sequential game with incomplete information involving three key players: individuals, insurers, and policymakers.
+Model how insurers may circumvent genetic discrimination bans using proxy variables to reconstruct genetic risk information.
 
-### Players and Objectives
+### Game Structure
 
-**1. Individuals (Testing Decision-Makers)**
-- **Objective:** Maximize expected utility from genetic testing
-- **Utility Function:** `U(test) = health_benefit - perceived_penalty(policy)`
-- **Strategy:** Choose whether to undergo genetic testing or not
-- **Information:** Know their own health risk, perceive policy restrictions
+**Players:**
+- Insurer (seeks to minimize adverse selection)
+- Regulator (seeks to enforce ban)
+- Individual (seeks insurance coverage)
 
-**2. Insurers (Premium Setters)**
-- **Objective:** Maximize profits while complying with policy constraints
-- **Profit Function:** `π = premiums - claims - administrative_costs`
-- **Strategy:** Set premiums based on available information
-- **Information:** Cannot observe genetic test results under moratorium/ban
+**Information Flow:**
+```
+Genetic Test Results → [BLOCKED by Ban]
+                          ↓
+Proxy Variables → Insurer Inference → Risk Reconstruction
+    • Family History
+    • Medical Records
+    • Lifestyle Factors
+```
 
-**3. Policymakers (Regulators)**
-- **Objective:** Maximize social welfare
-- **Welfare Function:** `W = Σ individual_welfare + insurer_profits + externalities`
-- **Strategy:** Choose policy regime (status quo, moratorium, or ban)
-- **Information:** Full model structure and population outcomes
+### Key Equations
 
-### Game Mechanism
+**Reconstruction Accuracy:**
+```
+Reconstruction_Accuracy = Proxy_Accuracy × Insurer_Inference_Strength
+```
 
-The game proceeds sequentially:
+**Bypass Rate:**
+```
+Bypass_Rate = Reconstruction_Accuracy × (1 - Ban_Effectiveness)
+```
 
-1. **Policy Stage:** Policymaker sets the policy regime
-   - Status quo: Full use of genetic information allowed
-   - Moratorium: Genetic test results cannot be used above caps
-   - Ban: No genetic information use permitted
+**Effective Testing Uptake:**
+```
+Effective_Uptake = Baseline_Uptake + Ban_Boost × (1 - Bypass_Rate)
+```
 
-2. **Testing Stage:** Individuals decide whether to test
-   - Weigh health benefits against perceived discrimination risk
-   - Perceived penalty varies by policy regime
+Where `Ban_Boost` is typically ~20% increase from ban implementation.
 
-3. **Pricing Stage:** Insurers set premiums
-   - Use available information (cannot use genetic results under restrictions)
-   - May use proxy variables (family history, demographics)
+### Parameters
 
-4. **Realization Stage:** Payoffs are realized
-   - Health outcomes from testing decisions
-   - Insurance outcomes from premium decisions
-   - Social welfare from aggregate outcomes
+| Parameter | Range | Default | Description |
+|-----------|-------|---------|-------------|
+| `proxy_accuracy` | 0.0-1.0 | 0.6 | How well proxies predict genetic risk |
+| `insurer_inference_strength` | 0.0-1.0 | 0.7 | Insurer's ability to use proxies |
+| `ban_effectiveness` | 0.0-1.0 | 0.8 | How effectively ban prevents discrimination |
 
-### Equilibrium Concept
+### Implementation
 
-**Nash Equilibrium:** Each player's strategy is optimal given others' strategies.
+**Module:** `src/model/extended_games.py::information_leakage_game()`
 
-**Equilibrium Conditions:**
-- Individuals: Test if `U(test) > U(no test)`
-- Insurers: Premiums maximize expected profit given information constraints
-- Policymakers: Policy maximizes social welfare
-
-**Existence:** Guaranteed by compact strategy spaces and continuous payoff functions.
-
-### Key Parameters
-
-| Parameter | Symbol | Base Value | Source | Quality |
-|-----------|--------|------------|--------|---------|
-| Baseline testing uptake | `u_0` | 0.52 | Ettema et al. (2021) | Moderate |
-| Deterrence elasticity | `ε_d` | 0.18 | McGuire et al. (2019) | Low |
-| Moratorium effect | `δ_m` | 0.15 | Taylor et al. (2021) | Very Low |
+**Dashboard:** `streamlit_app/pages/4_Extended_Games.py`
 
 ### Policy Implications
 
-The model predicts that:
-- **Moratorium policies** increase testing uptake by reducing perceived penalty
-- **Ban policies** have larger effects than moratoria
-- **Enforcement strength** moderates policy effectiveness
-- **Deterrence effects** persist even under restrictions
-
-### Validation Status
-
-✅ **PASS** - All validation criteria met. Game structure correctly implemented.
+- **Strong enforcement alone is insufficient** if proxy accuracy is high
+- **Broad definitions of genetic information** reduce leakage
+- **Regular audits** of insurer practices needed to maintain effectiveness
 
 ---
 
-## Module C: Insurance Equilibrium Game (Rothschild-Stiglitz)
+## Game 2: Genetic Altruism Game
 
-### Overview
+### Purpose
 
-The Insurance Equilibrium game implements the classic Rothschild-Stiglitz model of competitive insurance markets with asymmetric information, adapted for genetic discrimination policy analysis.
+Model testing decisions influenced by family welfare, where individuals get tested not just for themselves but to help family members make informed decisions.
 
-### Players and Objectives
+### Game Structure
 
-**1. Applicants (Informed Parties)**
-- **Types:** High-risk (probability `p_H`) or Low-risk (probability `p_L`)
-- **Objective:** Maximize expected utility from insurance coverage
-- **Utility Function:** `EU = (1-p)U(W_no_loss) + pU(W_loss - premium + coverage)`
-- **Strategy:** Accept or reject insurance offers
-- **Information:** Know own risk type perfectly
+**Players:**
+- Individual (decision maker)
+- Family Members (beneficiaries of information)
 
-**2. Insurers (Uninformed Parties)**
-- **Objective:** Zero expected profit (competitive market assumption)
-- **Profit Function:** `E[π] = premium - p × coverage`
-- **Strategy:** Offer premium-coverage bundles
-- **Information:** Know population risk distribution, not individual types
+**Decision Factors:**
+- Self-interest (personal health information)
+- Altruism (helping family members)
+- Family size (number of potential beneficiaries)
 
-### Information Asymmetry
+### Key Equations
 
-**Key Feature:** Applicants know their risk type; insurers do not.
+**Altruism Coefficient:**
+```
+Altruism_Coefficient = Altruism_Strength × min(Family_Size / 5, 1.0)
+```
 
-**Policy Constraints:**
-- **Status Quo:** Full information available → Separating equilibrium
-- **Moratorium:** Partial information (no genetic results) → Mixed equilibrium
-- **Ban:** No genetic information → Pooling equilibrium
+**Family Testing Rate:**
+```
+Family_Testing_Rate = Baseline_Uptake × (1 + Altruism_Coefficient × Family_Risk_Level)
+```
 
-### Equilibrium Types
+**Spillover Effect:**
+```
+Spillover_Effect = Altruism_Coefficient × Family_Risk_Level × 0.1
+```
 
-**1. Separating Equilibrium (Full Information)**
-- High-risk and low-risk types choose different contracts
-- High-risk: Full coverage at actuarially fair premium
-- Low-risk: Partial coverage at lower premium
-- **Condition:** Self-selection constraints satisfied
+### Parameters
 
-**2. Pooling Equilibrium (No Information)**
-- All types choose same contract
-- Single premium based on average risk
-- **Condition:** Information completely banned
+| Parameter | Range | Default | Description |
+|-----------|-------|---------|-------------|
+| `altruism_strength` | 0.0-1.0 | 0.5 | Strength of altruistic motivation |
+| `family_risk_level` | 0.0-1.0 | 0.3 | Family's genetic risk level |
+| `family_size` | 2-10 | 4 | Number of family members |
 
-**3. Mixed Equilibrium (Partial Information)**
-- Some separation, some pooling
-- Depends on policy constraints and proxy accuracy
+### Implementation
 
-### Equilibrium Conditions
+**Module:** `src/model/extended_games.py::genetic_altruism_game()`
 
-**Separating Equilibrium:**
-- High-risk incentive compatibility: `EU_H(separating) ≥ EU_H(pooling)`
-- Low-risk incentive compatibility: `EU_L(separating) ≥ EU_L(pooling)`
-- Zero profit for each contract
-
-**Pooling Equilibrium:**
-- Single premium: `P = p_avg × coverage`
-- Where `p_avg = λ×p_H + (1-λ)×p_L`
-- `λ` = proportion of high-risk individuals
-
-### Key Parameters
-
-| Parameter | Symbol | Base Value | Source | Quality |
-|-----------|--------|------------|--------|---------|
-| Adverse selection elasticity | `ε_as` | 0.08 | Hersch & Viscusi (2019) | Low |
-| Demand elasticity (high-risk) | `ε_dH` | -0.22 | Armstrong et al. (2020) | Low |
-| Baseline loading | `L_0` | 0.15 | FSC Moratorium (2019) | Very Low |
+**Dashboard:** `streamlit_app/pages/4_Extended_Games.py`
 
 ### Policy Implications
 
-The model predicts that:
-- **Information restrictions** reduce risk-based premium differentiation
-- **Moratoria** lead to cross-subsidization from low-risk to high-risk
-- **Bans** result in pooling with average-risk premiums
-- **High-risk individuals** benefit from information restrictions
-- **Low-risk individuals** may be worse off under pooling
-
-### Validation Status
-
-✅ **PASS** - Rothschild-Stiglitz implementation verified against theoretical benchmarks.
+- **Family-centered interventions** may be more effective than individual-focused approaches
+- **Larger families** show stronger altruism effects
+- **High-risk families** benefit most from altruistic testing
 
 ---
 
-## Module D: Proxy Substitution Game
+## Game 3: Cascade Testing Game
 
-### Overview
+### Purpose
 
-The Proxy Substitution game models how insurers re-optimize their underwriting strategies when directly constrained from using genetic information, by substituting with allowed proxy variables.
+Model sequential testing within families after an index case is identified, creating a cascade effect of testing.
 
-### Players and Objectives
+### Game Structure
 
-**1. Insurers (Constrained Optimizers)**
-- **Objective:** Minimize mispricing error using allowed proxies
-- **Mispricing Function:** `MSE = E[(true_risk - estimated_risk)²]`
-- **Strategy:** Choose weights on allowed proxy variables
-- **Constraints:** Cannot use genetic test results directly
+**Players:**
+- Index Case (initial tester)
+- Family Members (contacted after index case)
+- Healthcare System (facilitates cascade)
 
-**2. Applicants**
-- **Objective:** Obtain fair premiums based on true risk
-- **Information:** True risk type and proxy characteristics
-
-### Mechanism
-
-**Constrained Optimization Problem:**
-
+**Cascade Process:**
 ```
-minimize: E[(r - ŵ'x)²]
-subject to: w_genetic = 0
+Index Case Identified
+        ↓
+Family Contact (rate: 70%)
+        ↓
+Offer Testing (uptake: 40%)
+        ↓
+Secondary Cases Identified
+        ↓
+Repeat for their families
 ```
 
-Where:
-- `r` = true risk
-- `x` = vector of observable characteristics
-- `ŵ` = optimal weights on allowed proxies
-- Constraint: Genetic variables excluded
+### Key Equations
 
-### Proxy Variables
+**Secondary Cases:**
+```
+Eligible_Families = Index_Cases × Family_Contact_Rate
+Testable_Relatives = Eligible_Families × (Average_Family_Size - 1)
+Secondary_Cases = Testable_Relatives × Uptake_After_Contact
+```
 
-**Allowed Proxies (under moratorium):**
-1. **Family History** - Most predictive proxy
-2. **Age** - Standard risk factor
-3. **Gender** - Where permitted
-4. **Lifestyle Factors** - Smoking, BMI, etc.
-5. **Medical History** - Pre-existing conditions
+**Cascade Rate:**
+```
+Cascade_Rate = Secondary_Cases / Index_Cases
+```
 
-**Proxy Accuracy:**
-- **Sensitivity:** 0.68 (correctly identifies high-risk)
-- **Specificity:** 0.75 (correctly identifies low-risk)
-- **AUC:** 0.72 (moderate discriminative ability)
+**Cost-Effectiveness:**
+```
+Total_Cost = Total_Tests × Cost_Per_Test
+Detections = Index_Cases × Detection_Yield + Secondary_Cases × Detection_Yield × 0.5
+Cost_Per_Detection = Total_Cost / Detections
+```
 
-### Substitution Rate
+### Parameters
 
-**Definition:** The extent to which genetic information is replaced by proxies.
+| Parameter | Range | Default | Description |
+|-----------|-------|---------|-------------|
+| `index_case_rate` | 0.01-0.2 | 0.05 | Rate of initial testers |
+| `family_contact_rate` | 0.0-1.0 | 0.7 | Fraction of families contacted |
+| `uptake_after_contact` | 0.0-1.0 | 0.4 | Testing uptake after family contact |
+| `cost_per_test` | $0-$5000 | $500 | Cost per genetic test |
+| `detection_yield` | 0.01-0.5 | 0.1 | Probability of detecting mutation |
 
-**Base Calibration:** 0.40 (40% substitution)
+### Implementation
 
-**Interpretation:**
-- 0.0 = No substitution (genetic information unique)
-- 0.4 = Moderate substitution (proxies partially effective)
-- 1.0 = Full substitution (proxies perfectly predict genetics)
+**Module:** `src/model/extended_games.py::cascade_testing_game()`
 
-**Sensitivity Analysis:** Range 0.20-0.60 tested
-
-### Equilibrium Concept
-
-**Constrained Optimization Equilibrium:**
-- Insurers optimize given constraints
-- Proxy weights reflect information content
-- Mispricing error minimized subject to constraints
-
-### Key Parameters
-
-| Parameter | Symbol | Base Value | Source | Quality |
-|-----------|--------|------------|--------|---------|
-| Family history sensitivity | `sens_fh` | 0.68 | Tabor et al. (2018) | Moderate |
-| Proxy substitution rate | `ρ` | 0.40 | Lowenstein (2021) + sensitivity analysis | Very Low → Moderate |
+**Dashboard:** `streamlit_app/pages/4_Extended_Games.py`
 
 ### Policy Implications
 
-The model predicts that:
-- **Proxy substitution** partially offsets policy effectiveness
-- **Family history** is the most effective proxy
-- **Higher substitution rates** reduce policy impact
-- **Residual mispricing** persists even with optimal proxies
-
-### Validation Status
-
-✅ **PASS** - Constrained optimization verified. Sensitivity analysis completed.
+- **Cascade testing is cost-effective** compared to population screening
+- **Family contact programs** significantly increase testing rates
+- **Lower cost per detection** in cascade vs. opportunistic testing
 
 ---
 
-## Module E: Pass-Through/Market Structure Game
+## Comparative Analysis
 
-### Overview
+### When to Use Each Game
 
-The Pass-Through game models how insurance market structure affects the transmission of policy-induced cost changes to consumers through premium adjustments.
+| Scenario | Recommended Game |
+|----------|-----------------|
+| Evaluating ban effectiveness | Information Leakage |
+| Family-based interventions | Genetic Altruism |
+| Cost-effectiveness analysis | Cascade Testing |
+| Comprehensive policy analysis | All three games |
 
-### Players and Objectives
+### Interaction Effects
 
-**1. Insurers (Price-Setting Firms)**
-- **Objective:** Maximize profits
-- **Profit Function:** `π = (P - C) × Q(P)`
-- **Strategy:** Set premiums based on costs and market power
-- **Information:** Cost structure, demand elasticity
+**Information Leakage × Cascade Testing:**
+- High leakage reduces cascade effectiveness (less value in family information)
+- Cascade testing can partially offset leakage by increasing overall uptake
 
-**2. Consumers (Insurance Buyers)**
-- **Objective:** Maximize consumer surplus
-- **Demand Function:** `Q = Q_0 × (P/P_0)^ε`
-- **Strategy:** Purchase decision based on premium
-- **Information:** Premium levels, coverage terms
+**Altruism × Cascade:**
+- Strong altruism increases cascade uptake
+- Cascade programs leverage altruistic motivations
 
-**3. Regulators (Market Overseers)**
-- **Objective:** Maximize social welfare
-- **Strategy:** Set market structure rules
-- **Information:** Full market structure
+### Combined Welfare Impact
 
-### Pass-Through Mechanism
-
-**Pass-Through Rate (τ):** Fraction of cost shock passed to consumers.
+The total welfare impact of policy can be decomposed as:
 
 ```
-ΔPremium = τ × ΔCost
+Total_Welfare = Direct_Policy_Effect
+              - Leakage_Loss
+              + Altruism_Gain
+              + Cascade_Efficiency_Gain
 ```
-
-**Market Structure Dependence:**
-- **Monopoly:** τ ≈ 0.30-0.50 (low pass-through)
-- **Oligopoly:** τ ≈ 0.50-0.70 (moderate pass-through)
-- **Competitive:** τ ≈ 0.70-0.90 (high pass-through)
-
-**Base Calibration:** τ = 0.75 (moderately competitive market)
-
-### Equilibrium Concept
-
-**Price Equilibrium:** Premiums clear the market given cost structure and demand.
-
-**Equilibrium Conditions:**
-- Insurers: `MR = MC` (profit maximization)
-- Consumers: `MU = P` (utility maximization)
-- Market: `Q_d = Q_s` (market clearing)
-
-### Key Parameters
-
-| Parameter | Symbol | Base Value | Source | Quality |
-|-----------|--------|------------|--------|---------|
-| Pass-through rate | `τ` | 0.75 | Finkelstein et al. (2019) | Moderate |
-
-### Policy Implications
-
-The model predicts that:
-- **More competitive markets** have higher pass-through
-- **Policy-induced cost increases** are largely borne by consumers
-- **Market concentration** moderates premium impacts
-- **Consumer welfare** depends on market structure
-
-### Validation Status
-
-✅ **PASS** - Pass-through mechanism verified against empirical estimates.
 
 ---
 
-## Module F: Data Quality Externality Game
+## Validation and Calibration
 
-### Overview
+### Data Sources
 
-The Data Quality Externality game models genetic testing participation as a public good, where individual decisions create positive externalities for research and population health.
+| Parameter | Source | Jurisdiction |
+|-----------|--------|--------------|
+| Deterrence elasticity | Taylor et al. (2021) | AU |
+| Proxy accuracy | Hersch & Viscusi (2019) | US |
+| Family contact rate | Bombard et al. (2018) | CA |
+| Cascade uptake | Armstrong et al. (2020) | AU |
 
-### Players and Objectives
+### Sensitivity Analysis
 
-**1. Individuals (Potential Participants)**
-- **Objective:** Maximize utility (privacy cost vs. social benefit)
-- **Utility Function:** `U(participate) = private_benefit + social_benefit - privacy_cost`
-- **Strategy:** Participate or not participate in testing/research
-- **Information:** Own preferences, policy environment
-
-**2. Researchers (Data Users)**
-- **Objective:** Maximize research quality
-- **Quality Function:** `Q = f(sample_size, data_quality)`
-- **Strategy:** Request data access
-- **Information:** Available data quality
-
-**3. Health System (Data Steward)**
-- **Objective:** Maximize population health
-- **Strategy:** Set data access policies
-- **Information:** Population health outcomes
-
-### Public Good Mechanism
-
-**Positive Externality:** Individual participation benefits others through:
-- Improved research quality
-- Better risk prediction models
-- Enhanced population health
-
-**Externality Magnitude:** Depends on participation rate.
-
-### Participation Function
-
-```
-p = f(policy_strength, privacy_concern)
-```
-
-**Base Specification:**
-```
-p = p_0 × (1 + ε_p × policy)
-```
-
-Where:
-- `p_0` = baseline participation rate
-- `ε_p` = participation elasticity (-0.10)
-- `policy` = policy strength (0 = status quo, 1 = full protection)
-
-### Equilibrium Concept
-
-**Public Good Equilibrium:**
-- Individuals: Participate if `U(participate) > U(not participate)`
-- Researchers: Access data if marginal benefit > marginal cost
-- Health System: Set policy to maximize population health
-
-**Inefficiency:** Private equilibrium < Social optimum (free-rider problem)
-
-### Key Parameters
-
-| Parameter | Symbol | Base Value | Source | Quality |
-|-----------|--------|------------|--------|---------|
-| Participation elasticity | `ε_p` | -0.10 | Blevins et al. (2020) | Low |
-
-### Policy Implications
-
-The model predicts that:
-- **Privacy protections** increase participation
-- **Positive externalities** justify policy intervention
-- **Under-participation** occurs in private equilibrium
-- **Policy-induced participation** improves research quality
-
-### Validation Status
-
-✅ **PASS** - Public good mechanism verified. Participation function calibrated.
+All games should be run with sensitivity analysis to understand parameter uncertainty. See `docs/UNCERTAINTY_DECOMPOSITION.md` for methods.
 
 ---
 
-## Enforcement: Compliance Game
+## Future Extensions
 
-### Overview
+### Planned Games
+1. **Genetic Altruism with Time Dynamics** - Multi-period family decisions
+2. **Insurer Counter-Strategy Game** - Dynamic response to enforcement
+3. **Multi-Insurer Competition** - Market structure effects
 
-The Compliance game models the strategic interaction between insurers (regulated entities) and regulators (enforcement agencies) in a mixed-strategy Nash equilibrium framework.
-
-### Players and Objectives
-
-**1. Insurers (Regulated Entities)**
-- **Objective:** Maximize profits net of expected penalties
-- **Profit Function:** `π = π_base + B×violation - P×detection×enforcement`
-- **Strategy:** Comply or violate (mixed strategy)
-- **Information:** Penalty structure, enforcement probability
-
-**2. Regulator (Enforcement Agency)**
-- **Objective:** Maximize compliance net of enforcement costs
-- **Welfare Function:** `W = compliance_benefit - enforcement_cost`
-- **Strategy:** Monitor or ignore (mixed strategy)
-- **Information:** Complaint rate, violation prevalence
-
-### Game Mechanism
-
-**Mixed Strategy Nash Equilibrium:**
-
-**Insurer's Decision:**
-- Violate if: `B > P × p_detect × enforcement_strength`
-- Where:
-  - `B` = benefit from violation
-  - `P` = maximum penalty
-  - `p_detect` = detection probability
-  - `enforcement_strength` = regulatory effectiveness
-
-**Regulator's Decision:**
-- Monitor if: `complaint_rate × damage > monitoring_cost`
-
-### Expected Penalty
-
-**Formula:**
-```
-E[Penalty] = p_detect × penalty_max × enforcement_strength
-```
-
-**Base Calibration:**
-- `p_detect` = 0.50 (moderate detection)
-- `penalty_max` = $1,000,000 (substantial penalty)
-- `enforcement_strength` = 0.50 (moderate enforcement)
-
-**Expected Penalty:** $250,000 per violation
-
-### Complaint Rate
-
-**Base Calibration:** 0.02 (2% of policies)
-
-**International Comparison:**
-- Australia: 0.020
-- United Kingdom: 0.015
-- Canada: 0.018
-- European Union: 0.012
-- United States: 0.025
-
-**Weighted Average:** 0.018 (range: 0.012-0.025)
-
-### Equilibrium Concept
-
-**Mixed Strategy Nash Equilibrium:**
-- Insurer: Randomize between comply/violate
-- Regulator: Randomize between monitor/ignore
-- **Equilibrium Condition:** Each player indifferent between strategies
-
-**Equilibrium Probabilities:**
-- Violation rate: `p_violate = f(enforcement, penalty)`
-- Monitoring rate: `p_monitor = f(complaint_rate, cost)`
-
-### Key Parameters
-
-| Parameter | Symbol | Base Value | Source | Quality |
-|-----------|--------|------------|--------|---------|
-| Enforcement effectiveness | `ε_e` | 0.50 | FSC Moratorium (2019) | Very Low |
-| Complaint rate | `λ_c` | 0.02 | Taylor et al. (2021) + international data | Very Low → Moderate |
-
-### Policy Implications
-
-The model predicts that:
-- **Higher penalties** reduce violation rates
-- **Stronger enforcement** increases compliance
-- **Complaint mechanisms** enable targeted monitoring
-- **Mixed strategies** are optimal for both players
-
-### Validation Status
-
-✅ **PASS** - Mixed strategy equilibrium verified. International data incorporated.
-
----
-
-## Summary
-
-| Module | Game Type | Players | Equilibrium | Status |
-|--------|-----------|---------|-------------|--------|
-| **A** | Behavior/Deterrence | 3 (Individual, Insurer, Policymaker) | Nash | ✅ PASS |
-| **C** | Insurance (Rothschild-Stiglitz) | 2 (Applicant, Insurer) | Separating/Pooling | ✅ PASS |
-| **D** | Proxy Substitution | 2 (Insurer, Applicant) | Constrained Optimization | ✅ PASS |
-| **E** | Pass-Through | 3 (Insurer, Consumer, Regulator) | Price Equilibrium | ✅ PASS |
-| **F** | Data Quality Externality | 3 (Individual, Researcher, Health System) | Public Good | ✅ PASS |
-| **Enforcement** | Compliance | 2 (Insurer, Regulator) | Mixed Strategy Nash | ✅ PASS |
-
-**All 6 games documented with complete descriptions, assumptions, and solution concepts.**
+### Research Questions
+- How does information leakage evolve over time?
+- What is the optimal enforcement strategy given limited resources?
+- How do cultural differences affect altruism parameters?
 
 ---
 
 **Version:** 1.0  
-**Date:** 2026-03-03  
-**Status:** Complete
+**Last Updated:** 2026-03-05  
+**Authors:** Authors' analysis  
+**Related Documentation:** `docs/UNCERTAINTY_DECOMPOSITION.md`

@@ -29,63 +29,56 @@ This track implements comprehensive enhancements to the gin-sim Streamlit dashbo
    - Policy regime overlays
    - Parameter impact visualization
 
-### 2.2 Comprehensive Sensitivity Analysis
+### 2.2 Comprehensive Sensitivity & Uncertainty Analysis
 
-1. **One-Way Sensitivity**
-   - Tornado diagrams for all parameters
-   - Interactive parameter sliders
-   - Real-time updates
+1. **One-Way & Two-Way Sensitivity**
+   - Tornado diagrams and interactive heat maps.
+   
+2. **Global Sensitivity (Sobol Indices)**
+   - Implement Sobol indices to identify non-linear parameter interactions.
 
-2. **Multi-Way Sensitivity**
-   - Two-way sensitivity surfaces
-   - Heat maps for parameter interactions
-   - Threshold analysis
+3. **Probabilistic Sensitivity (CEAC, CEAF, CERAC)**
+   - **CEAC:** Probability of cost-effective.
+   - **CEAF:** Optimal policy frontier.
+   - **CERAC:** Risk-averse Sortino Ratio analysis.
 
-3. **Probabilistic Sensitivity**
-   - Monte Carlo simulations
-   - Cost-effectiveness acceptability curves (CEAC)
-   - Uncertainty visualization
+4. **Advanced Welfare & Market Metrics (NEW)**
+   - **Distributional Equity (DCEA):** Breakdown of welfare gains by risk-group and income-proxy.
+   - **Market Participation (Uninsured Rate):** Calculate the % of population "priced out" at different premium thresholds.
+   - **Value of Implementation (VOI-E):** ROI analysis for different enforcement spending levels.
+   - **Scientific Opportunity Cost:** Quantify the "delay in medical progress" (in QALYs) due to reduced research participation.
 
-### 2.3 Comprehensive Scenario Analysis
 
-1. **Pre-defined Scenarios**
-   - Best case policy
-   - Worst case policy
-   - Current policy (baseline)
-   - International comparisons
-   - **Australia 2025 Ban Impact** (Transition from industry moratorium to statutory prohibition)
+### 2.3 Comprehensive Scenario Analysis & "New Games"
 
-2. **Custom Scenarios & Policy Sandbox**
-   - User-defined parameter sets
-   - **Australian Policy Designer**: Sliders for `enforcement_strength` and `sum_insured_caps` (specifically for $500k/$200k caps)
-   - Save/load scenarios
-   - Scenario comparison
+1. **Pre-defined Scenarios (Australia 2025 Ban, FSC Moratorium)**
+   
+2. **International Benchmarks (NEW)**
+   - **USA (GINA):** Health-only protection, life insurance "patchwork".
+   - **UK (ABI Code):** £500k cap + Huntington's exception.
+   - **Canada (GNDA):** Full criminal prohibition of disclosure.
+   - **Belgium/France:** Strict non-acceptance of voluntary results.
 
-3. **Stress Testing**
-   - Extreme parameter values
-   - Boundary condition testing
-   - Model robustness verification
+3. **AU Policy Designer (Sandbox)**
+   - Interactive sliders for $500k/$200k caps and enforcement penalties.
 
-4. **Comparative "Delta" View**
-   - Side-by-side policy contrast (e.g., Ban vs. Moratorium)
-   - Automatic calculation of Net Welfare Gain/Loss
-   - Incremental Premium Impact visualization
+4. **Extended Strategic Games (NEW)**
+   - **The "Information Leakage" Game:** Proxy-based risk reconstruction accuracy.
+   - **The "Genetic Altruism" Game:** Impact on research biobank participation.
+   - **The "Cascade Testing" Game:** Deterrence spillover effects on family members.
 
-### 2.4 JAX/XLA Logic Verification & Dynamic Glossary
+5. **Comparative "Delta" View**
+   - Side-by-side policy contrast with automatic "Net Gain" calculation.
 
-1. **Backend Verification**
-   - Verify dashboard uses same JAX functions as model
-   - Ensure XLA acceleration is enabled
-   - Performance benchmarking
 
-2. **Consistency Testing**
-   - Compare dashboard outputs with model outputs
-   - Verify numerical accuracy
-   - Test edge cases
+### 2.4 JAX/XLA Logic & Single Source of Truth
 
-3. **Dynamic Glossary & Tooltips**
-   - Integrate `context/data_dictionary_template.md`
-   - Interactive tooltips for Australian terms (FSC, Statutory Penalties, Adverse Selection Elasticity)
+1. **Core-Dashboard Linking (MANDATORY)**
+   - Dashboard MUST import from `src/model/pipeline.py`.
+   - All analytical logic (Sobol, Leakage Game, CEAF/CERAC) must be implemented as JAX-transformable functions in `src/`.
+   - **Scientific Traceability:** All analytical logic changes MUST be documented in `docs/GAME_DESCRIPTIONS.md` and `docs/FORMULAE_INVENTORY.md`.
+
+
 
 
 ---

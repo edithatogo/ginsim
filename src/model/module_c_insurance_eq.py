@@ -12,6 +12,7 @@ Strategic Game: Adverse Selection under Asymmetric Information
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any
 import jax.numpy as jnp
 from jax import jit, lax
 from jaxtyping import Array, Float
@@ -172,12 +173,9 @@ def pooling_equilibrium(
     # Initial pool risk (average)
     avg_risk = proportion_high * risk_high + (1 - proportion_high) * risk_low
 
-    def iteration_step(
-        carry_converged: tuple[
-            tuple[Float[Array, ""], Float[Array, ""], float, int],
-            Array,
-        ],
-    ) -> tuple[tuple[Float[Array, ""], Float[Array, ""], float, int], Array]:
+    # `lax.while_loop` passes JAX tracers through the carry, so these internal
+    # helpers must not advertise plain Python scalar types that beartype would reject.
+    def iteration_step(carry_converged: Any) -> tuple[Any, Array]:
         premium, _pool_risk, prop_high, i = carry_converged[0]
 
         takeup_high = compute_demand(premium, price_elasticity=params.demand_elasticity_high_risk)
@@ -204,13 +202,10 @@ def pooling_equilibrium(
     )
     init_carry = (initial_premium, jnp.array(avg_risk), proportion_high, 0)
 
-    def continue_condition(
-        carry_converged: tuple[
-            tuple[Float[Array, ""], Float[Array, ""], float, int],
-            Array,
-        ],
-    ) -> Array:
-        return jnp.logical_and(jnp.logical_not(carry_converged[1]), carry_converged[0][3] < max_iterations)
+    def continue_condition(carry_converged: Any) -> Array:
+        return jnp.logical_and(
+            jnp.logical_not(carry_converged[1]), carry_converged[0][3] < max_iterations
+        )
 
     (premium, pool_risk, _prop_high, n_iter), _ = lax.while_loop(
         continue_condition,
@@ -234,7 +229,7 @@ def pooling_equilibrium(
         takeup_low_risk=takeup_low,
         uninsured_rate=uninsured_rate,
         insurer_profits=profit,
-        converged=(n_iter < max_iterations),
+        converged=bool(n_iter < max_iterations),
         iterations=int(n_iter),
     )
 

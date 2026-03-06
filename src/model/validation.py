@@ -7,9 +7,11 @@ Protocol for validating model outputs against empirical targets.
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
+
+import numpy as np
 
 
 @dataclass
@@ -50,13 +52,11 @@ def compute_coverage(
     Returns:
         True if target is within 95% CI of simulated values
     """
-    import numpy as np
-
     simulated_array = np.array(simulated_values)
     ci_lower = np.percentile(simulated_array, 2.5)
     ci_upper = np.percentile(simulated_array, 97.5)
 
-    return ci_lower <= target_value <= ci_upper
+    return bool(ci_lower <= target_value <= ci_upper)
 
 
 def compute_bias(
@@ -102,9 +102,10 @@ def run_ppc(
 
         simulated = simulated_data[parameter]
         simulated_mean = sum(simulated) / len(simulated)
+        simulated_array = np.array(simulated, dtype=float)
         simulated_ci = (
-            min(simulated),  # Simplified - use min/max
-            max(simulated),
+            float(np.percentile(simulated_array, 2.5)),
+            float(np.percentile(simulated_array, 97.5)),
         )
 
         coverage = compute_coverage(simulated, targets["value"])
@@ -205,19 +206,11 @@ def save_ppc_results(
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    results = []
-    for check in checks:
-        results.append(
-            {
-                "parameter": check.parameter,
-                "target_value": check.target_value,
-                "target_ci": check.target_ci,
-                "simulated_mean": check.simulated_mean,
-                "simulated_ci": check.simulated_ci,
-                "coverage": check.coverage,
-                "bias": check.bias,
-            }
-        )
+    results = [asdict(check) for check in checks]
+    payload = {
+        "summary": summarize_ppc(checks),
+        "checks": results,
+    }
 
-    with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(results, f, indent=2)
+    with output_path.open("w", encoding="utf-8") as f:
+        json.dump(payload, f, indent=2)

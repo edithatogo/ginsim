@@ -20,6 +20,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
+from streamlit_app.dashboard_helpers import evaluate_sandbox_policy
 from src.model.pipeline import evaluate_single_policy
 
 # Import from core model
@@ -272,13 +273,16 @@ with col1:
 with col2:
     st.markdown("#### Expected Outcomes")
 
-    # Simple estimation (placeholder - should use actual model)
-    estimated_uptake = sandbox_uptake + (1 - sandbox_deterrence) * sandbox_enforcement * 0.1
-    estimated_welfare = (sandbox_enforcement * sandbox_penalty - 0.3) * 1000000
+    sandbox_result = evaluate_sandbox_policy(
+        baseline_testing_uptake=sandbox_uptake,
+        deterrence_elasticity=sandbox_deterrence,
+        enforcement_effectiveness=sandbox_enforcement,
+        penalty_rate=sandbox_penalty,
+    )
 
-    st.metric("Estimated Testing Uptake", f"{estimated_uptake:.1%}")
-    st.metric("Estimated Welfare Impact", f"${estimated_welfare:,.0f}")
-    st.metric("Policy Effectiveness Score", f"{sandbox_enforcement * 100:.0f}/100")
+    st.metric("Estimated Testing Uptake", f"{float(sandbox_result.testing_uptake):.1%}")
+    st.metric("Estimated Welfare Impact", f"${float(sandbox_result.welfare_impact):,.0f}")
+    st.metric("Policy Effectiveness Score", f"{float(sandbox_result.compliance_rate) * 100:.0f}/100")
 
 # Download button
 if comparison:

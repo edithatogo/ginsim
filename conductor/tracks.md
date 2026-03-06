@@ -6,19 +6,21 @@ This registry is the index of Conductor tracks for this repository.
 
 | Track ID | Title | Status | Link |
 |---|---|---|---|
-| gdpe_0016_repo_hardening | Repository-wide lint, typing, and automation hardening | [~] Active | [track](./tracks/gdpe_0016_repo_hardening/index.md) |
+| _None_ | | | |
 
 ## Planned Tracks
 
 | Track ID | Title | Status | Link |
 |---|---|---|---|
-| gdpe_0017_reporting_pipeline | Reporting and publish-pack pipeline refinement | Planned | [track](./tracks/gdpe_0017_reporting_pipeline/index.md) |
-| gdpe_0018_dashboard_alignment | Dashboard, validation, and gin-sim alignment | Planned | [track](./tracks/gdpe_0018_dashboard_alignment/index.md) |
+| _None_ | | | |
 
 ## Completed Follow-up Tracks
 
 | Track ID | Title | Status | Link |
 |---|---|---|---|
+| gdpe_0018_dashboard_alignment | Dashboard, validation, and gin-sim alignment | ✅ Complete | [track](./tracks/gdpe_0018_dashboard_alignment/index.md) |
+| gdpe_0017_reporting_pipeline | Reporting and publish-pack pipeline refinement | ✅ Complete | [track](./tracks/gdpe_0017_reporting_pipeline/index.md) |
+| gdpe_0016_repo_hardening | Repository-wide lint, typing, and automation hardening | ✅ Complete | [track](./tracks/gdpe_0016_repo_hardening/index.md) |
 | gdpe_0015_reconciliation | Conductor reconciliation and working tree classification | ✅ Complete | [track](./tracks/gdpe_0015_reconciliation/index.md) |
 
 ## Archived Tracks
@@ -46,11 +48,14 @@ This registry is the index of Conductor tracks for this repository.
 
 **Completed milestone tracks:** 14/14  
 **Repository baseline:** Publication Ready (SOTA) ✅  
-**Current active follow-up track:** `gdpe_0016_repo_hardening`
+**Current active follow-up track:** none  
+**Next planned follow-up track:** none
 
 ---
 
 ## Notes
 
 - Historical Conductor files from completed tracks are intentionally retained in `conductor/tracks/` and `conductor/archive/` for traceability.
-- `gdpe_0015_reconciliation` captures post-publication-ready repository changes that are present in the working tree but not yet promoted into completed follow-on tracks.
+- `gdpe_0015_reconciliation` captures the classification step that promoted the dirty working tree into explicit follow-on tracks.
+- `gdpe_0016_repo_hardening` is now complete; remaining lint debt is intentionally separated between deferred follow-on work (`gdpe_0017`, `gdpe_0018`) and a smaller set of non-blocking structural refactor candidates.
+- `gdpe_0017_reporting_pipeline` and `gdpe_0018_dashboard_alignment` are now complete; there are no remaining planned follow-on tracks from the current classified working tree.

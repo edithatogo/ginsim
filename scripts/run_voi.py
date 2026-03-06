@@ -97,7 +97,9 @@ def main():
         base_k = keys[i]
         outs = [simulate_policy(base_k, pol, p) for pol in policies]
 
-        nb = [100000.0 * o["net_qalys"] - o["net_health_cost"] - 0.1 * o["avg_premium"] for o in outs]
+        nb = [
+            100000.0 * o["net_qalys"] - o["net_health_cost"] - 0.1 * o["avg_premium"] for o in outs
+        ]
         return jnp.stack(nb)
 
     net_benefit = jax.vmap(one_draw)(jnp.arange(n_draws))

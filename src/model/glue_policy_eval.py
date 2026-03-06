@@ -57,7 +57,9 @@ def simulate_policy(key: jax.Array, policy: dict[str, Any], params: GlobalParams
     # Module C: simple premium/takeup placeholder for glue scripts.
     avg_premium = jnp.array(
         params.insurance.base_premium
-        + params.insurance.loss_cost * params.insurance.adverse_selection_sensitivity * (1.0 - uptake)
+        + params.insurance.loss_cost
+        * params.insurance.adverse_selection_sensitivity
+        * (1.0 - uptake)
     )
     takeup = jnp.clip(1.0 - params.insurance.price_elasticity * (avg_premium / 10000.0), 0.0, 1.0)
     out_c = {"premium": avg_premium, "takeup": takeup}
@@ -68,11 +70,16 @@ def simulate_policy(key: jax.Array, policy: dict[str, Any], params: GlobalParams
     # Module F (data quality; fear should come from Module A / survey latent variable)
     fear = jnp.clip(1.0 - uptake, 0.0, 1.0)  # placeholder mapping
     participation = jnp.clip(
-        jax.nn.sigmoid(params.data_quality.base_participation_logit - params.data_quality.fear_sensitivity * fear),
+        jax.nn.sigmoid(
+            params.data_quality.base_participation_logit
+            - params.data_quality.fear_sensitivity * fear
+        ),
         0.0,
         1.0,
     )
-    auc = jnp.clip(params.data_quality.base_auc - params.data_quality.auc_sensitivity * fear, 0.5, 0.99)
+    auc = jnp.clip(
+        params.data_quality.base_auc - params.data_quality.auc_sensitivity * fear, 0.5, 0.99
+    )
     out_f = {"repr_score": participation, "auc": auc, "mean_participation": participation}
 
     # Minimal DCBA-style metric placeholders

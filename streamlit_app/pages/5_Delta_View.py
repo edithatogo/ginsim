@@ -16,6 +16,8 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
+from streamlit_app.dashboard_helpers import format_positive_share
+
 # Import from core model
 from src.model.delta_view import (
     comparative_delta_analysis,
@@ -287,12 +289,13 @@ if "delta_analysis" in st.session_state:
     best_uptake = analysis.summary.get("best_uptake_policy", "N/A")
     positive_welfare = analysis.summary.get("policies_with_positive_welfare", 0)
     total_policies = analysis.summary.get("total_policies_compared", 0)
+    positive_share = format_positive_share(positive_welfare, total_policies)
 
     st.info(f"""
     **Key Findings:**
     - **Best policy by welfare:** {best_welfare}
     - **Best policy by uptake:** {best_uptake}
-    - **Policies with positive welfare impact:** {positive_welfare}/{total_policies} ({positive_welfare / total_policies * 100:.0f}% if total_policies > 0 else 0%)
+    - **Policies with positive welfare impact:** {positive_welfare}/{total_policies} ({positive_share})
     """)
 
     # Detailed markdown table

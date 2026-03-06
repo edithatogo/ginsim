@@ -32,6 +32,7 @@ class TestJAXConsistency:
 
     def test_jax_array_operations(self):
         """Test that JAX array operations work correctly."""
+
         @jit
         def simple_calc(x, y):
             return x * 2 + y
@@ -45,6 +46,7 @@ class TestJAXPerformance:
 
     def test_jax_jit_speedup(self):
         """Test that JIT compilation provides speedup."""
+
         @jit
         def jit_func(x):
             return x**2 + 2 * x + 1
@@ -115,6 +117,7 @@ class TestReproducibility:
 
     def test_reproducible_results(self):
         """Test that results are reproducible across runs."""
+
         @jit
         def deterministic_func(x, key):
             return jnp.sum(x) + random.uniform(key).sum()
@@ -137,6 +140,7 @@ class TestSensitivityAnalysis:
 
     def test_sobol_indices_range(self):
         """Test that Sobol indices are in valid range [0, 1]."""
+
         def simple_model(params):
             return jnp.sum(params)
 

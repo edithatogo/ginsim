@@ -13,6 +13,23 @@ from typing import Any
 from tabulate import tabulate
 
 
+def _top_policy(
+    comparisons: dict[str, dict[str, float]],
+    metric: str,
+    higher_is_better: bool = True,
+) -> str:
+    """Return the policy with the best value for a comparison metric."""
+    if not comparisons:
+        return "insufficient data"
+
+    ranked = sorted(
+        comparisons.items(),
+        key=lambda item: item[1].get(metric, 0.0),
+        reverse=higher_is_better,
+    )
+    return ranked[0][0].replace("_", " ").title()
+
+
 def format_policy_table(results: dict[str, Any]) -> str:
     """
     Format policy evaluation results as table.
@@ -41,15 +58,13 @@ def format_policy_table(results: dict[str, Any]) -> str:
 
 
 def format_comparison_table(
-    comparisons: dict[str, dict[str, float]], baseline: str = "status_quo"
+    comparisons: dict[str, dict[str, float]],
 ) -> str:
     """
     Format policy comparisons as table.
 
     Args:
         comparisons: Dictionary of comparison metrics
-        baseline: Baseline policy name
-
     Returns:
         Formatted table string
     """
@@ -62,7 +77,7 @@ def format_comparison_table(
                 policy_name,
                 f"{metrics.get('testing_uptake_change', 0):+.1%}",
                 f"{metrics.get('premium_change', 0):+.3f}",
-                f"${metrics.get('welfare_change', 0):,+,.0f}",
+                f"${metrics.get('welfare_change', 0):+,.0f}",
                 f"{metrics.get('compliance_change', 0):+.1%}",
             ]
         )
@@ -93,7 +108,7 @@ def save_results_json(results: dict[str, Any], output_path: str | Path) -> None:
             else:
                 serializable[policy_name][key] = value
 
-    with open(output_path, "w", encoding="utf-8") as f:
+    with output_path.open("w", encoding="utf-8") as f:
         json.dump(serializable, f, indent=2)
 
 
@@ -146,7 +161,11 @@ def generate_policy_brief(
     # Add welfare findings
     for policy_name, metrics in comparisons.items():
         welfare = metrics.get("welfare_change", 0)
-        lines.append(f"- **{policy_name.title()}**: ${welfare:,+,.0f} vs status quo")
+        lines.append(f"- **{policy_name.title()}**: ${welfare:+,.0f} vs status quo")
+
+    best_uptake = _top_policy(comparisons, "testing_uptake_change")
+    best_welfare = _top_policy(comparisons, "welfare_change")
+    best_compliance = _top_policy(comparisons, "compliance_change")
 
     lines.extend(
         [
@@ -161,9 +180,9 @@ def generate_policy_brief(
             "",
             "Based on the evaluation:",
             "",
-            "1. **For maximizing testing uptake**: [Recommendation based on results]",
-            "2. **For maximizing welfare**: [Recommendation based on results]",
-            "3. **For minimizing adverse selection**: [Recommendation based on results]",
+            f"1. **For maximizing testing uptake**: {best_uptake}",
+            f"2. **For maximizing welfare**: {best_welfare}",
+            f"3. **For strengthening compliance**: {best_compliance}",
             "",
             "## Uncertainty and Limitations",
             "",
@@ -177,7 +196,7 @@ def generate_policy_brief(
         ]
     )
 
-    with open(output_path, "w", encoding="utf-8") as f:
+    with output_path.open("w", encoding="utf-8") as f:
         f.write("\n".join(lines))
 
 

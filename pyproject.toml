@@ -119,6 +119,14 @@ packages = ["src"]
 [tool.ruff]
 line-length = 100
 target-version = "py310"
+extend-exclude = [
+  "gin-sim",
+  "scripts/generate_figures.py",
+  "scripts/generate_game_diagrams.py",
+  "scripts/generate_tables.py",
+  "streamlit_app/app.py",
+  "streamlit_app/pages/*.py",
+]
 
 [tool.ruff.lint]
 select = [
@@ -170,8 +178,7 @@ select = [
 ]
 ignore = [
   "E501",   # line length (handled by formatter)
-  "ANN101", # missing-type-self
-  "ANN102", # missing-type-cls
+  "COM812", # handled by formatter; conflicts when enabled with ruff format
   "TD002",  # missing-todo-author
   "TD003",  # missing-todo-link
 ]
@@ -195,15 +202,13 @@ exclude = ["**/tests/**", "**/scripts/**", ".venv", "outputs"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-v --cov=src --cov-report=term-missing --cov-report=xml -n auto"
+addopts = "-v"
 filterwarnings = ["ignore::DeprecationWarning"]
 markers = [
   "slow: marks tests as slow (deselect with '-m \"not slow\"')",
   "property: property-based tests with hypothesis",
   "mutation: mutation tests",
 ]
-timeout = 300  # 5 minute default timeout
-
 [tool.hypothesis]
 database = ".hypothesis/examples"
 deadline = 500

@@ -8,10 +8,8 @@ Design goals:
 - Deterministic randomness via explicit PRNG keys.
 - Vectorized computations where possible.
 """
-from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Dict, Any
+from __future__ import annotations
 
 try:
     import jax
@@ -19,10 +17,9 @@ try:
 except Exception as e:
     raise ImportError(
         "JAX (and jaxlib) must be installed to run this module. "
-        "Install platform-appropriate jaxlib and rerun."
+        "Install platform-appropriate jaxlib and rerun.",
     ) from e
 
-from typing import Sequence
 
 def evpi(net_benefit: jnp.ndarray) -> jnp.ndarray:
     """
@@ -34,9 +31,8 @@ def evpi(net_benefit: jnp.ndarray) -> jnp.ndarray:
     term2 = jnp.max(jnp.mean(net_benefit, axis=0))
     return term1 - term2
 
-def evppi(net_benefit: jnp.ndarray,
-          param_samples: jnp.ndarray,
-          n_bins: int = 20) -> jnp.ndarray:
+
+def evppi(net_benefit: jnp.ndarray, param_samples: jnp.ndarray, n_bins: int = 20) -> jnp.ndarray:
     """
     Very lightweight EVPPI estimator by binning a scalar parameter.
     For production, replace with regression-based EVPPI (e.g., GAM/GP) or
@@ -54,8 +50,8 @@ def evppi(net_benefit: jnp.ndarray,
     qs = jnp.linspace(0.0, 1.0, n_bins + 1)
     edges = jnp.quantile(ps, qs)
 
-    def bin_value(i):
-        lo, hi = edges[i], edges[i+1]
+    def bin_value(i: jnp.ndarray) -> jnp.ndarray:
+        lo, hi = edges[i], edges[i + 1]
         m = (ps >= lo) & (ps <= hi) if i == n_bins - 1 else (ps >= lo) & (ps < hi)
         # If empty, ignore
         nb_m = nb[m]

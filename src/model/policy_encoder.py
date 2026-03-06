@@ -6,7 +6,6 @@ Encodes policy regimes into model-ready parameters.
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional
 from dataclasses import dataclass
 from enum import Enum
 
@@ -15,6 +14,7 @@ from .parameters import PolicyConfig
 
 class PolicyRegime(Enum):
     """Standard policy regimes."""
+
     STATUS_QUO = "status_quo"
     MORATORIUM = "moratorium"
     STATUTORY_BAN = "statutory_ban"
@@ -24,7 +24,7 @@ class PolicyRegime(Enum):
 class EncodedPolicy:
     """
     Encoded policy parameters for model evaluation.
-    
+
     Attributes:
         name: Policy name
         allow_genetic_tests: Whether genetic test results can be used
@@ -34,14 +34,15 @@ class EncodedPolicy:
         penalty_max: Maximum penalty for violations
         information_index: Information availability index (0-1)
     """
+
     name: str
     allow_genetic_tests: bool
     allow_family_history: bool
-    sum_insured_caps: Optional[Dict[str, float]]
+    sum_insured_caps: dict[str, float] | None
     enforcement_strength: float
     penalty_max: float
     information_index: float  # 0 = no information, 1 = full information
-    
+
     def to_policy_config(self) -> PolicyConfig:
         """Convert to PolicyConfig."""
         return PolicyConfig(
@@ -58,7 +59,7 @@ class EncodedPolicy:
 def encode_status_quo() -> EncodedPolicy:
     """
     Encode status quo policy (no restrictions).
-    
+
     Returns:
         EncodedPolicy object
     """
@@ -81,13 +82,13 @@ def encode_moratorium(
 ) -> EncodedPolicy:
     """
     Encode industry moratorium policy.
-    
+
     Args:
         cap_death: Cap for life insurance
         cap_tpd: Cap for TPD insurance
         cap_trauma: Cap for trauma insurance
         enforcement_strength: Industry self-enforcement strength
-        
+
     Returns:
         EncodedPolicy object
     """
@@ -96,9 +97,9 @@ def encode_moratorium(
         allow_genetic_tests=False,
         allow_family_history=True,
         sum_insured_caps={
-            'death': cap_death,
-            'tpd': cap_tpd,
-            'trauma': cap_trauma,
+            "death": cap_death,
+            "tpd": cap_tpd,
+            "trauma": cap_trauma,
         },
         enforcement_strength=enforcement_strength,
         penalty_max=0.0,  # Industry self-regulation
@@ -112,11 +113,11 @@ def encode_statutory_ban(
 ) -> EncodedPolicy:
     """
     Encode statutory ban policy.
-    
+
     Args:
         enforcement_strength: Regulatory enforcement strength
         penalty_max: Maximum statutory penalty
-        
+
     Returns:
         EncodedPolicy object
     """
@@ -131,17 +132,17 @@ def encode_statutory_ban(
     )
 
 
-def get_standard_policies() -> Dict[str, EncodedPolicy]:
+def get_standard_policies() -> dict[str, EncodedPolicy]:
     """
     Get all standard encoded policies.
-    
+
     Returns:
         Dictionary mapping policy name to EncodedPolicy
     """
     return {
-        'status_quo': encode_status_quo(),
-        'moratorium': encode_moratorium(),
-        'statutory_ban': encode_statutory_ban(),
+        "status_quo": encode_status_quo(),
+        "moratorium": encode_moratorium(),
+        "statutory_ban": encode_statutory_ban(),
     }
 
 
@@ -149,13 +150,13 @@ def encode_custom_policy(
     name: str,
     allow_genetic_tests: bool,
     allow_family_history: bool,
-    sum_insured_caps: Optional[Dict[str, float]] = None,
+    sum_insured_caps: dict[str, float] | None = None,
     enforcement_strength: float = 0.5,
     penalty_max: float = 0.0,
 ) -> EncodedPolicy:
     """
     Encode custom policy.
-    
+
     Args:
         name: Policy name
         allow_genetic_tests: Whether genetic tests allowed
@@ -163,7 +164,7 @@ def encode_custom_policy(
         sum_insured_caps: Sum insured caps
         enforcement_strength: Enforcement strength
         penalty_max: Maximum penalty
-        
+
     Returns:
         EncodedPolicy object
     """
@@ -176,7 +177,7 @@ def encode_custom_policy(
     if sum_insured_caps is not None:
         # Partial information below caps
         info_index = max(info_index, 0.3)
-    
+
     return EncodedPolicy(
         name=name,
         allow_genetic_tests=allow_genetic_tests,

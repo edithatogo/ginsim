@@ -1,174 +1,66 @@
 # Current Status
 
-**Last updated:** 2026-03-03  
-**Current track:** gdpe_0002_evidence_anchoring  
-**Current phase:** Phase 3 ✅ COMPLETE → Phase 4 (next)
+**Last updated:** 2026-03-06  
+**Current track:** gdpe_0016_repo_hardening  
+**Current phase:** Phase 3 - Verification
 
 ---
 
-## Progress Summary
+## Repository State
 
-| Phase | Status | Completion Date |
-|-------|--------|-----------------|
-| Phase 1 - Evidence registers | ✅ Complete | 2026-03-03 |
-| Phase 2 - Calibration targets and priors | ✅ Complete | 2026-03-03 |
-| Phase 3 - Identification plan | ✅ Complete | 2026-03-03 |
-| Phase 4 - Validation and verification | ⏳ Pending | - |
-| Phase 5 - Research outputs | ⏳ Pending | - |
+- Conductor registry milestone status remains: **14 completed tracks** and **publication-ready baseline achieved**.
+- The repository also contains a substantial **post-milestone dirty working tree** across `src/`, `scripts/`, `streamlit_app/`, `tests/`, and packaging files.
+- The dirty working tree has been classified and the next active implementation track is now `gdpe_0016_repo_hardening`.
 
 ---
 
-## This Week (Completed)
+## Current Objectives
 
-### Phase 3 Deliverables
-- ✅ Identification plan
-  - Event study design for each module
-  - Data sources inventory (AU: 5, NZ: 5)
-  - Power analysis (MDE: 6% change)
-  - Timeline: 12-18 months for empirical work
-  
-- ✅ Data access and governance appendix
-  - Ethics requirements (AU + NZ)
-  - Māori data sovereignty principles acknowledged
-  - Privacy Act compliance (both jurisdictions)
-  - Security measures documented
-  
-- ✅ Data provenance log
-  - Current data (Phase 1-3): Public aggregate only
-  - Future data (Phase 4+): Transformation templates ready
-  - Version control framework
-  - Run manifests specified
-  
-- ✅ Runbook v2.0
-  - Calibration workflow (5 steps)
-  - Validation and quality section
-  - Phase review workflow
-  - Troubleshooting guide
-
-- ✅ Phase 3 review completed
-
-### Key Findings
-- **Empirical identification:** 12-18 months timeline (data access applications)
-- **Current approach:** Calibration with priors (complete)
-- **Data governance:** Framework established, applications pending
-- **Māori data sovereignty:** Principles acknowledged, partnership commitment for Phase 4
-
-### Phase 2 Summary
-- Australia calibration config (12 parameters)
-- New Zealand calibration config (12 parameters)
-- Evidence-to-prior mapping documentation
-- EVPPI parameter groupings
-
-### Phase 1 Summary
-- Australia evidence register (12 evidence items)
-- New Zealand evidence register (5 evidence items)
-- Policy timeline document
-- Reference validation pipeline
+1. Stabilize the expanded Ruff, typing, and automation baseline.
+2. Separate mechanical hardening edits from behavior-affecting code changes.
+3. Use the hardening findings to reduce ambiguity before `gdpe_0017` and `gdpe_0018`.
+4. Preserve all existing files; no deletions are permitted in this pass.
 
 ---
 
-## Next Week (Phase 4)
+## Hardening Triage
 
-### Phase 4 — Validation and Verification
-
-**Tasks:**
-1. Face validity protocol (recruit ≥2 expert reviewers)
-2. Cross-validation against published literature (≥3 studies)
-3. Stress tests (extreme scenarios: 100% uptake, 0 adverse selection)
-4. Prior predictive checks (Phase 4 validation)
-5. Phase 4 review
-
-**Estimated Duration:** 2 weeks
-
-**Open Questions:**
-- Who to recruit for face validity review?
-- Which published studies for cross-validation?
-- What extreme scenarios to test?
+- Mechanical hardening candidates are now identified across examples, many tests, and several page-level formatting edits.
+- High-risk semantic candidates are concentrated in `src/model/rng.py`, `src/model/module_a_behavior_wrappers.py`, `src/model/extended_games.py`, `src/model/module_c_insurance_eq.py`, `src/model/sensitivity.py`, `src/model/sensitivity_total.py`, and `src/model/voi_analysis.py`.
+- Reporting-oriented files have been explicitly deferred to `gdpe_0017_reporting_pipeline`.
+- Dashboard/test/mirror files have been explicitly deferred to `gdpe_0018_dashboard_alignment`.
+- Seven low-risk hardening tranches have now been cleaned, the full `tests/` tree is Ruff-clean, multiple touched runner-script tranches are now either Ruff-clean or reduced to structural-only warnings, and the model typing hardening pass now leaves `pyright src` at 0 errors.
 
 ---
 
-## Blockers
+## Classified Follow-on Tracks
 
-None currently.
+The current dirty working tree has been split into three follow-on tracks:
 
----
-
-## Recent Decisions
-
-See `context/decision_log.md` for full list.
-
-**Phase 3 decisions:**
-- Calibration approach for current phase (empirical for future)
-- Event study design as preferred identification
-- Māori data sovereignty principles acknowledged
-- Data provenance templates established
+1. `gdpe_0015_reconciliation` is now complete.
+2. `gdpe_0016_repo_hardening` is active.
+3. `gdpe_0017_reporting_pipeline` remains planned.
+4. `gdpe_0018_dashboard_alignment` remains planned.
 
 ---
 
-## Files to Review
+## Working Tree Snapshot
 
-- `docs/IDENTIFICATION_PLAN.md`
-- `docs/DATA_ACCESS_GOVERNANCE.md`
-- `docs/DATA_PROVENANCE_LOG.md`
-- `docs/RUNBOOK.md` (v2.0)
-- `conductor/tracks/gdpe_0002_evidence_anchoring/phase_3_review.md`
-
----
-
-**Next update:** End of Phase 4 (estimated 2026-03-17)
-
-### Tasks
-1. Define calibration targets per module
-2. Convert evidence into prior distributions
-3. Add sensitivity-ready parameter groupings for EVPPI
-4. Document evidence-to-prior mapping rationale
-5. Phase 2 review: Validate priors and run smoke test
-
-### Estimated Duration
-1-2 weeks
-
-### Open Questions
-- How wide should NZ priors be given extremely weak evidence?
-- Should we use expert elicitation for critical parameters?
-- What calibration targets are realistic given data availability?
+- Modified tracked files still span model core, output generation, Streamlit UI, scripts, and project configuration.
+- Untracked additions currently include `noxfile.py`, `gin-sim/`, and test package markers.
+- The working tree therefore represents active development rather than a clean publication-ready checkout.
+- Hardening baseline results so far: the original baselines were `ruff check .` with 824 findings and `pyright src` with 83 errors; the current re-scoped baseline is `ruff check .` with 721 findings and `pyright src` with 0 errors. Subsequent cleanup eliminated the remaining Ruff issues under `tests/`, cleaned several runner scripts outright, reduced the `run_full_uncertainty*` pair to structural Ruff warnings only, and cleared both lower-risk and higher-risk model typing slices.
+- Runtime verification remains partially open: targeted `pytest` required overriding repo `addopts` because `pytest-xdist` is unavailable in the current environment, and the resulting focused test run still exposes JAX/beartype compatibility failures in the enforcement and pipeline path.
 
 ---
 
-## Blockers
+## Reconciliation Notes
 
-None currently.
-
----
-
-## Recent Decisions
-
-1. **Phase 1 review approach** - Accept warnings, fix errors, proceed (2026-03-03)
-2. **NZ evidence adapted from AU** - With wider priors to reflect uncertainty (2026-03-03)
-3. **Very low quality evidence accepted** - Make uncertainty visible, don't hide it (2026-03-03)
-4. **Policy timeline as standalone** - Facilitates direct AU/NZ comparison (2026-03-03)
-5. **Reference validation pipeline** - Custom script for project-specific needs (2026-03-03)
-
-See `context/decision_log.md` for full details.
+- The reconciliation track normalized stale status records and promoted the current work into explicit follow-on tracks.
+- The next active effort is now the repo-hardening baseline rather than further Conductor restructuring.
 
 ---
 
-## Files to Review
+## Next Review Point
 
-- `context/jurisdiction_profiles/australia_evidence_register.yaml`
-- `context/jurisdiction_profiles/new_zealand_evidence_register.yaml`
-- `context/jurisdiction_profiles/policy_timeline_au_nz.md`
-- `context/decision_log.md`
-- `docs/PHASE_1_SUMMARY.md`
-
----
-
-## Notes
-
-- Phase 1 infrastructure setup complete
-- Ready to proceed with Phase 2 calibration
-- Evidence quality disparity (AU vs NZ) is a key finding
-- VOI analysis will be critical for identifying research priorities
-
----
-
-**Next update:** End of Phase 2 (estimated 2026-03-17)
+After `gdpe_0016_repo_hardening` resolves the remaining runtime verification failures in the enforcement and pipeline path, or explicitly splits those runtime repairs into a dedicated follow-up task.

@@ -8,10 +8,11 @@ Design goals:
 - Deterministic randomness via explicit PRNG keys.
 - Vectorized computations where possible.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Any
+from typing import Any
 
 try:
     import jax
@@ -19,8 +20,9 @@ try:
 except Exception as e:
     raise ImportError(
         "JAX (and jaxlib) must be installed to run this module. "
-        "Install platform-appropriate jaxlib and rerun."
+        "Install platform-appropriate jaxlib and rerun.",
     ) from e
+
 
 @dataclass(frozen=True)
 class PassThroughParams:
@@ -28,6 +30,7 @@ class PassThroughParams:
     base_pass_through: float = 0.7
     concentration_slope: float = -0.3  # higher concentration -> lower pass-through (toy)
     noise_sd: float = 0.05
+
 
 def simulate_pass_through(key: jax.Array, hhi: float, params: PassThroughParams) -> jnp.ndarray:
     """
@@ -39,6 +42,9 @@ def simulate_pass_through(key: jax.Array, hhi: float, params: PassThroughParams)
     eps = params.noise_sd * jax.random.normal(key)
     return jnp.clip(mean + eps, 0.0, 1.0)
 
-def run_module(key: jax.Array, policy: Dict[str, Any], hhi: float, params: PassThroughParams) -> Dict[str, Any]:
+
+def run_module(
+    key: jax.Array, policy: dict[str, Any], hhi: float, params: PassThroughParams
+) -> dict[str, Any]:
     pt = simulate_pass_through(key, hhi, params)
     return {"pass_through": pt, "hhi": jnp.array(hhi)}

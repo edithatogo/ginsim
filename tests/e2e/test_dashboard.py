@@ -17,24 +17,23 @@ from streamlit.testing.v1 import AppTest
 @pytest.fixture
 def app_test():
     """Create AppTest fixture with increased timeout for JAX compilation."""
-    at = AppTest.from_file("streamlit_app/app.py", default_timeout=30)
-    return at
+    return AppTest.from_file("streamlit_app/app.py", default_timeout=30)
 
 
 class TestDashboardLoads:
     """Test dashboard loads without errors."""
-    
+
     def test_dashboard_loads(self, app_test):
         """Test dashboard loads successfully."""
         app_test.run()
         # Check that title is present (indicates successful load)
         assert len(app_test.title) > 0
-    
+
     def test_title_present(self, app_test):
         """Test dashboard title is present."""
         app_test.run()
         assert app_test.title[0].value == "🧬 Genetic Discrimination Policy Dashboard"
-    
+
     def test_sidebar_present(self, app_test):
         """Test sidebar is present."""
         app_test.run()
@@ -46,23 +45,23 @@ class TestDashboardLoads:
 
 class TestSidebarControls:
     """Test all sidebar controls."""
-    
+
     def test_policy_selection(self, app_test):
         """Test policy regime selection."""
         app_test.run()
         # Policy Regime is the 2nd selectbox now
         assert app_test.selectbox[1].value == "Status Quo"
-        
+
         # Change policy
         app_test.selectbox[1].set_value("Moratorium")
         app_test.run()
         assert app_test.selectbox[1].value == "Moratorium"
-    
+
     def test_baseline_uptake_slider(self, app_test):
         """Test baseline testing uptake slider."""
         app_test.run()
         assert app_test.slider[0].value == 0.52
-        
+
         # Change slider
         app_test.slider[0].set_value(0.60)
         app_test.run()
@@ -71,16 +70,16 @@ class TestSidebarControls:
 
 class TestFunctionality:
     """Test dashboard functionality."""
-    
+
     def test_run_model_button(self, app_test):
         """Test that clicking 'Run Model' generates results."""
         app_test.run()
-        
+
         # Click button
         # find by label
         run_button = next(b for b in app_test.button if b.label == "🔬 Run Model")
         run_button.click().run()
-        
+
         # Check for metrics instead of session state (more reliable)
         assert len(app_test.metric) >= 3
         # First metric is Testing Uptake

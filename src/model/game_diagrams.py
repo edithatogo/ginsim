@@ -18,6 +18,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.figure import Figure
 from matplotlib.patches import Circle, Rectangle
 
 
@@ -41,7 +42,7 @@ def create_module_a_diagram(
     params: dict[str, float] | None = None,
     config: DiagramConfig | None = None,
     save_path: Path | None = None,
-) -> plt.Figure:
+) -> Figure:
     """
     Create Module A: Behavior/Deterrence game diagram.
 
@@ -78,7 +79,12 @@ def create_module_a_diagram(
     # Draw nodes
     # Start node (Individual)
     start_circle = Circle(
-        (start_x, start_y), 0.4, fill=True, color=config.node_color, ec=config.node_edge_color, lw=2
+        (start_x, start_y),
+        0.4,
+        fill=True,
+        color=config.node_color,
+        ec=config.node_edge_color,
+        lw=2,
     )
     ax.add_patch(start_circle)
     ax.text(
@@ -271,7 +277,7 @@ def create_module_c_diagram(
     params: dict[str, float] | None = None,
     config: DiagramConfig | None = None,
     save_path: Path | None = None,
-) -> plt.Figure:
+) -> Figure:
     """
     Create Module C: Insurance Equilibrium diagram.
 
@@ -472,7 +478,7 @@ def create_module_d_diagram(
     params: dict[str, float] | None = None,
     config: DiagramConfig | None = None,
     save_path: Path | None = None,
-) -> plt.Figure:
+) -> Figure:
     """
     Create Module D: Proxy Substitution diagram.
 
@@ -494,7 +500,10 @@ def create_module_d_diagram(
     ax.set_facecolor(config.background_color)
 
     ax.set_title(
-        "Module D: Proxy Substitution (Information Leakage)", fontsize=14, fontweight="bold", pad=20
+        "Module D: Proxy Substitution (Information Leakage)",
+        fontsize=14,
+        fontweight="bold",
+        pad=20,
     )
 
     # Create proxy substitution flow diagram
@@ -549,7 +558,12 @@ def create_module_d_diagram(
 
     for px, py, label in proxy_positions:
         proxy_circle = Circle(
-            (px, py), 0.6, fill=True, color=config.warning_color, ec=config.node_edge_color, lw=2
+            (px, py),
+            0.6,
+            fill=True,
+            color=config.warning_color,
+            ec=config.node_edge_color,
+            lw=2,
         )
         ax.add_patch(proxy_circle)
         ax.text(
@@ -651,7 +665,7 @@ def create_module_e_diagram(
     params: dict[str, float] | None = None,
     config: DiagramConfig | None = None,
     save_path: Path | None = None,
-) -> plt.Figure:
+) -> Figure:
     """
     Create Module E: Pass-Through diagram.
 
@@ -766,7 +780,7 @@ def create_module_e_diagram(
     if params and "pass_through_rate" in params:
         ptr = params["pass_through_rate"]
         # Color gradient based on pass-through
-        colors = plt.cm.RdYlGn(gauge_x * ptr)
+        colors = plt.get_cmap("RdYlGn")(gauge_x * ptr)
         for i in range(len(gauge_x) - 1):
             ax.axvspan(
                 2 + gauge_x[i] * 8,
@@ -833,7 +847,7 @@ def create_module_f_diagram(
     params: dict[str, float] | None = None,
     config: DiagramConfig | None = None,
     save_path: Path | None = None,
-) -> plt.Figure:
+) -> Figure:
     """
     Create Module F: Data Quality diagram.
 
@@ -983,7 +997,10 @@ def create_module_f_diagram(
         xy=(policy_x - 1.5, policy_y),
         xytext=(quality_x - 0.6, quality_y),
         arrowprops=dict(
-            arrowstyle="->", color=config.success_color, lw=2, connectionstyle="arc3,rad=-0.5"
+            arrowstyle="->",
+            color=config.success_color,
+            lw=2,
+            connectionstyle="arc3,rad=-0.5",
         ),
     )
 
@@ -1045,7 +1062,7 @@ def create_enforcement_diagram(
     params: dict[str, float] | None = None,
     config: DiagramConfig | None = None,
     save_path: Path | None = None,
-) -> plt.Figure:
+) -> Figure:
     """
     Create Enforcement: Compliance game diagram.
 
@@ -1314,7 +1331,7 @@ def create_enforcement_diagram(
 
 
 def export_diagram(
-    fig: plt.Figure,
+    fig: Figure,
     save_path: Path,
     formats: list[str] = ["png", "svg"],
 ) -> list[Path]:

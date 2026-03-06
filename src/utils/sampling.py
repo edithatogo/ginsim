@@ -1,9 +1,12 @@
 from __future__ import annotations
 
-from typing import Sequence, Any, Literal
+from collections.abc import Sequence
+from typing import Any, Literal
+
 import numpy as np
 
 SamplingMode = Literal["independent", "common_index", "random"]
+
 
 def index_map(i: int, n_draws: int, n_available: int) -> int:
     if n_available <= 0:
@@ -12,7 +15,10 @@ def index_map(i: int, n_draws: int, n_available: int) -> int:
         return 0
     return int(round(i * (n_available - 1) / (n_draws - 1)))
 
-def select_draw(draws: Sequence[Any] | None, i: int, n_draws: int, mode: SamplingMode, rng: np.random.Generator) -> Any | None:
+
+def select_draw(
+    draws: Sequence[Any] | None, i: int, n_draws: int, mode: SamplingMode, rng: np.random.Generator
+) -> Any | None:
     if draws is None or len(draws) == 0:
         return None
     if mode == "independent":

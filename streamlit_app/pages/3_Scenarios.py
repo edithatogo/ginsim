@@ -16,20 +16,18 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
+import streamlit as st
+
+from src.model.pipeline import evaluate_single_policy
 
 # Import from core model
 from src.model.scenario_analysis import (
-    load_scenarios,
     compare_scenarios,
     format_comparison_table,
-    evaluate_scenario,
+    load_scenarios,
 )
-from src.model.parameters import ModelParameters
-from src.model.pipeline import evaluate_single_policy
-from src.model.module_a_behavior import get_standard_policies
 
 # Page configuration
 st.set_page_config(
@@ -117,7 +115,7 @@ if "scenario_comparison" in st.session_state:
 
     st.divider()
     st.subheader(
-        f"📊 Scenario Comparison (Baseline: {baseline_options.get(baseline_key, baseline_key)})"
+        f"📊 Scenario Comparison (Baseline: {baseline_options.get(baseline_key, baseline_key)})",
     )
 
     # Create comparison dataframe
@@ -133,7 +131,7 @@ if "scenario_comparison" in st.session_state:
                 "Welfare Impact": f"${result.welfare_impact:,.0f}",
                 "Δ Welfare": f"${delta.get('welfare_delta', 0):+,.0f}" if delta else "—",
                 "Compliance": f"{result.compliance_rate:.1%}",
-            }
+            },
         )
 
     df = pd.DataFrame(data)
@@ -154,7 +152,8 @@ if "scenario_comparison" in st.session_state:
             colors.append("#95a5a6")  # Gray for baseline
         else:
             delta = comparison.delta_from_baseline.get(r.scenario_name, {}).get(
-                "testing_uptake_delta", 0
+                "testing_uptake_delta",
+                0,
             )
             if delta > 0:
                 colors.append("#2ecc71")  # Green for positive
@@ -168,7 +167,7 @@ if "scenario_comparison" in st.session_state:
             marker_color=colors,
             text=[f"{u:.1%}" for u in uptakes],
             textposition="outside",
-        )
+        ),
     )
 
     fig.update_layout(
@@ -204,7 +203,7 @@ if "scenario_comparison" in st.session_state:
             ],
             text=[f"${w:,.0f}" for w in welfares],
             textposition="outside",
-        )
+        ),
     )
 
     fig2.update_layout(

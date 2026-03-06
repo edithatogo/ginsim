@@ -12,13 +12,23 @@ Strategic Game: Testing Participation under Penalty Risk
 
 from __future__ import annotations
 
-from typing import Dict, Tuple, List, Any
+from dataclasses import dataclass
+from typing import Any
+
 import jax.numpy as jnp
 import jax.random as jr
-from jax import jit, vmap
 from jaxtyping import Array, Float
 
 from .parameters import PolicyConfig
+
+
+@dataclass(frozen=True)
+class BehaviorParams:
+    """Compact behavior parameters used by glue scripts."""
+
+    baseline_logit: float
+    policy_shock: float
+    trend: float
 
 
 # Don't use @jit here - boolean arguments don't work with JIT
@@ -29,17 +39,17 @@ def compute_perceived_penalty(
     enforcement_strength: float,
     enforcement_effectiveness: float,
     moratorium_effect: float,
-    sum_insured_caps: dict | None = None,
+    sum_insured_caps: dict[str, float] | None = None,
 ) -> Float[Array, ""]:
     """
     Compute perceived discrimination penalty under policy regime.
-    
+
     The perceived penalty captures the expected cost of genetic testing
     from the individual's perspective, considering:
     - Probability of discrimination
     - Severity of discrimination (premium loading, denial)
     - Policy protections
-    
+
     Args:
         adverse_selection_elasticity: Adverse selection elasticity
         baseline_loading: Baseline premium loading
@@ -48,27 +58,27 @@ def compute_perceived_penalty(
         enforcement_effectiveness: Enforcement effectiveness
         moratorium_effect: Moratorium effect size
         sum_insured_caps: Sum insured caps by product type
-        
+
     Returns:
         Perceived penalty (higher = more deterrence)
     """
     # Base penalty from adverse selection
     base_penalty = adverse_selection_elasticity * baseline_loading
-    
+
     # Policy reduces penalty based on:
     # 1. Information restrictions
     # 2. Enforcement effectiveness
-    
+
     info_restriction = 1.0 if allow_genetic_test_results else 0.0
     enforcement_factor = enforcement_strength * enforcement_effectiveness
-    
+
     # Penalty reduction from policy
     penalty_reduction = info_restriction * enforcement_factor
-    
+
     # Apply moratorium effect if applicable
     if not allow_genetic_test_results and sum_insured_caps is not None:
         penalty_reduction += moratorium_effect
-    
+
     # Final perceived penalty
     perceived_penalty = base_penalty * (1.0 - penalty_reduction)
 
@@ -94,34 +104,34 @@ def compute_perceived_penalty_wrapper(
 
 
 def compute_testing_utility(
-    benefits: Float[Array, "..."],
+    benefits: Float[Array, ...],
     perceived_penalty: Float[Array, ""],
-    individual_characteristics: Dict[str, Float[Array, "..."]] | None = None,
-) -> Float[Array, "..."]:
+    individual_characteristics: dict[str, Float[Array, ...]] | None = None,
+) -> Float[Array, ...]:
     """
     Compute utility of genetic testing.
-    
+
     Utility function:
         U(test) = benefits - perceived_penalty + individual_factors
     """
     # Base utility
     utility = benefits - perceived_penalty
-    
+
     # Add individual characteristics if provided
     if individual_characteristics is not None:
         for factor, weight in individual_characteristics.items():
             utility = utility + weight * individual_characteristics.get(factor, 0.0)
-    
+
     return utility
 
 
 def compute_testing_probability(
-    utility: Float[Array, "..."],
+    utility: Float[Array, ...],
     scale: float = 1.0,
-) -> Float[Array, "..."]:
+) -> Float[Array, ...]:
     """
     Compute probability of testing given utility (logit model).
-    
+
     P(test) = exp(scale * utility) / (1 + exp(scale * utility))
     """
     scaled_utility = utility * scale
@@ -140,7 +150,7 @@ def compute_testing_uptake(
 ) -> Float[Array, ""]:
     """
     Compute aggregate testing uptake under policy regime.
-    
+
     Args:
         params: Model parameters (ModelParameters)
         policy: Policy configuration
@@ -148,7 +158,7 @@ def compute_testing_uptake(
         benefits_sd: Standard deviation of benefits
         n_individuals: Number of individuals to simulate
         rng_key: Optional RNG key
-        
+
     Returns:
         Aggregate testing uptake rate (0-1)
     """
@@ -162,7 +172,7 @@ def compute_testing_uptake(
         params.moratorium_effect,
         policy.sum_insured_caps,
     )
-    
+
     # Simulate heterogeneous benefits
     if rng_key is not None:
         benefits = jr.normal(rng_key, (n_individuals,)) * benefits_sd + benefits_mean
@@ -171,50 +181,50 @@ def compute_testing_uptake(
         benefits = jnp.linspace(
             benefits_mean - 3 * benefits_sd,
             benefits_mean + 3 * benefits_sd,
-            n_individuals
+            n_individuals,
         )
-    
+
     # Compute utility for each individual
     utilities = compute_testing_utility(benefits, perceived_penalty)
-    
+
     # Compute testing probabilities
     probabilities = compute_testing_probability(utilities)
-    
+
     # Aggregate uptake
     uptake = jnp.mean(probabilities)
-    
+
     return uptake
+
 
 def compute_policy_effect(
     params: Any,
     baseline_policy: PolicyConfig,
     reform_policy: PolicyConfig,
-) -> Dict[str, Float[Array, ""]]:
-
+) -> dict[str, Float[Array, ""]]:
     """
     Compute effect of policy reform on testing uptake.
     """
     # Compute uptake under both policies
     baseline_uptake = compute_testing_uptake(params, baseline_policy)
     reform_uptake = compute_testing_uptake(params, reform_policy)
-    
+
     # Compute effects
     absolute_effect = reform_uptake - baseline_uptake
     relative_effect = absolute_effect / (baseline_uptake + 1e-10)
-    
+
     return {
-        'baseline_uptake': baseline_uptake,
-        'reform_uptake': reform_uptake,
-        'absolute_effect': absolute_effect,
-        'relative_effect': relative_effect,
+        "baseline_uptake": baseline_uptake,
+        "reform_uptake": reform_uptake,
+        "absolute_effect": absolute_effect,
+        "relative_effect": relative_effect,
     }
 
 
 def evaluate_multiple_policies(
     params: Any,
-    policies: List[PolicyConfig],
-    **kwargs,
-) -> Dict[str, Float[Array, ""]]:
+    policies: list[PolicyConfig],
+    **kwargs: Any,
+) -> dict[str, Float[Array, ""]]:
     """
     Evaluate testing uptake for multiple policies.
     """
@@ -225,32 +235,32 @@ def evaluate_multiple_policies(
 
 
 # Convenience function for common scenarios
-def get_standard_policies() -> Dict[str, PolicyConfig]:
+def get_standard_policies() -> dict[str, PolicyConfig]:
     """
     Get standard policy configurations.
-    
+
     Returns:
         Dictionary with 'status_quo', 'moratorium', 'ban' policies
     """
     return {
-        'status_quo': PolicyConfig(
-            name='status_quo',
-            description='No restrictions on genetic information use',
+        "status_quo": PolicyConfig(
+            name="status_quo",
+            description="No restrictions on genetic information use",
             allow_genetic_test_results=True,
             allow_family_history=True,
             enforcement_strength=1.0,
         ),
-        'moratorium': PolicyConfig(
-            name='moratorium',
-            description='Industry moratorium with caps',
+        "moratorium": PolicyConfig(
+            name="moratorium",
+            description="Industry moratorium with caps",
             allow_genetic_test_results=False,
             allow_family_history=True,
-            sum_insured_caps={'death': 500000, 'tpd': 200000, 'trauma': 200000},
+            sum_insured_caps={"death": 500000, "tpd": 200000, "trauma": 200000},
             enforcement_strength=0.5,
         ),
-        'ban': PolicyConfig(
-            name='ban',
-            description='Statutory ban on genetic information use',
+        "ban": PolicyConfig(
+            name="ban",
+            description="Statutory ban on genetic information use",
             allow_genetic_test_results=False,
             allow_family_history=False,
             enforcement_strength=1.0,

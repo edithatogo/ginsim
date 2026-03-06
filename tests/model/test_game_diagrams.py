@@ -3,7 +3,6 @@
 Tests for game diagram generation functions.
 """
 
-import pytest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -135,7 +134,7 @@ class TestGenerateAllDiagrams:
             assert len(results) == 6
 
             # Check each diagram has PNG and SVG
-            for name, paths in results.items():
+            for paths in results.values():
                 assert len(paths) == 2  # PNG and SVG
                 for path in paths:
                     assert path.exists()

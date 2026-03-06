@@ -3,18 +3,18 @@
 Tests for scenario analysis module.
 """
 
-import pytest
 from pathlib import Path
 from tempfile import TemporaryDirectory
+
+import pytest
 import yaml
 
 from src.model.scenario_analysis import (
-    load_scenarios,
-    evaluate_scenario,
+    ScenarioComparison,
+    ScenarioResult,
     compare_scenarios,
     format_comparison_table,
-    ScenarioResult,
-    ScenarioComparison,
+    load_scenarios,
 )
 
 
@@ -54,11 +54,11 @@ class TestLoadScenarios:
                         "parameters": {
                             "baseline_testing_uptake": 0.5,
                         },
-                    }
-                }
+                    },
+                },
             }
-            with open(config_path, "w", encoding="utf-8") as f:
-                yaml.dump(config_data, f)
+            with config_path.open("w", encoding="utf-8") as config_file:
+                yaml.dump(config_data, config_file)
 
             scenarios = load_scenarios(config_path)
             assert "test_scenario" in scenarios
@@ -122,7 +122,7 @@ class TestFormatComparisonTable:
                     "welfare_delta": 25000.0,
                     "qalys_delta": 2.5,
                     "compliance_delta": 0.15,
-                }
+                },
             },
         )
 
@@ -161,7 +161,7 @@ class TestCompareScenarios:
             "test": {
                 "jurisdiction": "AU",
                 "parameters": {"baseline_testing_uptake": 0.55},
-            }
+            },
         }
 
         comparison = compare_scenarios(scenarios, mock_model, baseline_name="test")

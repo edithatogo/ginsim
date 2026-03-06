@@ -2,10 +2,12 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
+
 class BehaviorParamsDraw(BaseModel):
     baseline_logit: float
     policy_shock: float
     trend: float
+
 
 class ClinicalParamsDraw(BaseModel):
     baseline_event_rate: float
@@ -13,6 +15,7 @@ class ClinicalParamsDraw(BaseModel):
     prevention_effect: float
     cost_per_event: float
     qaly_loss_per_event: float
+
 
 class InsuranceParamsDraw(BaseModel):
     base_premium: float
@@ -22,10 +25,12 @@ class InsuranceParamsDraw(BaseModel):
     adverse_selection_sensitivity: float
     price_elasticity: float
 
+
 class PassThroughParamsDraw(BaseModel):
     base_pass_through: float = 0.7
     concentration_slope: float = -0.3
     noise_sd: float = 0.05
+
 
 class DataQualityParamsDraw(BaseModel):
     base_participation_logit: float
@@ -33,6 +38,7 @@ class DataQualityParamsDraw(BaseModel):
     base_auc: float
     auc_sensitivity: float
     noise_sd: float = 0.01
+
 
 class PolicyMappingParamsDraw(BaseModel):
     beta_allow: float

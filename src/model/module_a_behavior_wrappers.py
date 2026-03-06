@@ -7,13 +7,11 @@ and call the JIT-compiled core functions with extracted primitives.
 
 from __future__ import annotations
 
-from typing import Dict, List
-import jax.numpy as jnp
 from jax import random as jr
-from jaxtyping import Array, Float
+from jaxtyping import Array
 
-from .parameters import ModelParameters, PolicyConfig
 from . import module_a_behavior as core
+from .parameters import ModelParameters, PolicyConfig
 
 
 def compute_perceived_penalty(
@@ -22,13 +20,13 @@ def compute_perceived_penalty(
 ) -> float:
     """
     Compute perceived discrimination penalty under policy regime.
-    
+
     Wrapper that accepts pydantic models and calls JIT-compiled core function.
-    
+
     Args:
         params: Model parameters
         policy: Policy configuration
-        
+
     Returns:
         Perceived penalty (higher = more deterrence)
     """
@@ -54,9 +52,9 @@ def compute_testing_uptake(
 ) -> float:
     """
     Compute aggregate testing uptake under policy regime.
-    
+
     Wrapper that accepts pydantic models.
-    
+
     Args:
         params: Model parameters
         policy: Policy configuration
@@ -64,17 +62,15 @@ def compute_testing_uptake(
         benefits_sd: Standard deviation of benefits
         n_individuals: Number of individuals to simulate
         rng_key: Optional RNG key
-        
+
     Returns:
         Aggregate testing uptake rate (0-1)
     """
     if rng_key is None:
-        rng_key = jr.PRNGKey(params.random_seed if hasattr(params, 'random_seed') else 20260303)
-    
+        rng_key = jr.PRNGKey(20260303)
+
     uptake = core.compute_testing_uptake(
-        params.baseline_testing_uptake,
-        params.deterrence_elasticity,
-        params.moratorium_effect,
+        params,
         policy,
         benefits_mean,
         benefits_sd,
@@ -88,36 +84,34 @@ def compute_policy_effect(
     params: ModelParameters,
     baseline_policy: PolicyConfig,
     reform_policy: PolicyConfig,
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """
     Compute effect of policy reform on testing uptake.
-    
+
     Wrapper that accepts pydantic models.
-    
+
     Args:
         params: Model parameters
         baseline_policy: Baseline policy
         reform_policy: Reform policy
-        
+
     Returns:
         Dictionary with baseline_uptake, reform_uptake, absolute_effect, relative_effect
     """
     result = core.compute_policy_effect(
-        params.baseline_testing_uptake,
-        params.deterrence_elasticity,
-        params.moratorium_effect,
+        params,
         baseline_policy,
         reform_policy,
     )
-    
+
     return {
-        'baseline_uptake': float(result['baseline_uptake']),
-        'reform_uptake': float(result['reform_uptake']),
-        'absolute_effect': float(result['absolute_effect']),
-        'relative_effect': float(result['relative_effect']),
+        "baseline_uptake": float(result["baseline_uptake"]),
+        "reform_uptake": float(result["reform_uptake"]),
+        "absolute_effect": float(result["absolute_effect"]),
+        "relative_effect": float(result["relative_effect"]),
     }
 
 
-def get_standard_policies() -> Dict[str, PolicyConfig]:
+def get_standard_policies() -> dict[str, PolicyConfig]:
     """Get standard policy configurations."""
     return core.get_standard_policies()

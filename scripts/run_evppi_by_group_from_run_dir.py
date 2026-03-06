@@ -1,18 +1,20 @@
 from __future__ import annotations
 
 import argparse
+from contextlib import suppress
 from pathlib import Path
-import numpy as np
-import pandas as pd
 
 import jax
 import jax.numpy as jnp
-
+import numpy as np
+import pandas as pd
 from src.model.evppi_rff import evppi_rff
-from src.model.voi import evpi
 from src.utils.manifest import write_manifest
 
-GROUPS = ["mapping","behavior","clinical","insurance","passthrough","data_quality"]
+from src.model.voi import evpi
+
+GROUPS = ["mapping", "behavior", "clinical", "insurance", "passthrough", "data_quality"]
+
 
 def load_theta(run_dir: Path, name: str):
     p = run_dir / f"theta_{name}.npy"
@@ -20,9 +22,14 @@ def load_theta(run_dir: Path, name: str):
         return np.load(p)
     return None
 
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--run_dir", required=True, help="Directory containing net_benefit_matrix.npy and theta_*.npy")
+    parser.add_argument(
+        "--run_dir",
+        required=True,
+        help="Directory containing net_benefit_matrix.npy and theta_*.npy",
+    )
     parser.add_argument("--out", default="outputs/runs/evppi_groups_from_run")
     parser.add_argument("--seed", type=int, default=20260302)
     parser.add_argument("--n_features", type=int, default=256)
@@ -33,7 +40,8 @@ def main():
     run_dir = Path(args.run_dir)
     nb_path = run_dir / "net_benefit_matrix.npy"
     if not nb_path.exists():
-        raise FileNotFoundError(f"Missing {nb_path}")
+        message = f"Missing {nb_path}"
+        raise FileNotFoundError(message)
 
     nb = np.load(nb_path)  # [S,P]
     nb_j = jnp.array(nb)
@@ -48,17 +56,30 @@ def main():
             continue
         theta_j = jnp.array(theta)
         k = jax.random.fold_in(key, hash(g) & 0xFFFFFFFF)
-        val = float(evppi_rff(nb_j, theta_j, k, n_features=args.n_features, lengthscale=args.lengthscale, l2=args.l2))
+        val = float(
+            evppi_rff(
+                nb_j,
+                theta_j,
+                k,
+                n_features=args.n_features,
+                lengthscale=args.lengthscale,
+                l2=args.l2,
+            ),
+        )
         rows.append({"group": g, "evppi": val})
 
-    df = pd.DataFrame(rows).sort_values("evppi", ascending=False) if rows else pd.DataFrame(columns=["group","evppi"])
+    df = (
+        pd.DataFrame(rows).sort_values("evppi", ascending=False)
+        if rows
+        else pd.DataFrame(columns=["group", "evppi"])
+    )
     out_dir = Path(args.out) / pd.Timestamp.utcnow().strftime("%Y%m%dT%H%M%SZ")
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    try:
+    with suppress(Exception):
         write_manifest(
             out_dir,
-            repo_root=Path("."),
+            repo_root=Path(),
             jurisdiction="n/a",
             domain="n/a",
             policies_file=Path("configs/base.yaml"),
@@ -66,17 +87,18 @@ def main():
             notes="EVPPI by group computed from run_dir theta matrices via RFF surrogate.",
             extra={"run_dir": str(run_dir), "evpi": evpi_val},
         )
-    except Exception:
-        pass
 
     df.to_csv(out_dir / "evppi_by_group.csv", index=False)
     (out_dir / "report.txt").write_text(
-        "EVPI: %.6f\n" % evpi_val + "\n".join([f"{r['group']}: {r['evppi']:.6f}" for r in rows]) + "\n",
+        f"EVPI: {evpi_val:.6f}\n"
+        + "\n".join([f"{r['group']}: {r['evppi']:.6f}" for r in rows])
+        + "\n",
         encoding="utf-8",
     )
 
     print("Wrote:", out_dir)
     print(df.to_string(index=False))
+
 
 if __name__ == "__main__":
     main()

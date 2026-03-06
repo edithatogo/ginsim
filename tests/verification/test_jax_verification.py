@@ -6,10 +6,14 @@ Verify that dashboard uses JAX-accelerated model from src/model/
 and benchmark performance improvements.
 """
 
-import pytest
 import time
-import numpy as np
 from pathlib import Path
+
+import jax.numpy as jnp
+import pytest
+from jax import jit, random
+
+from src.model.sensitivity_total import sobol_sensitivity
 
 
 class TestJAXConsistency:
@@ -17,12 +21,9 @@ class TestJAXConsistency:
 
     def test_jax_deterministic_with_seed(self):
         """Test that JAX random operations are deterministic with fixed seed."""
-        import jax.random as random
-        import jax.numpy as jnp
-
         key = random.PRNGKey(42)
         result1 = random.uniform(key, shape=(10,)).sum()
-        
+
         key = random.PRNGKey(42)
         result2 = random.uniform(key, shape=(10,)).sum()
 
@@ -31,9 +32,6 @@ class TestJAXConsistency:
 
     def test_jax_array_operations(self):
         """Test that JAX array operations work correctly."""
-        import jax.numpy as jnp
-        from jax import jit
-
         @jit
         def simple_calc(x, y):
             return x * 2 + y
@@ -47,16 +45,12 @@ class TestJAXPerformance:
 
     def test_jax_jit_speedup(self):
         """Test that JIT compilation provides speedup."""
-        import jax.numpy as jnp
-        from jax import jit
-        import time
-
         @jit
         def jit_func(x):
-            return x ** 2 + 2 * x + 1
+            return x**2 + 2 * x + 1
 
         def plain_func(x):
-            return x ** 2 + 2 * x + 1
+            return x**2 + 2 * x + 1
 
         x = jnp.array(1000.0)
 
@@ -82,7 +76,9 @@ class TestJAXPerformance:
         """Test that batch processing works correctly."""
         # Note: This test is skipped due to JAX tracing limitations with Python functions
         # The _evaluate_model_jax function requires JAX-traceable functions
-        pytest.skip("JAX tracing limitation - requires JAX-traceable model function")  # Less than 1 second
+        pytest.skip(
+            "JAX tracing limitation - requires JAX-traceable model function",
+        )  # Less than 1 second
 
 
 class TestDashboardIntegration:
@@ -92,9 +88,9 @@ class TestDashboardIntegration:
         """Test that dashboard imports from core model."""
         # Read dashboard file
         dashboard_path = Path(__file__).parent.parent.parent / "streamlit_app" / "app.py"
-        
-        with open(dashboard_path, "r", encoding="utf-8") as f:
-            content = f.read()
+
+        with dashboard_path.open(encoding="utf-8") as dashboard_file:
+            content = dashboard_file.read()
 
         # Check for core model imports
         assert "from src.model" in content
@@ -103,9 +99,9 @@ class TestDashboardIntegration:
     def test_no_duplicate_logic(self):
         """Test that dashboard doesn't duplicate model logic."""
         dashboard_path = Path(__file__).parent.parent.parent / "streamlit_app" / "app.py"
-        
-        with open(dashboard_path, "r", encoding="utf-8") as f:
-            content = f.read()
+
+        with dashboard_path.open(encoding="utf-8") as dashboard_file:
+            content = dashboard_file.read()
 
         # Check for common duplicated patterns (should NOT be present)
         # These are signs of duplicated logic
@@ -119,10 +115,6 @@ class TestReproducibility:
 
     def test_reproducible_results(self):
         """Test that results are reproducible across runs."""
-        import jax.numpy as jnp
-        from jax import jit
-        import jax.random as random
-
         @jit
         def deterministic_func(x, key):
             return jnp.sum(x) + random.uniform(key).sum()
@@ -145,9 +137,6 @@ class TestSensitivityAnalysis:
 
     def test_sobol_indices_range(self):
         """Test that Sobol indices are in valid range [0, 1]."""
-        import jax.numpy as jnp
-        from src.model.sensitivity_total import sobol_sensitivity
-
         def simple_model(params):
             return jnp.sum(params)
 

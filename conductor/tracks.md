@@ -4,11 +4,22 @@ This registry is the index of Conductor tracks for this repository.
 
 ## Active Tracks
 
-*No active tracks. All tracks complete.*
+| Track ID | Title | Status | Link |
+|---|---|---|---|
+| gdpe_0016_repo_hardening | Repository-wide lint, typing, and automation hardening | [~] Active | [track](./tracks/gdpe_0016_repo_hardening/index.md) |
 
 ## Planned Tracks
 
-*No planned tracks.*
+| Track ID | Title | Status | Link |
+|---|---|---|---|
+| gdpe_0017_reporting_pipeline | Reporting and publish-pack pipeline refinement | Planned | [track](./tracks/gdpe_0017_reporting_pipeline/index.md) |
+| gdpe_0018_dashboard_alignment | Dashboard, validation, and gin-sim alignment | Planned | [track](./tracks/gdpe_0018_dashboard_alignment/index.md) |
+
+## Completed Follow-up Tracks
+
+| Track ID | Title | Status | Link |
+|---|---|---|---|
+| gdpe_0015_reconciliation | Conductor reconciliation and working tree classification | ✅ Complete | [track](./tracks/gdpe_0015_reconciliation/index.md) |
 
 ## Archived Tracks
 
@@ -31,7 +42,15 @@ This registry is the index of Conductor tracks for this repository.
 
 ---
 
-## 🎉 ALL TRACKS COMPLETE
+## Milestone Summary
 
-**Total Tracks:** 14/14  
-**Repository Status:** Publication Ready (SOTA) ✅
+**Completed milestone tracks:** 14/14  
+**Repository baseline:** Publication Ready (SOTA) ✅  
+**Current active follow-up track:** `gdpe_0016_repo_hardening`
+
+---
+
+## Notes
+
+- Historical Conductor files from completed tracks are intentionally retained in `conductor/tracks/` and `conductor/archive/` for traceability.
+- `gdpe_0015_reconciliation` captures post-publication-ready repository changes that are present in the working tree but not yet promoted into completed follow-on tracks.

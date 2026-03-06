@@ -1,22 +1,24 @@
 from __future__ import annotations
 
 import argparse
-import yaml
 from pathlib import Path
 
 import jax
 import jax.numpy as jnp
+import yaml
 
-from src.model.voi import evpi, evppi
 from src.model.glue_policy_eval import GlobalParams, simulate_policy
 from src.model.module_a_behavior import BehaviorParams
 from src.model.module_b_clinical import ClinicalParams
 from src.model.module_c_insurance_eq import InsuranceParams
 from src.model.module_e_passthrough import PassThroughParams
 from src.model.module_f_data_quality import DataQualityParams
+from src.model.voi import evpi, evppi
+
 
 def load_yaml(path: Path):
     return yaml.safe_load(path.read_text())
+
 
 def get_policies_path(jurisdiction: str) -> Path:
     mapping = {
@@ -26,8 +28,10 @@ def get_policies_path(jurisdiction: str) -> Path:
         "au": Path("configs/policies_australia.yaml"),
     }
     if jurisdiction not in mapping:
-        raise ValueError(f"Unknown jurisdiction: {jurisdiction}. Use australia or new_zealand.")
+        message = f"Unknown jurisdiction: {jurisdiction}. Use australia or new_zealand."
+        raise ValueError(message)
     return mapping[jurisdiction]
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -72,35 +76,36 @@ def main():
         policies.append({"name": name, **rule})
 
     # Monte Carlo over one uncertain parameter to demo EVPPI
-    S = 2000
-    keys = jax.random.split(key, S)
+    n_draws = 2000
+    keys = jax.random.split(key, n_draws)
 
-    shock = jax.random.normal(keys[0], (S,)) * 0.3 + 1.0
+    shock = jax.random.normal(keys[0], (n_draws,)) * 0.3 + 1.0
     shock = jnp.clip(shock, 0.0, 2.0)
 
     def one_draw(i):
         p = GlobalParams(
-            behavior=BehaviorParams(baseline_logit=base_params.behavior.baseline_logit,
-                                    policy_shock=float(shock[i]),
-                                    trend=base_params.behavior.trend),
+            behavior=BehaviorParams(
+                baseline_logit=base_params.behavior.baseline_logit,
+                policy_shock=float(shock[i]),
+                trend=base_params.behavior.trend,
+            ),
             clinical=base_params.clinical,
             insurance=base_params.insurance,
             passthrough=base_params.passthrough,
-            data_quality=base_params.data_quality
+            data_quality=base_params.data_quality,
         )
         base_k = keys[i]
         outs = [simulate_policy(base_k, pol, p) for pol in policies]
 
-        nb = []
-        for o in outs:
-            nb.append(100000.0 * o["net_qalys"] - o["net_health_cost"] - 0.1 * o["avg_premium"])
+        nb = [100000.0 * o["net_qalys"] - o["net_health_cost"] - 0.1 * o["avg_premium"] for o in outs]
         return jnp.stack(nb)
 
-    net_benefit = jax.vmap(one_draw)(jnp.arange(S))
+    net_benefit = jax.vmap(one_draw)(jnp.arange(n_draws))
 
     print(f"Jurisdiction: {pol_cfg.get('jurisdiction')} | Domain: {pol_cfg.get('domain')}")
     print("EVPI:", float(evpi(net_benefit)))
     print("EVPPI (policy_shock):", float(evppi(net_benefit, shock, n_bins=20)))
+
 
 if __name__ == "__main__":
     main()

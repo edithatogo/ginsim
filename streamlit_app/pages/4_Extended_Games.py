@@ -15,15 +15,14 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-import streamlit as st
 import plotly.graph_objects as go
+import streamlit as st
 
 # Import from core model
 from src.model.extended_games import (
-    information_leakage_game,
-    genetic_altruism_game,
     cascade_testing_game,
-    format_extended_games_results,
+    genetic_altruism_game,
+    information_leakage_game,
 )
 
 # Page configuration
@@ -260,7 +259,7 @@ if "current_game" in st.session_state:
                         f"{result.effective_uptake:.1%}",
                     ],
                     textposition="outside",
-                )
+                ),
             )
 
             fig.update_layout(
@@ -279,7 +278,7 @@ if "current_game" in st.session_state:
                 **Key Insight:** With {result.bypass_rate:.1%} bypass rate, 
                 approximately {result.bypass_rate * 100:.0f}% of the ban's effectiveness 
                 is lost through proxy-based information leakage.
-                """
+                """,
             )
 
     elif game_name == "Genetic Altruism":
@@ -306,7 +305,7 @@ if "current_game" in st.session_state:
                     marker_color=["#95a5a6", "#3498db"],
                     text=[f"{0.5:.1%}", f"{result.family_testing_rate:.1%}"],
                     textposition="outside",
-                )
+                ),
             )
 
             fig.update_layout(
@@ -325,7 +324,7 @@ if "current_game" in st.session_state:
                 **Positive Spillover:** Altruistic behavior increases family testing 
                 by {(result.family_testing_rate - 0.5) * 100:.1f} percentage points,
                 generating ${result.welfare_impact:,.0f} in net welfare.
-                """
+                """,
             )
 
     elif game_name == "Cascade Testing":
@@ -360,7 +359,7 @@ if "current_game" in st.session_state:
                     marker_color=["#3498db", "#2ecc71"],
                     text=[str(result.index_cases), str(result.secondary_cases)],
                     textposition="outside",
-                )
+                ),
             )
 
             fig.update_layout(
@@ -378,7 +377,7 @@ if "current_game" in st.session_state:
                 **Cascade Effect:** Each index case generates {result.cascade_rate:.1f} 
                 additional tests through family cascade, making this 
                 ${result.cost_effectiveness:,.0f} per detection.
-                """
+                """,
             )
 
 # Documentation

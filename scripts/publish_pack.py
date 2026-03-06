@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 import argparse
-from pathlib import Path
-from typing import Dict, List, Tuple, Optional
 import json
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-def _latest_run_dir(full_uncertainty_dir: Path, prefix: str) -> Optional[Path]:
+
+def _latest_run_dir(full_uncertainty_dir: Path, prefix: str) -> Path | None:
     if not full_uncertainty_dir.exists():
         return None
     cands = [p for p in full_uncertainty_dir.iterdir() if p.is_dir() and p.name.startswith(prefix)]
@@ -16,6 +16,7 @@ def _latest_run_dir(full_uncertainty_dir: Path, prefix: str) -> Optional[Path]:
         return None
     cands.sort(key=lambda p: p.stat().st_mtime, reverse=True)
     return cands[0]
+
 
 def _load_draws_summary(run_dir: Path) -> pd.DataFrame:
     draws_path = run_dir / "full_uncertainty_draws.csv"
@@ -32,55 +33,66 @@ def _load_draws_summary(run_dir: Path) -> pd.DataFrame:
     if "avg_premium" not in df.columns:
         df["avg_premium"] = np.nan
 
-    def q(x, p): 
+    def q(x, p):
         return float(np.quantile(x.dropna(), p)) if x.dropna().shape[0] else np.nan
 
     out = (
         df.groupby("policy")
-          .agg(
-              nb_mean=("nb","mean"),
-              nb_p05=("nb", lambda x: q(x, 0.05)),
-              nb_p95=("nb", lambda x: q(x, 0.95)),
-              qaly_mean=("net_qalys","mean"),
-              qaly_p05=("net_qalys", lambda x: q(x, 0.05)),
-              qaly_p95=("net_qalys", lambda x: q(x, 0.95)),
-              prem_mean=("avg_premium","mean"),
-              prem_p05=("avg_premium", lambda x: q(x, 0.05)),
-              prem_p95=("avg_premium", lambda x: q(x, 0.95)),
-          )
-          .reset_index()
-          .sort_values("nb_mean", ascending=False)
+        .agg(
+            nb_mean=("nb", "mean"),
+            nb_p05=("nb", lambda x: q(x, 0.05)),
+            nb_p95=("nb", lambda x: q(x, 0.95)),
+            qaly_mean=("net_qalys", "mean"),
+            qaly_p05=("net_qalys", lambda x: q(x, 0.05)),
+            qaly_p95=("net_qalys", lambda x: q(x, 0.95)),
+            prem_mean=("avg_premium", "mean"),
+            prem_p05=("avg_premium", lambda x: q(x, 0.05)),
+            prem_p95=("avg_premium", lambda x: q(x, 0.95)),
+        )
+        .reset_index()
+        .sort_values("nb_mean", ascending=False)
     )
     return out
 
-def _maybe_load_manifest(run_dir: Path) -> Dict:
+
+def _maybe_load_manifest(run_dir: Path) -> dict:
     p = run_dir / "run_manifest.json"
     if p.exists():
         return json.loads(p.read_text(encoding="utf-8"))
     return {}
 
-def _compute_uncertainty_tables(run_dir: Path, seed: int = 20260302) -> Tuple[pd.DataFrame, pd.DataFrame]:
+
+def _compute_uncertainty_tables(
+    run_dir: Path, seed: int = 20260302
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Compute EVPPI by group and (S1, ST) tables if theta matrices exist."""
     try:
         import jax
         import jax.numpy as jnp
         from src.model.evppi_rff import evppi_rff
-        from src.model.voi import evpi
+
         from src.model.sensitivity import sobol_first_order_rff
         from src.model.sensitivity_total import total_order_sobol_rff
+        from src.model.voi import evpi
     except Exception:
         # If JAX not installed in environment running publish_pack, skip.
-        return (pd.DataFrame(columns=["group","evppi"]), pd.DataFrame(columns=["group","S1_optimal_NB","ST_optimal_NB"]))
+        return (
+            pd.DataFrame(columns=["group", "evppi"]),
+            pd.DataFrame(columns=["group", "S1_optimal_NB", "ST_optimal_NB"]),
+        )
 
     nb_path = run_dir / "net_benefit_matrix.npy"
     if not nb_path.exists():
-        return (pd.DataFrame(columns=["group","evppi"]), pd.DataFrame(columns=["group","S1_optimal_NB","ST_optimal_NB"]))
+        return (
+            pd.DataFrame(columns=["group", "evppi"]),
+            pd.DataFrame(columns=["group", "S1_optimal_NB", "ST_optimal_NB"]),
+        )
 
     nb = np.load(nb_path)
     nb_j = jnp.array(nb)
     nb_opt = jnp.max(nb_j, axis=1)
 
-    groups = ["mapping","behavior","clinical","insurance","passthrough","data_quality"]
+    groups = ["mapping", "behavior", "clinical", "insurance", "passthrough", "data_quality"]
     theta = {}
     for g in groups:
         p = run_dir / f"theta_{g}.npy"
@@ -96,7 +108,11 @@ def _compute_uncertainty_tables(run_dir: Path, seed: int = 20260302) -> Tuple[pd
         k = jax.random.fold_in(key, hash(g) & 0xFFFFFFFF)
         v = float(evppi_rff(nb_j, th, k, n_features=256, lengthscale=1.0, l2=1e-2))
         evppi_rows.append({"group": g, "evppi": v})
-    evppi_df = pd.DataFrame(evppi_rows).sort_values("evppi", ascending=False) if evppi_rows else pd.DataFrame(columns=["group","evppi"])
+    evppi_df = (
+        pd.DataFrame(evppi_rows).sort_values("evppi", ascending=False)
+        if evppi_rows
+        else pd.DataFrame(columns=["group", "evppi"])
+    )
     evppi_df["evpi"] = evpi_val
 
     # S1 + ST for decision output (optimal NB) and avg policy NB
@@ -128,16 +144,31 @@ def _compute_uncertainty_tables(run_dir: Path, seed: int = 20260302) -> Tuple[pd
         st_pol = total_order_sobol_rff(nb_j, comp, k4)
         st_avg = float(jnp.mean(st_pol))
 
-        decomp_rows.append({
-            "group": g,
-            "S1_optimal_NB": s1_opt,
-            "ST_optimal_NB": st_opt,
-            "S1_avg_policy_NB": s1_avg,
-            "ST_avg_policy_NB": st_avg,
-        })
+        decomp_rows.append(
+            {
+                "group": g,
+                "S1_optimal_NB": s1_opt,
+                "ST_optimal_NB": st_opt,
+                "S1_avg_policy_NB": s1_avg,
+                "ST_avg_policy_NB": st_avg,
+            }
+        )
 
-    decomp_df = pd.DataFrame(decomp_rows).sort_values("ST_optimal_NB", ascending=False) if decomp_rows else pd.DataFrame(columns=["group","S1_optimal_NB","ST_optimal_NB","S1_avg_policy_NB","ST_avg_policy_NB"])
+    decomp_df = (
+        pd.DataFrame(decomp_rows).sort_values("ST_optimal_NB", ascending=False)
+        if decomp_rows
+        else pd.DataFrame(
+            columns=[
+                "group",
+                "S1_optimal_NB",
+                "ST_optimal_NB",
+                "S1_avg_policy_NB",
+                "ST_avg_policy_NB",
+            ]
+        )
+    )
     return evppi_df, decomp_df
+
 
 def _plot_policy_bars(df: pd.DataFrame, out_png: Path, title: str, metric: str = "nb_mean"):
     try:
@@ -150,7 +181,7 @@ def _plot_policy_bars(df: pd.DataFrame, out_png: Path, title: str, metric: str =
     x = np.arange(df.shape[0])
     y = df[metric].values
     yerr = None
-    if metric == "nb_mean" and {"nb_p05","nb_p95"}.issubset(df.columns):
+    if metric == "nb_mean" and {"nb_p05", "nb_p95"}.issubset(df.columns):
         yerr = np.vstack([y - df["nb_p05"].values, df["nb_p95"].values - y])
 
     plt.figure(figsize=(10, 5))
@@ -164,6 +195,7 @@ def _plot_policy_bars(df: pd.DataFrame, out_png: Path, title: str, metric: str =
     out_png.parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(out_png, dpi=200)
     plt.close()
+
 
 def _plot_evppi(evppi_df: pd.DataFrame, out_png: Path, title: str):
     try:
@@ -185,7 +217,14 @@ def _plot_evppi(evppi_df: pd.DataFrame, out_png: Path, title: str):
     plt.savefig(out_png, dpi=200)
     plt.close()
 
-def _write_docx(out_docx: Path, title: str, sections: List[Tuple[str, str]], tables: List[Tuple[str, pd.DataFrame]], figures: List[Tuple[str, Path]]):
+
+def _write_docx(
+    out_docx: Path,
+    title: str,
+    sections: list[tuple[str, str]],
+    tables: list[tuple[str, pd.DataFrame]],
+    figures: list[tuple[str, Path]],
+):
     try:
         from docx import Document
         from docx.shared import Inches
@@ -224,11 +263,14 @@ def _write_docx(out_docx: Path, title: str, sections: List[Tuple[str, str]], tab
     out_docx.parent.mkdir(parents=True, exist_ok=True)
     doc.save(str(out_docx))
 
-def _write_pdf(out_pdf: Path, title: str, sections: List[Tuple[str, str]], figures: List[Tuple[str, Path]]):
+
+def _write_pdf(
+    out_pdf: Path, title: str, sections: list[tuple[str, str]], figures: list[tuple[str, Path]]
+):
     try:
         from reportlab.lib.pagesizes import letter
-        from reportlab.pdfgen import canvas
         from reportlab.lib.units import inch
+        from reportlab.pdfgen import canvas
     except Exception:
         return
 
@@ -236,56 +278,72 @@ def _write_pdf(out_pdf: Path, title: str, sections: List[Tuple[str, str]], figur
     c = canvas.Canvas(str(out_pdf), pagesize=letter)
     width, height = letter
 
-    y = height - 0.8*inch
+    y = height - 0.8 * inch
     c.setFont("Helvetica-Bold", 16)
-    c.drawString(0.75*inch, y, title)
-    y -= 0.5*inch
+    c.drawString(0.75 * inch, y, title)
+    y -= 0.5 * inch
 
     c.setFont("Helvetica", 10)
 
     for heading, body in sections:
-        if y < 1.5*inch:
+        if y < 1.5 * inch:
             c.showPage()
-            y = height - 0.8*inch
+            y = height - 0.8 * inch
             c.setFont("Helvetica", 10)
         c.setFont("Helvetica-Bold", 12)
-        c.drawString(0.75*inch, y, heading)
-        y -= 0.25*inch
+        c.drawString(0.75 * inch, y, heading)
+        y -= 0.25 * inch
         c.setFont("Helvetica", 10)
         for line in body.split("\n"):
             if not line.strip():
-                y -= 0.12*inch
+                y -= 0.12 * inch
                 continue
-            if y < 1.0*inch:
+            if y < 1.0 * inch:
                 c.showPage()
-                y = height - 0.8*inch
+                y = height - 0.8 * inch
                 c.setFont("Helvetica", 10)
-            c.drawString(0.75*inch, y, line[:120])
-            y -= 0.14*inch
-        y -= 0.1*inch
+            c.drawString(0.75 * inch, y, line[:120])
+            y -= 0.14 * inch
+        y -= 0.1 * inch
 
     # Figures
     for ftitle, fpath in figures:
         if not fpath.exists():
             continue
         c.showPage()
-        y = height - 0.8*inch
+        y = height - 0.8 * inch
         c.setFont("Helvetica-Bold", 12)
-        c.drawString(0.75*inch, y, ftitle)
-        y -= 0.3*inch
+        c.drawString(0.75 * inch, y, ftitle)
+        y -= 0.3 * inch
         # Fit image into page box
-        img_w = width - 1.5*inch
-        img_h = height - 1.8*inch
-        c.drawImage(str(fpath), 0.75*inch, 0.75*inch, width=img_w, height=img_h, preserveAspectRatio=True, anchor='c')
+        img_w = width - 1.5 * inch
+        img_h = height - 1.8 * inch
+        c.drawImage(
+            str(fpath),
+            0.75 * inch,
+            0.75 * inch,
+            width=img_w,
+            height=img_h,
+            preserveAspectRatio=True,
+            anchor="c",
+        )
 
     c.save()
 
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--meta_dir", required=True, help="Path to outputs/runs/meta_pipeline/<timestamp>")
-    parser.add_argument("--title", default="Policy brief: genetic discrimination protections (Australia and New Zealand)")
+    parser.add_argument(
+        "--meta_dir", required=True, help="Path to outputs/runs/meta_pipeline/<timestamp>"
+    )
+    parser.add_argument(
+        "--title",
+        default="Policy brief: genetic discrimination protections (Australia and New Zealand)",
+    )
     parser.add_argument("--author", default="")
-    parser.add_argument("--out", default="", help="Output folder (default: <meta_dir>/publish_pack)")
+    parser.add_argument(
+        "--out", default="", help="Output folder (default: <meta_dir>/publish_pack)"
+    )
     args = parser.parse_args()
 
     meta_dir = Path(args.meta_dir)
@@ -300,7 +358,9 @@ def main():
     nz_run = _latest_run_dir(full_unc, "new_zealand_")
 
     if au_run is None or nz_run is None:
-        raise FileNotFoundError("Could not locate australia_*/new_zealand_* run dirs under meta_dir/full_uncertainty")
+        raise FileNotFoundError(
+            "Could not locate australia_*/new_zealand_* run dirs under meta_dir/full_uncertainty"
+        )
 
     # Build summary tables
     au_summary = _load_draws_summary(au_run)
@@ -320,10 +380,26 @@ def main():
 
     # Figures
     figs_dir = out_dir / "figures"
-    _plot_policy_bars(au_summary, figs_dir / "australia_net_benefit.png", "Australia: net benefit by policy (mean and 90% interval)")
-    _plot_policy_bars(nz_summary, figs_dir / "new_zealand_net_benefit.png", "New Zealand: net benefit by policy (mean and 90% interval)")
-    _plot_evppi(au_evppi, figs_dir / "australia_evppi.png", "Australia: EVPPI by parameter group (surrogate)")
-    _plot_evppi(nz_evppi, figs_dir / "new_zealand_evppi.png", "New Zealand: EVPPI by parameter group (surrogate)")
+    _plot_policy_bars(
+        au_summary,
+        figs_dir / "australia_net_benefit.png",
+        "Australia: net benefit by policy (mean and 90% interval)",
+    )
+    _plot_policy_bars(
+        nz_summary,
+        figs_dir / "new_zealand_net_benefit.png",
+        "New Zealand: net benefit by policy (mean and 90% interval)",
+    )
+    _plot_evppi(
+        au_evppi,
+        figs_dir / "australia_evppi.png",
+        "Australia: EVPPI by parameter group (surrogate)",
+    )
+    _plot_evppi(
+        nz_evppi,
+        figs_dir / "new_zealand_evppi.png",
+        "New Zealand: EVPPI by parameter group (surrogate)",
+    )
 
     # Manifest snippets
     au_manifest = _maybe_load_manifest(au_run)
@@ -331,12 +407,18 @@ def main():
 
     # Policy brief markdown
     def top3(df):
-        return df.head(3)[["policy","nb_mean","nb_p05","nb_p95","qaly_mean","prem_mean"]]
+        return df.head(3)[["policy", "nb_mean", "nb_p05", "nb_p95", "qaly_mean", "prem_mean"]]
 
     exec_lines = []
-    exec_lines.append("This pack summarises the latest meta pipeline outputs for Australia and New Zealand.")
-    exec_lines.append("Top policies are ranked by mean net benefit (DCBA ledger) with 90% intervals (5th to 95th percentile).")
-    exec_lines.append("Uncertainty drivers are summarised using EVPPI and (approximate) Sobol indices when theta matrices are available.")
+    exec_lines.append(
+        "This pack summarises the latest meta pipeline outputs for Australia and New Zealand."
+    )
+    exec_lines.append(
+        "Top policies are ranked by mean net benefit (DCBA ledger) with 90% intervals (5th to 95th percentile)."
+    )
+    exec_lines.append(
+        "Uncertainty drivers are summarised using EVPPI and (approximate) Sobol indices when theta matrices are available."
+    )
 
     md = []
     md.append(f"# {args.title}\n")
@@ -353,7 +435,7 @@ def main():
     md.append("")
     if not au_evppi.empty:
         md.append("### Australia: EVPPI by group\n")
-        md.append(au_evppi[["group","evppi"]].to_markdown(index=False))
+        md.append(au_evppi[["group", "evppi"]].to_markdown(index=False))
         md.append("")
     if not au_decomp.empty:
         md.append("### Australia: uncertainty decomposition (S1/ST)\n")
@@ -365,7 +447,7 @@ def main():
     md.append("")
     if not nz_evppi.empty:
         md.append("### New Zealand: EVPPI by group\n")
-        md.append(nz_evppi[["group","evppi"]].to_markdown(index=False))
+        md.append(nz_evppi[["group", "evppi"]].to_markdown(index=False))
         md.append("")
     if not nz_decomp.empty:
         md.append("### New Zealand: uncertainty decomposition (S1/ST)\n")
@@ -373,15 +455,29 @@ def main():
         md.append("")
 
     md.append("## Reproducibility\n")
-    md.append("This analysis is configuration-driven and each run writes `run_manifest.json` with file hashes.")
+    md.append(
+        "This analysis is configuration-driven and each run writes `run_manifest.json` with file hashes."
+    )
     if au_manifest:
         md.append("\n### Australia run manifest (excerpt)\n")
-        for k in ["created_utc","repo_tree_hash","policies_file","policies_file_sha256","base_config_file_sha256"]:
+        for k in [
+            "created_utc",
+            "repo_tree_hash",
+            "policies_file",
+            "policies_file_sha256",
+            "base_config_file_sha256",
+        ]:
             if k in au_manifest:
                 md.append(f"- {k}: {au_manifest[k]}")
     if nz_manifest:
         md.append("\n### New Zealand run manifest (excerpt)\n")
-        for k in ["created_utc","repo_tree_hash","policies_file","policies_file_sha256","base_config_file_sha256"]:
+        for k in [
+            "created_utc",
+            "repo_tree_hash",
+            "policies_file",
+            "policies_file_sha256",
+            "base_config_file_sha256",
+        ]:
             if k in nz_manifest:
                 md.append(f"- {k}: {nz_manifest[k]}")
 
@@ -399,9 +495,9 @@ def main():
         ("New Zealand policy summary", nz_summary),
     ]
     if not au_evppi.empty:
-        tables.append(("Australia EVPPI by group", au_evppi[["group","evppi"]]))
+        tables.append(("Australia EVPPI by group", au_evppi[["group", "evppi"]]))
     if not nz_evppi.empty:
-        tables.append(("New Zealand EVPPI by group", nz_evppi[["group","evppi"]]))
+        tables.append(("New Zealand EVPPI by group", nz_evppi[["group", "evppi"]]))
     if not au_decomp.empty:
         tables.append(("Australia uncertainty decomposition", au_decomp))
     if not nz_decomp.empty:
@@ -418,6 +514,7 @@ def main():
     _write_pdf(out_dir / "POLICY_BRIEF.pdf", args.title, sections, figures)
 
     print("Wrote publish pack to:", out_dir)
+
 
 if __name__ == "__main__":
     main()

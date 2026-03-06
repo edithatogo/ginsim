@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any
 
-from src.utils.posterior import load_draws_npy, save_draws_npy, deterministic_subsample
+from src.utils.posterior import deterministic_subsample, load_draws_npy, save_draws_npy
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -16,7 +17,7 @@ def main():
     parser.add_argument("--insurance", default="")
     parser.add_argument("--passthrough", default="")
     parser.add_argument("--data_quality", default="")
-    parser.add_argument("--mode", default="common_index", choices=["common_index","independent"])
+    parser.add_argument("--mode", default="common_index", choices=["common_index", "independent"])
     args = parser.parse_args()
 
     group_paths = {
@@ -28,19 +29,19 @@ def main():
         "data_quality": args.data_quality,
     }
 
-    groups: Dict[str, list[dict[str, Any]]] = {}
+    groups: dict[str, list[dict[str, Any]]] = {}
     for g, p in group_paths.items():
         if p:
             draws = load_draws_npy(Path(p))
             groups[g] = deterministic_subsample(draws, args.n_draws)
 
-    n = int(args.n_draws)
+    n = args.n_draws
     out_draws = []
     for i in range(n):
-        d: Dict[str, Any] = {}
+        d: dict[str, Any] = {}
         for g, draws in groups.items():
             if args.mode == "common_index":
-                idx = int(round(i * (len(draws)-1) / (n-1))) if n > 1 else 0
+                idx = round(i * (len(draws) - 1) / (n - 1)) if n > 1 else 0
             else:
                 idx = i % len(draws)
             d[g] = draws[idx]
@@ -48,6 +49,7 @@ def main():
 
     save_draws_npy(Path(args.out), out_draws)
     print(f"Wrote joint draws: {args.out} (n={n}, groups={list(groups.keys())})")
+
 
 if __name__ == "__main__":
     main()

@@ -12,9 +12,9 @@ from pathlib import Path
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import patches
 
 # Colorblind-safe palette (Okabe-Ito)
 COLORS = {
@@ -77,7 +77,13 @@ def generate_module_a_diagram(output_dir: Path, dpi: int, formats: list):
 
     for x, y, name, color, role in players:
         rect = patches.Rectangle(
-            (x - 1.2, y - 0.8), 2.4, 1.6, linewidth=2, edgecolor=color, facecolor=color, alpha=0.2
+            (x - 1.2, y - 0.8),
+            2.4,
+            1.6,
+            linewidth=2,
+            edgecolor=color,
+            facecolor=color,
+            alpha=0.2,
         )
         ax.add_patch(rect)
         ax.text(x, y, name, fontsize=12, fontweight="bold", ha="center", va="center", color=color)
@@ -115,7 +121,13 @@ def generate_module_a_diagram(output_dir: Path, dpi: int, formats: list):
 
     # Equilibrium box
     rect = patches.Rectangle(
-        (4, 2.5), 4, 3, linewidth=2, edgecolor=COLORS["black"], facecolor="white", linestyle="--"
+        (4, 2.5),
+        4,
+        3,
+        linewidth=2,
+        edgecolor=COLORS["black"],
+        facecolor="white",
+        linestyle="--",
     )
     ax.add_patch(rect)
     ax.text(
@@ -175,7 +187,13 @@ def generate_module_c_diagram(output_dir: Path, dpi: int, formats: list):
 
     # Players
     applicants_box = patches.Rectangle(
-        (1, 5.5), 4, 2, linewidth=2, edgecolor=COLORS["blue"], facecolor=COLORS["blue"], alpha=0.2
+        (1, 5.5),
+        4,
+        2,
+        linewidth=2,
+        edgecolor=COLORS["blue"],
+        facecolor=COLORS["blue"],
+        alpha=0.2,
     )
     ax.add_patch(applicants_box)
     ax.text(
@@ -241,7 +259,12 @@ def generate_module_c_diagram(output_dir: Path, dpi: int, formats: list):
     )
     ax.add_patch(pool_box)
     ax.text(
-        8.25, 3.5, "Pooling\nEquilibrium\n(Same premium)", fontsize=10, ha="center", va="center"
+        8.25,
+        3.5,
+        "Pooling\nEquilibrium\n(Same premium)",
+        fontsize=10,
+        ha="center",
+        va="center",
     )
 
     # Policy constraint
@@ -327,7 +350,13 @@ def generate_module_d_diagram(output_dir: Path, dpi: int, formats: list):
 
     # Risk score
     risk_box = patches.Rectangle(
-        (9, 4.5), 2.5, 2, linewidth=2, edgecolor=COLORS["blue"], facecolor=COLORS["blue"], alpha=0.2
+        (9, 4.5),
+        2.5,
+        2,
+        linewidth=2,
+        edgecolor=COLORS["blue"],
+        facecolor=COLORS["blue"],
+        alpha=0.2,
     )
     ax.add_patch(risk_box)
     ax.text(
@@ -406,11 +435,24 @@ def generate_module_e_diagram(output_dir: Path, dpi: int, formats: list):
 
     for x, structure, rate, color in structures:
         rect = patches.Rectangle(
-            (x - 1.5, 5.5), 3, 2.5, linewidth=2, edgecolor=color, facecolor=color, alpha=0.2
+            (x - 1.5, 5.5),
+            3,
+            2.5,
+            linewidth=2,
+            edgecolor=color,
+            facecolor=color,
+            alpha=0.2,
         )
         ax.add_patch(rect)
         ax.text(
-            x, 6.5, structure, fontsize=11, fontweight="bold", ha="center", va="center", color=color
+            x,
+            6.5,
+            structure,
+            fontsize=11,
+            fontweight="bold",
+            ha="center",
+            va="center",
+            color=color,
         )
         ax.text(x, 5.8, rate, fontsize=10, ha="center", va="center")
 
@@ -473,7 +515,12 @@ def generate_module_f_diagram(output_dir: Path, dpi: int, formats: list):
 
     # Players
     individuals = patches.Circle(
-        (3, 5.5), 1.5, linewidth=2, edgecolor=COLORS["blue"], facecolor=COLORS["blue"], alpha=0.2
+        (3, 5.5),
+        1.5,
+        linewidth=2,
+        edgecolor=COLORS["blue"],
+        facecolor=COLORS["blue"],
+        alpha=0.2,
     )
     ax.add_patch(individuals)
     ax.text(
@@ -605,7 +652,13 @@ def generate_enforcement_diagram(output_dir: Path, dpi: int, formats: list):
 
     # Regulator decision
     regulator_box = patches.Rectangle(
-        (7, 5), 4, 3, linewidth=2, edgecolor=COLORS["blue"], facecolor=COLORS["blue"], alpha=0.2
+        (7, 5),
+        4,
+        3,
+        linewidth=2,
+        edgecolor=COLORS["blue"],
+        facecolor=COLORS["blue"],
+        alpha=0.2,
     )
     ax.add_patch(regulator_box)
     ax.text(
@@ -798,7 +851,12 @@ def generate_equilibrium_concepts_diagram(output_dir: Path, dpi: int, formats: l
     x = np.linspace(0, 10, 100)
     participation = 8 * (1 - np.exp(-0.5 * x))  # Concave participation function
     ax.plot(
-        x, participation, "-", color=COLORS["bluish_green"], linewidth=2, label="Participation Rate"
+        x,
+        participation,
+        "-",
+        color=COLORS["bluish_green"],
+        linewidth=2,
+        label="Participation Rate",
     )
 
     # Social optimum
@@ -984,10 +1042,16 @@ def generate_payoff_matrices_diagram(output_dir: Path, dpi: int, formats: list):
 def main():
     parser = argparse.ArgumentParser(description="Generate game structure diagrams")
     parser.add_argument(
-        "--output", type=str, default="outputs/figures/games", help="Output directory for diagrams"
+        "--output",
+        type=str,
+        default="outputs/figures/games",
+        help="Output directory for diagrams",
     )
     parser.add_argument(
-        "--dpi", type=int, default=1200, help="Resolution for PNG output (default: 1200)"
+        "--dpi",
+        type=int,
+        default=1200,
+        help="Resolution for PNG output (default: 1200)",
     )
     parser.add_argument(
         "--formats",

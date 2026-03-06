@@ -20,15 +20,16 @@ import jax.numpy as jnp
 import plotly.graph_objects as go
 import streamlit as st
 
+from src.model.module_a_behavior import get_standard_policies
+from src.model.parameters import ModelParameters
+from src.model.pipeline import evaluate_single_policy
+
 # Import from core model
 from src.model.sensitivity_total import (
     sobol_sensitivity,
     tornado_sensitivity,
     twoway_sensitivity,
 )
-from src.model.module_a_behavior import get_standard_policies
-from src.model.parameters import ModelParameters
-from src.model.pipeline import evaluate_single_policy
 
 # Page configuration
 st.set_page_config(
@@ -46,7 +47,7 @@ st.markdown(
 
 Explore how uncertainty in model parameters affects policy outcomes
 through multiple sensitivity analysis methods.
-"""
+""",
 )
 
 # Sidebar for analysis configuration
@@ -262,7 +263,7 @@ if "sensitivity_results" in st.session_state:
                     orientation="h",
                     marker_color=["#3498db"] * len(tornado),
                     name="Outcome Range",
-                )
+                ),
             )
 
             fig.update_layout(
@@ -284,7 +285,7 @@ if "sensitivity_results" in st.session_state:
                     "Range": [f"{r.low_value:.3f} - {r.high_value:.3f}" for r in tornado],
                     "Impact": [f"{r.low_outcome:.1%} - {r.high_outcome:.1%}" for r in tornado],
                     "Sensitivity": [f"{r.sensitivity_magnitude:.4f}" for r in tornado],
-                }
+                },
             )
 
         # Sobol Indices
@@ -308,7 +309,7 @@ if "sensitivity_results" in st.session_state:
                     orientation="h",
                     name="First-Order (S_i)",
                     marker_color="#3498db",
-                )
+                ),
             )
 
             fig.add_trace(
@@ -319,7 +320,7 @@ if "sensitivity_results" in st.session_state:
                     name="Total-Order (S_Ti)",
                     marker_color="#e74c3c",
                     opacity=0.7,
-                )
+                ),
             )
 
             fig.update_layout(
@@ -359,7 +360,7 @@ if "sensitivity_results" in st.session_state:
                     "First-Order (S_i)": [f"{float(r.first_order):.3f}" for r in sobol],
                     "Total-Order (S_Ti)": [f"{float(r.total_order):.3f}" for r in sobol],
                     "Interactions": [f"{float(r.total_order - r.first_order):.3f}" for r in sobol],
-                }
+                },
             )
 
         # Heat Map
@@ -378,7 +379,7 @@ if "sensitivity_results" in st.session_state:
                     y=[f"{v:.3f}" for v in heatmap.param1_values],
                     colorscale="RdYlBu",
                     colorbar=dict(title="Testing Uptake"),
-                )
+                ),
             )
 
             fig.update_layout(

@@ -6,8 +6,9 @@ Aggregates welfare impacts across stakeholders with time dynamics.
 
 from __future__ import annotations
 
-from typing import Dict, Optional, List
 from dataclasses import dataclass
+from typing import Any
+
 import jax.numpy as jnp
 from jax import jit
 from jaxtyping import Array, Float
@@ -17,7 +18,7 @@ from jaxtyping import Array, Float
 class DCBAResult:
     """
     DCBA ledger results.
-    
+
     Attributes:
         net_welfare: Net welfare impact
         consumer_surplus: Consumer surplus change
@@ -27,6 +28,7 @@ class DCBAResult:
         distributional_weight: Distributional weight applied
         time_horizon: Time horizon in years
     """
+
     net_welfare: Float[Array, ""]
     consumer_surplus: Float[Array, ""]
     producer_surplus: Float[Array, ""]
@@ -69,23 +71,23 @@ def compute_health_benefits(
 ) -> Float[Array, ""]:
     """
     Compute health benefits with time discounting.
-    
+
     In the short term (e.g. Year 3), health benefits are lower as
     screening/prevention takes time to manifest as QALY gains.
     """
     uptake_change = testing_uptake - baseline_uptake
-    
+
     # Time-dependent manifestation factor (Scientific Power logic)
     # Year 3: 20% of lifetime benefits manifested
     # Year 20: 100% of lifetime benefits manifested
     manifestation_factor = jnp.minimum(time_horizon / 20.0, 1.0)
-    
+
     qaly_gain = uptake_change * qaly_per_test * manifestation_factor
     health_benefit = qaly_gain * value_per_qaly
-    
+
     # Discount back to present
-    discount_factor = (1 + discount_rate) ** (-time_horizon / 2) # Mid-point discount
-    
+    discount_factor = (1 + discount_rate) ** (-time_horizon / 2)  # Mid-point discount
+
     return health_benefit * discount_factor
 
 
@@ -100,23 +102,23 @@ def compute_fiscal_impact(
 ) -> Float[Array, ""]:
     """
     Compute fiscal impact with setup costs.
-    
+
     Short-term (Year 3) is dominated by setup costs.
     Long-term (Year 20) is dominated by cumulative savings.
     """
     uptake_change = testing_uptake - baseline_uptake
-    
+
     # Recurring costs/savings
     annual_testing_cost = uptake_change * cost_per_test
     annual_health_savings = uptake_change * health_savings_per_test * (time_horizon / 20.0)
-    
+
     total_recurring = (annual_health_savings - annual_testing_cost) * time_horizon
-    
+
     # Front-loaded setup costs (only in year 1-3)
     effective_setup = setup_cost if time_horizon >= 1 else 0.0
-    
+
     fiscal_impact = total_recurring - effective_setup
-    
+
     return fiscal_impact
 
 
@@ -133,12 +135,18 @@ def compute_dcba(
     """Compute full DCBA ledger for a specific time horizon."""
     consumer_surplus = compute_consumer_surplus(testing_uptake, insurance_premium, baseline_premium)
     producer_surplus = compute_producer_surplus(insurer_profits, baseline_profits)
-    health_benefits = compute_health_benefits(testing_uptake, baseline_uptake, time_horizon=time_horizon)
-    fiscal_impact = compute_fiscal_impact(testing_uptake, baseline_uptake, time_horizon=time_horizon)
-    
-    net_welfare = (consumer_surplus * time_horizon) + producer_surplus + health_benefits + fiscal_impact
+    health_benefits = compute_health_benefits(
+        testing_uptake, baseline_uptake, time_horizon=time_horizon
+    )
+    fiscal_impact = compute_fiscal_impact(
+        testing_uptake, baseline_uptake, time_horizon=time_horizon
+    )
+
+    net_welfare = (
+        (consumer_surplus * time_horizon) + producer_surplus + health_benefits + fiscal_impact
+    )
     weighted_welfare = net_welfare * distributional_weight
-    
+
     return DCBAResult(
         net_welfare=weighted_welfare,
         consumer_surplus=consumer_surplus * time_horizon,
@@ -151,15 +159,15 @@ def compute_dcba(
 
 
 def compute_dual_horizon_dcba(
-    **kwargs
-) -> Dict[str, DCBAResult]:
+    **kwargs: Any,
+) -> dict[str, DCBAResult]:
     """Compute DCBA for both short-term (Year 3) and long-term (Year 20)."""
     res_3 = compute_dcba(**kwargs, time_horizon=3)
     res_20 = compute_dcba(**kwargs, time_horizon=20)
-    
+
     return {
         "short_term": res_3,
-        "long_term": res_20
+        "long_term": res_20,
     }
 
 

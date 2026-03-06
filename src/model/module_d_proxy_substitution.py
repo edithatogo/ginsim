@@ -8,10 +8,11 @@ Design goals:
 - Deterministic randomness via explicit PRNG keys.
 - Vectorized computations where possible.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Any
+from typing import Any
 
 try:
     import jax
@@ -19,27 +20,32 @@ try:
 except Exception as e:
     raise ImportError(
         "JAX (and jaxlib) must be installed to run this module. "
-        "Install platform-appropriate jaxlib and rerun."
+        "Install platform-appropriate jaxlib and rerun.",
     ) from e
+
 
 @dataclass(frozen=True)
 class ProxyParams:
     # Toy linear risk score parameters (weights learned/assumed).
-    w: jnp.ndarray          # shape [K]
+    w: jnp.ndarray  # shape [K]
     b: float
     # Penalty for using prohibited features (set high to enforce constraint).
     prohibited_penalty: float = 50.0
+
 
 def risk_score(x: jnp.ndarray, params: ProxyParams) -> jnp.ndarray:
     """Linear score -> probability of claim (toy)."""
     return jax.nn.sigmoid(jnp.dot(x, params.w) + params.b)
 
-def reoptimize_weights(x: jnp.ndarray,
-                       y: jnp.ndarray,
-                       allowed_mask: jnp.ndarray,
-                       key: jax.Array,
-                       n_steps: int = 200,
-                       lr: float = 1e-2) -> ProxyParams:
+
+def reoptimize_weights(
+    x: jnp.ndarray,
+    y: jnp.ndarray,
+    allowed_mask: jnp.ndarray,
+    key: jax.Array,
+    n_steps: int = 200,
+    lr: float = 1e-2,
+) -> ProxyParams:
     """
     Toy gradient descent re-optimisation with a soft constraint:
     - allowed_mask: 1 for allowed features, 0 for prohibited.
@@ -48,12 +54,12 @@ def reoptimize_weights(x: jnp.ndarray,
     w = jnp.zeros(x.shape[1])
     b = jnp.array(0.0)
 
-    def loss_fn(w, b):
+    def loss_fn(w: jnp.ndarray, b: jnp.ndarray) -> jnp.ndarray:
         p = jax.nn.sigmoid(x @ w + b)
         # Logistic loss
         ll = -jnp.mean(y * jnp.log(p + 1e-8) + (1 - y) * jnp.log(1 - p + 1e-8))
         # Penalty on prohibited weights
-        penalty = jnp.sum((1.0 - allowed_mask) * (w ** 2)) * 50.0
+        penalty = jnp.sum((1.0 - allowed_mask) * (w**2)) * 50.0
         return ll + penalty
 
     grad_fn = jax.grad(loss_fn, argnums=(0, 1))
@@ -65,12 +71,13 @@ def reoptimize_weights(x: jnp.ndarray,
 
     return ProxyParams(w=w, b=float(b))
 
+
 def calibration_error(p: jnp.ndarray, y: jnp.ndarray, n_bins: int = 10) -> jnp.ndarray:
     """Simple ECE-like metric."""
     bins = jnp.linspace(0, 1, n_bins + 1)
-    ece = 0.0
+    ece = jnp.array(0.0)
     for i in range(n_bins):
-        lo, hi = bins[i], bins[i+1]
+        lo, hi = bins[i], bins[i + 1]
         mask = (p >= lo) & (p < hi)
         frac = jnp.mean(mask.astype(jnp.float32))
         # avoid empty bin issues
@@ -79,11 +86,10 @@ def calibration_error(p: jnp.ndarray, y: jnp.ndarray, n_bins: int = 10) -> jnp.n
         ece = ece + frac * jnp.abs(avg_p - avg_y)
     return ece
 
-def run_module(key: jax.Array,
-               policy: Dict[str, Any],
-               x: jnp.ndarray,
-               y: jnp.ndarray,
-               subgroup: jnp.ndarray) -> Dict[str, Any]:
+
+def run_module(
+    key: jax.Array, policy: dict[str, Any], x: jnp.ndarray, y: jnp.ndarray, subgroup: jnp.ndarray
+) -> dict[str, Any]:
     """
     Inputs:
     - x: underwriting features [N, K] (toy; include proxies such as family history, postcode)
@@ -109,7 +115,7 @@ def run_module(key: jax.Array,
     ece_adapt = calibration_error(p_adapt, y)
 
     # Subgroup mispricing proxy: mean predicted - mean observed
-    def subgroup_gap(p):
+    def subgroup_gap(p: jnp.ndarray) -> jnp.ndarray:
         gaps = []
         for g in jnp.unique(subgroup):
             m = subgroup == g

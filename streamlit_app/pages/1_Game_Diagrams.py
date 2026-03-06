@@ -29,7 +29,10 @@ from src.model.game_diagrams import (
 
 # Page configuration
 st.set_page_config(
-    page_title="Game Diagrams", page_icon="🎮", layout="wide", initial_sidebar_state="expanded"
+    page_title="Game Diagrams",
+    page_icon="🎮",
+    layout="wide",
+    initial_sidebar_state="expanded",
 )
 
 # Title
@@ -68,7 +71,9 @@ diagram_key = diagram_options[selected_diagram]
 # Customization options
 st.sidebar.subheader("Visual Customization")
 show_parameters = st.sidebar.checkbox(
-    "Show Model Parameters", value=True, help="Display current parameter values on diagram"
+    "Show Model Parameters",
+    value=True,
+    help="Display current parameter values on diagram",
 )
 
 # Get parameters from session state or use defaults

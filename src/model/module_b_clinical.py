@@ -8,19 +8,19 @@ Design goals:
 - Deterministic randomness via explicit PRNG keys.
 - Shape-safe arrays (use jaxtyping/chex in real implementations).
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Any, Tuple
 
 try:
-    import jax
     import jax.numpy as jnp
 except Exception as e:
     raise ImportError(
         "JAX (and jaxlib) must be installed to run this module. "
-        "Install platform-appropriate jaxlib and rerun."
+        "Install platform-appropriate jaxlib and rerun.",
     ) from e
+
 
 @dataclass(frozen=True)
 class ClinicalParams:
@@ -31,7 +31,8 @@ class ClinicalParams:
     cost_per_event: float
     qaly_loss_per_event: float
 
-def simulate_outcomes(uptake: jnp.ndarray, params: ClinicalParams) -> Dict[str, jnp.ndarray]:
+
+def simulate_outcomes(uptake: jnp.ndarray, params: ClinicalParams) -> dict[str, jnp.ndarray]:
     """
     Toy mapping from uptake to prevented events, costs, and QALYs.
     Replace with disease-specific microsimulation or Markov models.

@@ -545,3 +545,102 @@ This log tracks key modelling, methodological, and infrastructure decisions with
 - **Impact:** Module D must include data-quality quintile reporting.
 - **Review date:** Before Phase 3 synthesis
 
+---
+
+## Decision: Open a reconciliation track instead of rewriting historical Conductor state
+- **Date:** 2026-03-06
+- **Track:** gdpe_0015_reconciliation
+- **Category:** Workflow/Infrastructure
+- **Context:** The repository registry reported all major tracks complete, but live Conductor files still contained stale `planned/new` metadata and the working tree held substantial uncaptured development.
+- **Options considered:**
+  - Option A: Rewrite historical files aggressively to mimic a fully archived clean state
+  - Option B: Open a new active reconciliation track and normalize only clearly stale status records
+  - Option C: Ignore the mismatch and continue development without Conductor updates
+- **Decision:** Option B — Create `gdpe_0015_reconciliation` and use it to classify post-milestone work while preserving historical files.
+- **Rationale:**
+  - Preserves traceability and avoids deleting or relocating files during reconciliation.
+  - Separates historical milestone completion from current uncommitted development.
+  - Creates a formal place to split the dirty working tree into coherent follow-on tracks.
+- **Evidence:**
+  - `conductor/tracks.md` reported 14/14 completed tracks.
+  - `docs/CURRENT_STATUS.md` still referenced `gdpe_0002_evidence_anchoring` as current.
+  - `git status --short` showed extensive uncaptured changes across source, scripts, dashboard, tests, and packaging.
+- **Impact:** Conductor registry, current-status reporting, and upcoming task planning.
+- **Alternatives rejected:**
+  - Option A: Risked overwriting historical context and exceeded the no-deletion constraint.
+  - Option C: Would leave project management state misleading and non-actionable.
+- **Review date:** After classification of the current working tree into explicit follow-on workstreams.
+
+---
+
+## Decision: Split the dirty working tree into three follow-on tracks
+- **Date:** 2026-03-06
+- **Track:** gdpe_0015_reconciliation
+- **Category:** Workflow/Planning
+- **Context:** The working tree contained broad but non-uniform changes spanning tooling, reporting scripts, dashboard code, validation tests, and the `gin-sim` mirror.
+- **Options considered:**
+  - Option A: Keep all current changes under the reconciliation track
+  - Option B: Split into a large number of file-level micro-tracks
+  - Option C: Promote three coherent follow-on tracks by concern area
+- **Decision:** Option C — Promote `gdpe_0016_repo_hardening`, `gdpe_0017_reporting_pipeline`, and `gdpe_0018_dashboard_alignment`.
+- **Rationale:**
+  - The observed diffs cluster naturally into code-quality/tooling, reporting-pipeline, and dashboard/test/mirror concerns.
+  - Each cluster can carry distinct acceptance checks.
+  - This reduces ambiguity without over-fragmenting the project plan.
+- **Evidence:**
+  - `pyproject.toml` and `noxfile.py` introduce repo-level quality automation.
+  - `scripts/generate_tables.py`, `scripts/generate_figures.py`, `scripts/publish_pack.py`, `src/model/output_formatter.py`, and `src/model/validation.py` show concentrated reporting changes.
+  - `streamlit_app/`, `tests/e2e/`, `tests/integration/`, and `gin-sim/` form a coordinated dashboard-facing surface.
+- **Impact:** Conductor planning, selection of the next active implementation track, and future verification workflow.
+- **Alternatives rejected:**
+  - Option A: Too coarse to manage safely.
+  - Option B: Too granular for efficient research-repo planning.
+- **Review date:** When selecting the next active implementation track.
+
+---
+
+## Decision: Activate repository hardening before reporting or dashboard follow-up
+- **Date:** 2026-03-06
+- **Track:** gdpe_0016_repo_hardening
+- **Category:** Workflow/Quality
+- **Context:** After classification, three follow-on tracks were available. The repository needed one next active track that would reduce ambiguity across the rest of the dirty tree.
+- **Options considered:**
+  - Option A: Activate reporting pipeline refinement first
+  - Option B: Activate dashboard alignment first
+  - Option C: Activate repo hardening first
+- **Decision:** Option C — Activate `gdpe_0016_repo_hardening` first.
+- **Rationale:**
+  - The broader quality/tooling sweep affects source, scripts, tests, and contributor workflow.
+  - Hardening results define which later diffs are mechanical versus behavior-affecting.
+  - Running the baseline tools immediately produced a concrete issue inventory.
+- **Evidence:**
+  - `ruff check .` returned 824 findings with the current configuration.
+  - `pyright src` returned 83 errors concentrated in model modules and type-heavy infrastructure.
+  - `noxfile.py` now defines the quality workflow expected for follow-on work.
+- **Impact:** `gdpe_0016_repo_hardening` becomes the active follow-up track; `gdpe_0017` and `gdpe_0018` remain planned.
+- **Alternatives rejected:**
+  - Option A/B: Higher risk of mixing semantic changes with unresolved quality/tooling churn.
+- **Review date:** After Phase 1 baseline triage in `gdpe_0016_repo_hardening`.
+
+---
+
+## Decision: Close the typing baseline before expanding runtime repair scope
+- **Date:** 2026-03-06
+- **Track:** gdpe_0016_repo_hardening
+- **Category:** Workflow/Quality
+- **Context:** The hardening pass had reduced the repo from broad lint/type debt to a smaller cluster of model and integration issues. The user requested that the work proceed through push and deployment rather than stop at partial analysis.
+- **Options considered:**
+  - Option A: Stop after the lower-risk typing slices and defer the remaining model errors.
+  - Option B: Finish the repo-wide Pyright baseline first, then record the residual runtime failures separately.
+- **Decision:** Option B — Complete the repo-wide Pyright cleanup and treat the remaining runtime/test failures as a distinct verification gap.
+- **Rationale:**
+  - A clean static typing baseline materially reduces ambiguity in the remaining runtime failures.
+  - The remaining `pytest` failures are concentrated in JAX/beartype compatibility and integration behavior rather than unresolved missing annotations.
+  - This produces a clearer handoff for any follow-up runtime repair work.
+- **Evidence:**
+  - `pyright src` improved from 83 errors to 16 errors and then to 0 errors after targeted fixes across proxy, enforcement, pipeline, scenario, sensitivity, and VOI modules.
+  - Targeted `pytest -o addopts="" ...` still exposed runtime failures in `module_enforcement`, `module_c_insurance_eq`, and pipeline integration, plus the environment-level absence of `pytest-xdist` for the configured `-n` addopt.
+- **Impact:** The hardening track records now distinguish completed typing work from unresolved runtime verification work.
+- **Alternatives rejected:**
+  - Option A: Would leave the repository in a less informative state, with runtime failures mixed together with avoidable static typing debt.
+- **Review date:** When deciding whether to keep runtime repairs inside `gdpe_0016` or split them into a follow-up task.

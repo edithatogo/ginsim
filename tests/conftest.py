@@ -6,9 +6,10 @@ Pytest configuration for tests.
 import sys
 from pathlib import Path
 
-# Set non-interactive matplotlib backend before importing pyplot
-import matplotlib
-matplotlib.use("Agg")  # Use non-interactive backend
+# Set non-interactive matplotlib backend before importing pyplot.
+import matplotlib as mpl
+
+mpl.use("Agg")
 
 # Add src to path for imports
 src_path = Path(__file__).parent.parent / "src"

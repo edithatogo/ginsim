@@ -7,18 +7,17 @@ Calculate and visualize policy deltas with automatic Net Welfare Gain calculatio
 
 from __future__ import annotations
 
-from typing import Dict, List, Any, Optional, Tuple
-from dataclasses import dataclass
-from pathlib import Path
 import json
-
-import jax.numpy as jnp
-from jaxtyping import Array, Float
+from dataclasses import dataclass
+from operator import itemgetter
+from pathlib import Path
+from typing import Any
 
 
 @dataclass
 class DeltaMetrics:
     """Delta metrics between two policies."""
+
     policy_name: str
     baseline_name: str
     testing_uptake_delta: float
@@ -32,12 +31,13 @@ class DeltaMetrics:
 @dataclass
 class ComparativeAnalysis:
     """Complete comparative analysis results."""
+
     baseline_policy: str
-    comparison_policies: List[str]
-    delta_metrics: List[DeltaMetrics]
-    ranking_by_welfare: List[str]
-    ranking_by_uptake: List[str]
-    summary: Dict[str, Any]
+    comparison_policies: list[str]
+    delta_metrics: list[DeltaMetrics]
+    ranking_by_welfare: list[str]
+    ranking_by_uptake: list[str]
+    summary: dict[str, Any]
 
 
 def calculate_net_welfare_gain(
@@ -49,14 +49,14 @@ def calculate_net_welfare_gain(
 ) -> float:
     """
     Calculate net welfare gain from policy change.
-    
+
     Args:
         welfare_delta: Change in welfare from policy
         implementation_cost: One-time implementation cost
         administrative_cost: Annual administrative cost
         time_horizon: Time horizon in years
         discount_rate: Discount rate for NPV calculation
-    
+
     Returns:
         Net present value of welfare gain
     """
@@ -64,10 +64,10 @@ def calculate_net_welfare_gain(
     pv_admin_costs = 0.0
     for t in range(1, time_horizon + 1):
         pv_admin_costs += administrative_cost / ((1 + discount_rate) ** t)
-    
+
     # Net welfare gain = welfare delta - implementation cost - PV of admin costs
     net_welfare = welfare_delta - implementation_cost - pv_admin_costs
-    
+
     return net_welfare
 
 
@@ -77,33 +77,33 @@ def calculate_cost_benefit_ratio(
 ) -> float:
     """
     Calculate cost-benefit ratio.
-    
+
     Args:
         benefits: Total benefits (welfare gains)
         costs: Total costs
-    
+
     Returns:
         Cost-benefit ratio (benefits per dollar spent)
     """
     if costs <= 0:
-        return float('inf')
-    
+        return float("inf")
+
     return benefits / costs
 
 
 def comparative_delta_analysis(
-    baseline_result: Dict[str, float],
-    policy_results: Dict[str, Dict[str, float]],
-    cost_params: Optional[Dict[str, float]] = None,
+    baseline_result: dict[str, float],
+    policy_results: dict[str, dict[str, float]],
+    cost_params: dict[str, float] | None = None,
 ) -> ComparativeAnalysis:
     """
     Perform comprehensive comparative delta analysis.
-    
+
     Args:
         baseline_result: Baseline policy results
         policy_results: Dictionary of policy results to compare
         cost_params: Cost parameters for net welfare calculation
-    
+
     Returns:
         ComparativeAnalysis with all delta metrics
     """
@@ -114,36 +114,41 @@ def comparative_delta_analysis(
             "time_horizon": 10,
             "discount_rate": 0.03,
         }
-    
+
     delta_metrics = []
     welfare_rankings = []
     uptake_rankings = []
-    
+
     for policy_name, result in policy_results.items():
         # Calculate deltas
-        testing_uptake_delta = result.get("testing_uptake", 0) - baseline_result.get("testing_uptake", 0)
+        testing_uptake_delta = result.get("testing_uptake", 0) - baseline_result.get(
+            "testing_uptake", 0
+        )
         welfare_delta = result.get("welfare_impact", 0) - baseline_result.get("welfare_impact", 0)
         qalys_delta = result.get("qalys_gained", 0) - baseline_result.get("qalys_gained", 0)
-        compliance_delta = result.get("compliance_rate", 0) - baseline_result.get("compliance_rate", 0)
-        
+        compliance_delta = result.get("compliance_rate", 0) - baseline_result.get(
+            "compliance_rate", 0
+        )
+
         # Calculate net welfare gain
         net_welfare_gain = calculate_net_welfare_gain(
             welfare_delta=abs(welfare_delta),  # Use absolute value for gain calculation
             implementation_cost=cost_params.get("implementation_cost", 1000000),
             administrative_cost=cost_params.get("administrative_cost", 100000),
-            time_horizon=cost_params.get("time_horizon", 10),
+            time_horizon=int(cost_params.get("time_horizon", 10)),
             discount_rate=cost_params.get("discount_rate", 0.03),
         )
-        
+
         # Adjust sign based on welfare delta direction
         if welfare_delta < 0:
             net_welfare_gain = -abs(net_welfare_gain)
-        
+
         # Calculate cost-benefit ratio
-        total_costs = cost_params.get("implementation_cost", 1000000) + \
-                      cost_params.get("administrative_cost", 100000) * cost_params.get("time_horizon", 10)
+        total_costs = cost_params.get("implementation_cost", 1000000) + cost_params.get(
+            "administrative_cost", 100000
+        ) * cost_params.get("time_horizon", 10)
         cost_benefit_ratio = calculate_cost_benefit_ratio(abs(welfare_delta), total_costs)
-        
+
         metrics = DeltaMetrics(
             policy_name=policy_name,
             baseline_name="baseline",
@@ -154,30 +159,32 @@ def comparative_delta_analysis(
             net_welfare_gain=net_welfare_gain,
             cost_benefit_ratio=cost_benefit_ratio,
         )
-        
+
         delta_metrics.append(metrics)
         welfare_rankings.append((policy_name, welfare_delta))
         uptake_rankings.append((policy_name, testing_uptake_delta))
-    
+
     # Sort rankings
-    welfare_rankings.sort(key=lambda x: x[1], reverse=True)
-    uptake_rankings.sort(key=lambda x: x[1], reverse=True)
-    
+    welfare_rankings.sort(key=itemgetter(1), reverse=True)
+    uptake_rankings.sort(key=itemgetter(1), reverse=True)
+
     ranking_by_welfare = [name for name, _ in welfare_rankings]
     ranking_by_uptake = [name for name, _ in uptake_rankings]
-    
+
     # Generate summary
     best_welfare = ranking_by_welfare[0] if ranking_by_welfare else None
     best_uptake = ranking_by_uptake[0] if ranking_by_uptake else None
-    
+
     summary = {
         "best_welfare_policy": best_welfare,
         "best_uptake_policy": best_uptake,
         "total_policies_compared": len(policy_results),
         "policies_with_positive_welfare": sum(1 for m in delta_metrics if m.welfare_delta > 0),
-        "policies_with_positive_uptake": sum(1 for m in delta_metrics if m.testing_uptake_delta > 0),
+        "policies_with_positive_uptake": sum(
+            1 for m in delta_metrics if m.testing_uptake_delta > 0
+        ),
     }
-    
+
     return ComparativeAnalysis(
         baseline_policy="baseline",
         comparison_policies=list(policy_results.keys()),
@@ -191,19 +198,23 @@ def comparative_delta_analysis(
 def format_delta_table(analysis: ComparativeAnalysis) -> str:
     """
     Format delta analysis as markdown table.
-    
+
     Args:
         analysis: ComparativeAnalysis object
-        
+
     Returns:
         Markdown table string
     """
     lines = []
-    
+
     # Header
-    lines.append("| Policy | Δ Uptake | Δ Welfare | Δ QALYs | Δ Compliance | Net Welfare Gain | C/B Ratio |")
-    lines.append("|--------|----------|-----------|---------|--------------|------------------|-----------|")
-    
+    lines.append(
+        "| Policy | Δ Uptake | Δ Welfare | Δ QALYs | Δ Compliance | Net Welfare Gain | C/B Ratio |"
+    )
+    lines.append(
+        "|--------|----------|-----------|---------|--------------|------------------|-----------|"
+    )
+
     # Rows
     for metrics in analysis.delta_metrics:
         lines.append(
@@ -213,15 +224,17 @@ def format_delta_table(analysis: ComparativeAnalysis) -> str:
             f"{metrics.qalys_delta:+.2f} | "
             f"{metrics.compliance_delta:+.1%} | "
             f"${metrics.net_welfare_gain:+,.0f} | "
-            f"{metrics.cost_benefit_ratio:.2f} |"
+            f"{metrics.cost_benefit_ratio:.2f} |",
         )
-    
+
     # Summary
     lines.append("\n**Summary:**")
     lines.append(f"- Best policy by welfare: {analysis.summary.get('best_welfare_policy', 'N/A')}")
     lines.append(f"- Best policy by uptake: {analysis.summary.get('best_uptake_policy', 'N/A')}")
-    lines.append(f"- Policies with positive welfare impact: {analysis.summary.get('policies_with_positive_welfare', 0)}/{analysis.summary.get('total_policies_compared', 0)}")
-    
+    lines.append(
+        f"- Policies with positive welfare impact: {analysis.summary.get('policies_with_positive_welfare', 0)}/{analysis.summary.get('total_policies_compared', 0)}"
+    )
+
     return "\n".join(lines)
 
 
@@ -231,14 +244,14 @@ def save_delta_analysis(
 ) -> None:
     """
     Save delta analysis to JSON file.
-    
+
     Args:
         analysis: ComparativeAnalysis object
         output_path: Output file path
     """
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    
+
     # Convert to serializable format
     data = {
         "baseline_policy": analysis.baseline_policy,
@@ -260,6 +273,6 @@ def save_delta_analysis(
         "ranking_by_uptake": analysis.ranking_by_uptake,
         "summary": analysis.summary,
     }
-    
+
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)

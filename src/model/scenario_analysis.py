@@ -7,10 +7,13 @@ Compare policy outcomes across predefined scenarios and custom configurations.
 
 from __future__ import annotations
 
-from typing import Dict, List, Any, Optional
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any, Callable
+
 import yaml
+
+ModelFunc = Callable[[Any, Any], Any]
 
 
 @dataclass
@@ -23,7 +26,7 @@ class ScenarioResult:
     welfare_impact: float
     qalys_gained: float
     compliance_rate: float
-    all_metrics: Dict[str, Any]
+    all_metrics: dict[str, Any]
 
 
 @dataclass
@@ -31,11 +34,11 @@ class ScenarioComparison:
     """Comparison of multiple scenarios."""
 
     baseline_scenario: str
-    scenarios: List[ScenarioResult]
-    delta_from_baseline: Dict[str, Dict[str, float]]
+    scenarios: list[ScenarioResult]
+    delta_from_baseline: dict[str, dict[str, float]]
 
 
-def load_scenarios(config_path: Path | str) -> Dict[str, Any]:
+def load_scenarios(config_path: Path | str) -> dict[str, Any]:
     """
     Load scenario definitions from YAML config.
 
@@ -49,7 +52,7 @@ def load_scenarios(config_path: Path | str) -> Dict[str, Any]:
     if not config_path.exists():
         raise FileNotFoundError(f"Scenario config not found: {config_path}")
 
-    with open(config_path, "r", encoding="utf-8") as f:
+    with open(config_path, encoding="utf-8") as f:
         config = yaml.safe_load(f)
 
     return config.get("scenarios", {})
@@ -57,8 +60,8 @@ def load_scenarios(config_path: Path | str) -> Dict[str, Any]:
 
 def evaluate_scenario(
     scenario_name: str,
-    scenario_config: Dict[str, Any],
-    model_func,
+    scenario_config: dict[str, Any],
+    model_func: ModelFunc,
 ) -> ScenarioResult:
     """
     Evaluate a single scenario using the core model.
@@ -79,7 +82,7 @@ def evaluate_scenario(
     # Create model parameters
     try:
         model_params = ModelParameters(**params_dict)
-    except Exception as e:
+    except Exception:
         # Handle missing parameters with defaults
         model_params = ModelParameters()
         for key, value in params_dict.items():
@@ -118,8 +121,8 @@ def evaluate_scenario(
 
 
 def compare_scenarios(
-    scenarios: Dict[str, Dict[str, Any]],
-    model_func,
+    scenarios: dict[str, dict[str, Any]],
+    model_func: ModelFunc,
     baseline_name: str = "au_status_quo",
 ) -> ScenarioComparison:
     """
@@ -179,10 +182,10 @@ def format_comparison_table(comparison: ScenarioComparison) -> str:
 
     # Header
     lines.append(
-        "| Scenario | Jurisdiction | Testing Uptake | Δ vs Baseline | Welfare Impact | Compliance |"
+        "| Scenario | Jurisdiction | Testing Uptake | Δ vs Baseline | Welfare Impact | Compliance |",
     )
     lines.append(
-        "|----------|--------------|----------------|---------------|----------------|------------|"
+        "|----------|--------------|----------------|---------------|----------------|------------|",
     )
 
     # Rows
@@ -195,16 +198,16 @@ def format_comparison_table(comparison: ScenarioComparison) -> str:
         lines.append(
             f"| {result.scenario_name} | {result.jurisdiction} | "
             f"{result.testing_uptake:.1%} | {delta_str} | "
-            f"${result.welfare_impact:,.0f} | {result.compliance_rate:.1%} |"
+            f"${result.welfare_impact:,.0f} | {result.compliance_rate:.1%} |",
         )
 
     return "\n".join(lines)
 
 
 def run_scenario_analysis(
-    config_path: Optional[Path | str] = None,
-    model_func=None,
-    output_dir: Optional[Path] = None,
+    config_path: Path | str | None = None,
+    model_func: ModelFunc | None = None,
+    output_dir: Path | None = None,
 ) -> ScenarioComparison:
     """
     Run complete scenario analysis.
@@ -219,6 +222,11 @@ def run_scenario_analysis(
     """
     if config_path is None:
         config_path = Path(__file__).parent.parent / "configs" / "scenarios.yaml"
+
+    if model_func is None:
+        from src.model.pipeline import evaluate_single_policy as default_model_func
+
+        model_func = default_model_func
 
     # Load scenarios
     print(f"Loading scenarios from {config_path}...")

@@ -1,15 +1,17 @@
 from __future__ import annotations
 
 import argparse
+from contextlib import suppress
 from pathlib import Path
-import numpy as np
-import pandas as pd
 
 import jax
 import jax.numpy as jnp
+import numpy as np
+import pandas as pd
+from src.utils.manifest import write_manifest
 
 from src.model.sensitivity import sobol_first_order_rff
-from src.utils.manifest import write_manifest
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -30,7 +32,7 @@ def main():
     key = jax.random.PRNGKey(args.seed)
 
     groups = []
-    for name in ["mapping","behavior","clinical","insurance","passthrough","data_quality"]:
+    for name in ["mapping", "behavior", "clinical", "insurance", "passthrough", "data_quality"]:
         p = run_dir / f"theta_{name}.npy"
         if p.exists():
             groups.append((name, jnp.array(np.load(p))))
@@ -38,23 +40,43 @@ def main():
     rows = []
     for name, theta in groups:
         k1 = jax.random.fold_in(key, hash(name) & 0xFFFFFFFF)
-        s1_opt = float(sobol_first_order_rff(nb_opt, theta, k1, n_features=args.n_features, lengthscale=args.lengthscale, l2=args.l2))
+        s1_opt = float(
+            sobol_first_order_rff(
+                nb_opt,
+                theta,
+                k1,
+                n_features=args.n_features,
+                lengthscale=args.lengthscale,
+                l2=args.l2,
+            ),
+        )
 
         k2 = jax.random.fold_in(key, (hash(name) + 1) & 0xFFFFFFFF)
-        s1_per_policy = sobol_first_order_rff(nb_j, theta, k2, n_features=args.n_features, lengthscale=args.lengthscale, l2=args.l2)
+        s1_per_policy = sobol_first_order_rff(
+            nb_j,
+            theta,
+            k2,
+            n_features=args.n_features,
+            lengthscale=args.lengthscale,
+            l2=args.l2,
+        )
         s1_avg = float(jnp.mean(s1_per_policy))
 
         rows.append({"group": name, "S1_optimal_NB": s1_opt, "S1_avg_policy_NB": s1_avg})
 
-    df = pd.DataFrame(rows).sort_values("S1_optimal_NB", ascending=False) if rows else pd.DataFrame(columns=["group","S1_optimal_NB","S1_avg_policy_NB"])
+    df = (
+        pd.DataFrame(rows).sort_values("S1_optimal_NB", ascending=False)
+        if rows
+        else pd.DataFrame(columns=["group", "S1_optimal_NB", "S1_avg_policy_NB"])
+    )
 
     out_dir = Path(args.out) / pd.Timestamp.utcnow().strftime("%Y%m%dT%H%M%SZ")
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    try:
+    with suppress(Exception):
         write_manifest(
             out_dir,
-            repo_root=Path("."),
+            repo_root=Path(),
             jurisdiction="n/a",
             domain="n/a",
             policies_file=Path("configs/base.yaml"),
@@ -62,14 +84,13 @@ def main():
             notes="Uncertainty decomposition: first-order Sobol indices via RFF surrogate.",
             extra={"run_dir": str(run_dir)},
         )
-    except Exception:
-        pass
 
     df.to_csv(out_dir / "sobol_first_order_by_group.csv", index=False)
     (out_dir / "report.txt").write_text(df.to_string(index=False) + "\n", encoding="utf-8")
 
     print("Wrote:", out_dir)
     print(df.to_string(index=False))
+
 
 if __name__ == "__main__":
     main()

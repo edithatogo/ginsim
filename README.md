@@ -1,4 +1,4 @@
-# GINSIM: Genetic Discrimination Policy Integrated Economic Evaluation
+# GINSIM: Genetic Information Non-Discrimination Policy Integrated Economic Evaluation
 
 ![Deployment Status](https://github.com/edithatogo/ginsim/actions/workflows/remote-e2e.yml/badge.svg)
 ![License](https://img.shields.io/github/license/edithatogo/ginsim)

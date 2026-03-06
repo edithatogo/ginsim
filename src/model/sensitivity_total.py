@@ -23,8 +23,8 @@ from jax import jit, vmap
 from jaxtyping import Array, Float, Int
 
 
-ModelFunc = Callable[[Float[Array, ...]], Any]
-CostEffectModelFunc = Callable[[Float[Array, ...], Float[Array, ...]], tuple[Any, Any]]
+ModelFunc = Callable[[Float[Array, "..."]], Any]
+CostEffectModelFunc = Callable[[Float[Array, "..."], Float[Array, "..."]], tuple[Any, Any]]
 
 
 @dataclass
@@ -75,10 +75,10 @@ class CEACResult:
 @jit
 def _evaluate_model_jax(
     model_func: ModelFunc,
-    params_batch: Float[Array, ...],
-    param_indices: Int[Array, ...],
-    param_values: Float[Array, ...],
-) -> Float[Array, ...]:
+    params_batch: Float[Array, "..."],
+    param_indices: Int[Array, "..."],
+    param_values: Float[Array, "..."],
+) -> Float[Array, "..."]:
     """
     Evaluate model with JAX for sensitivity analysis.
 
@@ -102,7 +102,7 @@ def _evaluate_model_jax(
 
 def tornado_sensitivity(
     model_func: ModelFunc,
-    base_params: Float[Array, ...],
+    base_params: Float[Array, "..."],
     param_names: list[str],
     param_indices: list[int],
     range_pct: float = 0.25,
@@ -171,7 +171,7 @@ def tornado_sensitivity(
 
 def twoway_sensitivity(
     model_func: ModelFunc,
-    base_params: Float[Array, ...],
+    base_params: Float[Array, "..."],
     param1_idx: int,
     param2_idx: int,
     param1_range: tuple[float, float],
@@ -226,7 +226,7 @@ def twoway_sensitivity(
 
 def sobol_sensitivity(
     model_func: ModelFunc,
-    base_params: Float[Array, ...],
+    base_params: Float[Array, "..."],
     param_names: list[str],
     param_indices: list[int],
     n_samples: int = 1000,
@@ -320,10 +320,10 @@ def sobol_sensitivity(
 
 def ceac_analysis(
     model_func: CostEffectModelFunc,
-    base_params: Float[Array, ...],
+    base_params: Float[Array, "..."],
     policies: list[str],
-    policy_params: list[Float[Array, ...]],
-    thresholds: Float[Array, ...],
+    policy_params: list[Float[Array, "..."]],
+    thresholds: Float[Array, "..."],
     n_draws: int = 1000,
     seed: int = 42,
 ) -> CEACResult:
@@ -360,9 +360,9 @@ def ceac_analysis(
     for policy_params_set in policy_params:
         # Create a closure that binds the current policy_params_set
         def make_eval_single(
-            pps: Float[Array, ...],
-        ) -> Callable[[Float[Array, ...]], tuple[Any, Any]]:
-            def eval_single(params: Float[Array, ...]) -> tuple[Any, Any]:
+            pps: Float[Array, "..."],
+        ) -> Callable[[Float[Array, "..."]], tuple[Any, Any]]:
+            def eval_single(params: Float[Array, "..."]) -> tuple[Any, Any]:
                 cost, effect = model_func(params, pps)
                 return cost, effect
 
@@ -456,7 +456,7 @@ def save_sensitivity_results(
 # Convenience function for complete sensitivity analysis
 def run_comprehensive_sensitivity(
     model_func: ModelFunc,
-    base_params: Float[Array, ...],
+    base_params: Float[Array, "..."],
     param_names: list[str],
     param_indices: list[int],
     output_dir: Path | None = None,

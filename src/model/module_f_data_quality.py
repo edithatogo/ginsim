@@ -46,9 +46,9 @@ class DataQualityParams:
 def compute_participation_probability(
     privacy_protections: Float[Array, ""],
     social_benefit: Float[Array, ""],
-    privacy_concern: Float[Array, ...],
+    privacy_concern: Float[Array, "..."],
     elasticity: float = -0.10,
-) -> Float[Array, ...]:
+) -> Float[Array, "..."]:
     """
     Compute probability of research participation.
     """

@@ -104,10 +104,10 @@ def compute_perceived_penalty_wrapper(
 
 
 def compute_testing_utility(
-    benefits: Float[Array, ...],
+    benefits: Float[Array, "..."],
     perceived_penalty: Float[Array, ""],
-    individual_characteristics: dict[str, Float[Array, ...]] | None = None,
-) -> Float[Array, ...]:
+    individual_characteristics: dict[str, Float[Array, "..."]] | None = None,
+) -> Float[Array, "..."]:
     """
     Compute utility of genetic testing.
 
@@ -126,9 +126,9 @@ def compute_testing_utility(
 
 
 def compute_testing_probability(
-    utility: Float[Array, ...],
+    utility: Float[Array, "..."],
     scale: float = 1.0,
-) -> Float[Array, ...]:
+) -> Float[Array, "..."]:
     """
     Compute probability of testing given utility (logit model).
 

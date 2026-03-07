@@ -12,15 +12,18 @@ Strategic Game: Adverse Selection under Asymmetric Information
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
 import jax.numpy as jnp
 from jax import jit, lax
-from jaxtyping import Array, Float
 
-from .parameters import ModelParameters, PolicyConfig
+if TYPE_CHECKING:
+    from jaxtyping import Array, Float
+
+    from .parameters import ModelParameters, PolicyConfig
 
 
-def _to_float_scalar(value: Array | float | int) -> Float[Array, ""]:
+def _to_float_scalar(value: Array | float) -> Float[Array, ""]:
     """Normalize scalar-like inputs to float JAX arrays."""
     return jnp.asarray(value, dtype=jnp.float32)
 
@@ -64,7 +67,7 @@ class InsuranceParams:
 
 
 def compute_risk_premium(
-    risk_probability: Array | float | int,
+    risk_probability: Array | float,
     sum_insured: float = 1.0,
     loading: float = 0.0,
 ) -> Float[Array, ""]:
@@ -77,7 +80,7 @@ def compute_risk_premium(
 
 @jit
 def compute_demand(
-    premium: Array | float | int,
+    premium: Array | float,
     income: float = 1.0,
     risk_aversion: float = 2.0,
     price_elasticity: float = -0.22,
@@ -89,16 +92,15 @@ def compute_demand(
     p_ref = 0.1
     relative_price = premium / (p_ref + 1e-10)
     demand = jnp.power(relative_price, price_elasticity)
-    demand = jnp.clip(demand, 0.0, 1.0)
-    return demand
+    return jnp.clip(demand, 0.0, 1.0)
 
 
 @jit
 def compute_expected_profit(
-    premium: Array | float | int,
-    risk_probability: Array | float | int,
+    premium: Array | float,
+    risk_probability: Array | float,
     sum_insured: float = 1.0,
-    takeup: Array | float | int = 1.0,
+    takeup: Array | float = 1.0,
     loading: float = 0.0,
 ) -> Float[Array, ""]:
     """
@@ -109,12 +111,11 @@ def compute_expected_profit(
     takeup = _to_float_scalar(takeup)
     expected_claim = risk_probability * sum_insured * (1.0 + loading)
     profit_per_policy = premium - expected_claim
-    total_profit = profit_per_policy * takeup
-    return total_profit
+    return profit_per_policy * takeup
 
 
 def zero_profit_premium(
-    risk_probability: Array | float | int,
+    risk_probability: Array | float,
     sum_insured: float = 1.0,
     loading: float = 0.0,
 ) -> Float[Array, ""]:
@@ -312,3 +313,31 @@ def get_standard_risk_parameters() -> dict[str, float]:
         "risk_low": 0.1,
         "proportion_high": 0.2,
     }
+
+
+from jax import jacfwd
+
+
+@jit
+def verify_equilibrium_stability(
+    premium: Float[Array, ""],
+    params: ModelParameters,
+    risk_high: float = 0.3,
+    risk_low: float = 0.1,
+    proportion_high: float = 0.2,
+) -> Float[Array, ""]:
+    """
+    Compute the derivative of the insurer's profit function.
+    A stable equilibrium should have a negative derivative (profit decreases as premium rises).
+    """
+
+    def profit_fn(p):
+        takeup_h = compute_demand(p, price_elasticity=params.demand_elasticity_high_risk)
+        takeup_l = compute_demand(p)
+        total_insured = proportion_high * takeup_h + (1 - proportion_high) * takeup_l + 1e-10
+        avg_risk = (
+            proportion_high * takeup_h * risk_high + (1 - proportion_high) * takeup_l * risk_low
+        ) / total_insured
+        return p - avg_risk * (1.0 + params.baseline_loading)
+
+    return jacfwd(profit_fn)(premium)

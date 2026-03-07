@@ -96,7 +96,8 @@ def draw_from_prior(prior_name: str, n_draws: int, seed: int | None = None) -> n
 
         return draws
 
-    raise ValueError(f"Unknown distribution: {prior['dist']}")
+    msg = f"Unknown distribution: {prior['dist']}"
+    raise ValueError(msg)
 
 
 def _build_model_parameters(draws: dict[str, np.ndarray], draw_idx: int) -> ModelParameters:
@@ -144,7 +145,9 @@ def simulate_model_outputs(draws: dict[str, np.ndarray], n_draws: int) -> dict[s
     }
 
 
-def compare_to_targets(simulations: dict[str, np.ndarray], targets: dict[str, dict]) -> dict[str, dict]:
+def compare_to_targets(
+    simulations: dict[str, np.ndarray], targets: dict[str, dict]
+) -> dict[str, dict]:
     """Compare simulated outputs to empirical targets."""
     comparisons = {}
 
@@ -176,7 +179,9 @@ def compare_to_targets(simulations: dict[str, np.ndarray], targets: dict[str, di
     return comparisons
 
 
-def generate_plots_data(simulations: dict[str, np.ndarray], targets: dict[str, dict], output_dir: Path) -> None:
+def generate_plots_data(
+    simulations: dict[str, np.ndarray], targets: dict[str, dict], output_dir: Path
+) -> None:
     """Generate compact JSON data for posterior predictive plots."""
     plot_data = {}
 
@@ -197,7 +202,9 @@ def generate_plots_data(simulations: dict[str, np.ndarray], targets: dict[str, d
                 targets[outcome]["ci_upper"],
             ]
 
-    (output_dir / "plot_data.json").write_text(json.dumps(plot_data, indent=2) + "\n", encoding="utf-8")
+    (output_dir / "plot_data.json").write_text(
+        json.dumps(plot_data, indent=2) + "\n", encoding="utf-8"
+    )
 
 
 def generate_report(comparisons: dict[str, dict], n_draws: int, output_dir: Path) -> str:

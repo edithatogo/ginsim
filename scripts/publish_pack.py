@@ -179,7 +179,9 @@ def _write_pdf(
         caption_path = figure_path.with_name(f"{figure_path.stem}_caption.md")
         if caption_path.exists():
             pdf.setFont("Helvetica", 9)
-            pdf.drawString(0.75 * inch, 0.45 * inch, caption_path.read_text(encoding="utf-8").strip()[:140])
+            pdf.drawString(
+                0.75 * inch, 0.45 * inch, caption_path.read_text(encoding="utf-8").strip()[:140]
+            )
 
     pdf.save()
     return out_pdf

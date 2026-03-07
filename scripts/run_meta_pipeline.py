@@ -17,7 +17,7 @@ def run(cmd: list[str]) -> None:
 
 def run_stage(cmd: list[str]) -> dict[str, Any]:
     print("\n$ " + " ".join(cmd))
-    proc = subprocess.run(cmd, capture_output=True, text=True)
+    proc = subprocess.run(cmd, capture_output=True, text=True, check=False)
     result = {
         "cmd": cmd,
         "returncode": proc.returncode,
@@ -37,7 +37,8 @@ def newest_subdir(path: Path) -> Path:
         raise FileNotFoundError(path)
     subs = [p for p in path.iterdir() if p.is_dir()]
     if not subs:
-        raise FileNotFoundError(f"No subdirectories under {path}")
+        msg = f"No subdirectories under {path}"
+        raise FileNotFoundError(msg)
     subs.sort(key=lambda p: p.stat().st_mtime, reverse=True)
     return subs[0]
 

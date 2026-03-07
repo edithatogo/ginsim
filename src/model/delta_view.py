@@ -66,9 +66,7 @@ def calculate_net_welfare_gain(
         pv_admin_costs += administrative_cost / ((1 + discount_rate) ** t)
 
     # Net welfare gain = welfare delta - implementation cost - PV of admin costs
-    net_welfare = welfare_delta - implementation_cost - pv_admin_costs
-
-    return net_welfare
+    return welfare_delta - implementation_cost - pv_admin_costs
 
 
 def calculate_cost_benefit_ratio(

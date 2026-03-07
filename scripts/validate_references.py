@@ -19,7 +19,6 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
-
 SCAN_PATTERNS = ("*.md", "*.tex", "*.py", "*.yaml", "*.yml", "*.json")
 SKIP_PARTS = {".git", ".venv", "outputs", "__pycache__", ".pytest_cache", ".mypy_cache"}
 
@@ -34,7 +33,7 @@ MARKDOWN_PATTERNS = (r"\[@([A-Za-z0-9_:\-]+)\]",)
 YAML_PATTERNS = (
     r'citation_key:\s*"([^"]+)"',
     r"citation_key:\s*'([^']+)'",
-    r'citation_key:\s*([A-Za-z0-9_:\-]+)',
+    r"citation_key:\s*([A-Za-z0-9_:\-]+)",
     r'source:\s*"([^"]+)"',
     r"source:\s*'([^']+)'",
 )

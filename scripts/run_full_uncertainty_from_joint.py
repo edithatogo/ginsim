@@ -7,9 +7,6 @@ from typing import Any
 import jax
 import numpy as np
 import pandas as pd
-from src.model.policy_loader import load_policies_config
-from src.utils.manifest import write_manifest
-from src.utils.posterior import deterministic_subsample, load_draws_npy
 
 from src.model.dcba_ledger import LedgerSpec, compute_ledger
 from src.model.glue_policy_eval import GlobalParams, simulate_policy
@@ -18,6 +15,9 @@ from src.model.module_b_clinical import ClinicalParams
 from src.model.module_c_insurance_eq import InsuranceParams
 from src.model.module_e_passthrough import PassThroughParams
 from src.model.module_f_data_quality import DataQualityParams
+from src.model.policy_loader import load_policies_config
+from src.utils.manifest import write_manifest
+from src.utils.posterior import deterministic_subsample, load_draws_npy
 
 
 def get_policies_path(jurisdiction: str) -> Path:

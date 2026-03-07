@@ -10,10 +10,12 @@ import json
 from dataclasses import dataclass
 from operator import attrgetter
 from pathlib import Path
-from collections.abc import Callable
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 @dataclass
@@ -76,10 +78,7 @@ def one_way_sensitivity(
     outcome_range = np.max(outcomes) - np.min(outcomes)
     base_outcome = model_func(base_params)
 
-    if base_outcome != 0:
-        sensitivity_index = outcome_range / abs(base_outcome)
-    else:
-        sensitivity_index = outcome_range
+    sensitivity_index = outcome_range / abs(base_outcome) if base_outcome != 0 else outcome_range
 
     return SensitivityResult(
         parameter=parameter_name,

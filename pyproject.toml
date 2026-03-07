@@ -2,14 +2,14 @@
 name = "genetic-discrimination-policy-econ"
 version = "0.2.0"
 description = "JAX-first scaffold for integrated economic evaluation of genetic discrimination policy options"
-requires-python = ">=3.10"
+requires-python = ">=3.11, <3.13"
 dependencies = [
   # Core numerical stack
   "jax>=0.4.25",
   "jaxlib>=0.4.25",
   "numpy>=1.26",
   "polars>=0.20.0",  # Faster than pandas
-  
+
   # Probabilistic programming
   "numpyro>=0.15.0",
   "optax>=0.2.2",
@@ -19,23 +19,23 @@ dependencies = [
   "chex>=0.1.86",
   "jaxtyping>=0.2.25",
   "beartype>=0.18.0",
-  
+
   # Config management
   "pyyaml>=6.0",
   "pydantic>=2.6",
   "hydra-core>=1.3",
-  
+
   # Game theory / economics
   "nashpy>=0.0.32",
   "quantecon>=0.8.0",
   "networkx>=3.0",
-  
+
   # CLI and output
   "typer>=0.9.0",
   "rich>=13.7.0",
   "tqdm>=4.66.0",
   "loguru>=0.7.2",  # Runtime logging
-  
+
   # Reporting
   "matplotlib>=3.8",
   "tabulate>=0.9",
@@ -59,10 +59,9 @@ dev = [
   "pyright>=1.1.350",  # Faster than mypy
   "pre-commit>=3.6",
   "ipython>=8.20",
-  
+
   # Data classes
   "attrs>=23.2.0",  # JAX-compatible data classes
-  
 ]
 
 profiling = [
@@ -71,11 +70,10 @@ profiling = [
   "pyinstrument>=4.6",  # Call stack profiler
   "scalene>=1.5.40",  # CPU+GPU+memory profiler (SOTA)
   "line_profiler>=4.1",  # Line-by-line timing
-  
+
   # Memory Profilers
   "memray>=1.11",  # Memory profiler with flame graphs
-  "tracemalloc-debug>=0.1",  # Python memory tracing
-  
+
   # Visualization
   "snakeviz>=2.2.0",  # cProfile viewer
   "speedscope>=0.0.1",  # Interactive flame graphs
@@ -90,7 +88,6 @@ coverage = [
 ]
 
 validation = [
-  "bibtex-tidy>=1.0",
   "bibtexparser>=1.4",
   "requests>=2.31",
   "habanero>=1.2",
@@ -175,6 +172,7 @@ select = [
   "RUF",  # ruff-specific rules
 ]
 ignore = [
+  "F722",   # jaxtyping DSL strings
   "E501",   # line length (handled by formatter)
   "COM812", # handled by formatter; conflicts when enabled with ruff format
   "TD002",  # missing-todo-author
@@ -183,7 +181,7 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["ANN", "S101", "PLR2004", "ARG", "FBT", "INP001"]
-"scripts/*" = ["ANN", "T201", "INP001"]
+"scripts/*" = ["ANN", "T201", "INP001", "S603", "S607"]
 "examples/*" = ["ANN", "T201", "S101", "INP001"]
 "streamlit_app/*" = ["ANN", "T201"]
 "conductor/templates/*" = ["INP001"]

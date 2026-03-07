@@ -7,11 +7,16 @@ and call the JIT-compiled core functions with extracted primitives.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from jax import random as jr
-from jaxtyping import Array
 
 from . import module_a_behavior as core
-from .parameters import ModelParameters, PolicyConfig
+
+if TYPE_CHECKING:
+    from jaxtyping import Array
+
+    from .parameters import ModelParameters, PolicyConfig
 
 
 def compute_perceived_penalty(

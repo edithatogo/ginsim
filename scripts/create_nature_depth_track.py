@@ -17,7 +17,6 @@ import re
 from datetime import date
 from pathlib import Path
 
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE_DIR = REPO_ROOT / "conductor" / "templates" / "nature_depth_cycle"
 TRACKS_DIR = REPO_ROOT / "conductor" / "tracks"
@@ -40,47 +39,53 @@ def render_template(template_text: str, replacements: dict[str, str]) -> str:
 
 def build_index(track_id: str, title: str) -> str:
     """Build a default track index file."""
-    return "\n".join(
-        [
-            f"# Track index: {track_id}",
-            "",
-            f"## {title}",
-            "",
-            "- [Specification](./spec.md)",
-            "- [Plan](./plan.md)",
-            "- [Metadata](./metadata.json)",
-            "- [Autonomous Cycle](./AUTONOMOUS_CYCLE.md)",
-            "- [Handoff](./HANDOFF.md)",
-            "- [Track Complete](./TRACK_COMPLETE.md)",
-            "",
-            "## Expected phase artifacts",
-            "",
-            "- `track_refinement_round_1.md` through `track_refinement_round_5.md` as needed",
-            "- `phase_0_review.md`",
-            "- `phase_1_review.md`",
-            "- `phase_2_review.md`",
-            "- `phase_3_review.md`",
-            "- `phase_4_review.md`",
-            "",
-            "## Current status",
-            "",
-            "- Planned.",
-            "- Created from the `nature_depth_cycle` template.",
-        ]
-    ) + "\n"
+    return (
+        "\n".join(
+            [
+                f"# Track index: {track_id}",
+                "",
+                f"## {title}",
+                "",
+                "- [Specification](./spec.md)",
+                "- [Plan](./plan.md)",
+                "- [Metadata](./metadata.json)",
+                "- [Autonomous Cycle](./AUTONOMOUS_CYCLE.md)",
+                "- [Handoff](./HANDOFF.md)",
+                "- [Track Complete](./TRACK_COMPLETE.md)",
+                "",
+                "## Expected phase artifacts",
+                "",
+                "- `track_refinement_round_1.md` through `track_refinement_round_5.md` as needed",
+                "- `phase_0_review.md`",
+                "- `phase_1_review.md`",
+                "- `phase_2_review.md`",
+                "- `phase_3_review.md`",
+                "- `phase_4_review.md`",
+                "",
+                "## Current status",
+                "",
+                "- Planned.",
+                "- Created from the `nature_depth_cycle` template.",
+            ]
+        )
+        + "\n"
+    )
 
 
 def build_placeholder_artifact(title: str) -> str:
     """Create a simple placeholder markdown artifact."""
-    return "\n".join(
-        [
-            f"# {title}",
-            "",
-            "Status: pending",
-            "",
-            "Populate this file during track execution.",
-        ]
-    ) + "\n"
+    return (
+        "\n".join(
+            [
+                f"# {title}",
+                "",
+                "Status: pending",
+                "",
+                "Populate this file during track execution.",
+            ]
+        )
+        + "\n"
+    )
 
 
 def update_tracks_registry(track_id: str, title: str, status: str) -> None:
@@ -88,14 +93,14 @@ def update_tracks_registry(track_id: str, title: str, status: str) -> None:
     registry_text = TRACKS_REGISTRY.read_text(encoding="utf-8")
     normalized_status = status.strip().lower()
     if normalized_status not in {"planned", "active"}:
-        raise ValueError(f"Unsupported track status: {status}")
+        msg = f"Unsupported track status: {status}"
+        raise ValueError(msg)
 
     section_title = "## Planned Tracks" if normalized_status == "planned" else "## Active Tracks"
     replacement_status = "Planned" if normalized_status == "planned" else "Active"
     empty_row = "| _None_ | | | |"
     new_row = (
-        f"| {track_id} | {title} | {replacement_status} | "
-        f"[track](./tracks/{track_id}/index.md) |"
+        f"| {track_id} | {title} | {replacement_status} | [track](./tracks/{track_id}/index.md) |"
     )
 
     if new_row in registry_text:
@@ -103,7 +108,8 @@ def update_tracks_registry(track_id: str, title: str, status: str) -> None:
 
     section_start = registry_text.find(section_title)
     if section_start == -1:
-        raise ValueError(f"Could not find registry section: {section_title}")
+        msg = f"Could not find registry section: {section_title}"
+        raise ValueError(msg)
 
     next_section = registry_text.find("\n## ", section_start + len(section_title))
     section_end = len(registry_text) if next_section == -1 else next_section
@@ -129,7 +135,8 @@ def instantiate_track(
     """Create a new track directory from the template."""
     track_dir = TRACKS_DIR / track_id
     if track_dir.exists():
-        raise FileExistsError(f"Track directory already exists: {track_dir}")
+        msg = f"Track directory already exists: {track_dir}"
+        raise FileExistsError(msg)
 
     track_dir.mkdir(parents=True, exist_ok=False)
 
@@ -213,7 +220,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Create a Conductor nature-depth-cycle track from the repository template."
     )
-    parser.add_argument("--track-id", required=True, help="Track identifier, e.g. gdpe_0022_example")
+    parser.add_argument(
+        "--track-id", required=True, help="Track identifier, e.g. gdpe_0022_example"
+    )
     parser.add_argument("--title", required=True, help="Human-readable track title")
     parser.add_argument(
         "--aspect",

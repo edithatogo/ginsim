@@ -18,9 +18,12 @@ try:
     import jax
     import jax.numpy as jnp
 except Exception as e:
-    raise ImportError(
+    msg = (
         "JAX (and jaxlib) must be installed to run this module. "
-        "Install platform-appropriate jaxlib and rerun.",
+        "Install platform-appropriate jaxlib and rerun."
+    )
+    raise ImportError(
+        msg,
     ) from e
 
 

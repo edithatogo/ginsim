@@ -8,12 +8,12 @@ for policy evaluation.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import jax.random as jr
-from jaxtyping import Array, Float
 from loguru import logger
 
+from .dcba_ledger import compute_dual_horizon_dcba
 from .module_a_behavior import (
     compute_testing_uptake,
     get_standard_policies,
@@ -35,7 +35,9 @@ from .module_f_data_quality import (
 )
 from .parameters import HyperParameters, ModelParameters, PolicyConfig
 from .rng import RNGManager
-from .dcba_ledger import compute_dual_horizon_dcba
+
+if TYPE_CHECKING:
+    from jaxtyping import Array, Float
 
 
 @dataclass
@@ -262,7 +264,8 @@ def compare_policies(
         Dictionary with comparative metrics
     """
     if baseline_name not in results:
-        raise ValueError(f"Baseline policy '{baseline_name}' not found in results")
+        msg = f"Baseline policy '{baseline_name}' not found in results"
+        raise ValueError(msg)
 
     baseline = results[baseline_name]
     comparisons = {}

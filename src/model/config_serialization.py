@@ -80,8 +80,7 @@ def load_config(path: str | Path) -> MsgSpecConfig:
     path = Path(path)
     json_bytes = path.read_bytes()
 
-    config = msgspec.json.decode(json_bytes, type=MsgSpecConfig)
-    return config
+    return msgspec.json.decode(json_bytes, type=MsgSpecConfig)
 
 
 def config_to_yaml(config: MsgSpecConfig, path: str | Path) -> None:
@@ -112,8 +111,7 @@ def config_from_yaml(path: str | Path) -> MsgSpecConfig:
     path = Path(path)
     yaml_bytes = path.read_bytes()
 
-    config = msgspec.yaml.decode(yaml_bytes, type=MsgSpecConfig)
-    return config
+    return msgspec.yaml.decode(yaml_bytes, type=MsgSpecConfig)
 
 
 def config_to_dict(config: MsgSpecConfig) -> dict[str, Any]:
@@ -153,16 +151,11 @@ if __name__ == "__main__":
     # Save/load JSON
     save_config(config, "outputs/config_test.json")
     config2 = load_config("outputs/config_test.json")
-    print(f"✓ JSON: {config2.jurisdiction}")
 
     # Save/load YAML
     config_to_yaml(config, "outputs/config_test.yaml")
     config3 = config_from_yaml("outputs/config_test.yaml")
-    print(f"✓ YAML: {config3.jurisdiction}")
 
     # Convert to/from dict
     config_dict = config_to_dict(config)
     config4 = config_from_dict(config_dict)
-    print(f"✓ Dict: {config4.jurisdiction}")
-
-    print("\n✓ msgspec config serialization working!")

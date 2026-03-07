@@ -47,7 +47,13 @@ def format_policy_table(results: dict[str, Any]) -> str:
     Returns:
         Formatted table string
     """
-    headers = ["Policy", "Testing Uptake", "Avg Premium Index", "Long-run Net Welfare", "Compliance"]
+    headers = [
+        "Policy",
+        "Testing Uptake",
+        "Avg Premium Index",
+        "Long-run Net Welfare",
+        "Compliance",
+    ]
 
     rows = []
     for policy_name, result in results.items():

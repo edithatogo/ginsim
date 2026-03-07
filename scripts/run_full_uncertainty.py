@@ -23,7 +23,8 @@ def get_policies_path(jurisdiction: str) -> Path:
         "au": Path("configs/policies_australia.yaml"),
     }
     if jurisdiction not in mapping:
-        raise ValueError(f"Unknown jurisdiction: {jurisdiction}. Use australia or new_zealand.")
+        msg = f"Unknown jurisdiction: {jurisdiction}. Use australia or new_zealand."
+        raise ValueError(msg)
     return mapping[jurisdiction]
 
 
@@ -46,19 +47,27 @@ def _sample_model_parameters(
     rng: np.random.Generator,
 ) -> ModelParameters:
     if draw:
-        return base.model_copy(update={key: value for key, value in draw.items() if key in base.model_fields})
+        return base.model_copy(
+            update={key: value for key, value in draw.items() if key in base.model_fields}
+        )
 
     sampled = {
-        "baseline_testing_uptake": _clip(rng.normal(base.baseline_testing_uptake, 0.03), 0.01, 0.99),
+        "baseline_testing_uptake": _clip(
+            rng.normal(base.baseline_testing_uptake, 0.03), 0.01, 0.99
+        ),
         "deterrence_elasticity": _clip(rng.normal(base.deterrence_elasticity, 0.02), 0.0, 1.0),
         "moratorium_effect": _clip(rng.normal(base.moratorium_effect, 0.03), 0.0, 1.0),
-        "adverse_selection_elasticity": max(0.0, rng.normal(base.adverse_selection_elasticity, 0.01)),
+        "adverse_selection_elasticity": max(
+            0.0, rng.normal(base.adverse_selection_elasticity, 0.01)
+        ),
         "demand_elasticity_high_risk": min(
             0.0,
             rng.normal(base.demand_elasticity_high_risk, 0.03),
         ),
         "baseline_loading": max(0.0, rng.normal(base.baseline_loading, 0.02)),
-        "family_history_sensitivity": _clip(rng.normal(base.family_history_sensitivity, 0.03), 0.0, 1.0),
+        "family_history_sensitivity": _clip(
+            rng.normal(base.family_history_sensitivity, 0.03), 0.0, 1.0
+        ),
         "proxy_substitution_rate": _clip(rng.normal(base.proxy_substitution_rate, 0.03), 0.0, 1.0),
         "pass_through_rate": _clip(rng.normal(base.pass_through_rate, 0.04), 0.0, 1.0),
         "research_participation_elasticity": min(
@@ -167,7 +176,9 @@ def main() -> None:
     for draw_index in range(n_draws):
         merged_draw: dict[str, Any] = {}
         for group_name, draws in posterior_groups.items():
-            selected = select_draw(draws, draw_index, n_draws, mode, rng) if draws is not None else None
+            selected = (
+                select_draw(draws, draw_index, n_draws, mode, rng) if draws is not None else None
+            )
             if isinstance(selected, dict):
                 merged_draw.update(selected)
 
@@ -196,7 +207,10 @@ def main() -> None:
                 }
             )
 
-    out_dir = Path(args.out) / f"{policies_config.jurisdiction}_{pd.Timestamp.utcnow().strftime('%Y%m%dT%H%M%SZ')}"
+    out_dir = (
+        Path(args.out)
+        / f"{policies_config.jurisdiction}_{pd.Timestamp.utcnow().strftime('%Y%m%dT%H%M%SZ')}"
+    )
     out_dir.mkdir(parents=True, exist_ok=True)
 
     write_manifest(

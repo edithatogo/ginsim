@@ -13,13 +13,15 @@ Strategic Game: Testing Participation under Penalty Risk
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import jax.numpy as jnp
 import jax.random as jr
-from jaxtyping import Array, Float
 
 from .parameters import PolicyConfig
+
+if TYPE_CHECKING:
+    from jaxtyping import Array, Float
 
 
 @dataclass(frozen=True)
@@ -106,10 +108,10 @@ def compute_perceived_penalty_wrapper(
 
 
 def compute_testing_utility(
-    benefits: Float[Array, "..."],
+    benefits: Float[Array, "*"],
     perceived_penalty: Float[Array, ""],
-    individual_characteristics: dict[str, Float[Array, "..."]] | None = None,
-) -> Float[Array, "..."]:
+    individual_characteristics: dict[str, Float[Array, "*"]] | None = None,
+) -> Float[Array, "*"]:
     """
     Compute utility of genetic testing.
 
@@ -128,17 +130,16 @@ def compute_testing_utility(
 
 
 def compute_testing_probability(
-    utility: Float[Array, "..."],
+    utility: Float[Array, "*"],
     scale: float = 1.0,
-) -> Float[Array, "..."]:
+) -> Float[Array, "*"]:
     """
     Compute probability of testing given utility (logit model).
 
     P(test) = exp(scale * utility) / (1 + exp(scale * utility))
     """
     scaled_utility = utility * scale
-    probability = jnp.exp(scaled_utility) / (1.0 + jnp.exp(scaled_utility))
-    return probability
+    return jnp.exp(scaled_utility) / (1.0 + jnp.exp(scaled_utility))
 
 
 # Don't use @jit - has boolean conditional
@@ -193,9 +194,7 @@ def compute_testing_uptake(
     probabilities = compute_testing_probability(utilities)
 
     # Aggregate uptake
-    uptake = jnp.mean(probabilities)
-
-    return uptake
+    return jnp.mean(probabilities)
 
 
 def compute_policy_effect(

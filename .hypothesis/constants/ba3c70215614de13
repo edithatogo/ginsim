@@ -1,0 +1,4 @@
+# file: C:\Users\60217257\OneDrive - Victoria University of Wellington - STAFF\Project - 2026.03 - Economics and Genetic Discrimination\src\model\module_c_insurance_eq.py
+# hypothesis_version: 6.151.9
+
+[-0.22, 0.0, 1e-10, 1e-06, 0.1, 0.2, 0.3, 1.0, 2.0, 100, 'absolute_divergence', 'avg_premium_baseline', 'avg_premium_reform', 'proportion_high', 'relative_divergence', 'risk_high', 'risk_low', 'risk_rating_baseline', 'risk_rating_reform']

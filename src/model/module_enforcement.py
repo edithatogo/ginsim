@@ -65,7 +65,7 @@ def compute_detection_probability(
 
 @jit
 def compute_expected_penalty(
-    penalty_max: int | float,
+    penalty_max: float,
     detection_probability: ScalarLike,
     enforcement_effectiveness: ScalarLike,
 ) -> Float[Array, ""]:
@@ -289,9 +289,7 @@ def compute_optimal_enforcement(
         compliance_gap = (target_compliance - outcome.compliance_rate) ** 2
         enforcement_cost = enforcement_cost_parameter * enf_strength**2
 
-        objective = compliance_gap + enforcement_cost
-
-        return objective
+        return compliance_gap + enforcement_cost
 
     # Evaluate objective at all enforcement levels
     objectives = jnp.array([compute_objective(e) for e in enforcement_levels])

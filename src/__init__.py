@@ -26,21 +26,21 @@ from .model.rng import RNGManager, get_global_rng, reset_global_rng
 __version__ = "0.2.0"
 __author__ = "Dylan A Mordaunt"
 __all__ = [
-    # Version
-    "__version__",
-    "__author__",
+    "HyperParameters",
     # Parameters
     "ModelParameters",
     "PolicyConfig",
-    "HyperParameters",
     # RNG
     "RNGManager",
-    "get_global_rng",
-    "reset_global_rng",
+    "__author__",
+    # Version
+    "__version__",
+    "compare_policies",
+    "evaluate_policy_sweep",
     # Pipeline
     "evaluate_single_policy",
-    "evaluate_policy_sweep",
-    "compare_policies",
     "generate_policy_summary",
+    "get_global_rng",
+    "reset_global_rng",
     "run_full_evaluation",
 ]

@@ -8,10 +8,10 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 import pandas as pd
-from src.utils.manifest import write_manifest
 
 from src.model.sensitivity import sobol_first_order_rff
 from src.model.sensitivity_total import total_order_sobol_rff
+from src.utils.manifest import write_manifest
 
 GROUPS = ["mapping", "behavior", "clinical", "insurance", "passthrough", "data_quality"]
 

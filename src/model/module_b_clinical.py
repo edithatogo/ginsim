@@ -12,13 +12,20 @@ Design goals:
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import jax.numpy as jnp
 
 try:
-    import jax.numpy as jnp
+    pass
 except Exception as e:
-    raise ImportError(
+    msg = (
         "JAX (and jaxlib) must be installed to run this module. "
-        "Install platform-appropriate jaxlib and rerun.",
+        "Install platform-appropriate jaxlib and rerun."
+    )
+    raise ImportError(
+        msg,
     ) from e
 
 

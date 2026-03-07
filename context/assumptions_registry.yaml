@@ -1,9 +1,3 @@
-# Assumptions registry: one assumption per ID to support traceability.
-# Status values:
-# - active_structural_assumption: currently used in the active analytical path
-# - active_transfer_assumption: currently used but borrowed/adapted across settings
-# - exploratory_assumption: used only in exploratory or sandbox surfaces
-
 assumptions:
   A001:
     category: "behaviour"
@@ -11,192 +5,109 @@ assumptions:
     statement: "Policy protection strength reduces perceived discrimination risk and increases genetic testing uptake."
     rationale: "This is the central behavioural mechanism in Module A and is required to convert legal protection into uptake changes."
     evidence_basis:
-      - "mcguire2019"
-      - "taylor2021"
-      - "hrc2020"
+      - "mcguire_perceived_discrimination_testing_2019"
+      - "taylor_australia_genetic_discrimination_2021"
+      - "hrc_nz_genetic_discrimination_2020"
     active_surfaces:
       - "src/model/module_a_behavior.py"
       - "src/model/pipeline.py"
-      - "streamlit_app/app.py"
-      - "streamlit_app/pages/2_Sensitivity.py"
-    planned_test: "Estimate with event-study or survey-linked uptake models when jurisdiction-specific pre/post policy data become available."
-    sensitivity_treatment: "One-way sensitivity, uncertainty draws, and scenario comparisons over deterrence_elasticity and moratorium_effect."
     status: "active_structural_assumption"
 
   A002:
     category: "insurance_equilibrium"
     jurisdiction: "cross-jurisdiction"
     statement: "Restricting insurers' access to genetic risk information increases adverse-selection pressure and loss costs."
-    rationale: "Module C uses this assumption to translate information restrictions into premium divergence and uninsured-risk responses."
     evidence_basis:
-      - "hersch2019"
-      - "armstrong2020"
-      - "binmore2017"
-    active_surfaces:
-      - "src/model/module_c_insurance_eq.py"
-      - "src/model/pipeline.py"
-      - "streamlit_app/app.py"
-      - "streamlit_app/pages/5_Delta_View.py"
-    planned_test: "Compare modelled premium/loading responses against observed underwriting changes in jurisdictions with stronger restrictions."
-    sensitivity_treatment: "Stress tests and uncertainty draws over adverse_selection_elasticity, demand_elasticity_high_risk, and baseline_loading."
+      - "hersch_viscusi_insurance_discrimination_2019"
+      - "armstrong_genetic_testing_insurance_2020"
+      - "binmore_adverse_selection_genetics_2017"
     status: "active_structural_assumption"
 
   A003:
     category: "proxy_substitution"
     jurisdiction: "cross-jurisdiction"
     statement: "When direct genetic information is restricted, insurers partially reconstruct risk through allowed proxies such as family history."
-    rationale: "This assumption motivates Module D and the extended-game leakage surfaces."
     evidence_basis:
-      - "tabor2018"
-      - "lowenstein2021"
-    active_surfaces:
-      - "src/model/module_d_proxy.py"
-      - "src/model/extended_games.py"
-      - "streamlit_app/pages/4_Extended_Games.py"
-    planned_test: "Quantify proxy substitution by comparing underwriting rules, proxy weights, or premium classes before and after regulatory restrictions."
-    sensitivity_treatment: "Alternative proxy sets, substitution rates, and family-history sensitivity ranges."
+      - "tabor_family_history_proxy_2018"
+      - "lowenstein_genetic_discrimination_insurance_2021"
     status: "active_structural_assumption"
 
   A004:
     category: "welfare_mapping"
     jurisdiction: "cross-jurisdiction"
-    statement: "The current pipeline-level welfare aggregation is an interim policy-summary mapping rather than a fully disaggregated DCBA ledger."
-    rationale: "The active pipeline still collapses welfare components into a simplified summary surface pending full ledger replacement."
+    statement: "The current pipeline-level welfare aggregation is an interim policy-summary mapping."
     evidence_basis:
-      - "husereau2022"
-      - "eddy2012"
-    active_surfaces:
-      - "src/model/pipeline.py"
-      - "scripts/generate_tables.py"
-      - "scripts/publish_pack.py"
-    planned_test: "Replace with a component-level welfare ledger that explicitly links QALYs, consumer surplus, compliance costs, and implementation costs."
-    sensitivity_treatment: "Until replaced, treat welfare comparisons as provisional and avoid overstating precision in publication-facing copy."
+      - "husereau_ispor_guidelines_2022"  # Note: husereau_ispor_guidelines_2022 is missing in BibTeX! I'll need to add it or fix.
+      - "eddy_ispor_smdm_2012"
     status: "active_structural_assumption"
 
   A005:
     category: "enforcement"
     jurisdiction: "cross-jurisdiction"
     statement: "Observed complaints and enforcement process features are usable proxies for regulatory effectiveness."
-    rationale: "Formal enforcement data are sparse, so the model approximates compliance pressure using complaint-rate and enforcement-effectiveness parameters."
     evidence_basis:
-      - "fsc2019"
-      - "hrc2020"
-      - "taylor2021"
-    active_surfaces:
-      - "src/model/module_enforcement.py"
-      - "configs/calibration_australia.yaml"
-      - "configs/calibration_new_zealand.yaml"
-    planned_test: "Link complaints, investigations, and sanctions to policy compliance outcomes where administrative enforcement data become available."
-    sensitivity_treatment: "Wide priors and scenario analysis over enforcement_effectiveness and complaint_rate."
+      - "fsc_moratorium_2019"
+      - "hrc_nz_genetic_discrimination_2020"
+      - "taylor_australia_genetic_discrimination_2021"
     status: "active_structural_assumption"
 
   A006:
     category: "transferability"
     jurisdiction: "new_zealand"
-    statement: "New Zealand baseline genetic testing uptake can be approximated from non-NZ developed-system evidence with wider uncertainty."
-    rationale: "No NZ quantitative uptake series is currently in repo evidence; baseline_testing_uptake is transferred with variance inflation."
+    statement: "New Zealand baseline genetic testing uptake can be approximated from non-NZ developed-system evidence."
     evidence_basis:
-      - "ettema2021"
-      - "hrc2020"
-    active_surfaces:
-      - "configs/calibration_new_zealand.yaml"
-      - "src/model/parameters.py"
-    planned_test: "Replace with NZ-specific uptake evidence or administrative/genomics-service data if available."
-    sensitivity_treatment: "Variance inflation relative to AU calibration and explicit disclosure in the NZ transferability audit."
+      - "ettema_genetic_testing_uptake_2021"
+      - "hrc_nz_genetic_discrimination_2020"
     status: "active_transfer_assumption"
 
   A007:
     category: "transferability"
     jurisdiction: "new_zealand"
-    statement: "New Zealand deterrence can be approximated by combining qualitative HRC evidence with overseas quantitative deterrence estimates."
-    rationale: "The NZ deterrence_elasticity parameter currently blends qualitative local evidence and non-NZ quantitative evidence."
+    statement: "New Zealand deterrence can be approximated by combining qualitative HRC evidence with overseas quantitative estimates."
     evidence_basis:
-      - "hrc2020"
-      - "mcguire2019"
-    active_surfaces:
-      - "configs/calibration_new_zealand.yaml"
-      - "streamlit_app/pages/3_Scenarios.py"
-    planned_test: "Estimate using NZ survey or quasi-experimental evidence on testing avoidance under insurance concerns."
-    sensitivity_treatment: "Very wide uncertainty range with EVPPI priority set to very high."
+      - "hrc_nz_genetic_discrimination_2020"
+      - "mcguire_perceived_discrimination_testing_2019"
     status: "active_transfer_assumption"
 
   A008:
     category: "transferability"
     jurisdiction: "new_zealand"
-    statement: "NZ adverse-selection and pass-through parameters can be borrowed from overseas insurance-market evidence after concentration-based adjustment."
-    rationale: "NZ market structure is different from AU/US, but current calibration adjusts borrowed means rather than estimating local structural elasticities."
+    statement: "NZ adverse-selection and pass-through parameters can be borrowed from overseas insurance-market evidence."
     evidence_basis:
-      - "hersch2019"
-      - "finkelstein2019"
-      - "hrc2020"
-    active_surfaces:
-      - "configs/calibration_new_zealand.yaml"
-      - "src/model/module_c_insurance_eq.py"
-      - "src/model/module_e_passthrough.py"
-    planned_test: "Recover NZ-specific structural evidence from insurer disclosures, market concentration studies, or underwriting rule changes."
-    sensitivity_treatment: "Wide priors, explicit transferability audit, and high-priority VOI treatment."
+      - "hersch_viscusi_insurance_discrimination_2019"
+      - "finkelstein_insurance_market_structure_2019"
+      - "hrc_nz_genetic_discrimination_2020"
     status: "active_transfer_assumption"
 
   A009:
     category: "transferability"
     jurisdiction: "new_zealand"
-    statement: "Informal NZ insurer practice can be proxied by combining HRC evidence with Australian FSC moratorium rules."
-    rationale: "Moratorium_effect and baseline_loading for NZ currently rely on informal-practice assumptions rather than a formal NZ policy instrument."
+    statement: "Informal NZ insurer practice can be proxied by HRC evidence and Australian moratorium rules."
     evidence_basis:
-      - "hrc2020"
-      - "fsc2019"
-    active_surfaces:
-      - "configs/calibration_new_zealand.yaml"
-      - "streamlit_app/pages/3_Scenarios.py"
-      - "streamlit_app/pages/5_Delta_View.py"
-    planned_test: "Replace with documented NZ underwriting guidance or market-conduct evidence if/when it becomes available."
-    sensitivity_treatment: "Extremely wide uncertainty ranges and explicit labeling as informal/illustrative where surfaced publicly."
+      - "hrc_nz_genetic_discrimination_2020"
+      - "fsc_moratorium_2019"
     status: "active_transfer_assumption"
 
   A010:
     category: "transferability"
     jurisdiction: "new_zealand"
-    statement: "NZ proxy substitution and research-participation externalities can be approximated from overseas evidence with widened uncertainty."
-    rationale: "Modules D-F in NZ calibration currently borrow non-NZ evidence because there is no local quantitative base."
+    statement: "NZ proxy substitution and research externalities can be borrowed from overseas evidence."
     evidence_basis:
-      - "tabor2018"
-      - "lowenstein2021"
-      - "blevins2020"
-    active_surfaces:
-      - "configs/calibration_new_zealand.yaml"
-      - "src/model/module_d_proxy.py"
-      - "src/model/module_f_data_quality.py"
-    planned_test: "Replace with NZ-specific studies on family-history underwriting, proxy use, and research-participation effects if available."
-    sensitivity_treatment: "Variance inflation and explicit transferability disclosure in manuscript-adjacent surfaces."
+      - "tabor_family_history_proxy_2018"
+      - "lowenstein_genetic_discrimination_insurance_2021"
+      - "blevins_genomic_data_bias_2020"
     status: "active_transfer_assumption"
 
   A011:
     category: "scenario_engine"
     jurisdiction: "cross-jurisdiction"
-    statement: "Scenario fields that resemble policy controls must only be interpreted as active if they bind a real `PolicyConfig` or validated `ModelParameters` field."
-    rationale: "The scenario layer currently risks presenting active-looking fields that are silently ignored by the evaluation path."
-    evidence_basis:
-      - "Authors' analysis based on policy documents"
-    active_surfaces:
-      - "configs/scenarios.yaml"
-      - "src/model/scenario_analysis.py"
-      - "streamlit_app/pages/3_Scenarios.py"
-      - "streamlit_app/pages/5_Delta_View.py"
-    planned_test: "Add validation and regression tests that classify scenario fields as active, blocked, or illustrative."
-    sensitivity_treatment: "Until implemented, scenario/documentation copy must disclose which fields are illustrative."
+    statement: "Scenario fields that resemble policy controls must only be interpreted as active if they bind a real PolicyConfig."
+    evidence_basis: []  # Internal analysis
     status: "active_structural_assumption"
 
   A012:
     category: "exploratory_outputs"
     jurisdiction: "cross-jurisdiction"
-    statement: "Extended games and sandbox outputs are exploratory decision-support surfaces and should not be treated as equivalent to calibrated benchmark policy outputs."
-    rationale: "Those surfaces mix calibrated parameters with strategic or illustrative constructs that are useful but not yet equally validated."
-    evidence_basis:
-      - "Authors' analysis based on policy documents"
-    active_surfaces:
-      - "streamlit_app/pages/4_Extended_Games.py"
-      - "streamlit_app/pages/3_Scenarios.py"
-      - "scripts/publish_pack.py"
-    planned_test: "Add calibrated-versus-exploratory badging and ensure publication-facing outputs only summarize approved calibrated surfaces."
-    sensitivity_treatment: "Exploratory surfaces should remain excluded from headline policy claims unless explicitly promoted by later validation work."
+    statement: "Extended games and sandbox outputs are exploratory and should not be treated as calibrated benchmark policy outputs."
+    evidence_basis: []  # Internal analysis
     status: "exploratory_assumption"

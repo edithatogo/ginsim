@@ -6,7 +6,6 @@ from typing import Any
 
 import pandas as pd
 from pydantic import BaseModel, ValidationError
-from src.utils.posterior import save_draws_npy
 
 from src.model.param_schema import (
     BehaviorParamsDraw,
@@ -16,6 +15,7 @@ from src.model.param_schema import (
     PassThroughParamsDraw,
     PolicyMappingParamsDraw,
 )
+from src.utils.posterior import save_draws_npy
 
 SCHEMAS: dict[str, type[BaseModel]] = {
     "behavior": BehaviorParamsDraw,

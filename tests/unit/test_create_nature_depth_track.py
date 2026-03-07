@@ -5,7 +5,9 @@ import json
 from scripts import create_nature_depth_track
 
 
-def test_instantiate_track_creates_seeded_artifacts_and_updates_registry(tmp_path, monkeypatch) -> None:
+def test_instantiate_track_creates_seeded_artifacts_and_updates_registry(
+    tmp_path, monkeypatch
+) -> None:
     conductor_dir = tmp_path / "conductor"
     templates_dir = conductor_dir / "templates" / "nature_depth_cycle"
     tracks_dir = conductor_dir / "tracks"
@@ -35,26 +37,8 @@ def test_instantiate_track_creates_seeded_artifacts_and_updates_registry(tmp_pat
         (templates_dir / filename).write_text(content, encoding="utf-8")
 
     registry_path.write_text(
-        "\n".join(
-            [
-                "# Tracks registry",
-                "",
-                "## Active Tracks",
-                "",
-                "| Track ID | Title | Status | Link |",
-                "|---|---|---|---|",
-                "| _None_ | | | |",
-                "",
-                "## Planned Tracks",
-                "",
-                "| Track ID | Title | Status | Link |",
-                "|---|---|---|---|",
-                "| _None_ | | | |",
-                "",
-                "## Completed Follow-up Tracks",
-            ]
-        )
-        + "\n",
+        "# Tracks registry\n\n## Active Tracks\n\n| Track ID | Title | Status | Link |\n|---|---|---|---|\n| _None_ | | | |\n\n## Planned Tracks\n\n| Track ID | Title | Status | Link |\n|---|---|---|---|\n| _None_ | | | |\n\n## Completed Follow-up Tracks"
+        "\n",
         encoding="utf-8",
     )
 
@@ -105,7 +89,11 @@ def test_conductor_tracking_files_are_not_ignored() -> None:
         "conductor/templates/README.md",
         "conductor/templates/nature_depth_cycle/README.md",
     ]
-    gitignore_text = (create_nature_depth_track.REPO_ROOT / ".gitignore").read_text(encoding="utf-8")
+    gitignore_text = (create_nature_depth_track.REPO_ROOT / ".gitignore").read_text(
+        encoding="utf-8"
+    )
 
     for tracked_path in tracked_paths:
-        assert f"!{tracked_path}" in gitignore_text or tracked_path.startswith("conductor/templates/")
+        assert f"!{tracked_path}" in gitignore_text or tracked_path.startswith(
+            "conductor/templates/"
+        )

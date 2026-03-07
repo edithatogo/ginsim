@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from scripts.validate_references import ReferenceValidator
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def write_text(path: Path, content: str) -> None:
@@ -35,12 +38,7 @@ def test_reference_validator_resolves_aliases_and_internal_sources(tmp_path: Pat
 
     write_text(
         tmp_path / "context" / "evidence.yaml",
-        '\n'.join(
-            [
-                'source: "mcguire_perceived_discrimination_testing_2019"',
-                'source: "Authors\' analysis based on policy documents"',
-            ]
-        ),
+        'source: "mcguire_perceived_discrimination_testing_2019"\nsource: "Authors\' analysis based on policy documents"',
     )
     write_text(tmp_path / "docs" / "paper.md", "Policy summary [@fsc2019].\n")
 
@@ -58,7 +56,9 @@ def test_reference_validator_reports_unresolved_keys(tmp_path: Path) -> None:
     references_file = tmp_path / "study" / "references" / "references.json"
     alias_file = tmp_path / "study" / "references" / "reference_key_aliases.json"
     references_file.parent.mkdir(parents=True, exist_ok=True)
-    references_file.write_text(json.dumps({"references": [{"id": "mcguire2019"}]}), encoding="utf-8")
+    references_file.write_text(
+        json.dumps({"references": [{"id": "mcguire2019"}]}), encoding="utf-8"
+    )
     alias_file.write_text("{}", encoding="utf-8")
 
     write_text(

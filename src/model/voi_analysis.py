@@ -10,9 +10,12 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
-from numpy.typing import NDArray
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 
 @dataclass
@@ -94,10 +97,7 @@ def compute_evppi(
         total_variance = float(np.var(net_benefits))
 
         # Proportion of variance explained by this group
-        if total_variance > 0:
-            variance_proportion = group_variance / total_variance
-        else:
-            variance_proportion = 0.0
+        variance_proportion = group_variance / total_variance if total_variance > 0 else 0.0
 
         # EVPPI approximation
         evpi = compute_evpi(net_benefits, optimal_net_benefit)

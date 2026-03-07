@@ -11,10 +11,13 @@ Implements advanced game-theoretic scenarios:
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 import jax.numpy as jnp
 from jax import jit, vmap
-from jaxtyping import Array, Float
+
+if TYPE_CHECKING:
+    from jaxtyping import Array, Float
 
 
 @dataclass
@@ -165,7 +168,7 @@ def cascade_testing_game(
 
 @jit
 def run_extended_games_batch(
-    params_batch: dict[str, Float[Array, "..."]],
+    params_batch: dict[str, Float[Array, "*"]],
 ) -> dict[str, dict[str, float | int]]:
     """Run all extended games in batch for efficiency."""
     # Information Leakage

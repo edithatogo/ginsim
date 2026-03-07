@@ -15,11 +15,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.figure import Figure
 from matplotlib.patches import Circle, Rectangle
+
+if TYPE_CHECKING:
+    from matplotlib.figure import Figure
 
 
 @dataclass
@@ -187,21 +190,21 @@ def create_module_a_diagram(
         "",
         xy=(info_x - 0.6, info_y),
         xytext=(start_x + 0.4, start_y),
-        arrowprops=dict(arrowstyle="->", color=config.node_edge_color, lw=2),
+        arrowprops={"arrowstyle": "->", "color": config.node_edge_color, "lw": 2},
     )
 
     ax.annotate(
         "",
         xy=(decision_x - 0.4, decision_y),
         xytext=(info_x + 0.6, info_y),
-        arrowprops=dict(arrowstyle="->", color=config.node_edge_color, lw=2),
+        arrowprops={"arrowstyle": "->", "color": config.node_edge_color, "lw": 2},
     )
 
     ax.annotate(
         "",
         xy=(outcome_test_x - 0.7, outcome_test_y),
         xytext=(decision_x + 0.4, decision_y + 0.3),
-        arrowprops=dict(arrowstyle="->", color=config.success_color, lw=2),
+        arrowprops={"arrowstyle": "->", "color": config.success_color, "lw": 2},
     )
     ax.text(
         8.5,
@@ -216,7 +219,7 @@ def create_module_a_diagram(
         "",
         xy=(outcome_no_test_x - 0.7, outcome_no_test_y),
         xytext=(decision_x + 0.4, decision_y - 0.3),
-        arrowprops=dict(arrowstyle="->", color=config.highlight_color, lw=2),
+        arrowprops={"arrowstyle": "->", "color": config.highlight_color, "lw": 2},
     )
     ax.text(
         8.5,
@@ -232,7 +235,12 @@ def create_module_a_diagram(
         "",
         xy=(decision_x, decision_y + 1.5),
         xytext=(decision_x, decision_y + 0.5),
-        arrowprops=dict(arrowstyle="->", color=config.highlight_color, lw=3, linestyle="--"),
+        arrowprops={
+            "arrowstyle": "->",
+            "color": config.highlight_color,
+            "lw": 3,
+            "linestyle": "--",
+        },
     )
     ax.text(
         decision_x,
@@ -257,7 +265,7 @@ def create_module_a_diagram(
             transform=ax.transAxes,
             fontsize=config.font_size - 2,
             verticalalignment="top",
-            bbox=dict(boxstyle="round", facecolor="white", alpha=0.8),
+            bbox={"boxstyle": "round", "facecolor": "white", "alpha": 0.8},
         )
 
     # Set limits
@@ -401,13 +409,13 @@ def create_module_c_diagram(
         "",
         xy=(insurer_x - 0.8, insurer_y),
         xytext=(high_risk_x + 1.5, insurer_y),
-        arrowprops=dict(arrowstyle="->", color=config.node_edge_color, lw=2),
+        arrowprops={"arrowstyle": "->", "color": config.node_edge_color, "lw": 2},
     )
     ax.annotate(
         "",
         xy=(insurer_x + 0.8, insurer_y),
         xytext=(low_risk_x - 1.5, insurer_y),
-        arrowprops=dict(arrowstyle="->", color=config.node_edge_color, lw=2),
+        arrowprops={"arrowstyle": "->", "color": config.node_edge_color, "lw": 2},
     )
 
     # Information asymmetry indicator
@@ -415,7 +423,7 @@ def create_module_c_diagram(
         "",
         xy=(insurer_x, insurer_y - 2),
         xytext=(insurer_x, insurer_y - 0.9),
-        arrowprops=dict(arrowstyle="->", color=config.warning_color, lw=3, linestyle="--"),
+        arrowprops={"arrowstyle": "->", "color": config.warning_color, "lw": 3, "linestyle": "--"},
     )
     ax.text(
         insurer_x,
@@ -433,7 +441,12 @@ def create_module_c_diagram(
         "",
         xy=(insurer_x, insurer_y + 0.9),
         xytext=(insurer_x, insurer_y + 2),
-        arrowprops=dict(arrowstyle="->", color=config.highlight_color, lw=3, linestyle="--"),
+        arrowprops={
+            "arrowstyle": "->",
+            "color": config.highlight_color,
+            "lw": 3,
+            "linestyle": "--",
+        },
     )
     ax.text(
         insurer_x,
@@ -459,7 +472,7 @@ def create_module_c_diagram(
         transform=ax.transAxes,
         fontsize=config.font_size - 1,
         verticalalignment="bottom",
-        bbox=dict(boxstyle="round", facecolor="white", alpha=0.9),
+        bbox={"boxstyle": "round", "facecolor": "white", "alpha": 0.9},
     )
 
     ax.set_xlim(0, 12)
@@ -536,7 +549,7 @@ def create_module_d_diagram(
         "",
         xy=(4, genetic_y),
         xytext=(genetic_x + 1, genetic_y),
-        arrowprops=dict(arrowstyle="->", color="red", lw=3, linestyle="--"),
+        arrowprops={"arrowstyle": "->", "color": "red", "lw": 3, "linestyle": "--"},
     )
     ax.text(
         4,
@@ -582,7 +595,7 @@ def create_module_d_diagram(
             "",
             xy=(px, py + 0.5),
             xytext=(4.5, genetic_y - 0.5),
-            arrowprops=dict(arrowstyle="->", color=config.warning_color, lw=2),
+            arrowprops={"arrowstyle": "->", "color": config.warning_color, "lw": 2},
         )
 
     # Insurer inference
@@ -614,7 +627,7 @@ def create_module_d_diagram(
             "",
             xy=(insurer_x - 1, insurer_y),
             xytext=(px + 0.6, py),
-            arrowprops=dict(arrowstyle="->", color=config.node_edge_color, lw=2),
+            arrowprops={"arrowstyle": "->", "color": config.node_edge_color, "lw": 2},
         )
 
     # Information leakage indicator
@@ -631,7 +644,7 @@ def create_module_d_diagram(
         transform=ax.transAxes,
         fontsize=config.font_size - 1,
         verticalalignment="bottom",
-        bbox=dict(boxstyle="round", facecolor=config.warning_color, alpha=0.3),
+        bbox={"boxstyle": "round", "facecolor": config.warning_color, "alpha": 0.3},
     )
 
     # Reconstruction accuracy metric
@@ -645,7 +658,7 @@ def create_module_d_diagram(
             transform=ax.transAxes,
             fontsize=config.font_size,
             verticalalignment="top",
-            bbox=dict(boxstyle="round", facecolor="white", alpha=0.9),
+            bbox={"boxstyle": "round", "facecolor": "white", "alpha": 0.9},
             ha="right",
         )
 
@@ -735,13 +748,13 @@ def create_module_e_diagram(
         "",
         xy=(4.8, 6),
         xytext=(3.2, 6),
-        arrowprops=dict(arrowstyle="->", color=config.node_edge_color, lw=3),
+        arrowprops={"arrowstyle": "->", "color": config.node_edge_color, "lw": 3},
     )
     ax.annotate(
         "",
         xy=(8.8, 6),
         xytext=(7.2, 6),
-        arrowprops=dict(arrowstyle="->", color=config.node_edge_color, lw=3),
+        arrowprops={"arrowstyle": "->", "color": config.node_edge_color, "lw": 3},
     )
 
     # Policy impact (vertical arrow)
@@ -749,7 +762,12 @@ def create_module_e_diagram(
         "",
         xy=(6, 7.5),
         xytext=(6, 6.8),
-        arrowprops=dict(arrowstyle="->", color=config.highlight_color, lw=3, linestyle="--"),
+        arrowprops={
+            "arrowstyle": "->",
+            "color": config.highlight_color,
+            "lw": 3,
+            "linestyle": "--",
+        },
     )
     ax.text(
         6,
@@ -828,7 +846,7 @@ def create_module_e_diagram(
         transform=ax.transAxes,
         fontsize=config.font_size - 1,
         verticalalignment="bottom",
-        bbox=dict(boxstyle="round", facecolor="white", alpha=0.9),
+        bbox={"boxstyle": "round", "facecolor": "white", "alpha": 0.9},
     )
 
     ax.set_xlim(0, 12)
@@ -921,7 +939,7 @@ def create_module_f_diagram(
         "",
         xy=(trust_x, trust_y + 0.6),
         xytext=(trust_x, policy_y - 0.7),
-        arrowprops=dict(arrowstyle="->", color=config.node_edge_color, lw=2),
+        arrowprops={"arrowstyle": "->", "color": config.node_edge_color, "lw": 2},
     )
     ax.text(
         trust_x + 0.3,
@@ -959,7 +977,7 @@ def create_module_f_diagram(
         "",
         xy=(participation_x, participation_y + 0.7),
         xytext=(participation_x, trust_y - 0.6),
-        arrowprops=dict(arrowstyle="->", color=config.node_edge_color, lw=2),
+        arrowprops={"arrowstyle": "->", "color": config.node_edge_color, "lw": 2},
     )
 
     # Data quality
@@ -988,7 +1006,7 @@ def create_module_f_diagram(
         "",
         xy=(quality_x, quality_y + 0.6),
         xytext=(quality_x, participation_y - 0.7),
-        arrowprops=dict(arrowstyle="->", color=config.node_edge_color, lw=2),
+        arrowprops={"arrowstyle": "->", "color": config.node_edge_color, "lw": 2},
     )
 
     # Feedback loop (curved arrow)
@@ -996,12 +1014,12 @@ def create_module_f_diagram(
         "",
         xy=(policy_x - 1.5, policy_y),
         xytext=(quality_x - 0.6, quality_y),
-        arrowprops=dict(
-            arrowstyle="->",
-            color=config.success_color,
-            lw=2,
-            connectionstyle="arc3,rad=-0.5",
-        ),
+        arrowprops={
+            "arrowstyle": "->",
+            "color": config.success_color,
+            "lw": 2,
+            "connectionstyle": "arc3,rad=-0.5",
+        },
     )
 
     # Feedback label
@@ -1025,7 +1043,7 @@ def create_module_f_diagram(
             transform=ax.transAxes,
             fontsize=config.font_size,
             verticalalignment="top",
-            bbox=dict(boxstyle="round", facecolor="white", alpha=0.9),
+            bbox={"boxstyle": "round", "facecolor": "white", "alpha": 0.9},
             ha="right",
         )
 
@@ -1043,7 +1061,7 @@ def create_module_f_diagram(
         transform=ax.transAxes,
         fontsize=config.font_size - 1,
         verticalalignment="bottom",
-        bbox=dict(boxstyle="round", facecolor=config.success_color, alpha=0.2),
+        bbox={"boxstyle": "round", "facecolor": config.success_color, "alpha": 0.2},
     )
 
     ax.set_xlim(0, 12)
@@ -1160,7 +1178,7 @@ def create_enforcement_diagram(
         "",
         xy=(enforcement_x - 1.2, enforcement_y),
         xytext=(regulator_x + 0.7, enforcement_y),
-        arrowprops=dict(arrowstyle="->", color=config.node_edge_color, lw=2),
+        arrowprops={"arrowstyle": "->", "color": config.node_edge_color, "lw": 2},
     )
 
     # Insurer
@@ -1208,7 +1226,7 @@ def create_enforcement_diagram(
         "",
         xy=(insurer_x - 0.7, insurer_y),
         xytext=(enforcement_x + 1.2, enforcement_y),
-        arrowprops=dict(arrowstyle="->", color=config.node_edge_color, lw=2),
+        arrowprops={"arrowstyle": "->", "color": config.node_edge_color, "lw": 2},
     )
 
     # Compliance decision branches
@@ -1259,13 +1277,13 @@ def create_enforcement_diagram(
         "",
         xy=(insurer_x - 0.5, comply_y),
         xytext=(insurer_x, insurer_y - 0.7),
-        arrowprops=dict(arrowstyle="->", color=config.success_color, lw=2),
+        arrowprops={"arrowstyle": "->", "color": config.success_color, "lw": 2},
     )
     ax.annotate(
         "",
         xy=(insurer_x - 0.5, violate_y),
         xytext=(insurer_x, insurer_y + 0.7),
-        arrowprops=dict(arrowstyle="->", color=config.highlight_color, lw=2),
+        arrowprops={"arrowstyle": "->", "color": config.highlight_color, "lw": 2},
     )
 
     # Penalty arrow (from enforcement to violate)
@@ -1273,7 +1291,7 @@ def create_enforcement_diagram(
         "",
         xy=(violate_x - 1, violate_y),
         xytext=(enforcement_x + 1.2, violate_y),
-        arrowprops=dict(arrowstyle="->", color="red", lw=3, linestyle="--"),
+        arrowprops={"arrowstyle": "->", "color": "red", "lw": 3, "linestyle": "--"},
     )
     ax.text(
         8.5,
@@ -1298,7 +1316,7 @@ def create_enforcement_diagram(
             transform=ax.transAxes,
             fontsize=config.font_size - 2,
             verticalalignment="top",
-            bbox=dict(boxstyle="round", facecolor="white", alpha=0.8),
+            bbox={"boxstyle": "round", "facecolor": "white", "alpha": 0.8},
         )
 
     # Equilibrium note
@@ -1315,7 +1333,7 @@ def create_enforcement_diagram(
         transform=ax.transAxes,
         fontsize=config.font_size - 1,
         verticalalignment="bottom",
-        bbox=dict(boxstyle="round", facecolor="white", alpha=0.9),
+        bbox={"boxstyle": "round", "facecolor": "white", "alpha": 0.9},
     )
 
     ax.set_xlim(0, 12)
@@ -1333,7 +1351,7 @@ def create_enforcement_diagram(
 def export_diagram(
     fig: Figure,
     save_path: Path,
-    formats: list[str] = ["png", "svg"],
+    formats: list[str] | None = None,
 ) -> list[Path]:
     """
     Export diagram to multiple formats.
@@ -1346,6 +1364,8 @@ def export_diagram(
     Returns:
         List of saved file paths
     """
+    if formats is None:
+        formats = ["png", "svg"]
     saved_paths = []
 
     for fmt in formats:
@@ -1386,8 +1406,6 @@ def generate_all_game_diagrams(
     results = {}
 
     for name, func in diagrams.items():
-        print(f"Generating {name} diagram...")
-
         diagram_params = params.get(name) if params else None
         save_path = output_dir / f"{name}_diagram"
 
@@ -1396,7 +1414,6 @@ def generate_all_game_diagrams(
         plt.close(fig)
 
         results[name] = paths
-        print(f"  Saved: {', '.join(map(str, paths))}")
 
     return results
 
@@ -1422,6 +1439,5 @@ if __name__ == "__main__":
     }
 
     saved_files = generate_all_game_diagrams(output_directory, example_params)
-    print(f"\nGenerated {len(saved_files)} diagrams:")
-    for name, paths in saved_files.items():
-        print(f"  {name}: {len(paths)} files")
+    for _name, _paths in saved_files.items():
+        pass

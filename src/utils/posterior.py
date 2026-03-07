@@ -1,9 +1,11 @@
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def load_draws_npy(path: Path) -> list[dict[str, Any]]:
@@ -27,4 +29,4 @@ def deterministic_subsample(draws: list[dict[str, Any]], n: int) -> list[dict[st
         return [draws[0]]
 
     indices = np.linspace(0, len(draws) - 1, num=n)
-    return [draws[int(round(index))] for index in indices]
+    return [draws[round(index)] for index in indices]

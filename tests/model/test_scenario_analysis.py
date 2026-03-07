@@ -218,7 +218,8 @@ class TestEvaluateScenario:
 
     def test_evaluate_scenario_rejects_unsupported_active_looking_fields(self):
         def mock_model(params, policy):  # pragma: no cover - should not be called
-            raise AssertionError("Scenario should fail before model evaluation")
+            msg = "Scenario should fail before model evaluation"
+            raise AssertionError(msg)
 
         scenario = {
             "jurisdiction": "AU",

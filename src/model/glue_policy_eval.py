@@ -12,23 +12,28 @@ Design goals:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 try:
     import jax
     import jax.numpy as jnp
 except Exception as e:
-    raise ImportError(
+    msg = (
         "JAX (and jaxlib) must be installed to run this module. "
-        "Install platform-appropriate jaxlib and rerun.",
+        "Install platform-appropriate jaxlib and rerun."
+    )
+    raise ImportError(
+        msg,
     ) from e
 
-from .module_a_behavior import BehaviorParams
 from .module_b_clinical import ClinicalParams, simulate_outcomes
-from .module_c_insurance_eq import InsuranceParams
 from .module_e_passthrough import PassThroughParams
 from .module_e_passthrough import run_module as run_passthrough
-from .module_f_data_quality import DataQualityParams
+
+if TYPE_CHECKING:
+    from .module_a_behavior import BehaviorParams
+    from .module_c_insurance_eq import InsuranceParams
+    from .module_f_data_quality import DataQualityParams
 
 
 @dataclass(frozen=True)

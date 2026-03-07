@@ -149,7 +149,7 @@ def get_global_rng() -> RNGManager:
     return _global_rng
 
 
-def reset_global_rng(seed: int = 20260303):
+def reset_global_rng(seed: int = 20260303) -> None:
     """Reset global RNG with new seed."""
     global _global_rng
     _global_rng = RNGManager(base_key=jr.PRNGKey(seed))

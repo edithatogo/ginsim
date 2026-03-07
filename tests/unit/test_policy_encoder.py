@@ -53,7 +53,7 @@ class TestEncodeMoratorium:
     def test_custom_caps(self):
         """Test moratorium with custom caps."""
         policy = encode_moratorium(
-            cap_death=600000,
+            cap_death=600000.0,
             cap_tpd=300000,
             cap_trauma=300000,
         )
@@ -79,7 +79,7 @@ class TestEncodeStatutoryBan:
 
     def test_custom_penalty(self):
         """Test statutory ban with custom penalty."""
-        policy = encode_statutory_ban(penalty_max=500000)
+        policy = encode_statutory_ban(penalty_max=500000.0)
 
         assert policy.penalty_max == 500000
 

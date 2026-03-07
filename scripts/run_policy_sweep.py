@@ -27,7 +27,8 @@ def get_policies_path(jurisdiction: str) -> Path:
         "au": Path("configs/policies_australia.yaml"),
     }
     if jurisdiction not in mapping:
-        raise ValueError(f"Unknown jurisdiction: {jurisdiction}. Use australia or new_zealand.")
+        msg = f"Unknown jurisdiction: {jurisdiction}. Use australia or new_zealand."
+        raise ValueError(msg)
     return mapping[jurisdiction]
 
 

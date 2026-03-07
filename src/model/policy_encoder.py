@@ -82,9 +82,9 @@ def encode_status_quo() -> EncodedPolicy:
 
 
 def encode_moratorium(
-    cap_death: float | int = 500000,
-    cap_tpd: float | int = 200000,
-    cap_trauma: float | int = 200000,
+    cap_death: float = 500000,
+    cap_tpd: float = 200000,
+    cap_trauma: float = 200000,
     enforcement_strength: float = 0.5,
 ) -> EncodedPolicy:
     """
@@ -103,11 +103,13 @@ def encode_moratorium(
         name="moratorium",
         allow_genetic_tests=False,
         allow_family_history=True,
-        sum_insured_caps=_float_caps({
-            "death": cap_death,
-            "tpd": cap_tpd,
-            "trauma": cap_trauma,
-        }),
+        sum_insured_caps=_float_caps(
+            {
+                "death": cap_death,
+                "tpd": cap_tpd,
+                "trauma": cap_trauma,
+            }
+        ),
         enforcement_strength=enforcement_strength,
         penalty_max=0.0,  # Industry self-regulation
         information_index=0.3,  # Partial information (below caps)
@@ -116,7 +118,7 @@ def encode_moratorium(
 
 def encode_statutory_ban(
     enforcement_strength: float = 1.0,
-    penalty_max: float | int = 1000000,
+    penalty_max: float = 1000000,
 ) -> EncodedPolicy:
     """
     Encode statutory ban policy.

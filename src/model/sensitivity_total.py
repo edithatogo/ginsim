@@ -23,7 +23,6 @@ import jax.numpy as jnp
 from jax import jit, vmap
 from jaxtyping import Array, Float, Int
 
-
 ModelFunc = Callable[[Float[Array, "..."]], Any]
 CostEffectModelFunc = Callable[[Float[Array, "..."], Float[Array, "..."]], tuple[Any, Any]]
 
@@ -76,10 +75,10 @@ class CEACResult:
 @partial(jit, static_argnums=(0,))
 def _evaluate_model_jax(
     model_func: ModelFunc,
-    params_batch: Float[Array, "..."],
-    param_indices: Int[Array, "..."],
-    param_values: Float[Array, "..."],
-) -> Float[Array, "..."]:
+    params_batch: Float[Array, "*"],
+    param_indices: Int[Array, "*"],
+    param_values: Float[Array, "*"],
+) -> Float[Array, "*"]:
     """
     Evaluate model with JAX for sensitivity analysis.
 
@@ -103,15 +102,15 @@ def _evaluate_model_jax(
 
 def _batched_python_eval(
     model_func: ModelFunc,
-    params_batch: list[Float[Array, "..."]] | Float[Array, "..."],
-) -> Float[Array, "..."]:
+    params_batch: list[Float[Array, "*"]] | Float[Array, "*"],
+) -> Float[Array, "*"]:
     """Fallback batch evaluation for non-JAX-traceable model functions."""
     return jnp.asarray([float(model_func(params)) for params in params_batch], dtype=jnp.float32)
 
 
 def tornado_sensitivity(
     model_func: ModelFunc,
-    base_params: Float[Array, "..."],
+    base_params: Float[Array, "*"],
     param_names: list[str],
     param_indices: list[int],
     range_pct: float = 0.25,
@@ -136,7 +135,7 @@ def tornado_sensitivity(
     # Get base outcome
     _ = float(model_func(base_params))
 
-    for name, idx in zip(param_names, param_indices):
+    for name, idx in zip(param_names, param_indices, strict=False):
         base_value = float(base_params[idx])
         low = base_value * (1 - range_pct)
         high = base_value * (1 + range_pct)
@@ -184,7 +183,7 @@ def tornado_sensitivity(
 
 def twoway_sensitivity(
     model_func: ModelFunc,
-    base_params: Float[Array, "..."],
+    base_params: Float[Array, "*"],
     param1_idx: int,
     param2_idx: int,
     param1_range: tuple[float, float],
@@ -246,7 +245,7 @@ def twoway_sensitivity(
 
 def sobol_sensitivity(
     model_func: ModelFunc,
-    base_params: Float[Array, "..."],
+    base_params: Float[Array, "*"],
     param_names: list[str],
     param_indices: list[int],
     n_samples: int = 1000,
@@ -285,7 +284,7 @@ def sobol_sensitivity(
     # A_B^i is matrix A with column i replaced by column i from B
 
     # Evaluate model at A and B
-    def params_from_scaled(scaled: Float[Array, "..."]) -> Float[Array, "..."]:
+    def params_from_scaled(scaled: Float[Array, "*"]) -> Float[Array, "*"]:
         """Convert [0,1] scaled params to actual values (assuming ±25% range)."""
         result = base_params.copy()
         for i, idx in enumerate(param_indices):
@@ -349,10 +348,10 @@ def sobol_sensitivity(
 
 def ceac_analysis(
     model_func: CostEffectModelFunc,
-    base_params: Float[Array, "..."],
+    base_params: Float[Array, "*"],
     policies: list[str],
-    policy_params: list[Float[Array, "..."]],
-    thresholds: Float[Array, "..."],
+    policy_params: list[Float[Array, "*"]],
+    thresholds: Float[Array, "*"],
     n_draws: int = 1000,
     seed: int = 42,
 ) -> CEACResult:
@@ -389,9 +388,9 @@ def ceac_analysis(
     for policy_params_set in policy_params:
         # Create a closure that binds the current policy_params_set
         def make_eval_single(
-            pps: Float[Array, "..."],
-        ) -> Callable[[Float[Array, "..."]], tuple[Any, Any]]:
-            def eval_single(params: Float[Array, "..."]) -> tuple[Any, Any]:
+            pps: Float[Array, "*"],
+        ) -> Callable[[Float[Array, "*"]], tuple[Any, Any]]:
+            def eval_single(params: Float[Array, "*"]) -> tuple[Any, Any]:
                 cost, effect = model_func(params, pps)
                 return cost, effect
 
@@ -485,7 +484,7 @@ def save_sensitivity_results(
 # Convenience function for complete sensitivity analysis
 def run_comprehensive_sensitivity(
     model_func: ModelFunc,
-    base_params: Float[Array, "..."],
+    base_params: Float[Array, "*"],
     param_names: list[str],
     param_indices: list[int],
     output_dir: Path | None = None,
@@ -507,14 +506,11 @@ def run_comprehensive_sensitivity(
     """
     results = {}
 
-    print("Running tornado sensitivity analysis...")
     tornado = tornado_sensitivity(model_func, base_params, param_names, param_indices)
     results["tornado"] = tornado
-    print("  Top 3 most sensitive parameters:")
-    for i, r in enumerate(tornado[:3]):
-        print(f"    {i + 1}. {r.parameter}: {r.sensitivity_magnitude:.4f}")
+    for _i, _r in enumerate(tornado[:3]):
+        pass
 
-    print("\nRunning Sobol global sensitivity analysis...")
     sobol = sobol_sensitivity(
         model_func,
         base_params,
@@ -523,9 +519,8 @@ def run_comprehensive_sensitivity(
         n_samples=n_sobol_samples,
     )
     results["sobol"] = sobol
-    print("  Top 3 by first-order index:")
-    for i, r in enumerate(sorted(sobol, key=lambda x: x.first_order, reverse=True)[:3]):
-        print(f"    {i + 1}. {r.parameter}: S={r.first_order:.3f}, S_T={r.total_order:.3f}")
+    for _i, _r in enumerate(sorted(sobol, key=lambda x: x.first_order, reverse=True)[:3]):
+        pass
 
     if output_dir:
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -534,6 +529,5 @@ def run_comprehensive_sensitivity(
             sobol_results=sobol,
             output_path=output_dir / "sensitivity_results.json",
         )
-        print(f"\nResults saved to {output_dir / 'sensitivity_results.json'}")
 
     return results

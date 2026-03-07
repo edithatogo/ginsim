@@ -121,7 +121,9 @@ def validate_outputs(results: dict[str, Any], scenario_name: str) -> list[str]:
         issues.append(f"Proxy substitution rate outside [0,1]: {proxy_rate}")
 
     if scenario_name == "C_100pct_enforcement" and compliance_rate < 0.95:
-        issues.append(f"Perfect enforcement scenario should have near-total compliance, got {compliance_rate:.3f}")
+        issues.append(
+            f"Perfect enforcement scenario should have near-total compliance, got {compliance_rate:.3f}"
+        )
     if scenario_name == "D_0pct_enforcement" and compliance_rate > 0.60:
         issues.append(
             "Zero enforcement scenario should materially reduce compliance under the implemented model, "
@@ -215,7 +217,9 @@ def generate_summary(all_results: dict[str, dict[str, Any]]) -> str:
         lines.append(f"- **Risk Rating Spread:** {results.get('premium_change', 0):+.3f}")
         lines.append(f"- **Welfare Impact:** {results.get('welfare_impact', 0):.1f}")
         lines.append(f"- **Compliance:** {results.get('enforcement_compliance', 0):.1%}")
-        lines.append(f"- **Research Participation:** {results.get('research_participation', 0):.1%}")
+        lines.append(
+            f"- **Research Participation:** {results.get('research_participation', 0):.1%}"
+        )
 
         if results.get("validation_issues"):
             lines.append("")

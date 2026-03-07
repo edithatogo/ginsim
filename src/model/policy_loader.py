@@ -40,7 +40,7 @@ def _normalize_caps(raw_caps: dict[str, Any] | None) -> dict[str, float] | None:
     return {str(key): float(value) for key, value in raw_caps.items()}
 
 
-def _normalize_enforcement(value: float | int | str | None) -> float:
+def _normalize_enforcement(value: float | str | None) -> float:
     if isinstance(value, (int, float)):
         return float(value)
     if value is None:

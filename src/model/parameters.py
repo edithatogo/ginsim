@@ -156,7 +156,8 @@ class ModelParameters(BaseModel):
     @classmethod
     def validate_jurisdiction(cls, v: str) -> str:
         if v not in ["australia", "new_zealand"]:
-            raise ValueError("jurisdiction must be 'australia' or 'new_zealand'")
+            msg = "jurisdiction must be 'australia' or 'new_zealand'"
+            raise ValueError(msg)
         return v
 
 
@@ -268,7 +269,8 @@ class PolicyConfig(BaseModel):
     @classmethod
     def validate_penalty_type(cls, v: str) -> str:
         if v not in ["civil", "criminal"]:
-            raise ValueError("penalty_type must be 'civil' or 'criminal'")
+            msg = "penalty_type must be 'civil' or 'criminal'"
+            raise ValueError(msg)
         return v
 
 
@@ -289,7 +291,8 @@ def load_parameters(config_path: str | Path) -> ModelParameters:
     config_path = Path(config_path)
 
     if not config_path.exists():
-        raise FileNotFoundError(f"Config file not found: {config_path}")
+        msg = f"Config file not found: {config_path}"
+        raise FileNotFoundError(msg)
 
     with open(config_path) as f:
         config = yaml.safe_load(f)

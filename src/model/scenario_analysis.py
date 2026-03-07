@@ -7,9 +7,10 @@ Compare policy outcomes across predefined scenarios and custom configurations.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 import yaml
 
@@ -88,7 +89,8 @@ def _build_policy_config(scenario_name: str, scenario_config: dict[str, Any]) ->
     policy_id = _infer_policy_id(scenario_name, scenario_config)
     if policy_id not in policies:
         available = ", ".join(sorted(policies))
-        raise ValueError(f"Unknown policy_id '{policy_id}'. Available policies: {available}")
+        msg = f"Unknown policy_id '{policy_id}'. Available policies: {available}"
+        raise ValueError(msg)
 
     policy = policies[policy_id]
     policy_updates = dict(scenario_config.get("policy_overrides", {}))
@@ -102,9 +104,8 @@ def _build_policy_config(scenario_name: str, scenario_config: dict[str, Any]) ->
 
     invalid_policy_fields = sorted(key for key in policy_updates if key not in valid_policy_fields)
     if invalid_policy_fields:
-        message = (
-            "Scenario contains unsupported policy override field(s): "
-            + ", ".join(invalid_policy_fields)
+        message = "Scenario contains unsupported policy override field(s): " + ", ".join(
+            invalid_policy_fields
         )
         raise ValueError(message)
 
@@ -123,7 +124,8 @@ def load_scenarios(config_path: Path | str) -> dict[str, Any]:
     """
     config_path = Path(config_path)
     if not config_path.exists():
-        raise FileNotFoundError(f"Scenario config not found: {config_path}")
+        msg = f"Scenario config not found: {config_path}"
+        raise FileNotFoundError(msg)
 
     with open(config_path, encoding="utf-8") as f:
         config = yaml.safe_load(f)
@@ -286,20 +288,12 @@ def run_scenario_analysis(
         model_func = default_model_func
 
     # Load scenarios
-    print(f"Loading scenarios from {config_path}...")
     scenarios = load_scenarios(config_path)
-    print(f"  Loaded {len(scenarios)} scenarios")
 
     # Run comparison
-    print("\nRunning scenario comparison...")
     comparison = compare_scenarios(scenarios, model_func)
 
     # Print results
-    print("\n" + "=" * 80)
-    print("SCENARIO COMPARISON RESULTS")
-    print("=" * 80)
-    print(f"\nBaseline: {comparison.baseline_scenario}\n")
-    print(format_comparison_table(comparison))
 
     # Save results
     if output_dir:
@@ -319,7 +313,5 @@ def run_scenario_analysis(
                 f.write(f"- **Welfare Impact:** ${result.welfare_impact:,.0f}\n")
                 f.write(f"- **QALYs Gained:** {result.qalys_gained:.2f}\n")
                 f.write(f"- **Compliance Rate:** {result.compliance_rate:.1%}\n")
-
-        print(f"\nResults saved to {output_path}")
 
     return comparison

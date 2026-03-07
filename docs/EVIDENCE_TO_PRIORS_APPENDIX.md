@@ -302,3 +302,9 @@ All evidence-to-prior mappings documented in:
 **Date:** 2026-03-03  
 **Track:** gdpe_0002_evidence_anchoring  
 **Phase:** 5 — Research outputs and dissemination
+## v2.0 Diamond Standard Hardening (08 March 2026)
+
+The v2.0 update institutionalizes "Diamond Standard" traceability and validation:
+1. **Harmonized References:** 100% of calibration parameters are now programmatically linked to `context/references.bib`.
+2. **Cryptographic Provenance:** Every prior-to-outcome mapping is hashed against the git commit (`PROVENANCE_HASH`) to ensure full chain-of-custody.
+3. **Automated Validation:** The `scripts/validate_references.py` utility now enforces that no assumption or parameter can exist without a verified citation.

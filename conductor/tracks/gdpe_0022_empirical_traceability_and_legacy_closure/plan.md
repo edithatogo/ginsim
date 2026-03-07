@@ -1,7 +1,7 @@
 # Implementation Plan: Diamond-Standard Element-by-Element Hardening
 
-**Track ID:** gdpe_0022_empirical_traceability_and_legacy_closure  
-**Execution mode:** Fully Autonomous depth cycle (Unattended Pattern with Observability)  
+**Track ID:** gdpe_0022_empirical_traceability_and_legacy_closure
+**Execution mode:** Fully Autonomous depth cycle (Unattended Pattern with Observability)
 **Estimated duration:** 10-15 days
 
 ---
@@ -18,7 +18,7 @@
 ## Phase 1 - Element 0: Infrastructure, CI/CD, and Repo Management
 - [ ] **Research:** Audit dependency fragmentation and CI/CD security gaps.
 - [ ] **Selection (Red Teamed):** Select `uv`, `commitlint`, and `pip-audit`.
-- [ ] **Implementation:** 
+- [ ] **Implementation:**
       - Unify dependencies into `pyproject.toml`; generate `uv.lock`.
       - Rewrite `.github/workflows/ci.yaml` and activate `detect-secrets`.
       - Verify `.devcontainer` consistency.

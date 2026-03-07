@@ -9,23 +9,21 @@ as the deployment entrypoint without maintaining a second divergent app.
 
 from __future__ import annotations
 
-import runpy
 import sys
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
-SOURCE_APP = REPO_ROOT / "streamlit_app" / "app.py"
+CURRENT_DIR = Path(__file__).resolve().parent
+if str(CURRENT_DIR) not in sys.path:
+    sys.path.insert(0, str(CURRENT_DIR))
+
+from _runner import run_source_path
+
+SOURCE_APP = CURRENT_DIR.parent / "streamlit_app" / "app.py"
 
 
 def main() -> None:
     """Execute the canonical dashboard app as the public deployment entrypoint."""
-    if not SOURCE_APP.exists():
-        message = f"Source dashboard not found at {SOURCE_APP}"
-        raise FileNotFoundError(message)
-
-    if str(REPO_ROOT) not in sys.path:
-        sys.path.insert(0, str(REPO_ROOT))
-    runpy.run_path(str(SOURCE_APP), run_name="__main__")
+    run_source_path(SOURCE_APP)
 
 
 if __name__ == "__main__":

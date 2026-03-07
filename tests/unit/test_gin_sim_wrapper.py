@@ -6,6 +6,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
 WRAPPER_PATH = ROOT / "gin-sim" / "app.py"
+PAGES_DIR = ROOT / "gin-sim" / "pages"
 
 
 def _load_wrapper_module():
@@ -25,12 +26,11 @@ def test_wrapper_runs_source_app(monkeypatch, tmp_path):
 
     called = {}
 
-    def fake_run_path(path, run_name):
+    def fake_run_source_path(path):
         called["path"] = path
-        called["run_name"] = run_name
 
     monkeypatch.setattr(module, "SOURCE_APP", source_app)
-    monkeypatch.setattr(module.runpy, "run_path", fake_run_path)
+    monkeypatch.setattr(module, "run_source_path", fake_run_source_path)
 
     original_sys_path = list(sys.path)
     try:
@@ -38,7 +38,7 @@ def test_wrapper_runs_source_app(monkeypatch, tmp_path):
     finally:
         sys.path[:] = original_sys_path
 
-    assert called == {"path": str(source_app), "run_name": "__main__"}
+    assert called == {"path": source_app}
 
 
 def test_wrapper_requires_source_app(monkeypatch, tmp_path):
@@ -48,3 +48,21 @@ def test_wrapper_requires_source_app(monkeypatch, tmp_path):
 
     with pytest.raises(FileNotFoundError, match="Source dashboard not found"):
         module.main()
+
+
+@pytest.mark.parametrize(
+    ("wrapper_name", "expected_target"),
+    [
+        ("1_Game_Diagrams.py", "streamlit_app/pages/1_Game_Diagrams.py"),
+        ("2_Sensitivity.py", "streamlit_app/pages/2_Sensitivity.py"),
+        ("3_Scenarios.py", "streamlit_app/pages/3_Scenarios.py"),
+        ("4_Extended_Games.py", "streamlit_app/pages/4_Extended_Games.py"),
+        ("5_Delta_View.py", "streamlit_app/pages/5_Delta_View.py"),
+    ],
+)
+def test_page_wrappers_exist_and_reference_source(wrapper_name, expected_target):
+    wrapper_path = PAGES_DIR / wrapper_name
+    assert wrapper_path.exists()
+    content = wrapper_path.read_text(encoding="utf-8")
+    assert "SOURCE_PAGE" in content
+    assert expected_target.split("/")[-1] in content

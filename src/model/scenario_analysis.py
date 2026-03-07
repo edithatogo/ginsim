@@ -95,7 +95,7 @@ def _build_policy_config(scenario_name: str, scenario_config: dict[str, Any]) ->
 
     # Backward compatibility: allow policy fields in parameters, but only if valid.
     parameter_values = scenario_config.get("parameters", {})
-    valid_policy_fields = set(policy.model_fields)
+    valid_policy_fields = set(type(policy).model_fields)
     for key, value in parameter_values.items():
         if key in valid_policy_fields and key not in policy_updates:
             policy_updates[key] = value

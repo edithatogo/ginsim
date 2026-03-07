@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
+from numpy.typing import NDArray
 
 
 @dataclass
@@ -33,7 +34,7 @@ class VOIResult:
 
 
 def compute_evpi(
-    net_benefits: np.ndarray,
+    net_benefits: NDArray[np.float64],
     optimal_net_benefit: float,
 ) -> float:
     """
@@ -60,8 +61,8 @@ def compute_evpi(
 
 
 def compute_evppi(
-    net_benefits: np.ndarray,
-    parameter_samples: dict[str, np.ndarray],
+    net_benefits: NDArray[np.float64],
+    parameter_samples: dict[str, NDArray[np.float64]],
     optimal_net_benefit: float,
     n_inner_draws: int = 50,
 ) -> dict[str, float]:
@@ -89,8 +90,8 @@ def compute_evppi(
         # In practice, would use Gaussian process or other surrogate
 
         # For now, use simplified formula
-        group_variance = np.var(samples)
-        total_variance = np.var(net_benefits)
+        group_variance = float(np.var(samples))
+        total_variance = float(np.var(net_benefits))
 
         # Proportion of variance explained by this group
         if total_variance > 0:
@@ -124,9 +125,9 @@ def identify_research_priority(
 
 
 def run_voi_analysis(
-    net_benefits: np.ndarray,
+    net_benefits: NDArray[np.float64],
     policy_names: list[str],
-    parameter_samples: dict[str, np.ndarray],
+    parameter_samples: dict[str, NDArray[np.float64]],
 ) -> VOIResult:
     """
     Run complete VOI analysis.

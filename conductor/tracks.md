@@ -6,7 +6,7 @@ This registry is the index of Conductor tracks for this repository.
 
 | Track ID | Title | Status | Link |
 |---|---|---|---|
-| _None_ | | | |
+| gdpe_0022_empirical_traceability_and_legacy_closure | Empirical traceability and legacy analysis closure | Active | [track](./tracks/gdpe_0022_empirical_traceability_and_legacy_closure/index.md) |
 
 ## Planned Tracks
 

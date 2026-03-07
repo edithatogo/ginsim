@@ -1,4 +1,4 @@
-# Context Engineering (SOTA) for This Project
+# Context Engineering for This Project
 
 **Version:** v1.1  
 **Date:** 02 March 2026
@@ -6,6 +6,8 @@
 This repo treats modelling as a *decision system* rather than a single model. To reduce ambiguity and improve reproducibility,
 we store “context” as first-class artefacts: assumptions, definitions, comparator rulesets, priors, decision criteria, and logs
 of modelling decisions.
+
+This document describes the current context-management approach. It should not be read as a standalone publication-readiness or "SOTA" claim.
 
 ## What’s included
 1. **Jurisdiction profiles** (`context/jurisdiction_profiles/`): structured definitions of what counts as genetic information,

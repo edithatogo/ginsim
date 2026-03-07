@@ -14,6 +14,11 @@ from jax import jit
 from jaxtyping import Array, Float
 
 
+def _to_float_scalar(value: Array | float | int) -> Float[Array, ""]:
+    """Normalize scalar-like inputs to float JAX arrays."""
+    return jnp.asarray(value, dtype=jnp.float32)
+
+
 @dataclass
 class DCBAResult:
     """
@@ -29,23 +34,26 @@ class DCBAResult:
         time_horizon: Time horizon in years
     """
 
-    net_welfare: Float[Array, ""]
-    consumer_surplus: Float[Array, ""]
-    producer_surplus: Float[Array, ""]
-    health_benefits: Float[Array, ""]
-    fiscal_impact: Float[Array, ""]
-    distributional_weight: Float[Array, ""]
-    time_horizon: int
+    net_welfare: Array
+    consumer_surplus: Array
+    producer_surplus: Array
+    health_benefits: Array
+    fiscal_impact: Array
+    distributional_weight: Array
+    time_horizon: int = 20
 
 
 @jit
 def compute_consumer_surplus(
-    testing_uptake: Float[Array, ""],
-    insurance_premium: Float[Array, ""],
-    baseline_premium: Float[Array, ""],
+    testing_uptake: Array | float | int,
+    insurance_premium: Array | float | int,
+    baseline_premium: Array | float | int,
     value_of_testing: float = 100.0,
 ) -> Float[Array, ""]:
     """Compute consumer surplus change."""
+    testing_uptake = _to_float_scalar(testing_uptake)
+    insurance_premium = _to_float_scalar(insurance_premium)
+    baseline_premium = _to_float_scalar(baseline_premium)
     premium_change = insurance_premium - baseline_premium
     surplus = testing_uptake * value_of_testing - premium_change
     return surplus
@@ -53,17 +61,19 @@ def compute_consumer_surplus(
 
 @jit
 def compute_producer_surplus(
-    insurer_profits: Float[Array, ""],
-    baseline_profits: Float[Array, ""],
+    insurer_profits: Array | float | int,
+    baseline_profits: Array | float | int,
 ) -> Float[Array, ""]:
     """Compute producer surplus change."""
+    insurer_profits = _to_float_scalar(insurer_profits)
+    baseline_profits = _to_float_scalar(baseline_profits)
     return insurer_profits - baseline_profits
 
 
 @jit
 def compute_health_benefits(
-    testing_uptake: Float[Array, ""],
-    baseline_uptake: Float[Array, ""],
+    testing_uptake: Array | float | int,
+    baseline_uptake: Array | float | int,
     qaly_per_test: float = 0.01,
     value_per_qaly: float = 50000.0,
     time_horizon: int = 20,
@@ -75,6 +85,8 @@ def compute_health_benefits(
     In the short term (e.g. Year 3), health benefits are lower as
     screening/prevention takes time to manifest as QALY gains.
     """
+    testing_uptake = _to_float_scalar(testing_uptake)
+    baseline_uptake = _to_float_scalar(baseline_uptake)
     uptake_change = testing_uptake - baseline_uptake
 
     # Time-dependent manifestation factor (Scientific Power logic)
@@ -93,8 +105,8 @@ def compute_health_benefits(
 
 @jit
 def compute_fiscal_impact(
-    testing_uptake: Float[Array, ""],
-    baseline_uptake: Float[Array, ""],
+    testing_uptake: Array | float | int,
+    baseline_uptake: Array | float | int,
     cost_per_test: float = 500.0,
     health_savings_per_test: float = 200.0,
     setup_cost: float = 1e6,
@@ -106,6 +118,8 @@ def compute_fiscal_impact(
     Short-term (Year 3) is dominated by setup costs.
     Long-term (Year 20) is dominated by cumulative savings.
     """
+    testing_uptake = _to_float_scalar(testing_uptake)
+    baseline_uptake = _to_float_scalar(baseline_uptake)
     uptake_change = testing_uptake - baseline_uptake
 
     # Recurring costs/savings
@@ -115,7 +129,7 @@ def compute_fiscal_impact(
     total_recurring = (annual_health_savings - annual_testing_cost) * time_horizon
 
     # Front-loaded setup costs (only in year 1-3)
-    effective_setup = setup_cost if time_horizon >= 1 else 0.0
+    effective_setup = jnp.where(time_horizon >= 1, setup_cost, 0.0)
 
     fiscal_impact = total_recurring - effective_setup
 
@@ -123,16 +137,23 @@ def compute_fiscal_impact(
 
 
 def compute_dcba(
-    testing_uptake: Float[Array, ""],
-    baseline_uptake: Float[Array, ""],
-    insurance_premium: Float[Array, ""],
-    baseline_premium: Float[Array, ""],
-    insurer_profits: Float[Array, ""],
-    baseline_profits: Float[Array, ""],
+    testing_uptake: Array | float | int,
+    baseline_uptake: Array | float | int,
+    insurance_premium: Array | float | int,
+    baseline_premium: Array | float | int,
+    insurer_profits: Array | float | int,
+    baseline_profits: Array | float | int,
     distributional_weight: float = 1.0,
     time_horizon: int = 20,
 ) -> DCBAResult:
     """Compute full DCBA ledger for a specific time horizon."""
+    testing_uptake = _to_float_scalar(testing_uptake)
+    baseline_uptake = _to_float_scalar(baseline_uptake)
+    insurance_premium = _to_float_scalar(insurance_premium)
+    baseline_premium = _to_float_scalar(baseline_premium)
+    insurer_profits = _to_float_scalar(insurer_profits)
+    baseline_profits = _to_float_scalar(baseline_profits)
+
     consumer_surplus = compute_consumer_surplus(testing_uptake, insurance_premium, baseline_premium)
     producer_surplus = compute_producer_surplus(insurer_profits, baseline_profits)
     health_benefits = compute_health_benefits(
@@ -153,7 +174,7 @@ def compute_dcba(
         producer_surplus=producer_surplus,
         health_benefits=health_benefits,
         fiscal_impact=fiscal_impact,
-        distributional_weight=jnp.array(distributional_weight),
+        distributional_weight=_to_float_scalar(distributional_weight),
         time_horizon=time_horizon,
     )
 

@@ -19,8 +19,8 @@ This document summarizes the implementation of gaps and recommendations identifi
 **Implementation:**
 - Created `scripts/generate_tables.py`
 - Created `scripts/generate_figures.py`
-- Generated 5 publication-ready tables
-- Generated 6 publication-ready figures (300dpi PNG)
+- Generated 5 initial reporting tables
+- Generated 6 initial reporting figures (300dpi PNG)
 
 **Files Created:**
 - `scripts/generate_tables.py` (210 lines)
@@ -141,7 +141,7 @@ This document summarizes the implementation of gaps and recommendations identifi
 ### After Gap Implementation
 
 - **Documentation:** ✅ Fully implemented with working scripts
-- **Outputs:** ✅ 10 publication-ready outputs generated
+- **Outputs:** ✅ 10 initial outputs generated
 - **Bibliography:** ✅ 19 entries (76% of target)
 - **Validation:** ✅ Complete report with results
 - **Test coverage:** ⏳ ~40% (deferred)
@@ -172,15 +172,15 @@ This document summarizes the implementation of gaps and recommendations identifi
 
 ## Conclusion
 
-**All critical gaps have been implemented.** The repository is now publication-ready with:
+**All critical gaps identified in that historical track were implemented.** That milestone should not be interpreted as meaning the current repository is publication-ready:
 
 - ✅ Working output generation pipeline
-- ✅ Publication-ready tables and figures
+- ✅ Initial tables and figures
 - ✅ Comprehensive validation report
 - ✅ Expanded bibliography
 - ✅ Complete documentation
 
-**The gdpe_0004_quality_assurance track objectives have been fully achieved.**
+**The gdpe_0004_quality_assurance track objectives were achieved for that milestone, but later follow-up review tracks reopened publication-facing hardening work.**
 
 ---
 

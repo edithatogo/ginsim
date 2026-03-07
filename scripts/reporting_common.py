@@ -61,6 +61,19 @@ def maybe_load_manifest(run_dir: Path) -> dict[str, Any]:
     return {}
 
 
+def describe_run_source(run_dir: Path) -> dict[str, Any]:
+    """Build a path-safe public description of a source run."""
+    manifest = maybe_load_manifest(run_dir)
+    return {
+        "run_id": run_dir.name,
+        "created_utc": manifest.get("created_utc"),
+        "repo_tree_hash": manifest.get("repo_tree_hash"),
+        "policies_file": manifest.get("policies_file"),
+        "policies_file_sha256": manifest.get("policies_file_sha256"),
+        "base_config_file_sha256": manifest.get("base_config_file_sha256"),
+    }
+
+
 def infer_jurisdiction(run_dir: Path) -> str:
     """Infer jurisdiction from the manifest or directory name."""
     manifest = maybe_load_manifest(run_dir)
@@ -415,10 +428,11 @@ def write_reporting_tables(output_dir: Path, bundle: dict[str, Any]) -> dict[str
                 )
 
     reporting_manifest = {
-        "source_run_dirs": {
-            jurisdiction: str(path) for jurisdiction, path in bundle["run_dirs"].items()
+        "source_runs": {
+            jurisdiction: describe_run_source(path)
+            for jurisdiction, path in bundle["run_dirs"].items()
         },
-        "generated_files": {name: str(path) for name, path in generated.items()},
+        "generated_files": {name: path.name for name, path in generated.items()},
     }
     manifest_path = output_dir / "reporting_manifest.json"
     manifest_path.write_text(

@@ -42,6 +42,14 @@ class TestDashboardLoads:
         # 3 sliders (Baseline, Deterrence, Moratorium)
         assert len(app_test.slider) >= 3
 
+    def test_plain_language_guide_present(self, app_test):
+        """Test landing page includes first-pass guidance."""
+        app_test.run()
+        assert any(
+            "Plain-language guide and glossary" in getattr(node, "label", "")
+            for node in app_test.expander
+        )
+
 
 class TestSidebarControls:
     """Test all sidebar controls."""
@@ -86,3 +94,4 @@ class TestFunctionality:
         assert "Testing Uptake" in app_test.metric[0].label
         # Value should be a percentage
         assert "%" in app_test.metric[0].value
+        assert "Long-run Net Welfare" in app_test.metric[1].label

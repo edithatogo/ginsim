@@ -41,12 +41,23 @@ st.markdown("""
 
 Compare multiple policies against a baseline and see:
 - Testing uptake deltas
-- Welfare impact deltas
+- Long-run net welfare deltas
 - QALY differences
 - Compliance rate changes
-- **Net Welfare Gain** (NPV adjusted)
+- **Net Welfare Gain** (NPV adjusted, implementation/admin costs deducted)
 - Cost-Benefit ratios
 """)
+st.info(
+    """
+**What this page answers**
+- How far each selected scenario moves relative to the baseline on uptake, welfare, QALYs, and compliance.
+- Which policy looks strongest once simple implementation and administration costs are layered on.
+
+**Status**
+- This page compares pre-defined scenarios that now bind canonical policy regimes through the scenario engine.
+- The NPV cost settings are user-specified decision inputs, so treat them as policy-analysis assumptions rather than observed costs.
+"""
+)
 
 # Sidebar for configuration
 st.sidebar.header("⚙️ Comparison Settings")
@@ -91,6 +102,7 @@ selected_policies = st.sidebar.multiselect(
     default=available_policies[:3] if len(available_policies) > 3 else available_policies,
     help="Policies to compare against baseline",
 )
+st.sidebar.caption("Use benchmark scenarios for policy comparison; sandbox-like scenarios are better treated as exploratory.")
 
 # Cost parameters
 st.sidebar.subheader("Cost Parameters")
@@ -203,10 +215,13 @@ if "delta_analysis" in st.session_state:
 
     df = pd.DataFrame(data)
     st.dataframe(df, use_container_width=True, hide_index=True)
+    st.caption(
+        "Interpretation: positive deltas mean the comparison scenario outperforms the selected baseline on that metric. Welfare metrics are currency-denominated decision metrics; QALYs are reported separately."
+    )
 
     # Visualization: Welfare Delta Comparison
     st.divider()
-    st.subheader("💰 Welfare Impact Deltas")
+    st.subheader("💰 Long-run Net Welfare Deltas")
 
     fig = go.Figure()
 
@@ -225,9 +240,9 @@ if "delta_analysis" in st.session_state:
     )
 
     fig.update_layout(
-        title="Welfare Impact vs Baseline",
+        title="Long-run Net Welfare vs Baseline",
         xaxis_title="Policy",
-        yaxis_title="Welfare Delta ($)",
+        yaxis_title="Long-run Net Welfare Delta ($)",
         yaxis=dict(tickformat="$,.0f"),
         height=400,
         showlegend=False,
@@ -321,7 +336,7 @@ with st.expander("📖 About Net Welfare Gain Calculation"):
     The Net Welfare Gain is calculated as:
     
     ```
-    Net Welfare Gain = Welfare Delta - Implementation Cost - PV(Administrative Costs)
+    Net Welfare Gain = Long-run Welfare Delta - Implementation Cost - PV(Administrative Costs)
     
     Where:
     - PV(Administrative Costs) = Σ [Admin Cost / (1 + r)^t] for t = 1 to time horizon
@@ -331,7 +346,7 @@ with st.expander("📖 About Net Welfare Gain Calculation"):
     ### Cost-Benefit Ratio
     
     ```
-    C/B Ratio = |Welfare Delta| / Total Costs
+    C/B Ratio = |Long-run Welfare Delta| / Total Costs
     
     Interpretation:
     - C/B > 1: Benefits exceed costs

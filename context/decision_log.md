@@ -644,3 +644,49 @@ This log tracks key modelling, methodological, and infrastructure decisions with
 - **Alternatives rejected:**
   - Option A: Would leave the repository in a less informative state, with runtime failures mixed together with avoidable static typing debt.
 - **Review date:** When deciding whether to keep runtime repairs inside `gdpe_0016` or split them into a follow-up task.
+
+---
+
+## Decision: Add reviewer-facing navigation and submission-gap artifacts instead of relying on scattered notes
+- **Date:** 2026-03-07
+- **Track:** gdpe_0021_manuscript_harmonization_and_submission_pack
+- **Category:** Documentation/Reviewer Experience
+- **Context:** The active code and reporting path had improved materially, but reviewer-facing explanation of how claims map to code, outputs, assumptions, and references remained implicit across multiple files.
+- **Options considered:**
+  - Option A: Keep the explanation distributed across existing docs
+  - Option B: Add explicit reviewer-facing artifacts for navigation and remaining blockers
+- **Decision:** Option B — Create `docs/REVIEWER_NAVIGATION_MAP.md`, `docs/MANUSCRIPT_ASSET_INVENTORY.md`, and `docs/SUBMISSION_GAP_REGISTER.md`.
+- **Rationale:**
+  - External reviewers need a short path from claim to evidence without reconstructing project memory.
+  - Submission blockers are easier to govern when centralized in one register.
+  - This improves repository auditability without reopening the active model implementation path.
+- **Evidence:**
+  - `gdpe_0021` Phase 1 audit identified missing reviewer navigation and blocker centralization as medium-priority risks.
+  - Existing output and readiness information was spread across `docs/PUBLISH_PACK.md`, `docs/OUTPUT_MANAGEMENT.md`, `docs/CURRENT_STATUS.md`, and conductor notes.
+- **Impact:** Reviewer-facing repository coherence and manuscript-package governance.
+- **Alternatives rejected:**
+  - Option A: Too dependent on reader inference and too easy to drift out of sync.
+- **Review date:** At `gdpe_0021` Phase 1 closeout.
+
+---
+
+## Decision: Preserve milestone-era review and structure documents with explicit historical framing
+- **Date:** 2026-03-07
+- **Track:** gdpe_0021_manuscript_harmonization_and_submission_pack
+- **Category:** Documentation/Archival Control
+- **Context:** Several visible documents remained useful as historical traceability records but still read like current repository truth, especially expert review notes and repository-structure materials.
+- **Options considered:**
+  - Option A: Delete or hide the old materials
+  - Option B: Keep them, but add explicit historical framing and point readers to current authoritative surfaces
+- **Decision:** Option B — Retain the materials with strong historical notes.
+- **Rationale:**
+  - The milestone-era documents still contain useful validation and design context.
+  - Deletion would lose traceability, while leaving them untouched would create reviewer confusion.
+  - Explicit historical framing is the least destructive and most auditable approach.
+- **Evidence:**
+  - `docs/expert_reviews/*.md` and `docs/REPOSITORY_STRUCTURE.md` still exposed milestone-era "SOTA" or submodule language.
+  - `docs/CURRENT_STATUS.md` and `conductor/product.md` had already become the better current-state narrative surfaces after harmonization.
+- **Impact:** Lower risk of reviewers mistaking historical milestone materials for current implementation claims.
+- **Alternatives rejected:**
+  - Option A: Would reduce traceability and make it harder to explain historical design evolution.
+- **Review date:** During `gdpe_0021` harmonization closeout.

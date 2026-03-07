@@ -20,6 +20,11 @@ from jaxtyping import Array, Float
 from .parameters import ModelParameters, PolicyConfig
 
 
+def _to_float_scalar(value: Array | float | int) -> Float[Array, ""]:
+    """Normalize scalar-like inputs to float JAX arrays."""
+    return jnp.asarray(value, dtype=jnp.float32)
+
+
 @dataclass
 class InsuranceEquilibrium:
     """
@@ -59,19 +64,20 @@ class InsuranceParams:
 
 
 def compute_risk_premium(
-    risk_probability: Float[Array, ""],
+    risk_probability: Array | float | int,
     sum_insured: float = 1.0,
     loading: float = 0.0,
 ) -> Float[Array, ""]:
     """
     Compute actuarially fair premium with loading.
     """
+    risk_probability = _to_float_scalar(risk_probability)
     return risk_probability * sum_insured * (1.0 + loading)
 
 
 @jit
 def compute_demand(
-    premium: Float[Array, ""],
+    premium: Array | float | int,
     income: float = 1.0,
     risk_aversion: float = 2.0,
     price_elasticity: float = -0.22,
@@ -79,6 +85,7 @@ def compute_demand(
     """
     Compute insurance demand given premium.
     """
+    premium = _to_float_scalar(premium)
     p_ref = 0.1
     relative_price = premium / (p_ref + 1e-10)
     demand = jnp.power(relative_price, price_elasticity)
@@ -88,22 +95,26 @@ def compute_demand(
 
 @jit
 def compute_expected_profit(
-    premium: Float[Array, ""],
-    risk_probability: Float[Array, ""],
+    premium: Array | float | int,
+    risk_probability: Array | float | int,
     sum_insured: float = 1.0,
-    takeup: Float[Array, ""] = jnp.array(1.0),
+    takeup: Array | float | int = 1.0,
+    loading: float = 0.0,
 ) -> Float[Array, ""]:
     """
     Compute insurer expected profit per policy.
     """
-    expected_claim = risk_probability * sum_insured
+    premium = _to_float_scalar(premium)
+    risk_probability = _to_float_scalar(risk_probability)
+    takeup = _to_float_scalar(takeup)
+    expected_claim = risk_probability * sum_insured * (1.0 + loading)
     profit_per_policy = premium - expected_claim
     total_profit = profit_per_policy * takeup
     return total_profit
 
 
 def zero_profit_premium(
-    risk_probability: Float[Array, ""],
+    risk_probability: Array | float | int,
     sum_insured: float = 1.0,
     loading: float = 0.0,
 ) -> Float[Array, ""]:
@@ -139,8 +150,18 @@ def separating_equilibrium(
     takeup_low = compute_demand(premium_low)
 
     # Profits
-    profit_high = compute_expected_profit(premium_high, jnp.array(risk_high), takeup=takeup_high)
-    profit_low = compute_expected_profit(premium_low, jnp.array(risk_low), takeup=takeup_low)
+    profit_high = compute_expected_profit(
+        premium_high,
+        jnp.array(risk_high),
+        takeup=takeup_high,
+        loading=params.baseline_loading,
+    )
+    profit_low = compute_expected_profit(
+        premium_low,
+        jnp.array(risk_low),
+        takeup=takeup_low,
+        loading=params.baseline_loading,
+    )
     total_profit = profit_high * proportion_high + profit_low * (1 - proportion_high)
 
     # Takeup and uninsured rate
@@ -216,7 +237,10 @@ def pooling_equilibrium(
     takeup_high = compute_demand(premium, price_elasticity=params.demand_elasticity_high_risk)
     takeup_low = compute_demand(premium)
     profit = compute_expected_profit(
-        premium, jnp.array(pool_risk), takeup=(takeup_high + takeup_low) / 2
+        premium,
+        jnp.array(pool_risk),
+        takeup=(takeup_high + takeup_low) / 2,
+        loading=params.baseline_loading,
     )
 
     overall_takeup = takeup_high * proportion_high + takeup_low * (1 - proportion_high)

@@ -1,43 +1,39 @@
 ============================================================
 REFERENCE VALIDATION REPORT
 ============================================================
-Total entries: 21
-Valid: 21 (100.0%)
-Invalid: 0
-Warnings: 2
-Orphaned (in bib but not cited): 21
-Missing (cited but not in bib): 0
-Duplicate pairs: 0
+Canonical references: 33
+Files scanned: 327
+Raw keys found: 25
+Resolved canonical keys: 11
+Internal-only keys allowed: 1
+Unresolved keys: 0
+Unused canonical references: 22
+Broken alias targets: 0
 ============================================================
 
+## Internal-only allowed keys
+- `Authors' analysis based on policy documents`
 
-## Warnings
-
-### taylor_australia_genetic_discrimination_2021
-- ⚠️ No DOI, URL, ISBN, or ISSN provided
-
-### asme_vv40_2018
-- ⚠️ Author name may be incomplete: {ASME}
-
-## Orphaned Entries (in bibliography but not cited)
-- `tabor_family_history_proxy_2018`
-- `finkelstein_insurance_market_structure_2019`
-- `hersch_viscusi_insurance_discrimination_2019`
-- `armstrong_genetic_testing_insurance_2020`
-- `baio_bayesian_health_economics_2011`
-- `strong_evpi_methods_2015`
-- `mcguire_perceived_discrimination_testing_2019`
-- `fsc_moratorium_2019`
-- `claxton_voi_framework_2004`
-- `lowenstein_genetic_discrimination_insurance_2021`
-- `asme_vv40_2018`
-- `binmore_adverse_selection_genetics_2017`
-- `blevins_genomic_data_bias_2020`
-- `eddy_ispor_smdm_2012`
-- `ettema_genetic_testing_uptake_2021`
-- `guyatt_grade_2008`
-- `bombard_genetic_discrimination_policy_2018`
-- `pharoah_predictive_genetic_testing_2020`
-- `taylor_australia_genetic_discrimination_2021`
-- `briggs_bayesian_cea_2012`
-... and 1 more
+## Unused canonical references
+- `akerlof1970`
+- `arrow1963`
+- `binmore2017`
+- `bombard2018`
+- `claxton2004`
+- `eddy2012`
+- `eiopa2022`
+- `fca2022`
+- `finkelstein2021`
+- `guyatt2008`
+- `husereau2022`
+- `lowenstein2021b`
+- `naic2021`
+- `oci2021`
+- `pauly1974`
+- `prince2020`
+- `riley2001`
+- `rothschild1976`
+- `schwartz2019`
+- `spence1973`
+- `strong2015`
+- `wilson1977`

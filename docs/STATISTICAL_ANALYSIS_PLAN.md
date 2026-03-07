@@ -253,7 +253,7 @@ for param in key_parameters:
 
 ## 9. Approvals
 
-**Prepared by:** Dylan A. Mordaunt  
+**Prepared by:** Dylan A Mordaunt  
 **Date:** 2026-03-03
 
 **Reviewed by:** [Pending expert review]  

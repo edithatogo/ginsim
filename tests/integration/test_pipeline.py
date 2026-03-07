@@ -73,6 +73,27 @@ class TestEvaluateSinglePolicy:
 
         assert 0.0 <= result.compliance_rate <= 1.0
 
+    def test_evaluation_includes_real_ledger_and_proxy_metrics(self):
+        """Test that evaluation exposes derived welfare and proxy outputs."""
+        params = ModelParameters()
+        policy = PolicyConfig(
+            name="test_ban",
+            description="Test ban",
+            allow_genetic_test_results=False,
+            allow_family_history=False,
+            enforcement_strength=1.0,
+            penalty_max=1_000_000.0,
+        )
+
+        result = evaluate_single_policy(params, policy)
+
+        assert "proxy" in result.all_metrics
+        assert "accuracy_loss" in result.all_metrics["proxy"]
+        assert "residual_information_gap" in result.all_metrics["proxy"]
+        assert "welfare" in result.all_metrics
+        assert "long_term_net_welfare" in result.all_metrics["welfare"]
+        assert "research_value_gain" in result.all_metrics["welfare"]
+
 
 class TestEvaluatePolicySweep:
     """Tests for evaluate_policy_sweep."""

@@ -25,7 +25,7 @@ STYLE = {
     "colors": {
         "status_quo": "#0072B2",  # Blue
         "moratorium": "#009E73",  # Green
-        "statutory_ban": "#D55E00",  # Vermillion
+        "ban": "#D55E00",  # Vermillion
         "neutral": "#999999",  # Grey
         "background": "#F0F2F6",
     },
@@ -45,7 +45,7 @@ def get_policy_color(policy_name: str) -> str:
     if "moratorium" in name:
         return STYLE["colors"]["moratorium"]
     if "ban" in name:
-        return STYLE["colors"]["statutory_ban"]
+        return STYLE["colors"]["ban"]
     return STYLE["colors"]["neutral"]
 
 
@@ -71,6 +71,34 @@ Interactive exploration of policy impacts on genetic testing uptake, insurance m
 
 **Uses core JAX-accelerated model for all computations.**
 """)
+st.info(
+    """
+**Start here**
+- This page compares three policy options for insurer use of genetic information: status quo, moratorium, and ban.
+- Change the sliders in the sidebar, click **Run Model**, then read the **Results** tab first.
+- Use **Sensitivity Analysis** for parameter stress tests and **Scenario Analysis** for benchmark country/policy scenarios.
+"""
+)
+with st.expander("Plain-language guide and glossary"):
+    st.markdown(
+        """
+**What this page answers**
+- If protections are stronger, does genetic testing uptake go up?
+- How much do insurance pricing patterns and compliance change?
+- Does the long-run welfare balance improve once health, market, and research effects are combined?
+
+**How to read the main outputs**
+- **Testing uptake:** the share of eligible people expected to proceed with testing.
+- **Long-run net welfare:** a decision metric that combines consumer surplus, insurer surplus, health benefits, fiscal effects, and research-value effects.
+- **Average premium index:** a normalized insurance-pricing indicator from the market model. It is useful for comparing policies, but it is not a quoted dollar premium.
+- **Short-term vs long-term:** the model tracks both a near-term and longer-term welfare view; the headline metric on this page is the long-run view.
+
+**Suggested first pass**
+1. Run **Status Quo** and note testing uptake and long-run welfare.
+2. Switch to **Moratorium** and then **Ban** to compare direction and size of changes.
+3. Use the comparison tab to see all three policies side by side.
+"""
+    )
 
 # Sidebar for parameter adjustment
 st.sidebar.header("⚙️ Model Parameters")
@@ -89,7 +117,7 @@ STANDARD_POLICIES = get_standard_policies()
 policy_display_names = {
     "Status Quo": "status_quo",
     "Moratorium": "moratorium",
-    "Statutory Ban": "statutory_ban",
+    "Ban": "ban",
 }
 policy_label = st.sidebar.selectbox(
     "Policy Regime",
@@ -100,7 +128,9 @@ selected_policy_id = policy_display_names[policy_label]
 selected_policy = STANDARD_POLICIES[selected_policy_id]
 
 # Parameter sliders with model defaults
-params_default = ModelParameters()
+params_default = ModelParameters(
+    jurisdiction="new_zealand" if jurisdiction == "New Zealand" else "australia"
+)
 
 baseline_uptake = st.sidebar.slider(
     "Baseline Testing Uptake",
@@ -149,6 +179,7 @@ if st.sidebar.button("🔬 Run Model", type="primary"):
             baseline_testing_uptake=baseline_uptake,
             deterrence_elasticity=deterrence_elasticity,
             moratorium_effect=moratorium_effect,
+            jurisdiction="new_zealand" if jurisdiction == "New Zealand" else "australia",
         )
 
         result = evaluate_model_cached(params_obj, selected_policy_id)
@@ -158,6 +189,7 @@ if st.sidebar.button("🔬 Run Model", type="primary"):
             "baseline_testing_uptake": baseline_uptake,
             "deterrence_elasticity": deterrence_elasticity,
             "moratorium_effect": moratorium_effect,
+            "jurisdiction": "new_zealand" if jurisdiction == "New Zealand" else "australia",
         }
         st.success("Model evaluation complete!")
 
@@ -180,9 +212,9 @@ with tab1:
 
         with col2:
             st.metric(
-                label="Welfare Impact",
+                label="Long-run Net Welfare",
                 value=f"{float(res.welfare_impact):.2f}",
-                help="Net Welfare (Testing Benefits + Consumer Surplus - Compliance Costs)",
+                help="Long-run DCBA-style welfare metric including market, health, fiscal, and research-value components.",
             )
 
         with col3:
@@ -198,27 +230,32 @@ with tab1:
         col_a, col_b = st.columns(2)
         with col_a:
             st.subheader("Insurance Metrics")
-            st.write(f"**Average Premium:** {float(res.insurance_premiums['avg_premium']):.3f}")
+            st.write(
+                f"**Average Premium Index:** {float(res.insurance_premiums['avg_premium']):.3f}"
+            )
             st.write(f"**Uninsured Rate:** {float(res.insurance_premiums['uninsured_rate']):.1%}")
             st.write(
-                f"**Premium High Risk:** {float(res.insurance_premiums['premium_high_risk']):.3f}"
+                f"**High-risk Premium Index:** {float(res.insurance_premiums['premium_high_risk']):.3f}"
             )
             st.write(
-                f"**Premium Low Risk:** {float(res.insurance_premiums['premium_low_risk']):.3f}"
+                f"**Low-risk Premium Index:** {float(res.insurance_premiums['premium_low_risk']):.3f}"
             )
-            st.write(f"**Risk Rating:** {float(res.insurance_premiums['risk_rating']):.3f}")
+            st.write(f"**Risk Rating Gap:** {float(res.insurance_premiums['risk_rating']):.3f}")
 
         with col_b:
             st.subheader("Societal Metrics")
             st.write(f"**Research Participation:** {float(res.research_participation):.1%}")
             st.write(
-                f"**Testing Benefit (QALYs):** {float(res.all_metrics['welfare']['testing_benefit']):.2f}"
+                f"**Short-run Net Welfare:** {float(res.all_metrics['welfare']['short_term_net_welfare']):.2f}"
             )
             st.write(
-                f"**Consumer Surplus:** {float(res.all_metrics['welfare']['consumer_surplus']):.2f}"
+                f"**Health Benefit Component:** {float(res.all_metrics['welfare']['health_benefits']):.2f}"
             )
             st.write(
-                f"**Compliance Cost:** {float(res.all_metrics['welfare']['compliance_cost']):.2f}"
+                f"**Consumer Surplus Component:** {float(res.all_metrics['welfare']['consumer_surplus']):.2f}"
+            )
+            st.write(
+                f"**Research Value Component:** {float(res.all_metrics['welfare']['research_value_gain']):.2f}"
             )
     else:
         st.info("👈 Adjust parameters and click 'Run Model' to see results.")
@@ -230,8 +267,8 @@ with tab2:
         # 1. Multi-Policy Comparison Bar Chart
         st.subheader("Policy Comparison: Testing Uptake")
 
-        policy_ids = ["status_quo", "moratorium", "statutory_ban"]
-        policy_names = ["Status Quo", "Moratorium", "Statutory Ban"]
+        policy_ids = ["status_quo", "moratorium", "ban"]
+        policy_names = ["Status Quo", "Moratorium", "Ban"]
 
         uptakes = []
         current_params = ModelParameters(**st.session_state["params_dict"])
@@ -299,15 +336,15 @@ with tab3:
         # Table of all policies
         policy_data = []
         current_params = ModelParameters(**st.session_state["params_dict"])
-        for pid in ["status_quo", "moratorium", "statutory_ban"]:
+        for pid in ["status_quo", "moratorium", "ban"]:
             r = evaluate_model_cached(current_params, pid)
             policy_data.append(
                 {
                     "Policy": pid.replace("_", " ").title(),
                     "Testing Uptake": f"{float(r.testing_uptake):.1%}",
-                    "Avg Premium": f"{float(r.insurance_premiums['avg_premium']):.3f}",
+                    "Avg Premium Index": f"{float(r.insurance_premiums['avg_premium']):.3f}",
                     "Compliance": f"{float(r.compliance_rate):.1%}",
-                    "Net Welfare": f"{float(r.welfare_impact):.2f}",
+                    "Long-run Net Welfare": f"{float(r.welfare_impact):.2f}",
                 }
             )
 
@@ -332,17 +369,22 @@ with tab4:
     **Backend:** JAX / XLA (Optimized)
     
     ### Jurisdictional Context: {jurisdiction}
-    The model is calibrated using the **Australia Evidence Register** (`AU_behav_001`, `AU_ins_003`).
+    The model currently evaluates the **{jurisdiction}** parameter surface selected in the sidebar.
     
     ### Visual Legend
     - <font color='{STYLE["colors"]["status_quo"]}'>■</font> **Status Quo**: No genetic restrictions.
     - <font color='{STYLE["colors"]["moratorium"]}'>■</font> **Moratorium**: Voluntary industry agreement (e.g., FSC 2019).
-    - <font color='{STYLE["colors"]["statutory_ban"]}'>■</font> **Statutory Ban**: Legislated prohibition (e.g., Proposed 2025 Bill).
+    - <font color='{STYLE["colors"]["ban"]}'>■</font> **Ban**: Legislated prohibition on genetic information use.
     
     ### Reference Parameters
     - **Baseline Uptake (0.52):** Ettema et al. (2021)
     - **Deterrence Elasticity (0.18):** McGuire et al. (2019)
     - **Moratorium Effect (0.15):** Taylor et al. (2021)
+
+    ### Interpretation notes
+    - Insurance premium outputs on this page are normalized model indices for policy comparison, not quoted retail premiums.
+    - The headline welfare metric is the longer-run ledger view; the results tab also shows a short-run welfare metric and research-value component.
+    - Scenario sandbox and extended-games pages are exploratory. The benchmark policy comparisons on this page use the canonical `status_quo`, `moratorium`, and `ban` policy registry.
     """,
         unsafe_allow_html=True,
     )

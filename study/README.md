@@ -2,10 +2,11 @@
 
 # Genetic Discrimination Policy Study - Australia & New Zealand
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.TODO.svg)](https://doi.org/10.5281/zenodo.TODO)
 [![License: CC-BY-4.0](https://img.shields.io/badge/License-CC--BY--4.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 
 Study artefacts for the economic evaluation of genetic discrimination policies in Australia and New Zealand.
+
+DOI note: Zenodo deposition metadata is not finalized in this working tree. Do not cite a Zenodo DOI from this file until a real DOI has been assigned.
 
 ## Contents
 
@@ -23,24 +24,26 @@ Study artefacts for the economic evaluation of genetic discrimination policies i
 import yaml
 
 # Load Australia evidence
-with open('evidence/australia_evidence_register.yaml') as f:
+with open('context/jurisdiction_profiles/australia_evidence_register.yaml') as f:
     au_evidence = yaml.safe_load(f)
 
 # Load NZ evidence
-with open('evidence/new_zealand_evidence_register.yaml') as f:
+with open('context/jurisdiction_profiles/new_zealand_evidence_register.yaml') as f:
     nz_evidence = yaml.safe_load(f)
 ```
 
 ### Load Calibration
 
 ```python
-from src.model.config_serialization import load_config
+import yaml
 
 # Load Australia calibration
-au_config = load_config('calibration/calibration_australia.yaml')
+with open('configs/calibration_australia.yaml') as f:
+    au_config = yaml.safe_load(f)
 
 # Load NZ calibration
-nz_config = load_config('calibration/calibration_new_zealand.yaml')
+with open('configs/calibration_new_zealand.yaml') as f:
+    nz_config = yaml.safe_load(f)
 ```
 
 ## Documentation
@@ -56,22 +59,22 @@ CC-BY 4.0 - See [LICENSE](LICENSE) for details.
 
 ## Citation
 
-If you use these study results, please cite:
+If you use these study results, cite the repository metadata or manuscript record that is current at the time of use. A dataset DOI placeholder should not be cited.
 
-```
-Mordaunt, D. A. (2026). Economic Evaluation of Genetic Discrimination 
-Policies in Australia and New Zealand [Data set]. 
-Zenodo. https://doi.org/10.5281/zenodo.TODO
-```
+Working citation metadata is maintained in:
+- `CITATION.cff`
+- `.zenodo.json`
+- `study/references/references.json`
 
 ## Access
 
-This submodule contains study-specific artefacts. For the model code, see:
-
-https://github.com/yourusername/genetic-discrimination-policy-code
+The study artefacts and model code live in the same repository. The core implementation is in:
+- `src/model/`
+- `streamlit_app/`
+- `configs/`
 
 ## Contact
 
-Dylan A. Mordaunt  
-Victoria University of Wellington  
+Dylan A Mordaunt  
+Research Fellow, Faculty of Health, Education and Psychology, Victoria University of Wellington  
 dylan.mordaunt@vuw.ac.nz

@@ -276,11 +276,11 @@ def compute_evpi(net_benefits: np.ndarray, optimal_net_benefit: float) -> float:
 
 ## 11. Responsibilities
 
-**Data Management:** Dylan A. Mordaunt
+**Data Management:** Dylan A Mordaunt
 
-**Code Quality:** Dylan A. Mordaunt
+**Code Quality:** Dylan A Mordaunt
 
-**Documentation:** Dylan A. Mordaunt
+**Documentation:** Dylan A Mordaunt
 
 **Review:** [Pending expert review]
 

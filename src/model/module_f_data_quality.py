@@ -20,6 +20,11 @@ from jaxtyping import Array, Float
 from .parameters import ModelParameters, PolicyConfig
 
 
+def _to_float_scalar(value: Float[Array, ""] | float | int) -> Float[Array, ""]:
+    """Normalize scalar-like inputs to float JAX arrays."""
+    return jnp.asarray(value, dtype=jnp.float32)
+
+
 @dataclass
 class DataQualityMetrics:
     """
@@ -44,14 +49,17 @@ class DataQualityParams:
 
 @jit
 def compute_participation_probability(
-    privacy_protections: Float[Array, ""],
-    social_benefit: Float[Array, ""],
-    privacy_concern: Float[Array, "..."],
+    privacy_protections: Float[Array, ""] | float | int,
+    social_benefit: Float[Array, ""] | float | int,
+    privacy_concern: Float[Array, "..."] | float | int,
     elasticity: float = -0.10,
 ) -> Float[Array, "..."]:
     """
     Compute probability of research participation.
     """
+    privacy_protections = _to_float_scalar(privacy_protections)
+    social_benefit = _to_float_scalar(social_benefit)
+    privacy_concern = jnp.asarray(privacy_concern, dtype=jnp.float32)
     # Base participation rate
     base_rate = 0.5
 
@@ -115,37 +123,40 @@ def compute_participation_rate(
 
 @jit
 def compute_representativeness(
-    participation_rate: Float[Array, ""],
+    participation_rate: Float[Array, ""] | float | int,
     selection_bias_parameter: float = 0.5,
 ) -> Float[Array, ""]:
     """
     Compute sample representativeness as function of participation.
     """
+    participation_rate = _to_float_scalar(participation_rate)
     representativeness = participation_rate ** (1.0 - selection_bias_parameter)
     return representativeness
 
 
 @jit
 def compute_scientific_power(
-    representativeness: Float[Array, ""],
+    representativeness: Float[Array, ""] | float | int,
     threshold: float = 0.4,
     steepness: float = 10.0,
 ) -> Float[Array, ""]:
     """
     Compute scientific power as non-linear function of representativeness.
     """
+    representativeness = _to_float_scalar(representativeness)
     return 1.0 / (1.0 + jnp.exp(-steepness * (representativeness - threshold)))
 
 
 @jit
 def compute_predictive_performance(
-    representativeness: Float[Array, ""],
+    representativeness: Float[Array, ""] | float | int,
     baseline_performance: float = 0.8,
     max_performance: float = 0.95,
 ) -> Float[Array, ""]:
     """
     Compute predictive performance as function of data quality.
     """
+    representativeness = _to_float_scalar(representativeness)
     performance = (
         baseline_performance + (max_performance - baseline_performance) * representativeness
     )
@@ -154,12 +165,13 @@ def compute_predictive_performance(
 
 @jit
 def compute_selection_bias(
-    participation_rate: Float[Array, ""],
+    participation_rate: Float[Array, ""] | float | int,
     high_risk_participation_ratio: float = 0.8,
 ) -> Float[Array, ""]:
     """
     Compute selection bias metric.
     """
+    participation_rate = _to_float_scalar(participation_rate)
     bias = jnp.abs(1.0 - high_risk_participation_ratio)
     bias = bias * (1.0 - participation_rate)
     return bias
@@ -199,8 +211,11 @@ def compute_data_quality_externality(
 
 @jit
 def compute_research_value_loss(
-    representativeness_baseline: Float[Array, ""],
-    representativeness_reform: Float[Array, ""],
+    representativeness_baseline: Float[Array, ""] | float | int | None = None,
+    representativeness_reform: Float[Array, ""] | float | int | None = None,
+    *,
+    performance_baseline: Float[Array, ""] | float | int | None = None,
+    performance_reform: Float[Array, ""] | float | int | None = None,
     annual_research_value: float = 1e6,
     discount_rate: float = 0.03,
     time_horizon: int = 10,
@@ -208,11 +223,20 @@ def compute_research_value_loss(
     """
     Compute present value of research value loss using non-linear power.
     """
-    power_baseline = compute_scientific_power(representativeness_baseline)
-    power_reform = compute_scientific_power(representativeness_reform)
-
-    power_loss = power_baseline - power_reform
-    annual_loss = power_loss * annual_research_value
+    if performance_baseline is not None and performance_reform is not None:
+        baseline_metric = _to_float_scalar(performance_baseline)
+        reform_metric = _to_float_scalar(performance_reform)
+        metric_loss = jnp.maximum(baseline_metric - reform_metric, 0.0)
+        annual_loss = metric_loss * annual_research_value
+    else:
+        if representativeness_baseline is None or representativeness_reform is None:
+            raise ValueError(
+                "Either representativeness_* or performance_* inputs must be provided."
+            )
+        power_baseline = compute_scientific_power(representativeness_baseline)
+        power_reform = compute_scientific_power(representativeness_reform)
+        power_loss = jnp.maximum(power_baseline - power_reform, 0.0)
+        annual_loss = power_loss * annual_research_value
 
     if discount_rate > 0:
         pv_factor = (1 - (1 + discount_rate) ** (-time_horizon)) / discount_rate

@@ -47,6 +47,17 @@ st.markdown("""
 - **Policy Sandbox:** Design custom scenarios with adjustable parameters
 - **Delta View:** See comparative impacts relative to baseline
 """)
+st.info(
+    """
+**What this page answers**
+- How benchmark scenarios compare against a chosen baseline on uptake, welfare, and compliance.
+- Which scenario assumptions are tied to a real policy regime versus a sandbox policy design.
+
+**Status**
+- Pre-defined scenarios now bind a canonical policy (`status_quo`, `moratorium`, or `ban`) plus scenario-specific parameter overrides.
+- The Australian policy designer below is exploratory and should not be read as a calibrated benchmark regime.
+"""
+)
 
 # Sidebar for scenario selection
 st.sidebar.header("⚙️ Scenario Configuration")
@@ -81,6 +92,10 @@ selected_scenario_key = st.sidebar.selectbox(
 if selected_scenario_key in scenarios:
     scenario_config = scenarios[selected_scenario_key]
     st.sidebar.info(f"**Description:** {scenario_config.get('description', 'No description')}")
+    if scenario_config.get("policy_id"):
+        st.sidebar.caption(f"Canonical policy: `{scenario_config['policy_id']}`")
+    if scenario_config.get("note"):
+        st.sidebar.caption(f"Scenario note: {scenario_config['note']}")
 
 # Baseline selector
 st.sidebar.subheader("Comparison Settings")
@@ -137,6 +152,9 @@ if "scenario_comparison" in st.session_state:
 
     df = pd.DataFrame(data)
     st.dataframe(df, use_container_width=True, hide_index=True)
+    st.caption(
+        "Interpretation: benchmark scenarios differ through both model parameters and the canonical policy regime shown in the scenario config."
+    )
 
     # Visualization: Testing Uptake Comparison
     st.divider()
@@ -228,6 +246,9 @@ st.subheader("🇦🇺 Australian Policy Designer (Sandbox)")
 st.markdown("""
 **Design custom policy scenarios for Australia.** Adjust caps, enforcement, and penalties to see impacts.
 """)
+st.warning(
+    "Exploratory surface: this sandbox is useful for intuition and design-space exploration, but it is not the same as a validated benchmark policy scenario."
+)
 
 col1, col2 = st.columns(2)
 

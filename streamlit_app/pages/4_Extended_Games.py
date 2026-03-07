@@ -43,6 +43,12 @@ These games model complex behavioral dynamics:
 - **Genetic Altruism:** Family-influenced testing decisions
 - **Cascade Testing:** Sequential testing within families
 """)
+st.warning(
+    """
+Exploratory surface: these games are designed to show strategic mechanisms and edge cases.
+They are not currently equivalent to the benchmark policy-comparison surfaces used for core scenario results.
+"""
+)
 
 # Sidebar for game selection
 st.sidebar.header("⚙️ Game Configuration")

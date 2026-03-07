@@ -19,9 +19,9 @@ keywords:
   - New Zealand
 authors:
   - family-names: "Mordaunt"
-    given-names: "Dylan"
+    given-names: "Dylan A"
     orcid: "https://orcid.org/0000-0002-9775-0603"
-    affiliation: "Victoria University of Wellington"
+    affiliation: "Research Fellow, Faculty of Health, Education and Psychology, Victoria University of Wellington"
     country: "NZ"
 license: MIT
 repository: "https://github.com/edithatogo/ginsim"

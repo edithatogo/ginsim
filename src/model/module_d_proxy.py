@@ -191,21 +191,33 @@ def compute_proxy_substitution_effect(
     reform_policy: PolicyConfig,
 ) -> dict[str, float]:
     """Compute effect of proxy substitution."""
-    # Simple multiplicative effect from parameters for pipeline integration
     baseline_accuracy = 0.8
 
     if reform_policy.allow_genetic_test_results:
-        reform_accuracy = 0.8
+        reform_accuracy = baseline_accuracy
     else:
-        # Information leakage through proxies
-        reform_accuracy = params.proxy_substitution_rate * 0.8
+        proxy_capture = params.proxy_substitution_rate
+        family_history_capture = (
+            params.family_history_sensitivity * 0.35 if reform_policy.allow_family_history else 0.0
+        )
+        enforcement_drag = 1.0 - (0.35 * reform_policy.enforcement_strength)
+        criminal_drag = 0.85 if reform_policy.penalty_type == "criminal" else 1.0
+
+        residual_capture = jnp.clip(
+            (proxy_capture + family_history_capture) * enforcement_drag * criminal_drag,
+            0.0,
+            1.0,
+        )
+        reform_accuracy = float(baseline_accuracy * residual_capture)
 
     accuracy_loss = baseline_accuracy - reform_accuracy
+    residual_information_gap = max(0.0, 1.0 - (reform_accuracy / baseline_accuracy))
 
     return {
         "accuracy_baseline": baseline_accuracy,
         "accuracy_reform": reform_accuracy,
         "accuracy_loss": accuracy_loss,
+        "residual_information_gap": residual_information_gap,
     }
 
 

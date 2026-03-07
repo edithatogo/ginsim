@@ -16,9 +16,8 @@ policy rules → behavioural response → insurance equilibrium outcomes → hea
 - A transparent mapping from **policy levers** (ban/moratorium/caps/enforcement) to **outcomes** (testing uptake, premiums/take-up, QALYs, costs).
 - Explicit uncertainty quantification with clear “what matters most” diagnostics (EVPI/EVPPI; S1/ST).
 - A structured evidence register per jurisdiction that anchors priors/assumptions.
-- Outputs that are publication-ready (policy brief pack + reproducible run manifests).
-- **Automated remote monitoring ensures 24/7 availability of the policy simulation dashboard.**
-- **Professionalised repository with standardized Open Science metadata (CITATION.cff, CONTRIBUTING.md).**
+- Outputs that are reproducible, reviewer-auditable, and suitable for manuscript/package assembly (policy brief pack + run manifests + evidence/assumption traceability).
+- A repository structure that makes the implemented model, reviewer-facing documents, and submission surfaces easy to audit without relying on internal project memory.
 
 ## Non-goals (for now)
 - Employment discrimination modelling (unless explicitly added as a domain extension track)

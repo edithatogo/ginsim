@@ -6,6 +6,10 @@
 
 ---
 
+**Historical note:** This document describes a milestone-era submodule design that is no longer the authoritative current repository topology. It is retained for traceability only. For the active repository layout, use the top-level `README.md`, `study/README.md`, and current conductor status/track documents.
+
+---
+
 ## Overview
 
 This document describes the repository structure for separating code from study artefacts, enabling code synchronization without study-specific data.

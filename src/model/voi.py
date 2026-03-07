@@ -52,11 +52,19 @@ def evppi(net_benefit: jnp.ndarray, param_samples: jnp.ndarray, n_bins: int = 20
 
     def bin_value(i: jnp.ndarray) -> jnp.ndarray:
         lo, hi = edges[i], edges[i + 1]
-        m = (ps >= lo) & (ps <= hi) if i == n_bins - 1 else (ps >= lo) & (ps < hi)
-        # If empty, ignore
-        nb_m = nb[m]
-        w = jnp.mean(m.astype(jnp.float32))
-        val = jnp.where(nb_m.shape[0] > 0, jnp.max(jnp.mean(nb_m, axis=0)), 0.0)
+        last_bin = i == (n_bins - 1)
+        upper_ok = jnp.where(last_bin, ps <= hi, ps < hi)
+        m = (ps >= lo) & upper_ok
+        weights = m.astype(nb.dtype)
+        count = jnp.sum(weights)
+        weighted_nb = nb * weights[:, None]
+        mean_by_policy = jnp.where(
+            count > 0,
+            jnp.sum(weighted_nb, axis=0) / jnp.maximum(count, 1.0),
+            jnp.zeros(nb.shape[1], dtype=nb.dtype),
+        )
+        w = jnp.mean(weights)
+        val = jnp.where(count > 0, jnp.max(mean_by_policy), 0.0)
         return w * val
 
     term1 = jnp.sum(jax.vmap(bin_value)(jnp.arange(n_bins)))

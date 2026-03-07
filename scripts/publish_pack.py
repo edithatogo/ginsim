@@ -5,7 +5,11 @@ from pathlib import Path
 
 import pandas as pd
 
-from scripts.generate_figures import plot_evppi, plot_policy_bars
+from scripts.generate_figures import (
+    plot_evppi,
+    plot_policy_bars,
+    plot_uncertainty_decomposition,
+)
 from scripts.reporting_common import build_reporting_bundle, write_reporting_tables
 
 try:
@@ -23,6 +27,46 @@ except Exception:  # pragma: no cover - optional dependency surface
     letter = None
     inch = None
     canvas = None
+
+
+def _format_currency(value: float) -> str:
+    return f"${value:,.0f}"
+
+
+def _format_interval(lo: float, hi: float) -> str:
+    return f"{_format_currency(lo)} to {_format_currency(hi)}"
+
+
+def _describe_jurisdiction(summary: pd.DataFrame) -> tuple[str, str]:
+    ordered = summary.sort_values("nb_mean", ascending=False).reset_index(drop=True)
+    leader = ordered.iloc[0]
+    lead_sentence = (
+        f"{leader['policy'].replace('_', ' ').title()} leads on mean net benefit at "
+        f"{_format_currency(float(leader['nb_mean']))} "
+        f"(90% interval {_format_interval(float(leader['nb_p05']), float(leader['nb_p95']))})."
+    )
+
+    if len(ordered) > 1:
+        runner_up = ordered.iloc[1]
+        gap = float(leader["nb_mean"]) - float(runner_up["nb_mean"])
+        gap_sentence = (
+            f"The margin over {runner_up['policy'].replace('_', ' ').title()} is "
+            f"{_format_currency(gap)} on mean net benefit."
+        )
+    else:
+        gap_sentence = "Only one policy surface is available in this reporting bundle."
+
+    return lead_sentence, gap_sentence
+
+
+def _top_uncertainty_driver(evppi: pd.DataFrame) -> str | None:
+    if evppi.empty:
+        return None
+    top = evppi.sort_values("evppi", ascending=False).iloc[0]
+    return (
+        f"Top uncertainty driver: {top['group'].replace('_', ' ')} "
+        f"(EVPPI {_format_currency(float(top['evppi']))})."
+    )
 
 
 def _write_docx(
@@ -62,6 +106,9 @@ def _write_docx(
         if figure_path.exists():
             doc.add_heading(figure_title, level=2)
             doc.add_picture(str(figure_path), width=Inches(6.5))
+            caption_path = figure_path.with_name(f"{figure_path.stem}_caption.md")
+            if caption_path.exists():
+                doc.add_paragraph(caption_path.read_text(encoding="utf-8").strip())
             doc.add_paragraph()
 
     out_docx.parent.mkdir(parents=True, exist_ok=True)
@@ -129,6 +176,10 @@ def _write_pdf(
             preserveAspectRatio=True,
             anchor="c",
         )
+        caption_path = figure_path.with_name(f"{figure_path.stem}_caption.md")
+        if caption_path.exists():
+            pdf.setFont("Helvetica", 9)
+            pdf.drawString(0.75 * inch, 0.45 * inch, caption_path.read_text(encoding="utf-8").strip()[:140])
 
     pdf.save()
     return out_pdf
@@ -149,20 +200,23 @@ def _build_markdown_brief(
     if author:
         lines.append(f"**Author:** {author}")
         lines.append("")
-    lines.append(f"**Source:** {meta_dir}")
-    lines.append("")
     lines.append("## Executive summary")
     lines.append("")
     lines.append(
-        "- This pack summarises the latest meta pipeline outputs for Australia and New Zealand."
+        "- This pack summarises policy performance using uncertainty draws and ledger-based net benefit outputs."
     )
-    lines.append(
-        "- Policies are ranked by mean net benefit with 90% intervals computed from uncertainty draws."
-    )
-    if not evppi_by_group.empty:
+    if not policy_summary.empty:
+        global_best = policy_summary.sort_values("nb_mean", ascending=False).iloc[0]
         lines.append(
-            "- Uncertainty drivers are summarised with EVPPI and Sobol-style decompositions when theta matrices are available."
+            "- Highest mean net benefit in the current bundle: "
+            f"{global_best['policy'].replace('_', ' ').title()} in "
+            f"{global_best['jurisdiction'].replace('_', ' ').title()} "
+            f"at {_format_currency(float(global_best['nb_mean']))}."
         )
+    if not evppi_by_group.empty:
+        top_driver = _top_uncertainty_driver(evppi_by_group)
+        if top_driver:
+            lines.append(f"- {top_driver}")
     lines.append("")
 
     for jurisdiction in sorted(bundle["run_dirs"]):
@@ -170,9 +224,18 @@ def _build_markdown_brief(
         jurisdiction_summary = policy_summary.loc[
             policy_summary["jurisdiction"] == jurisdiction
         ].drop(columns=["jurisdiction"])
+        lead_sentence, gap_sentence = _describe_jurisdiction(jurisdiction_summary)
         lines.append(f"## {title_case} results")
         lines.append("")
+        lines.append(lead_sentence)
+        lines.append("")
+        lines.append(gap_sentence)
+        lines.append("")
         lines.append(jurisdiction_summary.head(3).to_markdown(index=False))
+        lines.append("")
+        lines.append(
+            "Metric note: `prem_*` columns are premium indices from the insurance model, not quoted retail premiums."
+        )
         lines.append("")
 
         jurisdiction_evppi = evppi_by_group.loc[
@@ -181,6 +244,10 @@ def _build_markdown_brief(
         if not jurisdiction_evppi.empty:
             lines.append(f"### {title_case}: EVPPI by group")
             lines.append("")
+            top_driver = _top_uncertainty_driver(jurisdiction_evppi)
+            if top_driver:
+                lines.append(top_driver)
+                lines.append("")
             lines.append(jurisdiction_evppi.to_markdown(index=False))
             lines.append("")
 
@@ -196,15 +263,17 @@ def _build_markdown_brief(
     lines.append("## Reproducibility")
     lines.append("")
     lines.append(
-        "This analysis is configuration-driven and each run directory carries a manifest plus deterministic reporting outputs."
+        "This analysis is configuration-driven and each source run carries a manifest plus deterministic reporting outputs."
     )
     lines.append("")
 
     for jurisdiction, manifest in manifests.items():
         if not manifest:
             continue
+        run_id = bundle["run_dirs"][jurisdiction].name
         lines.append(f"### {jurisdiction.replace('_', ' ').title()} run manifest (excerpt)")
         lines.append("")
+        lines.append(f"- run_id: {run_id}")
         for key in [
             "created_utc",
             "repo_tree_hash",
@@ -252,8 +321,15 @@ def main() -> None:
     figures_dir = out_dir / "figures"
     figures_dir.mkdir(parents=True, exist_ok=True)
     for jurisdiction in sorted(bundle["run_dirs"]):
-        plot_policy_bars(bundle["policy_summary"], jurisdiction, figures_dir, 200, ["png"])
-        plot_evppi(bundle["evppi_by_group"], jurisdiction, figures_dir, 200, ["png"])
+        plot_policy_bars(bundle["policy_summary"], jurisdiction, figures_dir, 300, ["png"])
+        plot_evppi(bundle["evppi_by_group"], jurisdiction, figures_dir, 300, ["png"])
+        plot_uncertainty_decomposition(
+            bundle["uncertainty_decomposition"],
+            jurisdiction,
+            figures_dir,
+            300,
+            ["png"],
+        )
 
     policy_summary = bundle["policy_summary"]
     evppi_by_group = bundle["evppi_by_group"]
@@ -267,15 +343,13 @@ def main() -> None:
     sections = [
         (
             "Executive summary",
-            "This pack summarises the latest meta pipeline outputs for Australia and New Zealand.\n"
-            "Policies are ranked by mean net benefit with 90% intervals computed from uncertainty draws.\n"
-            "Reporting tables and figures are generated directly from the run directories.",
+            "This pack summarises policy performance using uncertainty draws and ledger-based net benefit outputs.\n"
+            "Policies are ranked by mean net benefit with 90% intervals computed from the reporting bundle.\n"
+            "Figures and tables are generated directly from the run manifests and uncertainty outputs.",
         ),
-        ("Australia - top policies", "See the jurisdiction-specific summary table and figure."),
-        ("New Zealand - top policies", "See the jurisdiction-specific summary table and figure."),
         (
             "Reproducibility",
-            "Each generated artifact records its source run directory in reporting_manifest.json.",
+            "Each generated artifact records its source run identifier and manifest excerpt in reporting_manifest.json.",
         ),
     ]
 
@@ -286,6 +360,14 @@ def main() -> None:
         jurisdiction_summary = policy_summary.loc[
             policy_summary["jurisdiction"] == jurisdiction
         ].drop(columns=["jurisdiction"])
+        lead_sentence, gap_sentence = _describe_jurisdiction(jurisdiction_summary)
+        sections.insert(
+            len(sections) - 1,
+            (
+                f"{label} - top policies",
+                f"{lead_sentence}\n{gap_sentence}",
+            ),
+        )
         tables.append((f"{label} policy summary", jurisdiction_summary))
 
         jurisdiction_evppi = evppi_by_group.loc[
@@ -312,6 +394,13 @@ def main() -> None:
                 figures_dir / f"{jurisdiction}_evppi.png",
             )
         )
+        if not jurisdiction_decomposition.empty:
+            figures.append(
+                (
+                    f"{label}: uncertainty decomposition",
+                    figures_dir / f"{jurisdiction}_uncertainty_decomposition.png",
+                )
+            )
 
     generated_docx = _write_docx(
         out_dir / "POLICY_BRIEF.docx", args.title, sections, tables, figures

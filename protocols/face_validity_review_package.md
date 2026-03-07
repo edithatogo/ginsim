@@ -5,6 +5,10 @@
 
 ---
 
+**Historical note:** This package documents the milestone-era expert review surface prepared during `gdpe_0002`. It is retained for traceability, but later follow-on tracks supersede it for current active-path interpretation.
+
+---
+
 ## Package Contents
 
 1. **Model Overview** (this document)
@@ -25,7 +29,7 @@ What are the net social impacts of alternative policy regimes restricting the us
 
 ### Policy Context
 
-- **Australia:** FSC Moratorium (2019-2024), proposed statutory ban (2025)
+- **Australia:** FSC Moratorium (2019-2024), later comparator evolution recorded in the current repository docs
 - **New Zealand:** HRC Inquiry (2020), no specific legislation
 
 ### Model Structure
@@ -75,7 +79,7 @@ Policy Rules → Module A (Behavior) → Module B (Clinical)
 |----------|-------------|-------------|------|
 | **Status Quo** | No restrictions | N/A | None |
 | **FSC Moratorium** | Industry self-regulation | Industry body | $500k life, $200k TPD/trauma |
-| **Statutory Ban** | Legislative prohibition | Statutory penalties | None (full ban) |
+| **Ban** | Legislative prohibition | Statutory penalties | None (full ban) |
 
 ---
 

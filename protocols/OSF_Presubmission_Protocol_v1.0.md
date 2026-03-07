@@ -3,12 +3,12 @@
 **Title:** Integrated Economic Evaluation of Policy Options to Restrict Genetic Discrimination  
 **Version:** v1.0  
 **Date:** 02 March 2026  
-**Primary investigator:** Dylan A. Mordaunt (edit)  
+**Primary investigator:** Dylan A Mordaunt  
 
 
 
 ---
-**Repo update:** executable scaffolds for Modules D–F and VOI added in v1.1 (02 March 2026).
+**Repo update:** the active repository now evaluates the canonical `status_quo`, `moratorium`, and `ban` policy regimes through the core pipeline, with scenario analysis layered on top of that canonical registry.
 ---
 
 ## Study type
@@ -76,6 +76,8 @@ Preferred policy is selected based on a pre-specified decision metric set:
 - Social welfare where utility-based evaluation is feasible.
 - VOI to prioritise future evidence generation.
 
+The active implementation reports a short-horizon and long-horizon welfare view. Public-facing dashboard and reporting artifacts use the long-horizon welfare surface as the headline metric and separately report research-value effects arising from data-quality externalities.
+
 ### Robustness checks
 - High/low deterrence and high/low adverse selection scenarios.
 - Alternative proxy substitution specifications.
@@ -86,6 +88,7 @@ Preferred policy is selected based on a pre-specified decision metric set:
 - Use de-identified data where possible and comply with jurisdictional privacy laws for genetic and insurance data.
 - Publish aggregated outputs and code where permitted.
 - Where data cannot be shared, publish synthetic exemplars and reproducible run manifests.
+- Public reporting artifacts should expose run identifiers and manifest excerpts without exposing local filesystem paths.
 
 ## Deviations
 Any deviations from this prespecified analysis plan will be documented with rationale, dated, and versioned, and will be reported alongside results.

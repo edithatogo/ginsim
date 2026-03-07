@@ -12,12 +12,14 @@ scenarios:
     name: "Australia 2025 Genetic Ban"
     description: "Complete ban on use of genetic test results in life insurance"
     jurisdiction: "AU"
+    policy_id: "ban"
     parameters:
       baseline_testing_uptake: 0.52
       deterrence_elasticity: 0.08  # Reduced deterrence under ban
       moratorium_effect: 0.0  # No moratorium effect (replaced by ban)
+    policy_overrides:
       enforcement_strength: 0.9  # Strong enforcement
-      penalty_rate: 0.8  # High penalties for violations
+      penalty_max: 1000000
     expected_outcomes:
       testing_uptake_increase: 0.18  # +18% vs status quo
       welfare_impact: "Positive for high-risk individuals"
@@ -26,12 +28,13 @@ scenarios:
     name: "FSC Moratorium (Australia)"
     description: "Financial Services Council moratorium on genetic discrimination"
     jurisdiction: "AU"
+    policy_id: "moratorium"
     parameters:
       baseline_testing_uptake: 0.52
       deterrence_elasticity: 0.12  # Moderate deterrence reduction
       moratorium_effect: 0.15  # Moratorium-specific boost
+    policy_overrides:
       enforcement_strength: 0.6  # Industry self-enforcement
-      penalty_rate: 0.4  # Moderate penalties
     expected_outcomes:
       testing_uptake_increase: 0.12  # +12% vs status quo
       welfare_impact: "Moderate positive"
@@ -40,12 +43,14 @@ scenarios:
     name: "Australia Status Quo"
     description: "Current Australian policy framework (pre-2025)"
     jurisdiction: "AU"
+    policy_id: "status_quo"
     parameters:
       baseline_testing_uptake: 0.52
       deterrence_elasticity: 0.18  # Baseline deterrence
       moratorium_effect: 0.0  # No additional effect
+    policy_overrides:
       enforcement_strength: 0.5  # Baseline enforcement
-      penalty_rate: 0.3  # Baseline penalties
+      penalty_max: 0
     expected_outcomes:
       testing_uptake_increase: 0.0  # Baseline
       welfare_impact: "Baseline"
@@ -58,12 +63,13 @@ scenarios:
     name: "New Zealand Current Policy"
     description: "Current NZ approach to genetic discrimination"
     jurisdiction: "NZ"
+    policy_id: "status_quo"
     parameters:
       baseline_testing_uptake: 0.48  # Slightly lower baseline
       deterrence_elasticity: 0.15
       moratorium_effect: 0.0
+    policy_overrides:
       enforcement_strength: 0.7
-      penalty_rate: 0.5
     expected_outcomes:
       testing_uptake_increase: 0.0
       welfare_impact: "Baseline for NZ"
@@ -76,13 +82,14 @@ scenarios:
     name: "USA GINA (Health Only)"
     description: "Genetic Information Nondiscrimination Act - health insurance/employment only"
     jurisdiction: "US"
+    policy_id: "status_quo"
+    note: "Does NOT cover life insurance - gap in protection"
     parameters:
       baseline_testing_uptake: 0.55  # Higher baseline (different healthcare system)
       deterrence_elasticity: 0.10  # Reduced for health insurance
       moratorium_effect: 0.0
+    policy_overrides:
       enforcement_strength: 0.8  # Strong federal enforcement
-      penalty_rate: 0.7
-      note: "Does NOT cover life insurance - gap in protection"
     expected_outcomes:
       testing_uptake_increase: 0.08  # Limited to health insurance
       welfare_impact: "Positive for health insurance, neutral for life"
@@ -91,13 +98,14 @@ scenarios:
     name: "UK Code on Genetic Testing"
     description: "Voluntary code with Huntington's disease exception"
     jurisdiction: "UK"
+    policy_id: "moratorium"
+    note: "High-cap Huntington's disease can be used for policies >£500k"
     parameters:
       baseline_testing_uptake: 0.50
       deterrence_elasticity: 0.14
       moratorium_effect: 0.10
+    policy_overrides:
       enforcement_strength: 0.65  # Industry self-regulation
-      penalty_rate: 0.5
-      note: "High-cap Huntington's disease can be used for policies >£500k"
     expected_outcomes:
       testing_uptake_increase: 0.10
       welfare_impact: "Moderate positive with exceptions"
@@ -106,13 +114,16 @@ scenarios:
     name: "Canada GNDA"
     description: "Genetic Non-Discrimination Act - criminal prohibition"
     jurisdiction: "CA"
+    policy_id: "ban"
+    note: "Strongest protection - criminal offense to require genetic testing"
     parameters:
       baseline_testing_uptake: 0.53
       deterrence_elasticity: 0.06  # Very low deterrence (criminal penalties)
       moratorium_effect: 0.0
+    policy_overrides:
       enforcement_strength: 0.95  # Criminal law enforcement
-      penalty_rate: 0.9  # Very high (criminal penalties)
-      note: "Strongest protection - criminal offense to require genetic testing"
+      penalty_type: "criminal"
+      penalty_max: 5000000
     expected_outcomes:
       testing_uptake_increase: 0.20
       welfare_impact: "Strongly positive"
@@ -125,12 +136,14 @@ scenarios:
     name: "Strong Enforcement Scenario"
     description: "High enforcement with moderate penalties"
     jurisdiction: "AU"
+    policy_id: "moratorium"
     parameters:
       baseline_testing_uptake: 0.52
       deterrence_elasticity: 0.10
       moratorium_effect: 0.15
+    policy_overrides:
       enforcement_strength: 0.9
-      penalty_rate: 0.6
+      penalty_max: 500000
     expected_outcomes:
       testing_uptake_increase: 0.15
       welfare_impact: "Positive"
@@ -139,12 +152,14 @@ scenarios:
     name: "Weak Enforcement Scenario"
     description: "Low enforcement with low penalties"
     jurisdiction: "AU"
+    policy_id: "moratorium"
     parameters:
       baseline_testing_uptake: 0.52
       deterrence_elasticity: 0.16
       moratorium_effect: 0.10
+    policy_overrides:
       enforcement_strength: 0.3
-      penalty_rate: 0.2
+      penalty_max: 100000
     expected_outcomes:
       testing_uptake_increase: 0.05
       welfare_impact: "Marginally positive"

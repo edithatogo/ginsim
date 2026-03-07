@@ -13,6 +13,7 @@ from src.model.scenario_analysis import (
     ScenarioComparison,
     ScenarioResult,
     compare_scenarios,
+    evaluate_scenario,
     format_comparison_table,
     load_scenarios,
 )
@@ -168,3 +169,65 @@ class TestCompareScenarios:
         assert len(comparison.scenarios) == 1
         assert comparison.scenarios[0].scenario_name == "test"
         assert comparison.delta_from_baseline == {}  # No delta for baseline itself
+
+
+class TestEvaluateScenario:
+    """Test scenario evaluation binds model parameters and policies correctly."""
+
+    def test_evaluate_scenario_uses_canonical_policy_id_and_overrides(self):
+        seen = {}
+
+        def mock_model(params, policy):
+            seen["jurisdiction"] = params.jurisdiction
+            seen["policy_name"] = policy.name
+            seen["enforcement_strength"] = policy.enforcement_strength
+            seen["penalty_type"] = policy.penalty_type
+
+            class MockResult:
+                testing_uptake = 0.61
+                welfare_impact = 12345.0
+                qalys_gained = 4.2
+                compliance_rate = 0.91
+
+            return MockResult()
+
+        scenario = {
+            "jurisdiction": "NZ",
+            "policy_id": "ban",
+            "parameters": {
+                "baseline_testing_uptake": 0.48,
+                "deterrence_elasticity": 0.10,
+            },
+            "policy_overrides": {
+                "enforcement_strength": 0.95,
+                "penalty_type": "criminal",
+            },
+        }
+
+        result = evaluate_scenario("nz_ban", scenario, mock_model)
+
+        assert result.scenario_name == "nz_ban"
+        assert result.testing_uptake == 0.61
+        assert result.all_metrics["policy_name"] == "ban"
+        assert seen == {
+            "jurisdiction": "new_zealand",
+            "policy_name": "ban",
+            "enforcement_strength": 0.95,
+            "penalty_type": "criminal",
+        }
+
+    def test_evaluate_scenario_rejects_unsupported_active_looking_fields(self):
+        def mock_model(params, policy):  # pragma: no cover - should not be called
+            raise AssertionError("Scenario should fail before model evaluation")
+
+        scenario = {
+            "jurisdiction": "AU",
+            "policy_id": "status_quo",
+            "parameters": {
+                "baseline_testing_uptake": 0.52,
+                "penalty_rate": 0.8,
+            },
+        }
+
+        with pytest.raises(ValueError, match="unsupported parameter field"):
+            evaluate_scenario("bad_scenario", scenario, mock_model)

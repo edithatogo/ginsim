@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate publication-ready figures from run outputs.
+Generate reporting figures from run outputs.
 
 Usage:
     python -m scripts.generate_figures --meta_dir outputs/runs/meta_pipeline/20260306T010203Z
@@ -49,6 +49,13 @@ def save_figure(fig: plt.Figure, output_path: Path, dpi: int, formats: list[str]
     plt.close(fig)
 
 
+def _write_caption(output_dir: Path, stem: str, caption: str) -> None:
+    """Write a plain-text caption alongside generated figure files."""
+    caption_path = output_dir / f"{stem}_caption.md"
+    caption_path.write_text(caption.strip() + "\n", encoding="utf-8")
+    print(f"  ✓ Saved {caption_path.name}")
+
+
 def plot_policy_bars(
     summary_df: pd.DataFrame,
     jurisdiction: str,
@@ -88,6 +95,14 @@ def plot_policy_bars(
     ax.grid(True, axis="y", alpha=0.3)
 
     save_figure(fig, output_dir / f"{jurisdiction}_net_benefit", dpi, formats)
+    _write_caption(
+        output_dir,
+        f"{jurisdiction}_net_benefit",
+        (
+            f"Figure: {jurisdiction.replace('_', ' ').title()} policy ranking by mean long-run net benefit. "
+            "Bars show posterior means and whiskers show the 90% interval from uncertainty draws."
+        ),
+    )
 
 
 def plot_evppi(
@@ -119,6 +134,68 @@ def plot_evppi(
     ax.grid(True, axis="y", alpha=0.3)
 
     save_figure(fig, output_dir / f"{jurisdiction}_evppi", dpi, formats)
+    _write_caption(
+        output_dir,
+        f"{jurisdiction}_evppi",
+        (
+            f"Figure: {jurisdiction.replace('_', ' ').title()} expected value of partial perfect information by parameter group. "
+            "Higher bars indicate uncertainty groups with greater decision value for additional evidence collection."
+        ),
+    )
+
+
+def plot_uncertainty_decomposition(
+    decomposition_df: pd.DataFrame,
+    jurisdiction: str,
+    output_dir: Path,
+    dpi: int,
+    formats: list[str],
+) -> None:
+    """Plot total-order uncertainty contributions for one jurisdiction."""
+    df = (
+        decomposition_df.loc[decomposition_df["jurisdiction"] == jurisdiction]
+        .drop(columns=["jurisdiction"])
+        .sort_values("ST_optimal_NB", ascending=False)
+    )
+    if df.empty:
+        return
+
+    x_positions = np.arange(df.shape[0])
+    width = 0.38
+    fig, ax = plt.subplots(figsize=(9, 4.5))
+    ax.bar(
+        x_positions - width / 2,
+        df["S1_optimal_NB"].to_numpy(),
+        width=width,
+        color=OKABE_ITO["bluish_green"],
+        label="First-order",
+    )
+    ax.bar(
+        x_positions + width / 2,
+        df["ST_optimal_NB"].to_numpy(),
+        width=width,
+        color=OKABE_ITO["vermilion"],
+        label="Total-order",
+    )
+    ax.set_xticks(x_positions)
+    ax.set_xticklabels(df["group"].to_list(), rotation=30, ha="right")
+    ax.set_ylabel("Sensitivity index")
+    ax.set_title(
+        f"{jurisdiction.replace('_', ' ').title()}: uncertainty decomposition for optimal net benefit",
+        fontweight="bold",
+    )
+    ax.legend(frameon=False)
+    ax.grid(True, axis="y", alpha=0.3)
+
+    save_figure(fig, output_dir / f"{jurisdiction}_uncertainty_decomposition", dpi, formats)
+    _write_caption(
+        output_dir,
+        f"{jurisdiction}_uncertainty_decomposition",
+        (
+            f"Figure: {jurisdiction.replace('_', ' ').title()} first-order and total-order uncertainty decomposition for optimal net benefit. "
+            "Total-order indices capture main effects plus interactions, while first-order indices isolate direct contributions."
+        ),
+    )
 
 
 def main() -> None:
@@ -174,6 +251,13 @@ def main() -> None:
     for jurisdiction in jurisdictions:
         plot_policy_bars(bundle["policy_summary"], jurisdiction, output_dir, args.dpi, args.formats)
         plot_evppi(bundle["evppi_by_group"], jurisdiction, output_dir, args.dpi, args.formats)
+        plot_uncertainty_decomposition(
+            bundle["uncertainty_decomposition"],
+            jurisdiction,
+            output_dir,
+            args.dpi,
+            args.formats,
+        )
 
     print(f"Source runs: {', '.join(jurisdictions)}")
     print("=" * 60)

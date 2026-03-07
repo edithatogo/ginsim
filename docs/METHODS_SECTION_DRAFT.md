@@ -1,9 +1,9 @@
 # Methods Section Draft: Genetic Discrimination Policy Economic Evaluation
 
-**Track:** gdpe_0002_evidence_anchoring — Phase 5  
+**Track:** gdpe_0020_dashboard_policy_alignment_and_publication_sync  
 **Purpose:** Draft methods section for journal submission  
-**Target Journal:** Value in Health / Medical Decision Making  
-**Date:** 2026-03-03
+**Target Journal:** Nature Human Behaviour / Value in Health / Medical Decision Making  
+**Date:** 2026-03-07
 
 ---
 
@@ -11,7 +11,7 @@
 
 ### Overview
 
-We developed a modular Bayesian decision analysis model to quantify the economic and welfare impacts of policies restricting genetic discrimination in life insurance. The model integrates evidence from multiple sources (behavioral, clinical, insurance markets) and propagates uncertainty through all modules to generate probabilistic policy recommendations.
+We developed a modular Bayesian decision analysis model to quantify the economic and welfare impacts of policies restricting genetic discrimination in life insurance. The model integrates evidence from multiple sources (behavioral, clinical, insurance markets, and research-participation externalities) and propagates uncertainty through all modules to generate probabilistic policy recommendations.
 
 ### Model Structure
 
@@ -24,13 +24,13 @@ The model comprises six interconnected modules representing the policy causal pa
 5. **Module E (Pass-Through/Market Structure):** Models incidence of costs across market participants
 6. **Module F (Data Quality Externality):** Estimates impacts on research participation and data quality
 
-Modules are linked sequentially: policy rules → behavioral response → insurance equilibrium → clinical outcomes → welfare impacts.
+Modules are linked sequentially: policy rules → behavioral response → insurance equilibrium → clinical outcomes and data-quality effects → welfare impacts.
 
 **[Figure 1: Model structure diagram would be inserted here]**
 
 ### Bayesian Framework
 
-We采用 full probabilistic Bayesian decision analysis to quantify uncertainty in all model parameters. Prior distributions were elicited from systematic evidence reviews using an adapted GRADE framework for quality assessment.
+We use full probabilistic Bayesian decision analysis to quantify uncertainty in all model parameters. Prior distributions were elicited from systematic evidence reviews using an adapted GRADE framework for quality assessment.
 
 **Prior specification:**
 - Proportions (bounded [0,1]): Beta distributions
@@ -93,14 +93,14 @@ For each parameter:
 
 ### Policy Scenarios
 
-We evaluated three policy regimes:
+We evaluated three canonical benchmark policy regimes:
 
 1. **Status Quo (Baseline):** No restrictions on genetic information use
-2. **FSC Moratorium:** Industry self-regulation with financial caps ($500k life, $200k TPD/trauma)
-3. **Statutory Ban:** Legislative prohibition with statutory penalties
+2. **Moratorium:** Industry self-regulation with financial caps ($500k life, $200k TPD/trauma in the benchmark Australian implementation)
+3. **Ban:** Legislative prohibition with statutory penalties
 
 Policy parameters encoded as:
-- **Allow genetic test results:** {true, limited, false}
+- **Allow genetic test results:** {true, false}
 - **Enforcement strength:** {baseline, industry, statutory}
 - **Sum insured caps:** {null, $500k/$200k}
 
@@ -111,13 +111,15 @@ Policy parameters encoded as:
 2. Change in insurance premiums and take-up
 3. Net QALYs gained/lost
 4. Net fiscal impact (health system costs)
-5. Net welfare impact (distributional cost-benefit analysis)
+5. Net welfare impact (distributional cost-benefit analysis, with short- and long-horizon views)
 
 **Secondary outcomes:**
 1. Adverse selection magnitude (premium divergence)
 2. Proxy substitution effects (underwriting accuracy)
 3. Research participation impacts
 4. Enforcement effectiveness
+
+In the current active implementation, proxy-substitution outputs and data-quality externalities are integrated into the reported welfare surface rather than treated only as disconnected auxiliary diagnostics.
 
 **Uncertainty quantification:**
 - 95% credible intervals for all outcomes
@@ -173,8 +175,8 @@ Where NB = net benefit, d = decision, θ = uncertain parameters
 - BlackJAX for MCMC sampling
 
 **Code availability:**
-- GitHub repository: [URL would be inserted]
-- Zenodo DOI: [DOI would be inserted]
+- Repository and archival identifiers should be inserted only once finalized.
+- Public reporting artifacts should use canonical run identifiers and manifest excerpts without exposing local filesystem paths.
 - License: MIT (code), CC-BY 4.0 (documentation)
 
 **Reproducibility:**
@@ -225,7 +227,7 @@ This study follows:
 
 ---
 
-**Version:** 1.0 draft  
-**Date:** 2026-03-03  
-**Track:** gdpe_0002_evidence_anchoring  
-**Phase:** 5 — Research outputs and dissemination
+**Version:** 1.1 draft  
+**Date:** 2026-03-07  
+**Track:** gdpe_0020_dashboard_policy_alignment_and_publication_sync  
+**Phase:** publication-facing synchronization

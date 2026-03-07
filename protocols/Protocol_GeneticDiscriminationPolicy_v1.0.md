@@ -2,12 +2,12 @@
 
 **Version:** v1.0  
 **Date:** 02 March 2026  
-**Author:** Dylan A. Mordaunt (adapt as needed)
+**Author:** Dylan A Mordaunt
 
 
 
 ---
-**Repo update:** executable scaffolds for Modules D–F and VOI added in v1.1 (02 March 2026).
+**Repo update:** the active repository now evaluates the canonical `status_quo`, `moratorium`, and `ban` policy regimes through the core pipeline, with scenario analysis layered on top of that canonical registry.
 ---
 
 ## 1. Background and rationale
@@ -39,13 +39,12 @@ This protocol is written to be jurisdiction-agnostic. The base case is voluntary
 - Insurance applicants and policyholders (by relevant product lines).
 
 ### 3.2 Policy comparators
-A standard set of comparators will be evaluated. Each comparator is implemented as a ruleset that constrains information use and sets enforcement and remedy settings.
+A standard set of comparators will be evaluated. The active implemented benchmark set is `status_quo`, `moratorium`, and `ban`; broader partial/hybrid designs remain protocol-specified extensions and are treated as scenario or future-work surfaces unless explicitly activated in configuration.
 
 1. **Status quo** (baseline legal and industry practice).
 2. **Moratorium** (time-limited or indefinite, with caps and/or thresholds).
-3. **Partial ban** (restricted use, for example by sum insured, by condition class, or predictive-only).
-4. **Total ban** (no use of adverse predictive genetic test results; jurisdiction-specific carve-outs defined a priori).
-5. **Hybrid designs** (ban plus risk-sharing mechanism such as reinsurance pool, public backstop, or community rating within a segment).
+3. **Ban** (no use of adverse predictive genetic test results; jurisdiction-specific carve-outs defined a priori).
+4. **Partial-ban and hybrid designs** (restricted use, risk-sharing pools, public backstops, or related extensions) remain protocol-specified extensions and should be labeled as exploratory unless promoted into the canonical implemented comparator set.
 
 ## 4. Conceptual framework
 
@@ -158,6 +157,8 @@ For each policy comparator, compute distributions over:
 - Household financial risk protection (catastrophic financial exposure proxies).
 - Equity and distributional impacts (subgroup breakdowns).
 
+The active implementation reports both a shorter-horizon and longer-horizon ledger view, and the public dashboard headline uses the longer-horizon net-welfare surface. Research-value effects from data-quality externalities are incorporated alongside the ledger rather than being reported as a disconnected appendix metric.
+
 ### 7.2 Social welfare
 Where feasible, compute expected utility under risk aversion to capture the value of insurance as consumption smoothing, not only expected costs.
 
@@ -179,6 +180,7 @@ The evaluation reports distributional impacts by relevant protected and policy-r
 - Ethics approvals where required.
 - Reproducible pipeline with versioned outputs and auditable parameter settings.
 - Public release plan: aggregated outputs, synthetic data examples, and code where permitted.
+- Public-facing reports should avoid leaking local filesystem paths and should use canonical comparator labels that match the implemented policy registry.
 
 ## 11. Implementation plan
 - Codebase structured into modules A to F plus integration.

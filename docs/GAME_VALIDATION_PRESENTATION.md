@@ -12,9 +12,8 @@
 
 **Comprehensive Validation Report**
 
-Dylan A. Mordaunt  
-Victoria University of Wellington  
-School of Economics and Finance
+Dylan A Mordaunt  
+Research Fellow, Faculty of Health, Education and Psychology, Victoria University of Wellington
 
 2026-03-03
 
@@ -32,7 +31,7 @@ How do different policy regimes affecting genetic discrimination in life insuran
 **Policy Regimes Evaluated**
 1. Status Quo (full information use)
 2. Moratorium (restricted use above caps)
-3. Statutory Ban (no use permitted)
+3. Ban (no use permitted)
 
 ---
 
@@ -238,11 +237,11 @@ How do different policy regimes affecting genetic discrimination in life insuran
 
 **Validation Complete**
 - ✅ All 6 game-theoretic models validated
-- ✅ All diagrams generated (publication-ready)
+- ✅ All diagrams generated
 - ✅ Comprehensive documentation produced
 - ✅ References compiled and cross-referenced
 
-**Ready for Policy Analysis**
+**Foundation Ready for Policy Analysis**
 - Models validated and documented
 - Parameters calibrated with uncertainty
 - Sensitivity analysis framework ready

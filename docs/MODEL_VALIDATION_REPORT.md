@@ -3,13 +3,13 @@
 **Track:** gdpe_0013_external_validation  
 **Phase:** 3 — Final Synthesis  
 **Date:** 2026-03-05  
-**Version:** 2.0 (Post-SOTA Enhancements)
+**Version:** 2.1 (historical milestone record)
 
 ---
 
 ## 1. Overview
 
-This document reports the final validation results for the genetic discrimination policy economic evaluation model, incorporating simulated expert face-validity, global empirical cross-validation, and structural sensitivity analysis.
+This document reports the historical validation results recorded at the `gdpe_0013_external_validation` milestone, incorporating simulated expert face-validity, global empirical cross-validation, and structural sensitivity analysis. It should be read together with the later `gdpe_0019` and `gdpe_0020` follow-up tracks, which reopened publication-facing hardening work on the active path.
 
 ---
 
@@ -83,9 +83,9 @@ This document reports the final validation results for the genetic discriminatio
 
 ### 6.2 Final Status
 
-**Status:** ✅ **VALIDATED & SOTA READY**
+**Status:** Historical milestone passed, but later follow-up review superseded any “SOTA ready” interpretation.
 
-**Recommendation:** The model is structurally robust, culturally aware (via Kinship Multipliers), and budget-relevant (via Dual-Horizon reporting). It is ready for international publication.
+**Recommendation:** Treat this document as evidence of milestone-era validation progress rather than as a current publication-readiness verdict for the active repository state.
 
 ---
 
@@ -96,6 +96,6 @@ This document reports the final validation results for the genetic discriminatio
 
 ---
 
-**Version:** 2.0  
-**Date:** 2026-03-05  
-**Status:** **COMPLETE ✅**
+**Version:** 2.1  
+**Date:** 2026-03-07  
+**Status:** Historical milestone record

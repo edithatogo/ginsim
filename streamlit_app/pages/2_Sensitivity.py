@@ -49,6 +49,18 @@ Explore how uncertainty in model parameters affects policy outcomes
 through multiple sensitivity analysis methods.
 """,
 )
+st.info(
+    """
+**What this page answers**
+- Which calibrated inputs move the selected policy result the most.
+- Whether the result changes smoothly or sharply when assumptions move.
+- Which conclusions are robust versus uncertainty-sensitive.
+
+**Status**
+- This page varies active model parameters and benchmark policy settings.
+- Use it to understand sensitivity, not as direct empirical validation of any single parameter value.
+"""
+)
 
 # Sidebar for analysis configuration
 st.sidebar.header("⚙️ Analysis Configuration")
@@ -78,13 +90,17 @@ param_options = {
         "moratorium_effect",
         float(params_model.moratorium_effect),
     ),
-    "High Risk Premium": (
-        "high_risk_premium",
-        float(params_model.high_risk_premium),
+    "Adverse Selection Elasticity": (
+        "adverse_selection_elasticity",
+        float(params_model.adverse_selection_elasticity),
     ),
-    "Low Risk Premium": (
-        "low_risk_premium",
-        float(params_model.low_risk_premium),
+    "High-Risk Demand Elasticity": (
+        "demand_elasticity_high_risk",
+        float(params_model.demand_elasticity_high_risk),
+    ),
+    "Baseline Loading": (
+        "baseline_loading",
+        float(params_model.baseline_loading),
     ),
 }
 
@@ -117,7 +133,7 @@ n_samples = st.sidebar.slider(
 # Policy selection
 policy_name = st.sidebar.selectbox(
     "Policy Regime",
-    ["Status Quo", "Moratorium", "Statutory Ban"],
+    ["Status Quo", "Moratorium", "Ban"],
     help="Select policy to analyze",
 )
 
@@ -138,8 +154,9 @@ def run_sensitivity_cached(
         "baseline_testing_uptake": float(params_model.baseline_testing_uptake),
         "deterrence_elasticity": float(params_model.deterrence_elasticity),
         "moratorium_effect": float(params_model.moratorium_effect),
-        "high_risk_premium": float(params_model.high_risk_premium),
-        "low_risk_premium": float(params_model.low_risk_premium),
+        "adverse_selection_elasticity": float(params_model.adverse_selection_elasticity),
+        "demand_elasticity_high_risk": float(params_model.demand_elasticity_high_risk),
+        "baseline_loading": float(params_model.baseline_loading),
     }
 
     # Convert to JAX array - simplified parameter mapping

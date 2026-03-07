@@ -30,6 +30,13 @@ def _top_policy(
     return ranked[0][0].replace("_", " ").title()
 
 
+def _display_policy_name(policy_name: str) -> str:
+    """Return a presentation-friendly policy label."""
+    if policy_name == "ban":
+        return "Ban"
+    return policy_name.replace("_", " ").title()
+
+
 def format_policy_table(results: dict[str, Any]) -> str:
     """
     Format policy evaluation results as table.
@@ -40,7 +47,7 @@ def format_policy_table(results: dict[str, Any]) -> str:
     Returns:
         Formatted table string
     """
-    headers = ["Policy", "Testing Uptake", "Avg Premium", "Welfare", "Compliance"]
+    headers = ["Policy", "Testing Uptake", "Avg Premium Index", "Long-run Net Welfare", "Compliance"]
 
     rows = []
     for policy_name, result in results.items():
@@ -137,7 +144,7 @@ def generate_policy_brief(
         "",
         "1. **Status Quo**: No restrictions on genetic information use",
         "2. **Moratorium**: Industry self-regulation with financial caps",
-        "3. **Statutory Ban**: Legislative prohibition with penalties",
+        "3. **Ban**: Legislative prohibition with penalties",
         "",
         "## Key Findings",
         "",
@@ -148,7 +155,7 @@ def generate_policy_brief(
     # Add testing uptake findings
     for policy_name, result in results.items():
         uptake = result.get("testing_uptake", 0)
-        lines.append(f"- **{policy_name.title()}**: {uptake:.1%} testing uptake")
+        lines.append(f"- **{_display_policy_name(policy_name)}**: {uptake:.1%} testing uptake")
 
     lines.extend(
         [
@@ -161,7 +168,7 @@ def generate_policy_brief(
     # Add welfare findings
     for policy_name, metrics in comparisons.items():
         welfare = metrics.get("welfare_change", 0)
-        lines.append(f"- **{policy_name.title()}**: ${welfare:+,.0f} vs status quo")
+        lines.append(f"- **{_display_policy_name(policy_name)}**: ${welfare:+,.0f} vs status quo")
 
     best_uptake = _top_policy(comparisons, "testing_uptake_change")
     best_welfare = _top_policy(comparisons, "welfare_change")
@@ -224,9 +231,9 @@ def generate_results_summary(results: dict[str, Any]) -> str:
         if "testing_uptake" in result:
             lines.append(f"  Testing Uptake: {result['testing_uptake']:.1%}")
         if "avg_premium" in result:
-            lines.append(f"  Average Premium: {result['avg_premium']:.3f}")
+            lines.append(f"  Average Premium Index: {result['avg_premium']:.3f}")
         if "welfare_impact" in result:
-            lines.append(f"  Net Welfare: ${result['welfare_impact']:,.0f}")
+            lines.append(f"  Long-run Net Welfare: ${result['welfare_impact']:,.0f}")
         if "compliance_rate" in result:
             lines.append(f"  Compliance Rate: {result['compliance_rate']:.1%}")
 

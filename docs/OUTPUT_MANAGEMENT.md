@@ -8,7 +8,9 @@
 
 ## Overview
 
-This document describes the output management framework for publication-ready tables, figures, and diagnostic plots.
+This document describes the output management framework for reporting tables, figures, captions, and diagnostic plots. The active reporting path is driven by `scripts/reporting_common.py`, `scripts/generate_figures.py`, and `scripts/publish_pack.py`.
+
+For a reviewer-facing summary of the main manuscript/package assets, see `docs/MANUSCRIPT_ASSET_INVENTORY.md`.
 
 ---
 
@@ -28,12 +30,10 @@ This document describes the output management framework for publication-ready ta
 
 | ID | Description | Location | Formats | Status |
 |----|-------------|----------|---------|--------|
-| **F1** | Model structure diagram | `outputs/figures/model_structure` | PNG (1200dpi), SVG | ⏳ Template ready |
-| **F2** | Policy comparison (forest plot) | `outputs/figures/policy_comparison` | PNG (1200dpi), SVG | ⏳ Template ready |
-| **F3** | Uncertainty (CEAC curves) | `outputs/figures/ceac_curves` | PNG (1200dpi), SVG | ⏳ Template ready |
-| **F4** | Sensitivity (tornado diagram) | `outputs/figures/tornado` | PNG (1200dpi), SVG | ⏳ Template ready |
-| **F5** | VOI results (bar chart) | `outputs/figures/voi_results` | PNG (1200dpi), SVG | ⏳ Template ready |
-| **F6** | Evidence quality (heatmap) | `outputs/figures/evidence_quality` | PNG (1200dpi), SVG | ⏳ Template ready |
+| **F1** | Policy net-benefit ranking | `<publish_pack>/figures/<jurisdiction>_net_benefit` | PNG | ✅ Active |
+| **F2** | EVPPI by parameter group | `<publish_pack>/figures/<jurisdiction>_evppi` | PNG | ✅ Active |
+| **F3** | Uncertainty decomposition | `<publish_pack>/figures/<jurisdiction>_uncertainty_decomposition` | PNG | ✅ Active |
+| **F4** | Figure captions | `<publish_pack>/figures/*_caption.md` | Markdown | ✅ Active |
 
 ### Diagnostic Plots
 
@@ -48,12 +48,12 @@ This document describes the output management framework for publication-ready ta
 
 ## Format Specifications
 
-### PNG (1200dpi)
+### PNG
 
-**Purpose:** Publication-ready raster images
+**Purpose:** Reporting and manuscript drafting raster images
 
 **Settings:**
-- Resolution: 1200 dpi
+- Resolution: 300 dpi in the active publish pack; higher-resolution export remains a follow-up option
 - Color mode: RGB
 - Compression: Lossless (PNG)
 - Font: Sans-serif (Arial/Helvetica)
@@ -152,7 +152,7 @@ python -m scripts.generate_tables --run_dir outputs/runs/meta_20260303 --output 
 ### Step 3: Generate Figures
 
 ```bash
-python -m scripts.generate_figures --run_dir outputs/runs/meta_20260303 --output outputs/figures --dpi 1200 --formats png svg
+python -m scripts.generate_figures --meta_dir outputs/runs/meta_pipeline/<timestamp> --output outputs/figures --dpi 300 --formats png
 ```
 
 ### Step 4: Generate Diagnostics
@@ -190,8 +190,8 @@ outputs/
 
 ### Version Naming
 
-- **v1.0:** Initial publication-ready outputs
-- **v1.1:** Minor corrections (typos, labels)
+- **v1.0:** Initial reporting outputs
+- **v1.1:** Label/caption corrections
 - **v2.0:** Major updates (new analysis, additional scenarios)
 
 ---
@@ -209,8 +209,8 @@ outputs/
 
 ### Figures
 
-- [ ] Resolution ≥1200dpi (PNG)
-- [ ] Vector format available (SVG)
+- [ ] Resolution appropriate to intended use and regenerated at submission quality when needed
+- [ ] Caption file generated for each publication-facing figure
 - [ ] Colorblind-safe palette
 - [ ] Font size ≥8pt
 - [ ] Axis labels with units
@@ -229,7 +229,7 @@ outputs/
 ## Acceptance Criteria
 
 - [ ] All 5 tables generated
-- [ ] All 6 figures generated (PNG + SVG)
+- [ ] All active publish-pack figures and captions generated
 - [ ] All 4 diagnostic plots generated (PNG + SVG)
 - [ ] Colorblind-safe palettes used
 - [ ] Versioning system implemented
@@ -239,12 +239,12 @@ outputs/
 
 ## Next Steps
 
-1. Create output generation scripts
-2. Generate initial outputs
-3. Review for publication suitability
+1. Generate tables, figures, and captions from the reporting bundle
+2. Review metric labels, units, and figure captions
+3. Regenerate higher-resolution or vector assets if a submission venue requires them
 4. Version and organize
 5. Document in manuscript
 
 ---
 
-**Status:** Framework ready. Proceeding to generate outputs.
+**Status:** Active reporting path implemented; broader manuscript harmonization still in progress.

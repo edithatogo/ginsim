@@ -64,6 +64,15 @@ def _write_run_fixture(parent: Path, jurisdiction: str) -> Path:
             ]
         ),
     )
+    np.save(
+        run_dir / "theta_insurance.npy",
+        np.array(
+            [
+                [0.4, 0.5],
+                [0.45, 0.55],
+            ]
+        ),
+    )
     (run_dir / "run_manifest.json").write_text(
         json.dumps(
             {
@@ -218,6 +227,7 @@ def test_generate_figures_and_publish_pack(tmp_path: Path, monkeypatch) -> None:
 
     assert (figures_dir / "australia_net_benefit.png").exists()
     assert (figures_dir / "new_zealand_net_benefit.png").exists()
+    assert (figures_dir / "australia_net_benefit_caption.md").exists()
 
     publish_dir = tmp_path / "publish_pack"
     monkeypatch.setattr(
@@ -238,6 +248,16 @@ def test_generate_figures_and_publish_pack(tmp_path: Path, monkeypatch) -> None:
     assert (publish_dir / "policy_summary.csv").exists()
     assert (publish_dir / "reporting_manifest.json").exists()
     assert (publish_dir / "figures" / "australia_net_benefit.png").exists()
+
+    brief = (publish_dir / "POLICY_BRIEF.md").read_text(encoding="utf-8")
+    assert "Source:" not in brief
+    assert "Moratorium leads on mean net benefit" in brief
+    assert "premium indices from the insurance model" in brief
+
+    manifest = json.loads((publish_dir / "reporting_manifest.json").read_text(encoding="utf-8"))
+    assert "source_runs" in manifest
+    assert "source_run_dirs" not in manifest
+    assert manifest["source_runs"]["australia"]["run_id"] == "australia_20260306T010203Z"
 
 
 def test_publish_pack_writes_uncertainty_outputs_from_bundle(tmp_path: Path, monkeypatch) -> None:
@@ -262,6 +282,8 @@ def test_publish_pack_writes_uncertainty_outputs_from_bundle(tmp_path: Path, mon
 
     assert (publish_dir / "australia_evppi_by_group.csv").exists()
     assert (publish_dir / "new_zealand_uncertainty_decomposition.csv").exists()
+    assert (publish_dir / "figures" / "new_zealand_uncertainty_decomposition.png").exists()
+    assert (publish_dir / "figures" / "new_zealand_uncertainty_decomposition_caption.md").exists()
 
 
 def test_validation_and_output_formatting(tmp_path: Path) -> None:
@@ -272,7 +294,7 @@ def test_validation_and_output_formatting(tmp_path: Path) -> None:
             "welfare_change": 50_000.0,
             "compliance_change": 0.10,
         },
-        "statutory_ban": {
+        "ban": {
             "testing_uptake_change": 0.08,
             "premium_change": 0.03,
             "welfare_change": 75_000.0,
@@ -296,7 +318,7 @@ def test_validation_and_output_formatting(tmp_path: Path) -> None:
         output_path=brief_path,
     )
     brief = brief_path.read_text(encoding="utf-8")
-    assert "Statutory Ban" in brief
+    assert "Ban" in brief
 
     checks = run_ppc(
         simulated_data={"uptake": [0.48, 0.5, 0.52, 0.54, 0.56]},

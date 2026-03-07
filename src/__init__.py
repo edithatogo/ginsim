@@ -24,7 +24,7 @@ from .model.pipeline import (
 from .model.rng import RNGManager, get_global_rng, reset_global_rng
 
 __version__ = "0.2.0"
-__author__ = "Dylan A. Mordaunt"
+__author__ = "Dylan A Mordaunt"
 __all__ = [
     # Version
     "__version__",

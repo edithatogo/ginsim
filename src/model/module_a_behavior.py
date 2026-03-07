@@ -66,23 +66,25 @@ def compute_perceived_penalty(
     base_penalty = adverse_selection_elasticity * baseline_loading
 
     # Policy reduces penalty based on:
-    # 1. Information restrictions
+    # 1. The degree of information restriction
     # 2. Enforcement effectiveness
-
-    info_restriction = 1.0 if allow_genetic_test_results else 0.0
+    # 3. Whether the restriction is partial (moratorium/caps) or closer to a full ban
     enforcement_factor = enforcement_strength * enforcement_effectiveness
 
-    # Penalty reduction from policy
-    penalty_reduction = info_restriction * enforcement_factor
+    if allow_genetic_test_results:
+        restriction_strength = 0.0
+    elif sum_insured_caps is not None:
+        restriction_strength = 0.5 + moratorium_effect
+    else:
+        restriction_strength = 1.0
 
-    # Apply moratorium effect if applicable
-    if not allow_genetic_test_results and sum_insured_caps is not None:
-        penalty_reduction += moratorium_effect
+    penalty_reduction = restriction_strength * (0.5 + 0.5 * enforcement_factor)
+    penalty_reduction = min(penalty_reduction, 0.95)
 
     # Final perceived penalty
     perceived_penalty = base_penalty * (1.0 - penalty_reduction)
 
-    return jnp.array(perceived_penalty)
+    return jnp.asarray(perceived_penalty, dtype=jnp.float32)
 
 
 # Convenience wrapper that accepts ModelParameters and PolicyConfig
@@ -255,7 +257,7 @@ def get_standard_policies() -> dict[str, PolicyConfig]:
             description="Industry moratorium with caps",
             allow_genetic_test_results=False,
             allow_family_history=True,
-            sum_insured_caps={"death": 500000, "tpd": 200000, "trauma": 200000},
+            sum_insured_caps={"death": 500000.0, "tpd": 200000.0, "trauma": 200000.0},
             enforcement_strength=0.5,
         ),
         "ban": PolicyConfig(

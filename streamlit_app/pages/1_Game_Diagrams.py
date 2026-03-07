@@ -328,7 +328,7 @@ with col2:
         )
 
 with col3:
-    st.caption("Diagrams are generated using matplotlib and are publication-ready.")
+    st.caption("Diagrams are generated using matplotlib for model interpretation and review.")
 
 # Navigation
 st.divider()

@@ -24,14 +24,18 @@ from .module_c_insurance_eq import (
 from .module_c_insurance_eq import (
     get_standard_risk_parameters,
 )
+from .module_d_proxy import compute_proxy_substitution_effect
 from .module_enforcement import (
     compute_compliance_equilibrium,
 )
 from .module_f_data_quality import (
+    compute_data_quality_externality,
     compute_participation_rate,
+    compute_research_value_loss,
 )
 from .parameters import HyperParameters, ModelParameters, PolicyConfig
 from .rng import RNGManager
+from .dcba_ledger import compute_dual_horizon_dcba
 
 
 @dataclass
@@ -104,13 +108,28 @@ def evaluate_single_policy(
     logger.debug(f"Average premium: {float(insurance_premiums['avg_premium']):.3f}")
 
     # =========================================================================
-    # Module D: Proxy Substitution (simplified)
+    # Baseline metrics for comparative ledgering
     # =========================================================================
-    # Full implementation would require training data
-    proxy_metrics = {
-        "substitution_rate": params.proxy_substitution_rate,
-        "family_history_sensitivity": params.family_history_sensitivity,
-    }
+    standard_policies = get_standard_policies()
+    baseline_policy = standard_policies["status_quo"]
+    baseline_testing_uptake = compute_testing_uptake(params, baseline_policy, rng_key=rng_key)
+    baseline_insurance_eq = insurance_equilibrium(
+        params,
+        baseline_policy,
+        risk_high=risk_params["risk_high"],
+        risk_low=risk_params["risk_low"],
+        proportion_high=risk_params["proportion_high"],
+    )
+    baseline_avg_premium = (
+        baseline_insurance_eq.premium_high_risk + baseline_insurance_eq.premium_low_risk
+    ) / 2
+
+    # =========================================================================
+    # Module D: Proxy Substitution
+    # =========================================================================
+    proxy_metrics = compute_proxy_substitution_effect(params, baseline_policy, policy)
+    proxy_metrics["family_history_sensitivity"] = params.family_history_sensitivity
+    proxy_metrics["proxy_substitution_rate"] = params.proxy_substitution_rate
 
     # =========================================================================
     # Enforcement
@@ -122,24 +141,27 @@ def evaluate_single_policy(
     # Module F: Data Quality
     # =========================================================================
     research_participation = compute_participation_rate(params, policy, rng_key=rng_key)
+    data_quality_effect = compute_data_quality_externality(params, baseline_policy, policy)
+    research_value_gain = -compute_research_value_loss(
+        data_quality_effect["representativeness_baseline"],
+        data_quality_effect["representativeness_reform"],
+    )
 
     # =========================================================================
-    # Welfare Aggregation (simplified DCBA ledger)
+    # Welfare Aggregation (DCBA ledger + research externality)
     # =========================================================================
-    # Welfare = Testing benefits + Insurance consumer surplus - Costs
+    dcba_by_horizon = compute_dual_horizon_dcba(
+        testing_uptake=testing_uptake,
+        baseline_uptake=baseline_testing_uptake,
+        insurance_premium=insurance_premiums["avg_premium"],
+        baseline_premium=baseline_avg_premium,
+        insurer_profits=insurance_eq.insurer_profits,
+        baseline_profits=baseline_insurance_eq.insurer_profits,
+    )
 
-    # Testing benefits (more testing → more health benefits)
-    testing_benefit = testing_uptake * 100  # Simplified: 100 QALYs per tester
-
-    # Insurance consumer surplus (lower premiums → higher surplus)
-    avg_premium = insurance_premiums["avg_premium"]
-    consumer_surplus = (1.0 - avg_premium) * 50  # Simplified
-
-    # Compliance costs (higher compliance → higher administrative costs)
-    compliance_cost = compliance_outcome.compliance_rate * 10
-
-    # Net welfare
-    welfare_impact = testing_benefit + consumer_surplus - compliance_cost
+    short_term_ledger = dcba_by_horizon["short_term"]
+    long_term_ledger = dcba_by_horizon["long_term"]
+    welfare_impact = long_term_ledger.net_welfare + research_value_gain
     logger.info(f"Net welfare impact for {policy.name}: {float(welfare_impact):.2f}")
 
     # =========================================================================
@@ -156,11 +178,24 @@ def evaluate_single_policy(
         },
         "data_quality": {
             "research_participation": research_participation,
+            "research_value_gain": research_value_gain,
+            "participation_baseline": data_quality_effect["participation_baseline"],
+            "participation_reform": data_quality_effect["participation_reform"],
+            "representativeness_baseline": data_quality_effect["representativeness_baseline"],
+            "representativeness_reform": data_quality_effect["representativeness_reform"],
+            "performance_baseline": data_quality_effect["performance_baseline"],
+            "performance_reform": data_quality_effect["performance_reform"],
+            "selection_bias_baseline": data_quality_effect["selection_bias_baseline"],
+            "selection_bias_reform": data_quality_effect["selection_bias_reform"],
         },
         "welfare": {
-            "testing_benefit": testing_benefit,
-            "consumer_surplus": consumer_surplus,
-            "compliance_cost": compliance_cost,
+            "short_term_net_welfare": short_term_ledger.net_welfare,
+            "long_term_net_welfare": long_term_ledger.net_welfare,
+            "consumer_surplus": long_term_ledger.consumer_surplus,
+            "producer_surplus": long_term_ledger.producer_surplus,
+            "health_benefits": long_term_ledger.health_benefits,
+            "fiscal_impact": long_term_ledger.fiscal_impact,
+            "research_value_gain": research_value_gain,
             "net_welfare": welfare_impact,
         },
     }
@@ -271,11 +306,11 @@ def generate_policy_summary(
         lines.append(f"Policy: {policy_name}")
         lines.append("-" * 40)
         lines.append(f"Testing Uptake: {result.testing_uptake:.1%}")
-        lines.append(f"Average Premium: {result.insurance_premiums['avg_premium']:.3f}")
+        lines.append(f"Average Premium Index: {result.insurance_premiums['avg_premium']:.3f}")
         lines.append(f"Risk Rating: {result.insurance_premiums['risk_rating']:.3f}")
         lines.append(f"Compliance Rate: {result.compliance_rate:.1%}")
         lines.append(f"Research Participation: {result.research_participation:.1%}")
-        lines.append(f"Net Welfare Impact: {result.welfare_impact:.2f}")
+        lines.append(f"Long-run Net Welfare: {result.welfare_impact:.2f}")
         lines.append("")
 
     # Compare policies

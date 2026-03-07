@@ -38,6 +38,79 @@ class ScenarioComparison:
     delta_from_baseline: dict[str, dict[str, float]]
 
 
+def _build_model_parameters(scenario_config: dict[str, Any]) -> Any:
+    """Build validated ModelParameters from a scenario config."""
+    from src.model.parameters import ModelParameters, PolicyConfig
+
+    params_dict = dict(scenario_config.get("parameters", {}))
+    model_fields = set(ModelParameters.model_fields)
+    policy_fields = set(PolicyConfig.model_fields)
+
+    invalid_fields = sorted(
+        key for key in params_dict if key not in model_fields and key not in policy_fields
+    )
+    if invalid_fields:
+        message = (
+            "Scenario contains unsupported parameter field(s): "
+            + ", ".join(invalid_fields)
+            + ". Move policy controls into `policy_overrides` or remove illustrative-only fields."
+        )
+        raise ValueError(message)
+
+    model_updates = {key: value for key, value in params_dict.items() if key in model_fields}
+    jurisdiction = scenario_config.get("jurisdiction", "").strip().upper()
+    if jurisdiction == "AU":
+        model_updates.setdefault("jurisdiction", "australia")
+    elif jurisdiction == "NZ":
+        model_updates.setdefault("jurisdiction", "new_zealand")
+
+    return ModelParameters(**model_updates)
+
+
+def _infer_policy_id(scenario_name: str, scenario_config: dict[str, Any]) -> str:
+    explicit_policy_id = scenario_config.get("policy_id")
+    if explicit_policy_id:
+        return str(explicit_policy_id)
+
+    normalized_name = f"{scenario_name} {scenario_config.get('name', '')}".lower()
+    if "moratorium" in normalized_name or "code" in normalized_name:
+        return "moratorium"
+    if "ban" in normalized_name or "gnda" in normalized_name:
+        return "ban"
+    return "status_quo"
+
+
+def _build_policy_config(scenario_name: str, scenario_config: dict[str, Any]) -> Any:
+    """Build validated PolicyConfig from scenario config."""
+    from src.model.module_a_behavior import get_standard_policies
+
+    policies = get_standard_policies()
+    policy_id = _infer_policy_id(scenario_name, scenario_config)
+    if policy_id not in policies:
+        available = ", ".join(sorted(policies))
+        raise ValueError(f"Unknown policy_id '{policy_id}'. Available policies: {available}")
+
+    policy = policies[policy_id]
+    policy_updates = dict(scenario_config.get("policy_overrides", {}))
+
+    # Backward compatibility: allow policy fields in parameters, but only if valid.
+    parameter_values = scenario_config.get("parameters", {})
+    valid_policy_fields = set(policy.model_fields)
+    for key, value in parameter_values.items():
+        if key in valid_policy_fields and key not in policy_updates:
+            policy_updates[key] = value
+
+    invalid_policy_fields = sorted(key for key in policy_updates if key not in valid_policy_fields)
+    if invalid_policy_fields:
+        message = (
+            "Scenario contains unsupported policy override field(s): "
+            + ", ".join(invalid_policy_fields)
+        )
+        raise ValueError(message)
+
+    return policy.model_copy(update=policy_updates)
+
+
 def load_scenarios(config_path: Path | str) -> dict[str, Any]:
     """
     Load scenario definitions from YAML config.
@@ -74,26 +147,8 @@ def evaluate_scenario(
     Returns:
         ScenarioResult with outcomes
     """
-    from src.model.parameters import ModelParameters
-
-    # Extract parameters
-    params_dict = scenario_config.get("parameters", {})
-
-    # Create model parameters
-    try:
-        model_params = ModelParameters(**params_dict)
-    except Exception:
-        # Handle missing parameters with defaults
-        model_params = ModelParameters()
-        for key, value in params_dict.items():
-            if hasattr(model_params, key):
-                setattr(model_params, key, value)
-
-    # Get policy config (simplified - use default policy)
-    from src.model.module_a_behavior import get_standard_policies
-
-    policies = get_standard_policies()
-    policy = policies.get("status_quo", list(policies.values())[0])
+    model_params = _build_model_parameters(scenario_config)
+    policy = _build_policy_config(scenario_name, scenario_config)
 
     # Evaluate
     result = model_func(model_params, policy)
@@ -116,6 +171,8 @@ def evaluate_scenario(
             "welfare_impact": welfare_impact,
             "qalys_gained": qalys_gained,
             "compliance_rate": compliance_rate,
+            "policy_name": policy.name,
+            "policy_description": policy.description,
         },
     )
 
@@ -221,7 +278,7 @@ def run_scenario_analysis(
         ScenarioComparison object
     """
     if config_path is None:
-        config_path = Path(__file__).parent.parent / "configs" / "scenarios.yaml"
+        config_path = Path(__file__).resolve().parents[2] / "configs" / "scenarios.yaml"
 
     if model_func is None:
         from src.model.pipeline import evaluate_single_policy as default_model_func

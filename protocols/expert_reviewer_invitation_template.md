@@ -59,8 +59,8 @@ Thank you for considering this request.
 
 **Ngā mihi / Best regards,**
 
-Dylan A. Mordaunt  
-Victoria University of Wellington  
+Dylan A Mordaunt  
+Research Fellow, Faculty of Health, Education and Psychology, Victoria University of Wellington  
 [Email] | [Phone]
 
 ---

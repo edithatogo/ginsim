@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import runpy
 import sys
 from pathlib import Path
@@ -17,6 +18,7 @@ def run_source_path(source_path: Path) -> None:
 
     if str(REPO_ROOT) not in sys.path:
         sys.path.insert(0, str(REPO_ROOT))
+    os.chdir(REPO_ROOT)
     runpy.run_path(str(source_path), run_name="__main__")
 
 

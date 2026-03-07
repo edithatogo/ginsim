@@ -85,12 +85,13 @@ baseline_options = {
     "nz_current": "New Zealand Current",
 }
 
-baseline_key = st.sidebar.selectbox(
+baseline_label_to_key = {label: key for key, label in baseline_options.items()}
+baseline_label = st.sidebar.selectbox(
     "Select Baseline",
-    list(baseline_options.keys()),
-    format_func=lambda x: baseline_options[x],
+    list(baseline_label_to_key.keys()),
     help="Baseline policy for delta calculations",
 )
+baseline_key = baseline_label_to_key[baseline_label]
 
 # Comparison policies selector
 st.sidebar.subheader("Policies to Compare")

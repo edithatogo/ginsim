@@ -79,14 +79,18 @@ def load_scenarios_cached():
 scenarios = load_scenarios_cached()
 
 # Scenario selector
-scenario_options = {name: config.get("name", name) for name, config in scenarios.items()}
+scenario_labels = {
+    name: f"{config.get('name', name)} ({config.get('jurisdiction', 'Unknown')})"
+    for name, config in scenarios.items()
+}
+scenario_label_to_key = {label: key for key, label in scenario_labels.items()}
 
-selected_scenario_key = st.sidebar.selectbox(
+selected_scenario_label = st.sidebar.selectbox(
     "Select Scenario",
-    list(scenario_options.keys()),
-    format_func=lambda x: f"{scenario_options[x]} ({scenarios[x].get('jurisdiction', 'Unknown')})",
+    list(scenario_label_to_key.keys()),
     help="Choose a predefined policy scenario",
 )
+selected_scenario_key = scenario_label_to_key[selected_scenario_label]
 
 # Display scenario description
 if selected_scenario_key in scenarios:
@@ -104,12 +108,13 @@ baseline_options = {
     "nz_current": "New Zealand Current",
 }
 
-baseline_key = st.sidebar.selectbox(
+baseline_label_to_key = {label: key for key, label in baseline_options.items()}
+baseline_label = st.sidebar.selectbox(
     "Baseline for Comparison",
-    list(baseline_options.keys()),
-    format_func=lambda x: baseline_options[x],
+    list(baseline_label_to_key.keys()),
     help="Select baseline scenario for delta calculations",
 )
+baseline_key = baseline_label_to_key[baseline_label]
 
 # Run button
 if st.sidebar.button("🔬 Run Scenario Comparison", type="primary"):

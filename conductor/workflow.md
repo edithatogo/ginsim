@@ -120,7 +120,8 @@ Recommended instantiation path:
 python -m scripts.create_nature_depth_track \
   --track-id <track_id> \
   --title "<title>" \
-  --aspect "<single_repo_aspect>"
+  --aspect "<single_repo_aspect>" \
+  --status planned
 ```
 
 ## Minimal development commands

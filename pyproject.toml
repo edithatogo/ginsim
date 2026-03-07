@@ -186,6 +186,7 @@ ignore = [
 "scripts/*" = ["ANN", "T201", "INP001"]
 "examples/*" = ["ANN", "T201", "S101", "INP001"]
 "streamlit_app/*" = ["ANN", "T201"]
+"conductor/templates/*" = ["INP001"]
 
 [tool.pyright]
 pythonVersion = "3.10"

@@ -9,6 +9,7 @@ This directory holds reusable Conductor templates for recurring track patterns.
   - Designed for use across Codex, Gemini CLI, and Qwen Code.
   - Uses Ralph-loop style repeated improvement, Conductor review gates, automatic in-scope remediation, remote push discipline, workflow verification, and Streamlit app verification.
   - Can be instantiated with `python -m scripts.create_nature_depth_track ...`.
+  - Seeds handoff and review artifacts so another coding agent can resume without hidden context.
 
 ## Template use rule
 

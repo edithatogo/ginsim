@@ -26,6 +26,7 @@ def test_instantiate_track_creates_seeded_artifacts_and_updates_registry(tmp_pat
             }
         ),
         "AUTONOMOUS_CYCLE.md": "# Cycle\n",
+        "HANDOFF.template.md": "# Handoff for <track_id>\nStatus: <status>\n",
         "TRACK_CLOSEOUT.template.md": "# Closeout for <track_id>\n",
         "TEMPLATE_REFLECTION_LOG.md": "# Reflection log\n",
     }
@@ -37,6 +38,12 @@ def test_instantiate_track_creates_seeded_artifacts_and_updates_registry(tmp_pat
         "\n".join(
             [
                 "# Tracks registry",
+                "",
+                "## Active Tracks",
+                "",
+                "| Track ID | Title | Status | Link |",
+                "|---|---|---|---|",
+                "| _None_ | | | |",
                 "",
                 "## Planned Tracks",
                 "",
@@ -60,12 +67,14 @@ def test_instantiate_track_creates_seeded_artifacts_and_updates_registry(tmp_pat
         title="Test Track",
         aspect="generator coverage",
         estimate="1 day",
+        status="active",
     )
 
     assert track_dir.exists()
     assert (track_dir / "spec.md").read_text(encoding="utf-8").find("Test Track") != -1
     assert (track_dir / "plan.md").read_text(encoding="utf-8").find("1 day") != -1
     assert (track_dir / "AUTONOMOUS_CYCLE.md").exists()
+    assert (track_dir / "HANDOFF.md").exists()
     assert (track_dir / "TRACK_COMPLETE.md").exists()
     assert (track_dir / "TEMPLATE_REFLECTION_LOG.seed.md").exists()
 
@@ -79,7 +88,21 @@ def test_instantiate_track_creates_seeded_artifacts_and_updates_registry(tmp_pat
     assert metadata["track_id"] == "gdpe_1234_test_track"
     assert metadata["title"] == "Test Track"
     assert metadata["aspect"] == "generator coverage"
+    assert metadata["status"] == "active"
 
     registry_text = registry_path.read_text(encoding="utf-8")
-    assert "| gdpe_1234_test_track | Test Track | Planned |" in registry_text
+    assert "| gdpe_1234_test_track | Test Track | Active |" in registry_text
     assert "| _None_ | | | |" not in registry_text
+
+
+def test_conductor_tracking_files_are_not_ignored() -> None:
+    tracked_paths = [
+        "conductor/index.md",
+        "conductor/workflow.md",
+        "conductor/templates/README.md",
+        "conductor/templates/nature_depth_cycle/README.md",
+    ]
+    gitignore_text = (create_nature_depth_track.REPO_ROOT / ".gitignore").read_text(encoding="utf-8")
+
+    for tracked_path in tracked_paths:
+        assert f"!{tracked_path}" in gitignore_text or tracked_path.startswith("conductor/templates/")

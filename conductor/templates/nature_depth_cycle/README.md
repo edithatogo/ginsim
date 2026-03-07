@@ -22,6 +22,7 @@ It is deliberately tool-agnostic and written so it can be used by Codex, Gemini 
 - `plan.template.md`
 - `metadata.template.json`
 - `AUTONOMOUS_CYCLE.md`
+- `HANDOFF.template.md`
 - `TRACK_CLOSEOUT.template.md`
 - `TEMPLATE_REFLECTION_LOG.md`
 
@@ -43,7 +44,8 @@ Instantiate a real track from this template with:
 python -m scripts.create_nature_depth_track \
   --track-id gdpe_00xx_example \
   --title "Example title" \
-  --aspect "single repository aspect"
+  --aspect "single repository aspect" \
+  --status planned
 ```
 
 After generation:

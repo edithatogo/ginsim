@@ -50,6 +50,7 @@ def build_index(track_id: str, title: str) -> str:
             "- [Plan](./plan.md)",
             "- [Metadata](./metadata.json)",
             "- [Autonomous Cycle](./AUTONOMOUS_CYCLE.md)",
+            "- [Handoff](./HANDOFF.md)",
             "- [Track Complete](./TRACK_COMPLETE.md)",
             "",
             "## Expected phase artifacts",
@@ -82,24 +83,38 @@ def build_placeholder_artifact(title: str) -> str:
     ) + "\n"
 
 
-def update_tracks_registry(track_id: str, title: str) -> None:
-    """Insert the generated track into the Planned Tracks table."""
+def update_tracks_registry(track_id: str, title: str, status: str) -> None:
+    """Insert the generated track into the requested registry section."""
     registry_text = TRACKS_REGISTRY.read_text(encoding="utf-8")
-    planned_none_row = "| _None_ | | | |"
+    normalized_status = status.strip().lower()
+    if normalized_status not in {"planned", "active"}:
+        raise ValueError(f"Unsupported track status: {status}")
+
+    section_title = "## Planned Tracks" if normalized_status == "planned" else "## Active Tracks"
+    replacement_status = "Planned" if normalized_status == "planned" else "Active"
+    empty_row = "| _None_ | | | |"
     new_row = (
-        f"| {track_id} | {title} | Planned | "
+        f"| {track_id} | {title} | {replacement_status} | "
         f"[track](./tracks/{track_id}/index.md) |"
     )
 
     if new_row in registry_text:
         return
 
-    if planned_none_row in registry_text:
-        registry_text = registry_text.replace(planned_none_row, new_row)
+    section_start = registry_text.find(section_title)
+    if section_start == -1:
+        raise ValueError(f"Could not find registry section: {section_title}")
+
+    next_section = registry_text.find("\n## ", section_start + len(section_title))
+    section_end = len(registry_text) if next_section == -1 else next_section
+    section_block = registry_text[section_start:section_end]
+
+    if empty_row in section_block:
+        section_block = section_block.replace(empty_row, new_row, 1)
     else:
-        marker = "## Completed Follow-up Tracks"
-        insertion = f"{new_row}\n\n{marker}"
-        registry_text = registry_text.replace(marker, insertion)
+        section_block = section_block.rstrip() + "\n" + new_row + "\n"
+
+    registry_text = registry_text[:section_start] + section_block + registry_text[section_end:]
 
     TRACKS_REGISTRY.write_text(registry_text, encoding="utf-8")
 
@@ -109,6 +124,7 @@ def instantiate_track(
     title: str,
     aspect: str,
     estimate: str,
+    status: str,
 ) -> Path:
     """Create a new track directory from the template."""
     track_dir = TRACKS_DIR / track_id
@@ -123,6 +139,17 @@ def instantiate_track(
         "repo_aspect": aspect,
         "yyyy-mm-dd": date.today().isoformat(),
         "estimate": estimate,
+        "status": status.lower(),
+        "phase": "phase_0",
+        "artifact": "spec.md / plan.md",
+        "change_1": "<change_1>",
+        "change_2": "<change_2>",
+        "next_action_1": "Run track refinement round 1",
+        "next_action_2": "Incorporate refinements into spec.md and plan.md",
+        "next_action_3": "Begin Phase 0 review",
+        "local_verification": "not yet run",
+        "remote_verification": "not yet run",
+        "streamlit_verification": "not yet run",
         "next_track_id": "<next_track_id>",
         "sha": "<sha>",
         "why": "<why>",
@@ -139,6 +166,7 @@ def instantiate_track(
         "plan.template.md": "plan.md",
         "metadata.template.json": "metadata.json",
         "AUTONOMOUS_CYCLE.md": "AUTONOMOUS_CYCLE.md",
+        "HANDOFF.template.md": "HANDOFF.md",
         "TRACK_CLOSEOUT.template.md": "TRACK_COMPLETE.md",
     }
 
@@ -173,9 +201,10 @@ def instantiate_track(
     metadata["track_id"] = track_id
     metadata["title"] = title
     metadata["aspect"] = aspect
+    metadata["status"] = status.lower()
     metadata_path.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
 
-    update_tracks_registry(track_id, title)
+    update_tracks_registry(track_id, title, status)
 
     return track_dir
 
@@ -196,6 +225,12 @@ def main() -> None:
         default="2-5 days",
         help="Estimated duration to write into the plan template",
     )
+    parser.add_argument(
+        "--status",
+        default="planned",
+        choices=["planned", "active"],
+        help="Registry section to insert the track into",
+    )
     args = parser.parse_args()
 
     track_dir = instantiate_track(
@@ -203,6 +238,7 @@ def main() -> None:
         title=args.title,
         aspect=args.aspect,
         estimate=args.estimate,
+        status=args.status,
     )
 
     print(f"Created track template at: {track_dir}")

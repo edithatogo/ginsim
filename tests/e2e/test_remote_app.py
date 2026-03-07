@@ -2,7 +2,7 @@ import os
 import time
 
 import pytest
-from playwright.sync_api import Page, sync_playwright
+from playwright.sync_api import Frame, Page, sync_playwright
 
 REMOTE_DASHBOARD_URL = os.environ.get("GDPE_REMOTE_DASHBOARD_URL")
 REMOTE_DASHBOARD_TIMEOUT_MS = int(os.environ.get("GDPE_REMOTE_DASHBOARD_TIMEOUT_MS", "420000"))
@@ -12,6 +12,14 @@ EXPECTED_NAV_BUTTONS = (
     "📊 Go to Sensitivity Analysis",
     "🎯 Go to Scenario Analysis",
 )
+EXPECTED_SIDEBAR_PAGES = (
+    ("Game Diagrams", "Game Diagrams"),
+    ("Sensitivity", "Comprehensive Sensitivity Analysis"),
+    ("Scenarios", "Scenario Analysis & Policy Sandbox"),
+    ("Extended Games", "Extended Strategic Games"),
+    ("Delta View", "Comparative Delta View"),
+    ("app", EXPECTED_HEADING),
+)
 EXPECTED_RESULT_LABELS = (
     "Testing Uptake",
     "Long-run Net Welfare",
@@ -20,18 +28,56 @@ EXPECTED_RESULT_LABELS = (
 )
 KNOWN_ERROR_TEXT = (
     "Error installing requirements.",
+    "Error running app",
     "This app has encountered an error",
     "Could not find page:",
-    "Manage app",
+    "Please contact support.",
 )
 
 
-def _body_text(page: Page) -> str:
-    """Read page body text defensively for smoke assertions."""
-    return page.locator("body").inner_text(timeout=10_000)
+def _surface_text(page: Page) -> str:
+    """Read outer page text defensively for smoke assertions."""
+    try:
+        return page.locator("body").inner_text(timeout=10_000)
+    except Exception:
+        return ""
 
 
-def _wait_for_dashboard(page: Page, remote_url: str) -> str:
+def _frame_body_text(frame: Frame) -> str:
+    """Read a frame body if it is accessible and rendered."""
+    try:
+        return frame.locator("body").inner_text(timeout=5_000)
+    except Exception:
+        return ""
+
+
+def _dashboard_frame_and_text(page: Page) -> tuple[Frame | None, str]:
+    """Return the Streamlit app frame and its text when available."""
+    for frame in page.frames:
+        body_text = _frame_body_text(frame)
+        if EXPECTED_HEADING in body_text:
+            return frame, body_text
+
+    return None, _surface_text(page)
+
+
+def _wait_for_frame_text(frame: Frame, expected_text: str, timeout_ms: int = 30_000) -> str:
+    """Wait until expected text appears in the dashboard frame."""
+    deadline = time.time() + (timeout_ms / 1000)
+    last_text = ""
+
+    while time.time() < deadline:
+        body_text = _frame_body_text(frame)
+        if expected_text in body_text:
+            return body_text
+
+        last_text = body_text[:500]
+        frame.page.wait_for_timeout(1_500)
+
+    pytest.fail(f"Timed out waiting for {expected_text!r}. Last frame text: {last_text}")
+
+
+def _wait_for_dashboard(page: Page, remote_url: str) -> tuple[Frame, str]:
     """Poll until the deployed dashboard becomes available or timeout expires."""
     deadline = time.time() + (REMOTE_DASHBOARD_TIMEOUT_MS / 1000)
     last_state = "dashboard did not render"
@@ -39,10 +85,10 @@ def _wait_for_dashboard(page: Page, remote_url: str) -> str:
     while time.time() < deadline:
         page.goto(remote_url, wait_until="domcontentloaded", timeout=120_000)
         page.wait_for_timeout(8_000)
-        body_text = _body_text(page)
+        dashboard_frame, body_text = _dashboard_frame_and_text(page)
 
-        if EXPECTED_HEADING in body_text:
-            return body_text
+        if dashboard_frame is not None:
+            return dashboard_frame, body_text
 
         matched_error = next((text for text in KNOWN_ERROR_TEXT if text in body_text), None)
         if matched_error is not None:
@@ -71,7 +117,7 @@ def test_remote_app_loads():
         page = context.new_page()
 
         try:
-            body_text = _wait_for_dashboard(page, REMOTE_DASHBOARD_URL)
+            dashboard_frame, body_text = _wait_for_dashboard(page, REMOTE_DASHBOARD_URL)
 
             assert EXPECTED_HEADING in body_text
             assert "Plain-language guide and glossary" in body_text
@@ -81,18 +127,25 @@ def test_remote_app_loads():
             for nav_button in EXPECTED_NAV_BUTTONS:
                 assert nav_button in body_text
 
-            page.get_by_role("button", name="🔬 Run Model").click(timeout=30_000)
+            dashboard_frame.get_by_role("button", name="🔬 Run Model").click(timeout=30_000)
             page.wait_for_timeout(5_000)
-            body_text = _body_text(page)
+            body_text = _frame_body_text(dashboard_frame)
 
             assert "Model evaluation complete!" in body_text
             for label in EXPECTED_RESULT_LABELS:
                 assert label in body_text
 
-            page.get_by_role("button", name="📊 Go to Sensitivity Analysis").click(timeout=30_000)
+            dashboard_frame.get_by_role("button", name="📊 Go to Sensitivity Analysis").click(timeout=30_000)
             page.wait_for_timeout(5_000)
-            body_text = _body_text(page)
+            body_text = _frame_body_text(dashboard_frame)
             assert "Comprehensive Sensitivity Analysis" in body_text
+
+            sidebar_nav = dashboard_frame.get_by_test_id("stSidebarNavItems")
+            for sidebar_label, expected_heading in EXPECTED_SIDEBAR_PAGES:
+                sidebar_nav.get_by_role("link", name=sidebar_label).click(timeout=30_000)
+                page.wait_for_timeout(4_000)
+                body_text = _wait_for_frame_text(dashboard_frame, expected_heading)
+                assert expected_heading in body_text
         finally:
             browser.close()
 

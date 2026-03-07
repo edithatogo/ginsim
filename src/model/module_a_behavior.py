@@ -10,6 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+import jax
 import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import Array, Float
@@ -53,7 +54,7 @@ def compute_perceived_penalty(
         restriction_strength = 1.0
 
     penalty_reduction = restriction_strength * (0.5 + 0.5 * enforcement_factor)
-    penalty_reduction = min(penalty_reduction, 0.95)
+    penalty_reduction = jnp.clip(penalty_reduction, 0.0, 0.95)
 
     # Final perceived penalty
     perceived_penalty = base_penalty * (1.0 - penalty_reduction)
@@ -103,10 +104,11 @@ def compute_testing_probability(
     scale: float = 1.0,
 ) -> Float[Array, "*"]:
     """
-    Compute probability of testing.
+    Compute probability of testing using numerically stable sigmoid.
     """
     scaled_utility = utility * scale
-    return jnp.exp(scaled_utility) / (1.0 + jnp.exp(scaled_utility))
+    # jax.nn.sigmoid is numerically stabilized for large values
+    return jax.nn.sigmoid(scaled_utility)
 
 
 def compute_testing_uptake(
@@ -190,7 +192,7 @@ def evaluate_multiple_policies(
 
 def get_standard_policies() -> dict[str, PolicyConfig]:
     """
-    Get standard policy configurations with scales matching existing tests.
+    Get standard policy configurations.
     """
     return {
         "status_quo": PolicyConfig(

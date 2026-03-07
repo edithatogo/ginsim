@@ -3,11 +3,6 @@ Module D: Proxy Substitution model.
 
 Implements constrained optimization for underwriting when genetic information
 is restricted.
-
-Strategic Game: Constrained Optimization under Regulatory Constraints
-- Players: Insurers (choosing underwriting weights), Regulator (constraints)
-- Mechanism: Re-optimization using proxy variables
-- Equilibrium: Optimal underwriting model given restricted information set
 """
 
 from __future__ import annotations
@@ -16,7 +11,7 @@ from dataclasses import dataclass
 
 import jax
 import jax.numpy as jnp
-from jax import grad, jit
+from jax import grad, jit, lax
 from jaxtyping import Array, Float
 
 from .parameters import ModelParameters, PolicyConfig
@@ -32,7 +27,7 @@ class UnderwritingAccuracy:
     mispricing_error: float
 
 
-@jit
+@jit(static_argnames=["params", "policy", "max_iterations"])
 def optimize_underwriting(
     params: ModelParameters,
     policy: PolicyConfig,
@@ -42,45 +37,34 @@ def optimize_underwriting(
 ) -> dict[str, Float[Array, ""]]:
     """
     Optimize underwriting model under policy constraints.
-
-    Args:
-        params: Model parameters
-        policy: Policy configuration
-        training_data: Dictionary with 'features', 'outcomes'
-        max_iterations: Maximum optimization iterations
-        noise_level: Level of adversarial noise in proxy features (0-1)
-
-    Returns:
-        Dictionary with optimized weights and accuracy metrics
+    Uses jax.lax.scan for high-performance iteration.
     """
     features = training_data["features"]
     outcomes = training_data["outcomes"]
 
-    # Inject adversarial noise if level > 0 (AL_1.2.1)
     if noise_level > 0:
         noise_matrix = jnp.ones_like(features) * noise_level
         features = features + noise_matrix
 
     n_features = features.shape[1]
-
-    # Initialize weights
     weights = jnp.ones(n_features) * 0.1
+    lr = 0.01
 
-    # Loss function: negative log-likelihood (MSE proxy)
     def loss_fn(w: Array) -> Float[Array, ""]:
         preds = jnp.dot(features, w)
         return jnp.mean((preds - outcomes) ** 2)
 
-    # Simple gradient descent
-    lr = 0.01
-    for _ in range(max_iterations):
-        g = grad(loss_fn)(weights)
-        weights = weights - lr * g
+    def step_fn(w, _):
+        g = grad(loss_fn)(w)
+        w_new = w - lr * g
+        return w_new, None
 
-    final_loss = loss_fn(weights)
+    # Use scan for efficient JIT-compatible looping
+    final_weights, _ = lax.scan(step_fn, weights, None, length=max_iterations)
+    final_loss = loss_fn(final_weights)
 
     return {
-        "weights": weights,
+        "weights": final_weights,
         "loss": final_loss,
         "accuracy": 1.0 - final_loss,
     }
@@ -92,7 +76,7 @@ def compute_auc_loss(
     features: Array,
     outcomes: Array,
 ) -> Float[Array, ""]:
-    """Compute AUC-like loss (predictive error)."""
+    """Compute predictive error."""
     preds = jnp.dot(features, weights)
     return jnp.mean((preds - outcomes) ** 2)
 
@@ -103,7 +87,7 @@ def compute_risk_score(
     *,
     include_genetic: bool = True,
 ) -> float:
-    """Compute a simple linear risk score from named features."""
+    """Compute risk score."""
     score = 0.0
     for feature_name, feature_value in features.items():
         if not include_genetic and feature_name == "genetic_test_result":
@@ -117,7 +101,7 @@ def compute_claim_probability(
     *,
     intercept: float = 0.0,
 ) -> float:
-    """Map a scalar risk score to claim probability via logistic link."""
+    """Logistic link function."""
     return float(jax.nn.sigmoid(risk_score + intercept))
 
 
@@ -127,7 +111,7 @@ def compute_underwriting_accuracy(
     *,
     threshold: float = 0.5,
 ) -> UnderwritingAccuracy:
-    """Compute basic underwriting accuracy metrics for compatibility tests."""
+    """Compute basic underwriting accuracy metrics."""
     predicted_positive = predicted >= threshold
     actual_positive = actual >= threshold
 
@@ -149,48 +133,14 @@ def compute_underwriting_accuracy(
     )
 
 
-def compute_equity_metrics(
-    weights: Array,
-    features: Array,
-    outcomes: Array,
-    n_quintiles: int = 5,
-) -> dict[str, list[float]]:
-    """
-    Compute predictive loss broken down by equity quintiles.
-
-    AL_1.4.2: SOTA Algorithmic Fairness requirement.
-    """
-    # Sort by outcome (risk level)
-    idx = jnp.argsort(outcomes)
-    features_sorted = features[idx]
-    outcomes_sorted = outcomes[idx]
-
-    # Split into quintiles
-    chunk_size = len(outcomes) // n_quintiles
-    quintile_losses = []
-
-    for i in range(n_quintiles):
-        start = i * chunk_size
-        end = (i + 1) * chunk_size if i < n_quintiles - 1 else len(outcomes)
-
-        q_feat = features_sorted[start:end]
-        q_out = outcomes_sorted[start:end]
-
-        loss = compute_auc_loss(weights, q_feat, q_out)
-        quintile_losses.append(float(loss))
-
-    return {
-        "quintile_losses": quintile_losses,
-        "max_disparity": max(quintile_losses) / (min(quintile_losses) + 1e-10),
-    }
-
-
 def compute_proxy_substitution_effect(
     params: ModelParameters,
     baseline_policy: PolicyConfig,
     reform_policy: PolicyConfig,
 ) -> dict[str, float]:
-    """Compute effect of proxy substitution."""
+    """
+    Compute effect of proxy substitution and the resulting 'Information Gap'.
+    """
     baseline_accuracy = 0.8
 
     if reform_policy.allow_genetic_test_results:
@@ -201,6 +151,8 @@ def compute_proxy_substitution_effect(
             params.family_history_sensitivity * 0.35 if reform_policy.allow_family_history else 0.0
         )
         enforcement_drag = 1.0 - (0.35 * reform_policy.enforcement_strength)
+
+        # SOTA logic: criminal penalties reduce reconstruction power more than civil
         criminal_drag = 0.85 if reform_policy.penalty_type == "criminal" else 1.0
 
         residual_capture = jnp.clip(
@@ -211,7 +163,8 @@ def compute_proxy_substitution_effect(
         reform_accuracy = float(baseline_accuracy * residual_capture)
 
     accuracy_loss = baseline_accuracy - reform_accuracy
-    residual_information_gap = max(0.0, 1.0 - (reform_accuracy / baseline_accuracy))
+    # The Information Gap measures how much genetic info remains concealed
+    residual_information_gap = max(0.0, 1.0 - (reform_accuracy / (baseline_accuracy + 1e-10)))
 
     return {
         "accuracy_baseline": baseline_accuracy,
@@ -226,12 +179,11 @@ def compute_family_history_accuracy(
     family_history_or_specificity: Array | float = 0.9,
     mutation: Array | None = None,
 ) -> Float[Array, ""] | dict[str, float]:
-    """Compute family history accuracy score or legacy test metrics."""
+    """Compute family history accuracy score."""
     if isinstance(sensitivity_or_params, ModelParameters):
         params = sensitivity_or_params
         if mutation is None:
-            msg = "mutation array is required when passing ModelParameters"
-            raise ValueError(msg)
+            raise ValueError("mutation array is required when passing ModelParameters")
 
         family_history = jnp.asarray(family_history_or_specificity)
         mutation_arr = jnp.asarray(mutation)
@@ -248,7 +200,7 @@ def compute_family_history_accuracy(
 
 
 def get_standard_proxy_features() -> list[str]:
-    """Get list of standard proxy features used in underwriting."""
+    """Get list of standard proxy features."""
     return [
         "age",
         "sex",
@@ -262,5 +214,5 @@ def get_standard_proxy_features() -> list[str]:
 
 
 def get_standard_features() -> list[str]:
-    """Backward-compatible alias for the proxy feature list."""
+    """Backward-compatible alias."""
     return get_standard_proxy_features()

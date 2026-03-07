@@ -1,116 +1,57 @@
-# Track Specification: Empirical traceability and legacy analysis closure
+# Track Specification: Diamond-Standard Element-by-Element Hardening
 
 **Track ID:** gdpe_0022_empirical_traceability_and_legacy_closure  
-**Type:** Nature-Depth Improvement Cycle  
-**Aspect:** empirical grounding, assumption traceability, and closure of legacy decomposition or uncertainty-analysis surfaces  
+**Type:** Nature-Depth Improvement Cycle (Iterative Element Pattern)  
+**Aspect:** Comprehensive SOTA Hardening of Infrastructure, Inputs, Assumptions, and Formulae  
 **Date:** 2026-03-07
 
 ---
 
 ## 1. Objective
 
-Take the repository aspect `empirical grounding, assumption traceability, and closure of legacy decomposition or uncertainty-analysis surfaces` from its current state to the strongest publication-grade, reviewer-defensible, deployment-safe state that is realistically achievable within one track.
+Systematically process the repository via the **Rigorous Iteration Pattern**. This track transforms the project into a "Diamond-Standard" research repository: technically unassailable (SOTA CI/CD, JAX proofs, PBT) and perfectly accessible (humanized dashboard, narrative audits).
 
-This track must not behave like a shallow bugfix pass. It must:
+## 2. Autonomous Phase Progression (The "Unattended" Loop)
+This track operates in **full autonomous mode** with the following systemic constraints:
+- **Circuit Breaker Rule:** If the agent fails to resolve a test error or linting warning within **3 attempts**, it must halt the autonomous loop, document the failure in `LOG_OBSERVABILITY.md`, and return control to the user.
+- **Programmatic Phase Gates:** Completion is not subjective. Every phase must pass a mandatory `scripts/conductor_gate.py` check (100% coverage, zero warnings, zero errors) before progression.
+- **Atomic Phase Commits:** Upon successful gate verification, the agent will execute a `git commit` to create a verified snapshot.
+- **Context Shedding:** At the end of each phase, the agent must synthesize findings into a `PHASE_SUMMARY.md` and explicitly reset its focus.
+- **Observability Trail:** The agent must maintain `LOG_OBSERVABILITY.md` tracking all research findings, tool outputs, and red-team critiques for full replayability.
 
-- explore the aspect in depth;
-- judge it against Nature-family expectations for sophistication, coherence, traceability, UX, reproducibility, and completeness;
-- identify gaps, placeholders, scaffolding, drift, and hidden downstream effects;
-- implement the highest-value closure work;
-- review itself before phase progression and before closure;
-- push validated changes remotely and confirm the remote workflows and Streamlit deployment status;
-- create the next track if flow-on work remains.
+## 3. The Rigorous Iteration Pattern (Zero-Defect Gate)
+Each aspect follows the **Ralph Loop** (Research -> Select -> Implement -> Verify):
+- **Adversarial Red Teaming:** During the "Selection" phase, the agent must document at least 3 reasons why the proposed SOTA solution might fail.
+- **Selection Heuristic:** Every improvement must be scored (1-10) against **Rigor**, **Maintainability**, and **Accessibility**.
+- **Absolute Verification:** 100% test coverage, zero `ruff` warnings, zero `pyright` errors, zero security vulnerabilities (`pip-audit`).
 
-This track opts into:
+## 4. Scope of Current Track
 
-- autonomous phase-loop execution;
-- Ralph-style iterative improvement;
-- post-phase Conductor review and auto-remediation;
-- post-push workflow monitoring;
-- end-of-track next-track creation;
-- template reflection and improvement.
+### 4.1 Element 0: SOTA Infrastructure & Repo Management
+- **Unified Dependencies:** Transition to `uv` and `uv.lock`.
+- **Hermetic CI/CD:** Rewrite GitHub Actions for `uv` parity and security.
+- **Registry Synchronization:** Implement `scripts/sync_registry.py` to auto-rebuild `tracks.md` from `metadata.json` ground truth.
+- **Golden Image:** Ensure `.devcontainer` is the primary, verified execution environment.
 
-## 2. Scope
+### 4.2 Element 1: Inputs & Grounding
+- **Strict Validation:** Use `pydantic` v2 and `beartype` for evidence-to-prior consistency.
+- **Automated Grounding:** Flawless reference linkage via `scripts/validate_references.py`.
 
-This track is specifically concerned with the still-open gap between the repository's active model path and the older legacy uncertainty, decomposition, EVPPI, and evidence-traceability surfaces that still matter for reviewer confidence and publication-grade closure.
+### 4.3 Element 2: Assumptions & Bounds
+- **Logic Verification:** Define "Sensitivity Bounds" for every assumption.
+- **Live Sensitivity:** Interactive Evidence Explorer on the dashboard.
 
-### 2.1 Aspect exploration
-- Inspect the chosen aspect deeply enough to identify active-path behavior, hidden assumptions, dead scaffolding, output/reporting effects, and deployment implications.
-- Map the aspect to the exact code paths, configs, docs, outputs, tests, and dashboard surfaces it touches.
-- Distinguish active-path defects from archival noise.
-- Prioritize the known weak surfaces first:
-  - legacy decomposition and EVPPI scripts that were previously noted as broken against removed APIs;
-  - evidence-to-parameter linkage and assumption justification surfaces;
-  - any manuscript or output artifacts that still imply richer uncertainty support than the active path actually delivers.
+### 4.4 Element 3: Formulae (Logic & Mathematics)
+- **Equilibrium Proofs:** JAX Jacobian (FOC/SOC) mathematical guarantees.
+- **Property-Based Testing:** `Hypothesis` verification of economic identities.
 
-### 2.2 Nature-level audit
-- Evaluate the aspect against top-tier publication expectations:
-  - empirical grounding;
-  - functional completeness;
-  - reviewer clarity;
-  - output quality;
-  - interpretability;
-  - deployment robustness;
-  - test coverage;
-  - traceability;
-  - claims discipline.
-- Treat placeholders, synthetic outputs, misleading docs, broken tests, unverified UI paths, and weak evidence linkage as first-class gaps.
+### 4.5 Element 4: Outputs & Humanization
+- **Cryptographic Provenance:** Embed `PROVENANCE_HASH` in all outputs.
+- **Accessible Dashboard:** Narrative-driven UI and Fairness Audits.
 
-### 2.3 Plan and implementation
-- Convert the audit into a concrete plan focused on the chosen aspect.
-- Replace active-path placeholder logic where found.
-- Repair defects, missing tests, missing docs, broken outputs, or incoherent UX in scope.
-- Keep the implementation narrow enough that the track remains coherent.
-- Where a legacy analytical surface should not be repaired, explicitly retire or qualify it rather than leaving it half-alive.
-
-### 2.4 Review and auto-remediation
-- At the end of each phase, run the Conductor review protocol for the current phase scope.
-- Automatically implement in-scope recommendations.
-- Re-run the review until no critical or high findings remain.
-
-### 2.5 Remote and deployment verification
-- Run relevant local verification.
-- Push to the remote repository.
-- Confirm GitHub Actions or equivalent workflows succeed for the pushed commit.
-- Verify the Streamlit dashboard locally and, where configured, against the live deployment.
-
-### 2.6 Flow-on effects and chaining
-- Assess downstream impacts of the change after implementation and after push.
-- Create the next follow-on track if residual work remains.
-- Update this template's reflection log with lessons learned.
-
-## 3. Acceptance Criteria
-
-- [ ] The chosen repository aspect has been explored deeply enough to separate active defects from archival noise.
-- [ ] A Nature-level audit has been recorded and converted into a specific implementation plan.
-- [ ] In-scope active-path gaps, placeholders, drift, and broken surfaces have been addressed.
-- [ ] Legacy uncertainty/decomposition or EVPPI surfaces are either repaired to active-path compatibility or explicitly retired with current-state documentation.
-- [ ] Evidence, assumptions, and output claims for this aspect are aligned so a reviewer does not encounter unsupported sophistication claims.
-- [ ] Relevant tests and smoke runs pass locally.
-- [ ] Streamlit dashboard verification passes locally; remote verification passes where configured.
-- [ ] The pushed commit's workflows succeed.
-- [ ] Flow-on effects are assessed and recorded.
-- [ ] If residual work remains, a concrete next track is created before closure.
-- [ ] The template reflection log is updated with at least one improvement to the template or process.
-- [ ] Phase review artifacts exist and show review, auto-remediation, and decision to proceed.
-
-## 4. Cross-agent operating rules
-
-This template is intended to work across Codex, Gemini CLI, and Qwen Code:
-
-- Do not rely on agent-specific slash commands.
-- Use plain markdown artifacts and explicit filenames.
-- Record assumptions, commands, verification steps, and next actions in files, not only chat.
-- Keep handoff artifacts stable enough that a different coding agent can resume without hidden context.
-
-## 5. Required refinement loop before implementation
-
-Before Phase 1 implementation starts, run a track-design refinement loop:
-
-1. Propose the initial track.
-2. Ask: "Are there any improvements to this track that you would recommend?"
-3. Incorporate the answer.
-4. Repeat the same question and incorporation cycle 3 to 5 times total.
-5. If no human operator is available, simulate the same refinement loop through structured self-critique documented in `track_refinement_round_<N>.md`.
-
-The purpose is to harden the track before coding begins rather than after avoidable design drift has already occurred.
+## 5. Acceptance Criteria
+- [ ] **SOTA Infra:** `uv.lock` exists, CI is hermetic, and `scripts/sync_registry.py` is active.
+- [ ] **Observability:** `LOG_OBSERVABILITY.md` contains a full audit trail of the autonomous run.
+- [ ] **100% Coverage:** Every modified line has verified test coverage.
+- [ ] **Zero Tolerance:** ZERO warnings or errors; `scripts/conductor_gate.py` passes.
+- [ ] **Autonomous Integrity:** All atomic commits and phase summaries are present.

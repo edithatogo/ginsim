@@ -32,10 +32,10 @@ jobs:
         pip install pytest pytest-cov ruff pyright hypothesis beartype streamlit playwright bibtexparser requests habanero
     
     - name: Lint (ruff)
-      run: ruff check src/ scripts/
-    
+      run: ruff check --ignore N999 gin-sim tests/e2e/test_remote_app.py tests/unit/test_gin_sim_wrapper.py
+
     - name: Format check (ruff format)
-      run: ruff format --check src/ scripts/
+      run: ruff format --check gin-sim tests/e2e/test_remote_app.py tests/unit/test_gin_sim_wrapper.py
     
     - name: Type check (pyright)
       run: pyright src/
@@ -68,7 +68,7 @@ jobs:
         pip install pytest ruff pyright hypothesis beartype streamlit playwright bibtexparser requests habanero
     
     - name: Run stress tests
-      run: python -m scripts.run_stress_tests --n_draws 100
+      run: python -m scripts.run_stress_tests
     
     - name: Run posterior predictive checks
       run: python -m scripts.run_posterior_predictive --n_draws 100

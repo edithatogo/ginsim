@@ -223,12 +223,12 @@ def run_stress_test(
     issues = validate_outputs(results, scenario_name)
 
     if issues:
-        print("⚠️  Validation issues found:")
+        print("[WARN] Validation issues found:")
         for issue in issues:
             print(f"   - {issue}")
         results["validation_issues"] = issues
     else:
-        print("✅ Validation passed")
+        print("[PASS] Validation passed")
 
     results["scenario"] = scenario_name
     results["description"] = scenario_config["description"]

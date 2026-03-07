@@ -63,7 +63,12 @@ data/processed/*.csv
 data/processed/*.parquet
 
 # Research meta-data and working folders (not for remote)
-conductor/
+conductor/*
+!conductor/index.md
+!conductor/workflow.md
+!conductor/tracks.md
+!conductor/templates/
+!conductor/templates/**
 archive/
 context/reflexive_journal/
 docs/expert_reviews/

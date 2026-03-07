@@ -105,6 +105,7 @@ workflow = [
 run-model = "scripts.run_model:main"
 run-stress-tests = "scripts.run_stress_tests:main"
 run-voi = "scripts.run_voi:main"
+create-nature-depth-track = "scripts.create_nature_depth_track:main"
 
 [build-system]
 requires = ["hatchling"]

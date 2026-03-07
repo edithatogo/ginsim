@@ -265,7 +265,7 @@ def sobol_sensitivity(
     # A_B^i is matrix A with column i replaced by column i from B
 
     # Evaluate model at A and B
-    def params_from_scaled(scaled: Float[Array, n_params]) -> Float[Array, n_params]:
+    def params_from_scaled(scaled: Float[Array, "..."]) -> Float[Array, "..."]:
         """Convert [0,1] scaled params to actual values (assuming ±25% range)."""
         result = base_params.copy()
         for i, idx in enumerate(param_indices):

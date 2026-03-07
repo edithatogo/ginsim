@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # ruff: noqa: E402
 """
 Deployment wrapper for the public gin-sim Streamlit app.

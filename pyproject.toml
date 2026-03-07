@@ -34,6 +34,7 @@ dependencies = [
   "typer>=0.9.0",
   "rich>=13.7.0",
   "tqdm>=4.66.0",
+  "loguru>=0.7.2",  # Runtime logging
   
   # Reporting
   "matplotlib>=3.8",
@@ -46,7 +47,6 @@ dependencies = [
 dev = [
   "uv>=0.1.0",  # Ultra-fast package installer
   "nox>=2024.3.2",  # Environment management
-  "loguru>=0.7.2",  # Modern logging
   "pytest>=8.0",
   "pytest-cov>=4.0",
   "pytest-xdist>=3.5",  # Parallel testing

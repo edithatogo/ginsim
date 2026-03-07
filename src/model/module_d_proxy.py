@@ -13,16 +13,13 @@ Strategic Game: Constrained Optimization under Regulatory Constraints
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
 
 import jax
 import jax.numpy as jnp
 from jax import grad, jit
+from jaxtyping import Array, Float
 
 from .parameters import ModelParameters, PolicyConfig
-
-if TYPE_CHECKING:
-    from jaxtyping import Array, Float
 
 
 @dataclass(frozen=True)

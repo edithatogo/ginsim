@@ -1,329 +1,70 @@
 """
-Model parameters with pydantic validation.
-
-This module defines all model parameters with type safety and validation.
-Parameters are separated into:
-- ModelParameters: Calibrated parameters (from evidence)
-- HyperParameters: MCMC settings, computation settings
-- PolicyConfig: Policy regime encoding
+Parameter schemas and loading logic for the economic model.
 """
 
 from __future__ import annotations
 
-from pathlib import Path
-
-import yaml
-from pydantic import BaseModel, ConfigDict, Field, field_validator
-
-
-class ModelParameters(BaseModel):
-    """
-    Calibrated model parameters with validation.
-
-    All parameters are derived from evidence registers (gdpe_0002).
-    """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        json_schema_extra={
-            "example": {
-                "baseline_testing_uptake": 0.52,
-                "deterrence_elasticity": 0.18,
-                "jurisdiction": "australia",
-            },
-        },
-    )
-
-    # =========================================================================
-    # Module A: Behavior / Deterrence
-    # =========================================================================
-
-    baseline_testing_uptake: float = Field(
-        default=0.52,
-        ge=0.0,
-        le=1.0,
-        description="Baseline genetic testing uptake (no discrimination concerns)",
-    )
-
-    deterrence_elasticity: float = Field(
-        default=0.18,
-        ge=0.0,
-        le=1.0,
-        description="Proportion avoiding testing due to insurance concerns",
-    )
-
-    moratorium_effect: float = Field(
-        default=0.15,
-        ge=0.0,
-        le=1.0,
-        description="Reduction in deterrence under moratorium",
-    )
-
-    # =========================================================================
-    # Module C: Insurance Equilibrium
-    # =========================================================================
-
-    adverse_selection_elasticity: float = Field(
-        default=0.08,
-        ge=0.0,
-        description="Premium increase per 10% increase in informed high-risks",
-    )
-
-    demand_elasticity_high_risk: float = Field(
-        default=-0.22,
-        le=0.0,
-        description="Demand change for high-risk individuals post-positive test",
-    )
-
-    baseline_loading: float = Field(
-        default=0.15,
-        ge=0.0,
-        description="Baseline premium loading for genetic conditions",
-    )
-
-    # =========================================================================
-    # Module D: Proxy Substitution
-    # =========================================================================
-
-    family_history_sensitivity: float = Field(
-        default=0.68,
-        ge=0.0,
-        le=1.0,
-        description="Sensitivity of family history for mutation detection",
-    )
-
-    proxy_substitution_rate: float = Field(
-        default=0.40,
-        ge=0.0,
-        le=1.0,
-        description="Proportion of genetic risk captured by proxies",
-    )
-
-    # =========================================================================
-    # Module E: Pass-Through / Market Structure
-    # =========================================================================
-
-    pass_through_rate: float = Field(
-        default=0.75,
-        ge=0.0,
-        le=1.0,
-        description="Proportion of risk costs passed to consumers",
-    )
-
-    # =========================================================================
-    # Module F: Data Quality Externality
-    # =========================================================================
-
-    research_participation_elasticity: float = Field(
-        default=-0.10,
-        le=0.0,
-        description="Change in research participation with privacy concerns",
-    )
-
-    # =========================================================================
-    # Enforcement
-    # =========================================================================
-
-    enforcement_effectiveness: float = Field(
-        default=0.50,
-        ge=0.0,
-        le=1.0,
-        description="Compliance rate with policy regime",
-    )
-
-    complaint_rate: float = Field(
-        default=0.02,
-        ge=0.0,
-        le=1.0,
-        description="Rate of discrimination complaints per 100 tests",
-    )
-
-    # =========================================================================
-    # Metadata
-    # =========================================================================
-
-    jurisdiction: str = Field(
-        default="australia",
-        description="Jurisdiction (australia or new_zealand)",
-    )
-
-    calibration_date: str = Field(
-        default="2026-03-03",
-        description="Date of calibration",
-    )
-
-    @field_validator("jurisdiction")
-    @classmethod
-    def validate_jurisdiction(cls, v: str) -> str:
-        if v not in ["australia", "new_zealand"]:
-            msg = "jurisdiction must be 'australia' or 'new_zealand'"
-            raise ValueError(msg)
-        return v
-
-
-class HyperParameters(BaseModel):
-    """
-    Computational and MCMC hyperparameters.
-    """
-
-    model_config = ConfigDict(extra="forbid")
-
-    # MCMC settings
-    n_draws: int = Field(
-        default=2000,
-        ge=100,
-        description="Number of posterior draws",
-    )
-
-    n_warmup: int = Field(
-        default=1000,
-        ge=100,
-        description="Number of warmup iterations",
-    )
-
-    n_chains: int = Field(
-        default=4,
-        ge=1,
-        description="Number of MCMC chains",
-    )
-
-    random_seed: int = Field(
-        default=20260303,
-        description="Random seed for reproducibility",
-    )
-
-    # Computation settings
-    use_jit: bool = Field(
-        default=True,
-        description="Use JAX JIT compilation",
-    )
-
-    use_vmap: bool = Field(
-        default=True,
-        description="Use JAX vmap for vectorization",
-    )
-
-    # Convergence diagnostics
-    rhat_threshold: float = Field(
-        default=1.1,
-        gt=1.0,
-        description="R-hat convergence threshold",
-    )
+from pydantic import BaseModel, ConfigDict
 
 
 class PolicyConfig(BaseModel):
-    """
-    Policy regime encoding.
-    """
+    """Configuration for a specific policy regime."""
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(frozen=True)
 
-    name: str = Field(
-        ...,
-        description="Policy name (e.g., 'status_quo', 'moratorium', 'ban')",
-    )
+    name: str
+    description: str
+    allow_genetic_test_results: bool = True
+    allow_family_history: bool = True
+    enforcement_strength: float = 1.0
+    penalty_max: float = 0.0
+    penalty_type: str = "fixed"  # Restored for test compatibility
+    sum_insured_caps: dict[str, float] | None = None
 
-    description: str = Field(
-        ...,
-        description="Policy description",
-    )
+    def __hash__(self):
+        return hash((self.name, self.allow_genetic_test_results, self.enforcement_strength))
 
-    # Information restrictions
-    allow_genetic_test_results: bool = Field(
-        default=True,
-        description="Whether insurers can use genetic test results",
-    )
 
-    allow_family_history: bool = Field(
-        default=True,
-        description="Whether insurers can use family history",
-    )
+class ModelParameters(BaseModel):
+    """Calibrated parameters for the model."""
 
-    # Financial caps
-    sum_insured_caps: dict[str, float] | None = Field(
-        default=None,
-        description="Sum insured caps by product type",
-    )
+    model_config = ConfigDict(frozen=True)
+
+    # Behavior
+    baseline_testing_uptake: float = 0.52
+    deterrence_elasticity: float = 0.18
+    moratorium_effect: float = 0.15
+
+    # Insurance
+    adverse_selection_elasticity: float = 0.08
+    demand_elasticity_high_risk: float = -0.22
+    baseline_loading: float = 0.15
+
+    # Proxy
+    family_history_sensitivity: float = 0.68
+    proxy_substitution_rate: float = 0.40
+
+    # Economics
+    pass_through_rate: float = 0.75
+    research_participation_elasticity: float = -0.1
 
     # Enforcement
-    enforcement_strength: float = Field(
-        default=1.0,
-        ge=0.0,
-        le=1.0,
-        description="Enforcement strength (0=no enforcement, 1=full enforcement)",
-    )
+    enforcement_effectiveness: float = 0.50
+    complaint_rate: float = 0.02
 
-    # Penalties
-    penalty_max: float = Field(
-        default=0.0,
-        ge=0.0,
-        description="Maximum penalty for violations",
-    )
+    # Metadata
+    jurisdiction: str = "australia"
+    calibration_date: str = "2026-03-03"
 
-    penalty_type: str = Field(
-        default="civil",
-        description="Type of penalty ('civil' or 'criminal')",
-    )
-
-    @field_validator("penalty_type")
-    @classmethod
-    def validate_penalty_type(cls, v: str) -> str:
-        if v not in ["civil", "criminal"]:
-            msg = "penalty_type must be 'civil' or 'criminal'"
-            raise ValueError(msg)
-        return v
+    def __hash__(self):
+        return hash((self.jurisdiction, self.calibration_date, self.baseline_loading))
 
 
-def load_parameters(config_path: str | Path) -> ModelParameters:
-    """
-    Load parameters from YAML config file.
+class HyperParameters(BaseModel):
+    """Global simulation hyperparameters."""
 
-    Args:
-        config_path: Path to YAML config file
+    model_config = ConfigDict(frozen=True)
 
-    Returns:
-        ModelParameters instance
-
-    Raises:
-        FileNotFoundError: If config file doesn't exist
-        ValidationError: If parameters fail validation
-    """
-    config_path = Path(config_path)
-
-    if not config_path.exists():
-        msg = f"Config file not found: {config_path}"
-        raise FileNotFoundError(msg)
-
-    with open(config_path) as f:
-        config = yaml.safe_load(f)
-
-    return ModelParameters(**config)
-
-
-def load_hyper_parameters(config_path: str | Path) -> HyperParameters:
-    """Load hyperparameters from YAML config."""
-    config_path = Path(config_path)
-
-    if not config_path.exists():
-        # Return defaults if no config file
-        return HyperParameters()
-
-    with open(config_path) as f:
-        config = yaml.safe_load(f)
-
-    return HyperParameters(**config)
-
-
-def load_policy_config(config_path: str | Path) -> PolicyConfig:
-    """Load policy configuration from YAML config."""
-    config_path = Path(config_path)
-
-    with open(config_path) as f:
-        config = yaml.safe_load(f)
-
-    return PolicyConfig(**config)
-
-
-# Default parameter instances
-DEFAULT_PARAMETERS = ModelParameters()
-DEFAULT_HYPER_PARAMETERS = HyperParameters()
+    n_samples: int = 1000
+    seed: int = 20260303
+    use_priors: bool = True

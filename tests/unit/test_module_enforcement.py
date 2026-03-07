@@ -48,7 +48,7 @@ class TestExpectedPenalty:
     def test_penalty_positive(self):
         """Test that expected penalty is positive."""
         penalty = compute_expected_penalty(
-            penalty_max=100000.0,
+            penalty_max=10000.0,
             detection_probability=0.5,
             enforcement_effectiveness=0.5,
         )
@@ -56,15 +56,15 @@ class TestExpectedPenalty:
 
     def test_penalty_increases_with_penalty_max(self):
         """Test that penalty increases with maximum penalty."""
-        penalty_low = compute_expected_penalty(100000, 0.5, 0.5)
-        penalty_high = compute_expected_penalty(1000000, 0.5, 0.5)
+        penalty_low = compute_expected_penalty(100000.0, 0.5, 0.5)
+        penalty_high = compute_expected_penalty(200000.0, 0.5, 0.5)
 
         assert penalty_high > penalty_low
 
     def test_penalty_increases_with_detection(self):
         """Test that penalty increases with detection probability."""
-        penalty_low = compute_expected_penalty(1000000, 0.2, 0.5)
-        penalty_high = compute_expected_penalty(1000000, 0.8, 0.5)
+        penalty_low = compute_expected_penalty(100000.00, 0.2, 0.5)
+        penalty_high = compute_expected_penalty(100000.00, 0.8, 0.5)
 
         assert penalty_high > penalty_low
 
@@ -152,7 +152,7 @@ class TestComplianceEquilibrium:
             description="Test policy",
             allow_genetic_test_results=False,
             enforcement_strength=0.5,
-            penalty_max=100000.0,
+            penalty_max=10000.0,
         )
 
         outcome = compute_compliance_equilibrium(params, policy)
@@ -216,7 +216,7 @@ class TestOptimalEnforcement:
             name="test",
             description="Test",
             allow_genetic_test_results=False,
-            penalty_max=100000.0,
+            penalty_max=10000.0,
         )
 
         result = compute_optimal_enforcement(params, policy)

@@ -1,0 +1,4 @@
+# file: C:\Users\60217257\OneDrive - Victoria University of Wellington - STAFF\Project - 2026.03 - Economics and Genetic Discrimination\src\model\output_formatter.py
+# hypothesis_version: 6.151.9
+
+[0.0, '## Executive Summary', '## Key Findings', '## Policy Comparison', '## Recommendations', '### Testing Uptake', '### Welfare Impacts', '-', '---', '=', 'Avg Premium Index', 'Ban', 'Compliance', 'Long-run Net Welfare', 'Policy', 'Testing Uptake', '_', '```', 'avg_premium', 'ban', 'compliance_change', 'compliance_rate', 'grid', 'insufficient data', 'item', 'testing_uptake', 'tolist', 'utf-8', 'w', 'welfare_change', 'welfare_impact', 'Δ Compliance', 'Δ Premium', 'Δ Uptake', 'Δ Welfare']

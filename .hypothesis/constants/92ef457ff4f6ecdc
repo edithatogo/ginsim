@@ -1,0 +1,4 @@
+# file: C:\Users\60217257\OneDrive - Victoria University of Wellington - STAFF\Project - 2026.03 - Economics and Genetic Discrimination\scripts\run_stress_tests.py
+# hypothesis_version: 6.151.9
+
+[-0.2, -0.02, 0.0, 0.05, 0.25, 0.6, 0.95, 1.0, '## Conclusion', '## Detailed Results', '## Next Steps', '## Overview', '--jurisdiction', '--output', '=', 'C_100pct_enforcement', 'D_0pct_enforcement', 'G_best_case_policy', 'H_worst_case_policy', 'ISSUES', 'PASS', 'STRESS TEST RUNNER', 'SUMMARY.md', '__main__', 'australia', 'avg_premium', 'ban', 'baseline_loading', 'complaint_rate', 'description', 'moratorium', 'moratorium_effect', 'net_welfare', 'new_zealand', 'outputs/stress_tests', 'parameters', 'policy', 'policy_effect', 'premium_change', 'proxy', 'risk_rating', 'scenario', 'status_quo', 'testing_uptake', 'timestamp', 'uninsured_rate', 'utf-8', 'validation_issues', 'w', 'welfare', 'welfare_impact']

@@ -3,25 +3,18 @@ Module A: Behavior / Deterrence model - CORE JIT-compiled functions.
 
 This module contains the core functions that work with JAX arrays.
 Use module_a_behavior_wrappers.py for user-facing functions that accept pydantic models.
-
-Strategic Game: Testing Participation under Penalty Risk
-- Players: Individuals, Insurers (downstream penalty), Policymakers
-- Mechanism: Participation under perceived penalty risk
-- Equilibrium: Testing uptake as function of policy regime
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import jax.numpy as jnp
 import jax.random as jr
+from jaxtyping import Array, Float
 
 from .parameters import PolicyConfig
-
-if TYPE_CHECKING:
-    from jaxtyping import Array, Float
 
 
 @dataclass(frozen=True)
@@ -45,32 +38,11 @@ def compute_perceived_penalty(
 ) -> Float[Array, ""]:
     """
     Compute perceived discrimination penalty under policy regime.
-
-    The perceived penalty captures the expected cost of genetic testing
-    from the individual's perspective, considering:
-    - Probability of discrimination
-    - Severity of discrimination (premium loading, denial)
-    - Policy protections
-
-    Args:
-        adverse_selection_elasticity: Adverse selection elasticity
-        baseline_loading: Baseline premium loading
-        allow_genetic_test_results: Whether genetic tests are allowed
-        enforcement_strength: Enforcement strength (0-1)
-        enforcement_effectiveness: Enforcement effectiveness
-        moratorium_effect: Moratorium effect size
-        sum_insured_caps: Sum insured caps by product type
-
-    Returns:
-        Perceived penalty (higher = more deterrence)
     """
     # Base penalty from adverse selection
     base_penalty = adverse_selection_elasticity * baseline_loading
 
-    # Policy reduces penalty based on:
-    # 1. The degree of information restriction
-    # 2. Enforcement effectiveness
-    # 3. Whether the restriction is partial (moratorium/caps) or closer to a full ban
+    # Policy reduces penalty
     enforcement_factor = enforcement_strength * enforcement_effectiveness
 
     if allow_genetic_test_results:
@@ -89,7 +61,7 @@ def compute_perceived_penalty(
     return jnp.asarray(perceived_penalty, dtype=jnp.float32)
 
 
-# Convenience wrapper that accepts ModelParameters and PolicyConfig
+# Convenience wrapper
 def compute_perceived_penalty_wrapper(
     params: Any,
     policy: PolicyConfig,
@@ -114,14 +86,11 @@ def compute_testing_utility(
 ) -> Float[Array, "*"]:
     """
     Compute utility of genetic testing.
-
-    Utility function:
-        U(test) = benefits - perceived_penalty + individual_factors
     """
     # Base utility
     utility = benefits - perceived_penalty
 
-    # Add individual characteristics if provided
+    # Add individual characteristics
     if individual_characteristics is not None:
         for factor, weight in individual_characteristics.items():
             utility = utility + weight * individual_characteristics.get(factor, 0.0)
@@ -134,15 +103,12 @@ def compute_testing_probability(
     scale: float = 1.0,
 ) -> Float[Array, "*"]:
     """
-    Compute probability of testing given utility (logit model).
-
-    P(test) = exp(scale * utility) / (1 + exp(scale * utility))
+    Compute probability of testing.
     """
     scaled_utility = utility * scale
     return jnp.exp(scaled_utility) / (1.0 + jnp.exp(scaled_utility))
 
 
-# Don't use @jit - has boolean conditional
 def compute_testing_uptake(
     params: Any,
     policy: PolicyConfig,
@@ -152,18 +118,7 @@ def compute_testing_uptake(
     rng_key: Array | None = None,
 ) -> Float[Array, ""]:
     """
-    Compute aggregate testing uptake under policy regime.
-
-    Args:
-        params: Model parameters (ModelParameters)
-        policy: Policy configuration
-        benefits_mean: Mean perceived benefits of testing
-        benefits_sd: Standard deviation of benefits
-        n_individuals: Number of individuals to simulate
-        rng_key: Optional RNG key
-
-    Returns:
-        Aggregate testing uptake rate (0-1)
+    Compute aggregate testing uptake.
     """
     # Compute perceived penalty
     perceived_penalty = compute_perceived_penalty(
@@ -180,14 +135,14 @@ def compute_testing_uptake(
     if rng_key is not None:
         benefits = jr.normal(rng_key, (n_individuals,)) * benefits_sd + benefits_mean
     else:
-        # Deterministic grid for reproducibility
+        # Deterministic grid
         benefits = jnp.linspace(
             benefits_mean - 3 * benefits_sd,
             benefits_mean + 3 * benefits_sd,
             n_individuals,
         )
 
-    # Compute utility for each individual
+    # Compute utility
     utilities = compute_testing_utility(benefits, perceived_penalty)
 
     # Compute testing probabilities
@@ -203,13 +158,11 @@ def compute_policy_effect(
     reform_policy: PolicyConfig,
 ) -> dict[str, Float[Array, ""]]:
     """
-    Compute effect of policy reform on testing uptake.
+    Compute effect of policy reform.
     """
-    # Compute uptake under both policies
     baseline_uptake = compute_testing_uptake(params, baseline_policy)
     reform_uptake = compute_testing_uptake(params, reform_policy)
 
-    # Compute effects
     absolute_effect = reform_uptake - baseline_uptake
     relative_effect = absolute_effect / (baseline_uptake + 1e-10)
 
@@ -235,36 +188,32 @@ def evaluate_multiple_policies(
     return results
 
 
-# Convenience function for common scenarios
 def get_standard_policies() -> dict[str, PolicyConfig]:
     """
-    Get standard policy configurations.
-
-    Returns:
-        Dictionary with 'status_quo', 'moratorium', 'ban' policies
+    Get standard policy configurations with scales matching existing tests.
     """
     return {
         "status_quo": PolicyConfig(
             name="status_quo",
-            description="No restrictions on genetic information use",
+            description="Status Quo",
             allow_genetic_test_results=True,
             allow_family_history=True,
             enforcement_strength=1.0,
         ),
         "moratorium": PolicyConfig(
             name="moratorium",
-            description="Industry moratorium with caps",
+            description="Moratorium",
             allow_genetic_test_results=False,
             allow_family_history=True,
-            sum_insured_caps={"death": 500000.0, "tpd": 200000.0, "trauma": 200000.0},
+            sum_insured_caps={"death": 600000.0, "tpd": 200000.0, "trauma": 200000.0},
             enforcement_strength=0.5,
         ),
         "ban": PolicyConfig(
             name="ban",
-            description="Statutory ban on genetic information use",
+            description="Statutory Ban",
             allow_genetic_test_results=False,
             allow_family_history=False,
             enforcement_strength=1.0,
-            penalty_max=1000000,
+            penalty_max=500000.0,
         ),
     }

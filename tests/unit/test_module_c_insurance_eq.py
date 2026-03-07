@@ -7,7 +7,7 @@ import jax.numpy as jnp
 from src.model.module_c_insurance_eq import (
     compute_demand,
     compute_equilibrium,
-    compute_expected_profit,
+    compute_insurer_profit,
     compute_premium_divergence,
     compute_risk_premium,
     get_standard_risk_parameters,
@@ -71,13 +71,13 @@ class TestDemand:
 
 
 class TestExpectedProfit:
-    """Tests for compute_expected_profit."""
+    """Tests for compute_insurer_profit."""
 
     def test_zero_profit_at_fair_premium(self):
         """Test that profit is zero at actuarially fair premium."""
         risk = 0.1
         premium = zero_profit_premium(risk)
-        profit = compute_expected_profit(premium, risk)
+        profit = compute_insurer_profit(premium, risk)
 
         # Should be very close to zero
         assert jnp.abs(profit) < 1e-6
@@ -87,7 +87,7 @@ class TestExpectedProfit:
         risk = 0.1
         fair_premium = zero_profit_premium(risk)
 
-        profit = compute_expected_profit(fair_premium * 1.2, risk)
+        profit = compute_insurer_profit(fair_premium * 1.2, risk)
         assert profit > 0.0
 
     def test_negative_profit_below_fair_premium(self):
@@ -95,7 +95,7 @@ class TestExpectedProfit:
         risk = 0.1
         fair_premium = zero_profit_premium(risk)
 
-        profit = compute_expected_profit(fair_premium * 0.8, risk)
+        profit = compute_insurer_profit(fair_premium * 0.8, risk)
         assert profit < 0.0
 
 

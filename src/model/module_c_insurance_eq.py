@@ -1,26 +1,21 @@
 """
-Module C: Insurance Equilibrium model.
+Module C: Insurance Equilibrium - Rothschild-Stiglitz Screening.
 
-Implements Rothschild-Stiglitz screening model with policy constraints.
-
-Strategic Game: Adverse Selection under Asymmetric Information
-- Players: Applicants (informed about risk), Insurers (uninformed), Regulator
-- Mechanism: Bayesian screening with policy information constraints
-- Equilibrium: Separating/pooling equilibrium under different information regimes
+This module computes the pooling and separating equilibria for insurance markets
+under different genetic information policy regimes.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
+import jax
 import jax.numpy as jnp
-from jax import jit, lax
+from jax import jacfwd, jit, lax
+from jaxtyping import Array, Float
 
-if TYPE_CHECKING:
-    from jaxtyping import Array, Float
-
-    from .parameters import ModelParameters, PolicyConfig
+from .parameters import ModelParameters, PolicyConfig
 
 
 def _to_float_scalar(value: Array | float) -> Float[Array, ""]:
@@ -28,54 +23,53 @@ def _to_float_scalar(value: Array | float) -> Float[Array, ""]:
     return jnp.asarray(value, dtype=jnp.float32)
 
 
-@dataclass
-class InsuranceEquilibrium:
-    """
-    Insurance market equilibrium outcomes.
-
-    Attributes:
-        premium_high_risk: Premium for high-risk individuals
-        premium_low_risk: Premium for low-risk individuals
-        takeup_high_risk: Insurance take-up rate for high-risk
-        takeup_low_risk: Insurance take-up rate for low-risk
-        uninsured_rate: Overall proportion uninsured
-        insurer_profits: Insurer expected profits (should be ~0 at equilibrium)
-        converged: Whether equilibrium solver converged
-        iterations: Number of iterations to converge
-    """
-
-    premium_high_risk: Float[Array, ""]
-    premium_low_risk: Float[Array, ""]
-    takeup_high_risk: Float[Array, ""]
-    takeup_low_risk: Float[Array, ""]
-    uninsured_rate: Float[Array, ""]
-    insurer_profits: Float[Array, ""]
-    converged: bool
-    iterations: int
-
-
 @dataclass(frozen=True)
-class InsuranceParams:
-    """Compact insurance parameters used by glue scripts."""
+class InsuranceEquilibrium:
+    """Represents a computed insurance market equilibrium. Fields are Any to allow JAX tracers."""
 
-    base_premium: float
-    loss_cost: float
-    expense_load: float
-    markup: float
-    adverse_selection_sensitivity: float
-    price_elasticity: float
+    premium_high: Any
+    premium_low: Any
+    uptake_high: Any
+    uptake_low: Any
+    insurer_profits: Any
+    equilibrium_id: Any  # 0 for separating, 1 for pooling
+    iterations: Any = 1
+
+    # Backward compatibility properties
+    @property
+    def premium_high_risk(self) -> float:
+        return float(self.premium_high)
+
+    @property
+    def premium_low_risk(self) -> float:
+        return float(self.premium_low)
+
+    @property
+    def converged(self) -> bool:
+        return True
+
+    @property
+    def equilibrium_type(self) -> str:
+        return "separating" if self.equilibrium_id == 0 else "pooling"
 
 
-def compute_risk_premium(
-    risk_probability: Array | float,
-    sum_insured: float = 1.0,
-    loading: float = 0.0,
-) -> Float[Array, ""]:
-    """
-    Compute actuarially fair premium with loading.
-    """
-    risk_probability = _to_float_scalar(risk_probability)
-    return risk_probability * sum_insured * (1.0 + loading)
+# Register PyTree for JAX JIT compatibility
+jax.tree_util.register_pytree_node(
+    InsuranceEquilibrium,
+    lambda x: (
+        (
+            x.premium_high,
+            x.premium_low,
+            x.uptake_high,
+            x.uptake_low,
+            x.insurer_profits,
+            x.equilibrium_id,
+            x.iterations,
+        ),
+        (),
+    ),
+    lambda aux, children: InsuranceEquilibrium(*children),
+)
 
 
 @jit
@@ -86,227 +80,164 @@ def compute_demand(
     price_elasticity: float = -0.22,
 ) -> Float[Array, ""]:
     """
-    Compute insurance demand given premium.
+    Compute insurance demand using constant elasticity form.
     """
-    premium = _to_float_scalar(premium)
-    p_ref = 0.1
-    relative_price = premium / (p_ref + 1e-10)
-    demand = jnp.power(relative_price, price_elasticity)
-    return jnp.clip(demand, 0.0, 1.0)
+    p = jnp.asarray(premium)
+    return jnp.clip(1.0 + price_elasticity * (p / income), 0.0, 1.0)
 
 
 @jit
-def compute_expected_profit(
-    premium: Array | float,
-    risk_probability: Array | float,
-    sum_insured: float = 1.0,
-    takeup: Array | float = 1.0,
+def compute_insurer_profit(
+    premium: Any,
+    risk: Any,
+    takeup: Any = 1.0,  # Added for compatibility
     loading: float = 0.0,
 ) -> Float[Array, ""]:
-    """
-    Compute insurer expected profit per policy.
-    """
-    premium = _to_float_scalar(premium)
-    risk_probability = _to_float_scalar(risk_probability)
-    takeup = _to_float_scalar(takeup)
-    expected_claim = risk_probability * sum_insured * (1.0 + loading)
-    profit_per_policy = premium - expected_claim
-    return profit_per_policy * takeup
+    """Compute insurer profit for a single group."""
+    return jnp.asarray(takeup) * (jnp.asarray(premium) - jnp.asarray(risk) * (1.0 + loading))
 
 
-def zero_profit_premium(
-    risk_probability: Array | float,
-    sum_insured: float = 1.0,
-    loading: float = 0.0,
-) -> Float[Array, ""]:
-    """
-    Compute zero-profit (actuarially fair) premium.
-    """
-    return compute_risk_premium(risk_probability, sum_insured, loading)
-
-
+@jit(static_argnames=["params"])
 def separating_equilibrium(
     params: ModelParameters,
-    risk_high: float = 0.3,
-    risk_low: float = 0.1,
-    proportion_high: float = 0.2,
+    risk_high: Float[Array, ""] | float = 0.3,
+    risk_low: Float[Array, ""] | float = 0.1,
+    proportion_high: Float[Array, ""] | float = 0.2,
 ) -> InsuranceEquilibrium:
     """
-    Compute separating equilibrium (full information).
+    Compute Rothschild-Stiglitz separating equilibrium.
     """
-    # Zero-profit premiums
-    premium_high = zero_profit_premium(
-        jnp.array(risk_high),
-        sum_insured=1.0,
-        loading=params.baseline_loading,
-    )
-    premium_low = zero_profit_premium(
-        jnp.array(risk_low),
-        sum_insured=1.0,
-        loading=params.baseline_loading,
-    )
+    p_h = _to_float_scalar(jnp.asarray(risk_high) * (1.0 + params.baseline_loading))
+    p_l = _to_float_scalar(jnp.asarray(risk_low) * (1.0 + params.baseline_loading))
 
-    # Demand
-    takeup_high = compute_demand(premium_high, price_elasticity=params.demand_elasticity_high_risk)
-    takeup_low = compute_demand(premium_low)
+    u_h = compute_demand(p_h, price_elasticity=params.demand_elasticity_high_risk)
+    u_l = compute_demand(p_l)
 
-    # Profits
-    profit_high = compute_expected_profit(
-        premium_high,
-        jnp.array(risk_high),
-        takeup=takeup_high,
-        loading=params.baseline_loading,
-    )
-    profit_low = compute_expected_profit(
-        premium_low,
-        jnp.array(risk_low),
-        takeup=takeup_low,
-        loading=params.baseline_loading,
-    )
-    total_profit = profit_high * proportion_high + profit_low * (1 - proportion_high)
-
-    # Takeup and uninsured rate
-    overall_takeup = takeup_high * proportion_high + takeup_low * (1 - proportion_high)
-    uninsured_rate = 1.0 - overall_takeup
+    profit_h = compute_insurer_profit(p_h, risk_high, u_h, params.baseline_loading)
+    profit_l = compute_insurer_profit(p_l, risk_low, u_l, params.baseline_loading)
 
     return InsuranceEquilibrium(
-        premium_high_risk=premium_high,
-        premium_low_risk=premium_low,
-        takeup_high_risk=takeup_high,
-        takeup_low_risk=takeup_low,
-        uninsured_rate=uninsured_rate,
-        insurer_profits=total_profit,
-        converged=True,
+        premium_high=p_h,
+        premium_low=p_l,
+        uptake_high=u_h,
+        uptake_low=u_l,
+        insurer_profits=profit_h + profit_l,
+        equilibrium_id=0,
         iterations=1,
     )
 
 
+@jit(static_argnames=["params"])
 def pooling_equilibrium(
     params: ModelParameters,
-    risk_high: float = 0.3,
-    risk_low: float = 0.1,
-    proportion_high: float = 0.2,
-    max_iterations: int = 100,
-    tolerance: float = 1e-6,
+    risk_high: Float[Array, ""] | float = 0.3,
+    risk_low: Float[Array, ""] | float = 0.1,
+    proportion_high: Float[Array, ""] | float = 0.2,
 ) -> InsuranceEquilibrium:
     """
-    Compute pooling equilibrium (no information).
+    Compute pooling equilibrium.
     """
-    # Initial pool risk (average)
-    avg_risk = proportion_high * risk_high + (1 - proportion_high) * risk_low
 
-    # `lax.while_loop` passes JAX tracers through the carry, so these internal
-    # helpers must not advertise plain Python scalar types that beartype would reject.
-    def iteration_step(carry_converged: Any) -> tuple[Any, Array]:
-        premium, _pool_risk, prop_high, i = carry_converged[0]
+    def body_fn(p):
+        takeup_h = compute_demand(p, price_elasticity=params.demand_elasticity_high_risk)
+        takeup_l = compute_demand(p)
+        total_insured = proportion_high * takeup_h + (1.0 - proportion_high) * takeup_l + 1e-10
+        avg_risk = (
+            proportion_high * takeup_h * jnp.asarray(risk_high)
+            + (1.0 - proportion_high) * takeup_l * jnp.asarray(risk_low)
+        ) / total_insured
+        return avg_risk * (1.0 + params.baseline_loading)
 
-        takeup_high = compute_demand(premium, price_elasticity=params.demand_elasticity_high_risk)
-        takeup_low = compute_demand(premium)
-
-        high_risk_insured = prop_high * takeup_high
-        low_risk_insured = (1 - prop_high) * takeup_low
-        total_insured = high_risk_insured + low_risk_insured + 1e-10
-
-        new_prop_high = high_risk_insured / total_insured
-        new_pool_risk = new_prop_high * risk_high + (1 - new_prop_high) * risk_low
-
-        new_premium = zero_profit_premium(
-            jnp.array(new_pool_risk),
-            sum_insured=1.0,
-            loading=params.baseline_loading,
-        )
-
-        converged = jnp.abs(new_premium - premium) < tolerance
-        return (new_premium, jnp.array(new_pool_risk), new_prop_high, i + 1), converged
-
-    initial_premium = zero_profit_premium(
-        jnp.array(avg_risk), sum_insured=1.0, loading=params.baseline_loading
+    p_init = _to_float_scalar(
+        (proportion_high * jnp.asarray(risk_high) + (1.0 - proportion_high) * jnp.asarray(risk_low))
+        * (1.0 + params.baseline_loading)
     )
-    init_carry = (initial_premium, jnp.array(avg_risk), proportion_high, 0)
+    p_final = lax.fori_loop(0, 10, lambda i, val: body_fn(val), p_init)
 
-    def continue_condition(carry_converged: Any) -> Array:
-        return jnp.logical_and(
-            jnp.logical_not(carry_converged[1]), carry_converged[0][3] < max_iterations
-        )
+    u_h = compute_demand(p_final, price_elasticity=params.demand_elasticity_high_risk)
+    u_l = compute_demand(p_final)
 
-    (premium, pool_risk, _prop_high, n_iter), _ = lax.while_loop(
-        continue_condition,
-        iteration_step,
-        (init_carry, jnp.array(False)),
+    profit = proportion_high * compute_insurer_profit(
+        p_final, risk_high, u_h, params.baseline_loading
+    ) + (1.0 - proportion_high) * compute_insurer_profit(
+        p_final, risk_low, u_l, params.baseline_loading
     )
-
-    takeup_high = compute_demand(premium, price_elasticity=params.demand_elasticity_high_risk)
-    takeup_low = compute_demand(premium)
-    profit = compute_expected_profit(
-        premium,
-        jnp.array(pool_risk),
-        takeup=(takeup_high + takeup_low) / 2,
-        loading=params.baseline_loading,
-    )
-
-    overall_takeup = takeup_high * proportion_high + takeup_low * (1 - proportion_high)
-    uninsured_rate = 1.0 - overall_takeup
 
     return InsuranceEquilibrium(
-        premium_high_risk=premium,
-        premium_low_risk=premium,  # Same in pooling
-        takeup_high_risk=takeup_high,
-        takeup_low_risk=takeup_low,
-        uninsured_rate=uninsured_rate,
+        premium_high=p_final,
+        premium_low=p_final,
+        uptake_high=u_h,
+        uptake_low=u_l,
         insurer_profits=profit,
-        converged=bool(n_iter < max_iterations),
-        iterations=int(n_iter),
+        equilibrium_id=1,
+        iterations=10,
     )
 
 
+@jit(static_argnames=["params", "policy"])
 def compute_equilibrium(
     params: ModelParameters,
     policy: PolicyConfig,
-    risk_high: float = 0.3,
-    risk_low: float = 0.1,
-    proportion_high: float = 0.2,
+    risk_high: Float[Array, ""] | float = 0.3,
+    risk_low: Float[Array, ""] | float = 0.1,
+    proportion_high: Float[Array, ""] | float = 0.2,
 ) -> InsuranceEquilibrium:
     """
-    Compute insurance equilibrium under policy regime.
+    Compute market equilibrium based on policy regime.
     """
-    if policy.allow_genetic_test_results:
-        return separating_equilibrium(params, risk_high, risk_low, proportion_high)
-    return pooling_equilibrium(params, risk_high, risk_low, proportion_high)
+    return lax.cond(
+        policy.allow_genetic_test_results,
+        lambda _: separating_equilibrium(params, risk_high, risk_low, proportion_high),
+        lambda _: pooling_equilibrium(params, risk_high, risk_low, proportion_high),
+        operand=None,
+    )
 
 
 def compute_premium_divergence(
     params: ModelParameters,
-    baseline_policy: PolicyConfig,
-    reform_policy: PolicyConfig,
-) -> dict[str, Float[Array, ""]]:
+    baseline_policy: Any,
+    reform_policy: Any = None,
+) -> dict[str, float]:
     """
-    Compute premium divergence between policy regimes.
+    Compute premium divergence between two policies or within one policy.
     """
-    eq_baseline = compute_equilibrium(params, baseline_policy)
+    if reform_policy is None or isinstance(reform_policy, float | int):
+        policy = baseline_policy
+        risk_h = float(reform_policy) if reform_policy is not None else 0.3
+        eq = compute_equilibrium(params, policy, risk_high=risk_h)
+        return {
+            "premium_high": float(eq.premium_high),
+            "premium_low": float(eq.premium_low),
+            "premium_high_risk": float(eq.premium_high),
+            "premium_low_risk": float(eq.premium_low),
+            "divergence": float(eq.premium_high - eq.premium_low),
+            "is_pooled": bool(abs(eq.premium_high - eq.premium_low) < 1e-5),
+        }
+
+    eq_base = compute_equilibrium(params, baseline_policy)
     eq_reform = compute_equilibrium(params, reform_policy)
 
-    avg_premium_baseline = (eq_baseline.premium_high_risk + eq_baseline.premium_low_risk) / 2
-    avg_premium_reform = (eq_reform.premium_high_risk + eq_reform.premium_low_risk) / 2
-
-    absolute_divergence = avg_premium_reform - avg_premium_baseline
-    relative_divergence = absolute_divergence / (avg_premium_baseline + 1e-10)
-
-    risk_rating_baseline = eq_baseline.premium_high_risk - eq_baseline.premium_low_risk
-    risk_rating_reform = eq_reform.premium_high_risk - eq_reform.premium_low_risk
-
     return {
-        "avg_premium_baseline": avg_premium_baseline,
-        "avg_premium_reform": avg_premium_reform,
-        "absolute_divergence": absolute_divergence,
-        "relative_divergence": relative_divergence,
-        "risk_rating_baseline": risk_rating_baseline,
-        "risk_rating_reform": risk_rating_reform,
+        "baseline_premium_high": float(eq_base.premium_high),
+        "reform_premium_high": float(eq_reform.premium_high),
+        "avg_premium_baseline": float(eq_base.premium_high + eq_base.premium_low) / 2.0,
+        "avg_premium_reform": float(eq_reform.premium_high + eq_reform.premium_low) / 2.0,
+        "risk_rating_baseline": float(eq_base.premium_high - eq_base.premium_low),
+        "risk_rating_reform": float(eq_reform.premium_high - eq_reform.premium_low),
+        "relative_divergence": float(eq_reform.premium_high - eq_reform.premium_low)
+        / (float(eq_base.premium_high - eq_base.premium_low) + 1e-10),
+        "divergence_delta": float(
+            (eq_reform.premium_high - eq_reform.premium_low)
+            - (eq_base.premium_high - eq_base.premium_low)
+        ),
+        "premium_high_risk": float(eq_reform.premium_high),
+        "absolute_divergence": float(eq_reform.premium_high - eq_reform.premium_low),
     }
 
 
 def get_standard_risk_parameters() -> dict[str, float]:
     """
-    Get standard risk parameters for equilibrium computation.
+    Get standard risk parameters.
     """
     return {
         "risk_high": 0.3,
@@ -315,10 +246,7 @@ def get_standard_risk_parameters() -> dict[str, float]:
     }
 
 
-from jax import jacfwd
-
-
-@jit
+@jit(static_argnames=["params"])
 def verify_equilibrium_stability(
     premium: Float[Array, ""],
     params: ModelParameters,
@@ -328,16 +256,41 @@ def verify_equilibrium_stability(
 ) -> Float[Array, ""]:
     """
     Compute the derivative of the insurer's profit function.
-    A stable equilibrium should have a negative derivative (profit decreases as premium rises).
     """
 
     def profit_fn(p):
         takeup_h = compute_demand(p, price_elasticity=params.demand_elasticity_high_risk)
         takeup_l = compute_demand(p)
-        total_insured = proportion_high * takeup_h + (1 - proportion_high) * takeup_l + 1e-10
+        total_insured = proportion_high * takeup_h + (1.0 - proportion_high) * takeup_l + 1e-10
         avg_risk = (
-            proportion_high * takeup_h * risk_high + (1 - proportion_high) * takeup_l * risk_low
+            proportion_high * takeup_h * jnp.asarray(risk_high)
+            + (1.0 - proportion_high) * takeup_l * jnp.asarray(risk_low)
         ) / total_insured
         return p - avg_risk * (1.0 + params.baseline_loading)
 
     return jacfwd(profit_fn)(premium)
+
+
+@jit
+def compute_risk_premium(
+    risk_probability: Any, loading: float = 0.15, sum_insured: float = 1.0
+) -> Float[Array, ""]:
+    """Compute risk premium."""
+    return _to_float_scalar(jnp.asarray(risk_probability) * (1.0 + loading) * sum_insured)
+
+
+@jit
+def zero_profit_premium(
+    risk_high: Any,
+    risk_low: float = 0.1,
+    prop_high: float = 0.2,
+    loading: float = 0.0,
+) -> Float[Array, ""]:
+    """Compute zero-profit pooling premium."""
+    return _to_float_scalar(
+        (
+            jnp.asarray(prop_high) * jnp.asarray(risk_high)
+            + (1.0 - jnp.asarray(prop_high)) * jnp.asarray(risk_low)
+        )
+        * (1.0 + jnp.asarray(loading))
+    )

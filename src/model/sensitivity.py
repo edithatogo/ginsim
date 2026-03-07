@@ -1,227 +1,111 @@
 """
-Sensitivity analysis.
+Sensitivity Analysis: One-way and Tornado Analysis.
 
-One-way sensitivity and scenario analysis.
+This module provides tools for quantifying the impact of parameter uncertainty
+on model outcomes using one-way sensitivity and tornado analysis.
 """
 
 from __future__ import annotations
 
-import json
+from collections.abc import Callable
 from dataclasses import dataclass
-from operator import attrgetter
-from pathlib import Path
-from typing import TYPE_CHECKING, Any
 
-import numpy as np
-
-if TYPE_CHECKING:
-    from collections.abc import Callable
+from .parameters import ModelParameters, PolicyConfig
 
 
-@dataclass
+@dataclass(frozen=True)
 class SensitivityResult:
-    """
-    Sensitivity analysis result.
+    """Represents the result of a sensitivity analysis for one parameter."""
 
-    Attributes:
-        parameter: Parameter name
-        base_value: Base case value
-        range: Tested range (low, high)
-        impact: Impact on outcome (low_outcome, high_outcome)
-        sensitivity_index: Normalized sensitivity index
-    """
-
-    parameter: str
+    parameter_name: str
     base_value: float
-    range: tuple[float, float]
-    impact: tuple[float, float]
+    lower_value: float
+    upper_value: float
+    base_outcome: float
+    lower_outcome: float
+    upper_outcome: float
     sensitivity_index: float
 
 
+def run_one_way_sensitivity(model_fn, params, name, variation=0.2):
+    """Legacy alias for one_way_sensitivity."""
+    return one_way_sensitivity(model_fn, params, name, variation=variation)
+
+
 def one_way_sensitivity(
-    model_func: Callable[[dict[str, float]], float],
-    base_params: dict[str, float],
-    parameter_name: str,
-    range_pct: float = 0.25,
-    n_points: int = 10,
+    model_fn: Callable[[ModelParameters], float],
+    params: ModelParameters,
+    param_name: str,
+    variation: float = 0.2,
 ) -> SensitivityResult:
     """
-    Run one-way sensitivity analysis.
-
-    Args:
-        model_func: Model function that takes parameters and returns outcome
-        base_params: Base case parameters
-        parameter_name: Parameter to vary
-        range_pct: Percentage variation (e.g., 0.25 = ±25%)
-        n_points: Number of points to evaluate
-
-    Returns:
-        SensitivityResult object
+    Run one-way sensitivity analysis for a single parameter.
     """
-    base_value = base_params[parameter_name]
-    low = base_value * (1 - range_pct)
-    high = base_value * (1 + range_pct)
+    base_val = getattr(params, param_name)
+    lower_val = base_val * (1.0 - variation)
+    upper_val = base_val * (1.0 + variation)
 
-    # Evaluate at multiple points
-    test_values = np.linspace(low, high, n_points)
-    outcomes = []
+    # Base outcome
+    base_outcome = model_fn(params)
 
-    for value in test_values:
-        params = base_params.copy()
-        params[parameter_name] = value
-        outcome = model_func(params)
-        outcomes.append(outcome)
+    # Lower bound outcome
+    params_low = params.model_copy(update={param_name: lower_val})
+    lower_outcome = model_fn(params_low)
 
-    outcomes = np.array(outcomes)
+    # Upper bound outcome
+    params_high = params.model_copy(update={param_name: upper_val})
+    upper_outcome = model_fn(params_high)
 
-    # Sensitivity index (normalized)
-    outcome_range = np.max(outcomes) - np.min(outcomes)
-    base_outcome = model_func(base_params)
-
-    sensitivity_index = outcome_range / abs(base_outcome) if base_outcome != 0 else outcome_range
+    # Sensitivity index (normalized delta)
+    total_swing = abs(upper_outcome - lower_outcome)
+    sensitivity_index = total_swing / (abs(base_outcome) + 1e-10)
 
     return SensitivityResult(
-        parameter=parameter_name,
-        base_value=base_value,
-        range=(low, high),
-        impact=(float(np.min(outcomes)), float(np.max(outcomes))),
+        parameter_name=param_name,
+        base_value=float(base_val),
+        lower_value=float(lower_val),
+        upper_value=float(upper_val),
+        base_outcome=float(base_outcome),
+        lower_outcome=float(lower_outcome),
+        upper_outcome=float(upper_outcome),
         sensitivity_index=float(sensitivity_index),
     )
 
 
 def tornado_analysis(
-    model_func: Callable[[dict[str, float]], float],
-    base_params: dict[str, float],
-    parameters: list[str],
-    range_pct: float = 0.25,
+    model_fn: Callable[[ModelParameters], float],
+    params: ModelParameters,
+    param_names: list[str],
+    variation: float = 0.2,
 ) -> list[SensitivityResult]:
     """
-    Run tornado (multi-parameter one-way) sensitivity analysis.
-
-    Args:
-        model_func: Model function
-        base_params: Base case parameters
-        parameters: List of parameters to analyze
-        range_pct: Percentage variation
-
-    Returns:
-        List of SensitivityResult objects, sorted by sensitivity
+    Run sensitivity analysis across multiple parameters and sort by impact.
     """
     results = []
+    for name in param_names:
+        results.append(one_way_sensitivity(model_fn, params, name, variation))
 
-    for param in parameters:
-        result = one_way_sensitivity(
-            model_func,
-            base_params,
-            param,
-            range_pct,
-        )
-        results.append(result)
-
-    # Sort by sensitivity index (descending)
-    results.sort(key=attrgetter("sensitivity_index"), reverse=True)
-
-    return results
+    # Sort by sensitivity index descending
+    return sorted(results, key=lambda x: x.sensitivity_index, reverse=True)
 
 
 def scenario_analysis(
-    model_func: Callable[[dict[str, float]], float],
-    base_params: dict[str, float],
-    scenarios: dict[str, dict[str, float]],
-) -> dict[str, Any]:
+    model_fn: Callable[[ModelParameters, PolicyConfig], float],
+    params: ModelParameters,
+    baseline_policy: PolicyConfig,
+    reform_policy: PolicyConfig,
+) -> dict[str, float]:
     """
-    Run scenario analysis.
-
-    Args:
-        model_func: Model function
-        base_params: Base case parameters
-        scenarios: Dictionary of scenario names to parameter overrides
-
-    Returns:
-        Dictionary of scenario results
+    Evaluate outcomes under two different policy scenarios.
     """
-    results = {}
+    baseline_outcome = model_fn(params, baseline_policy)
+    reform_outcome = model_fn(params, reform_policy)
 
-    # Base case
-    base_outcome = model_func(base_params)
-    results["base"] = {
-        "outcome": base_outcome,
-        "params": base_params,
+    return {
+        "baseline_outcome": float(baseline_outcome),
+        "reform_outcome": float(reform_outcome),
+        "delta": float(reform_outcome - baseline_outcome),
+        "percentage_change": float(
+            (reform_outcome / baseline_outcome - 1.0) if baseline_outcome != 0 else 0
+        ),
     }
-
-    # Scenarios
-    for scenario_name, overrides in scenarios.items():
-        scenario_params = base_params.copy()
-        scenario_params.update(overrides)
-
-        outcome = model_func(scenario_params)
-        change = (outcome - base_outcome) / abs(base_outcome) if base_outcome != 0 else 0
-
-        results[scenario_name] = {
-            "outcome": outcome,
-            "change_from_base": change,
-            "params": scenario_params,
-        }
-
-    return results
-
-
-def format_sensitivity_results(
-    results: list[SensitivityResult],
-) -> str:
-    """
-    Format sensitivity results as table.
-
-    Args:
-        results: List of SensitivityResult objects
-
-    Returns:
-        Formatted table string
-    """
-    from tabulate import tabulate
-
-    headers = ["Parameter", "Base", "Range", "Impact", "Sensitivity"]
-
-    rows = []
-    for result in results:
-        rows.append(
-            [
-                result.parameter,
-                f"{result.base_value:.3f}",
-                f"{result.range[0]:.3f} - {result.range[1]:.3f}",
-                f"{result.impact[0]:.2f} - {result.impact[1]:.2f}",
-                f"{result.sensitivity_index:.3f}",
-            ]
-        )
-
-    return tabulate(rows, headers=headers, tablefmt="grid")
-
-
-def save_sensitivity_results(
-    results: list[SensitivityResult],
-    output_path: str | Path,
-) -> None:
-    """
-    Save sensitivity results to JSON file.
-
-    Args:
-        results: List of SensitivityResult objects
-        output_path: Output file path
-    """
-    output_path = Path(output_path)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-
-    results_dict = []
-    for result in results:
-        results_dict.append(
-            {
-                "parameter": result.parameter,
-                "base_value": result.base_value,
-                "range": result.range,
-                "impact": result.impact,
-                "sensitivity_index": result.sensitivity_index,
-            }
-        )
-
-    with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(results_dict, f, indent=2)

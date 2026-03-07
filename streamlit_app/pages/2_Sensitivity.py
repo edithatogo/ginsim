@@ -166,7 +166,7 @@ def run_sensitivity_cached(
 
     for key in param_keys:
         if key in param_options:
-            attr_name, default_value = param_options[key]
+            attr_name, _default_value = param_options[key]
             if attr_name in base_params_dict:
                 param_indices.append(len(base_values))
                 param_names.append(key)
@@ -275,7 +275,7 @@ if "sensitivity_results" in st.session_state:
             fig.add_trace(
                 go.Bar(
                     y=y_labels,
-                    x=[high - low for high, low in zip(high_outcomes, low_outcomes)],
+                    x=[high - low for high, low in zip(high_outcomes, low_outcomes, strict=False)],
                     base=list(low_outcomes),
                     orientation="h",
                     marker_color=["#3498db"] * len(tornado),
@@ -287,7 +287,7 @@ if "sensitivity_results" in st.session_state:
                 title="Parameter Sensitivity (Tornado Diagram)",
                 xaxis_title="Testing Uptake",
                 yaxis_title="Parameter",
-                xaxis=dict(tickformat=".1%"),
+                xaxis={"tickformat": ".1%"},
                 height=400,
                 showlegend=False,
             )
@@ -344,7 +344,7 @@ if "sensitivity_results" in st.session_state:
                 title="Sobol Sensitivity Indices",
                 xaxis_title="Sensitivity Index",
                 yaxis_title="Parameter",
-                xaxis=dict(range=[0, 1], tickformat=".1%"),
+                xaxis={"range": [0, 1], "tickformat": ".1%"},
                 barmode="overlay",
                 height=400,
             )
@@ -395,7 +395,7 @@ if "sensitivity_results" in st.session_state:
                     x=[f"{v:.3f}" for v in heatmap.param2_values],
                     y=[f"{v:.3f}" for v in heatmap.param1_values],
                     colorscale="RdYlBu",
-                    colorbar=dict(title="Testing Uptake"),
+                    colorbar={"title": "Testing Uptake"},
                 ),
             )
 

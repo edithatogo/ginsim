@@ -1,6 +1,5 @@
-import sys
 import subprocess
-from pathlib import Path
+import sys
 
 
 def run_cmd(cmd_list):
@@ -11,7 +10,7 @@ def run_cmd(cmd_list):
 
 def check_lint():
     print("Running ruff check...")
-    rc, out, err = run_cmd(["ruff", "check", "."])
+    rc, _out, _err = run_cmd(["ruff", "check", "."])
     return rc == 0
 
 

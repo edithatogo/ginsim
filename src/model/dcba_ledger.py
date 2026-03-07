@@ -7,13 +7,11 @@ Aggregates welfare impacts across stakeholders with time dynamics.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import jax.numpy as jnp
 from jax import jit
-
-if TYPE_CHECKING:
-    from jaxtyping import Array, Float
+from jaxtyping import Array, Float
 
 
 def _to_float_scalar(value: Array | float) -> Float[Array, ""]:

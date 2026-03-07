@@ -20,7 +20,6 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from streamlit_app.dashboard_helpers import evaluate_sandbox_policy
 from src.model.pipeline import evaluate_single_policy
 
 # Import from core model
@@ -29,6 +28,7 @@ from src.model.scenario_analysis import (
     format_comparison_table,
     load_scenarios,
 )
+from streamlit_app.dashboard_helpers import evaluate_sandbox_policy
 
 # Page configuration
 st.set_page_config(
@@ -198,7 +198,7 @@ if "scenario_comparison" in st.session_state:
         title="Testing Uptake Across Policy Scenarios",
         xaxis_title="Scenario",
         yaxis_title="Testing Uptake",
-        yaxis=dict(tickformat=".0%"),
+        yaxis={"tickformat": ".0%"},
         height=500,
         showlegend=False,
     )
@@ -234,7 +234,7 @@ if "scenario_comparison" in st.session_state:
         title="Welfare Impact Across Policy Scenarios",
         xaxis_title="Scenario",
         yaxis_title="Welfare Impact ($)",
-        yaxis=dict(tickformat="$,.0f"),
+        yaxis={"tickformat": "$,.0f"},
         height=500,
         showlegend=False,
     )
@@ -308,7 +308,9 @@ with col2:
 
     st.metric("Estimated Testing Uptake", f"{float(sandbox_result.testing_uptake):.1%}")
     st.metric("Estimated Welfare Impact", f"${float(sandbox_result.welfare_impact):,.0f}")
-    st.metric("Policy Effectiveness Score", f"{float(sandbox_result.compliance_rate) * 100:.0f}/100")
+    st.metric(
+        "Policy Effectiveness Score", f"{float(sandbox_result.compliance_rate) * 100:.0f}/100"
+    )
 
 # Download button
 if comparison:

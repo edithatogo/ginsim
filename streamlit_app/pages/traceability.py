@@ -1,7 +1,6 @@
+import bibtexparser
 import streamlit as st
 import yaml
-import bibtexparser
-from pathlib import Path
 
 st.set_page_config(page_title="Evidence Explorer", layout="wide")
 
@@ -11,13 +10,15 @@ This page provides **Diamond-Standard Traceability** for all model inputs.
 Every parameter in the model is grounded in empirical evidence and specific assumptions.
 """)
 
+
 def load_data():
-    with open("context/assumptions_registry.yaml", "r") as f:
+    with open("context/assumptions_registry.yaml") as f:
         assumptions = yaml.safe_load(f)["assumptions"]
-    with open("context/references.bib", "r") as f:
+    with open("context/references.bib") as f:
         bib_db = bibtexparser.load(f)
         bib_dict = {entry["ID"]: entry for entry in bib_db.entries}
     return assumptions, bib_dict
+
 
 assumptions, bib = load_data()
 
@@ -43,7 +44,7 @@ with col2:
             entry = bib[ref_id]
             st.markdown(f"- **{entry.get('author', 'Unknown')} ({entry.get('year', 'N/A')})**")
             st.markdown(f"  *{entry.get('title', 'Untitled')}*")
-            if 'doi' in entry:
+            if "doi" in entry:
                 st.caption(f"DOI: {entry['doi']}")
         else:
             st.warning(f"Reference '{ref_id}' not found in bibliography.")

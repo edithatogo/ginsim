@@ -11,13 +11,10 @@ Implements advanced game-theoretic scenarios:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
 
 import jax.numpy as jnp
 from jax import jit, vmap
-
-if TYPE_CHECKING:
-    from jaxtyping import Array, Float
+from jaxtyping import Array, Float
 
 
 @dataclass

@@ -82,7 +82,7 @@ class TestEvaluateSinglePolicy:
             allow_genetic_test_results=False,
             allow_family_history=False,
             enforcement_strength=1.0,
-            penalty_max=1_000_000.0,
+            penalty_max=1000000.0,
         )
 
         result = evaluate_single_policy(params, policy)

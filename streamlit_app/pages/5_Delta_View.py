@@ -16,8 +16,6 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from streamlit_app.dashboard_helpers import format_positive_share
-
 # Import from core model
 from src.model.delta_view import (
     comparative_delta_analysis,
@@ -25,6 +23,7 @@ from src.model.delta_view import (
 )
 from src.model.pipeline import evaluate_single_policy
 from src.model.scenario_analysis import evaluate_scenario, load_scenarios
+from streamlit_app.dashboard_helpers import format_positive_share
 
 # Page configuration
 st.set_page_config(
@@ -95,7 +94,7 @@ baseline_key = baseline_label_to_key[baseline_label]
 
 # Comparison policies selector
 st.sidebar.subheader("Policies to Compare")
-available_policies = [k for k in scenarios.keys() if k != baseline_key]
+available_policies = [k for k in scenarios if k != baseline_key]
 
 selected_policies = st.sidebar.multiselect(
     "Select comparison policies",
@@ -103,7 +102,9 @@ selected_policies = st.sidebar.multiselect(
     default=available_policies[:3] if len(available_policies) > 3 else available_policies,
     help="Policies to compare against baseline",
 )
-st.sidebar.caption("Use benchmark scenarios for policy comparison; sandbox-like scenarios are better treated as exploratory.")
+st.sidebar.caption(
+    "Use benchmark scenarios for policy comparison; sandbox-like scenarios are better treated as exploratory."
+)
 
 # Cost parameters
 st.sidebar.subheader("Cost Parameters")
@@ -244,7 +245,7 @@ if "delta_analysis" in st.session_state:
         title="Long-run Net Welfare vs Baseline",
         xaxis_title="Policy",
         yaxis_title="Long-run Net Welfare Delta ($)",
-        yaxis=dict(tickformat="$,.0f"),
+        yaxis={"tickformat": "$,.0f"},
         height=400,
         showlegend=False,
     )
@@ -274,7 +275,7 @@ if "delta_analysis" in st.session_state:
         title="Net Welfare Gain (Implementation + Admin Costs Deducted)",
         xaxis_title="Policy",
         yaxis_title="Net Welfare Gain ($)",
-        yaxis=dict(tickformat="$,.0f"),
+        yaxis={"tickformat": "$,.0f"},
         height=400,
         showlegend=False,
     )
@@ -333,30 +334,30 @@ st.divider()
 with st.expander("📖 About Net Welfare Gain Calculation"):
     st.markdown("""
     ### Net Welfare Gain Formula
-    
+
     The Net Welfare Gain is calculated as:
-    
+
     ```
     Net Welfare Gain = Long-run Welfare Delta - Implementation Cost - PV(Administrative Costs)
-    
+
     Where:
     - PV(Administrative Costs) = Σ [Admin Cost / (1 + r)^t] for t = 1 to time horizon
     - r = discount rate
     ```
-    
+
     ### Cost-Benefit Ratio
-    
+
     ```
     C/B Ratio = |Long-run Welfare Delta| / Total Costs
-    
+
     Interpretation:
     - C/B > 1: Benefits exceed costs
     - C/B = 1: Break-even
     - C/B < 1: Costs exceed benefits
     ```
-    
+
     ### Default Parameters
-    
+
     - **Implementation Cost:** $1,000,000 (one-time)
     - **Administrative Cost:** $100,000/year
     - **Time Horizon:** 10 years

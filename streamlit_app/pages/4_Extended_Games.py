@@ -272,7 +272,7 @@ if "current_game" in st.session_state:
             fig.update_layout(
                 title="Information Leakage Metrics",
                 yaxis_title="Value",
-                yaxis=dict(tickformat=".0%"),
+                yaxis={"tickformat": ".0%"},
                 height=400,
                 showlegend=False,
             )
@@ -282,8 +282,8 @@ if "current_game" in st.session_state:
             # Insights
             st.info(
                 f"""
-                **Key Insight:** With {result.bypass_rate:.1%} bypass rate, 
-                approximately {result.bypass_rate * 100:.0f}% of the ban's effectiveness 
+                **Key Insight:** With {result.bypass_rate:.1%} bypass rate,
+                approximately {result.bypass_rate * 100:.0f}% of the ban's effectiveness
                 is lost through proxy-based information leakage.
                 """,
             )
@@ -318,7 +318,7 @@ if "current_game" in st.session_state:
             fig.update_layout(
                 title="Testing Rate: Self-Interest vs Altruism",
                 yaxis_title="Testing Rate",
-                yaxis=dict(tickformat=".0%"),
+                yaxis={"tickformat": ".0%"},
                 height=400,
                 showlegend=False,
             )
@@ -328,7 +328,7 @@ if "current_game" in st.session_state:
             # Insights
             st.success(
                 f"""
-                **Positive Spillover:** Altruistic behavior increases family testing 
+                **Positive Spillover:** Altruistic behavior increases family testing
                 by {(result.family_testing_rate - 0.5) * 100:.1f} percentage points,
                 generating ${result.welfare_impact:,.0f} in net welfare.
                 """,
@@ -381,8 +381,8 @@ if "current_game" in st.session_state:
             # Insights
             st.info(
                 f"""
-                **Cascade Effect:** Each index case generates {result.cascade_rate:.1f} 
-                additional tests through family cascade, making this 
+                **Cascade Effect:** Each index case generates {result.cascade_rate:.1f}
+                additional tests through family cascade, making this
                 ${result.cost_effectiveness:,.0f} per detection.
                 """,
             )
@@ -392,36 +392,36 @@ st.divider()
 with st.expander("📖 About Extended Strategic Games"):
     st.markdown("""
     ### Information Leakage Game
-    
+
     Models how insurers may circumvent genetic discrimination bans using proxy variables:
     - **Family History:** Insurers use family medical history to infer genetic risk
     - **Medical Records:** Electronic health records may reveal genetic information
     - **Lifestyle Factors:** Correlated behaviors may signal genetic predisposition
-    
+
     **Policy Implication:** Strong enforcement and broad definitions of genetic information
     are needed to prevent leakage.
-    
+
     ---
-    
+
     ### Genetic Altruism Game
-    
+
     Models testing decisions influenced by family welfare:
     - **Altruistic Motivation:** Getting tested to help family members
     - **Spillover Effects:** Non-tested family members benefit from information
     - **Family Size Effect:** Larger families show stronger altruism
-    
+
     **Policy Implication:** Family-centered interventions may be more effective
     than individual-focused approaches.
-    
+
     ---
-    
+
     ### Cascade Testing Game
-    
+
     Models sequential testing within families after index case identification:
     - **Index Cases:** Initial testers who identify genetic risk
     - **Cascade Effect:** Family members tested after contact
     - **Cost-Effectiveness:** Cascade testing often more efficient than population screening
-    
+
     **Policy Implication:** Supporting cascade testing programs can improve
     cost-effectiveness of genetic testing initiatives.
     """)

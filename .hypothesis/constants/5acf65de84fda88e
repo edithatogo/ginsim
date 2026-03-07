@@ -1,0 +1,4 @@
+# file: C:\Users\60217257\OneDrive - Victoria University of Wellington - STAFF\Project - 2026.03 - Economics and Genetic Discrimination\src\model\delta_view.py
+# hypothesis_version: 6.151.9
+
+[0.0, 0.03, 100000, 1000000, '\n**Summary:**', 'administrative_cost', 'baseline', 'baseline_name', 'baseline_policy', 'best_uptake_policy', 'best_welfare_policy', 'comparison_policies', 'compliance_delta', 'compliance_rate', 'cost_benefit_ratio', 'delta_metrics', 'discount_rate', 'implementation_cost', 'inf', 'net_welfare_gain', 'policy_name', 'qalys_delta', 'qalys_gained', 'ranking_by_uptake', 'ranking_by_welfare', 'summary', 'testing_uptake', 'testing_uptake_delta', 'time_horizon', 'utf-8', 'w', 'welfare_delta', 'welfare_impact']

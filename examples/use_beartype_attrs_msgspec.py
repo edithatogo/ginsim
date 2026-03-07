@@ -153,7 +153,7 @@ def train_once(state: ModelState, _config: Config) -> ModelState:
     return state
 
 
-def test_training():
+def test_training() -> None:
     """Test with chex utilities."""
 
     # Create test data
@@ -174,8 +174,4 @@ def test_training():
 
 if __name__ == "__main__":
     # Example usage
-    print("✓ beartype: Runtime type checking enabled")
-    print("✓ attrs: Immutable data classes")
-    print("✓ msgspec: Fast serialization")
-    print("✓ chex: JAX testing utilities")
-    print("\nAll libraries working together!")
+    pass

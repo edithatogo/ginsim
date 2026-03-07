@@ -167,9 +167,7 @@ def evaluate_model_cached(_params, policy_id):
     policy = STANDARD_POLICIES[policy_id]
 
     # Run core pipeline
-    result = evaluate_single_policy(_params, policy)
-
-    return result
+    return evaluate_single_policy(_params, policy)
 
 
 # Calculate results
@@ -290,7 +288,7 @@ with tab2:
 
         fig.update_layout(
             template=STYLE["chart_defaults"]["template"],
-            yaxis=dict(title="Testing Uptake", tickformat=".0%", range=[0, 1]),
+            yaxis={"title": "Testing Uptake", "tickformat": ".0%", "range": [0, 1]},
             height=400,
         )
         st.plotly_chart(fig, use_container_width=True)
@@ -314,7 +312,7 @@ with tab2:
                 x=elasticity_range,
                 y=sens_uptakes,
                 mode="lines+markers",
-                line=dict(color=get_policy_color(policy_label), width=3),
+                line={"color": get_policy_color(policy_label), "width": 3},
                 name=policy_label,
             )
         )
@@ -322,7 +320,7 @@ with tab2:
         fig2.update_layout(
             template=STYLE["chart_defaults"]["template"],
             xaxis_title="Deterrence Elasticity",
-            yaxis=dict(title="Testing Uptake", tickformat=".0%"),
+            yaxis={"title": "Testing Uptake", "tickformat": ".0%"},
             height=400,
         )
         st.plotly_chart(fig2, use_container_width=True)
@@ -364,18 +362,18 @@ with tab4:
     st.markdown(
         f"""
     ## Single Source of Truth
-    This dashboard is linked directly to the core JAX-accelerated model. 
-    
+    This dashboard is linked directly to the core JAX-accelerated model.
+
     **Backend:** JAX / XLA (Optimized)
-    
+
     ### Jurisdictional Context: {jurisdiction}
     The model currently evaluates the **{jurisdiction}** parameter surface selected in the sidebar.
-    
+
     ### Visual Legend
     - <font color='{STYLE["colors"]["status_quo"]}'>■</font> **Status Quo**: No genetic restrictions.
     - <font color='{STYLE["colors"]["moratorium"]}'>■</font> **Moratorium**: Voluntary industry agreement (e.g., FSC 2019).
     - <font color='{STYLE["colors"]["ban"]}'>■</font> **Ban**: Legislated prohibition on genetic information use.
-    
+
     ### Reference Parameters
     - **Baseline Uptake (0.52):** Ettema et al. (2021)
     - **Deterrence Elasticity (0.18):** McGuire et al. (2019)

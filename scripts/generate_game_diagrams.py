@@ -9,9 +9,9 @@ Usage:
 import argparse
 from pathlib import Path
 
-import matplotlib
+import matplotlib as mpl
 
-matplotlib.use("Agg")
+mpl.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import patches
@@ -30,7 +30,7 @@ COLORS = {
 }
 
 
-def save_figure(fig, output_path: Path, dpi: int = 1200, formats: list = None):
+def save_figure(fig, output_path: Path, dpi: int = 1200, formats: list | None = None):
     """Save figure in multiple formats."""
     if formats is None:
         formats = ["png", "svg"]
@@ -90,14 +90,14 @@ def generate_module_a_diagram(output_dir: Path, dpi: int, formats: list):
         ax.text(x, y - 0.5, role, fontsize=9, ha="center", va="center", style="italic")
 
     # Game sequence arrows
-    arrow_props = dict(arrowstyle="->", color=COLORS["black"], linewidth=2)
+    {"arrowstyle": "->", "color": COLORS["black"], "linewidth": 2}
 
     # Policy → Individual
     ax.annotate(
         "",
         xy=(10, 7),
         xytext=(2, 7),
-        arrowprops=dict(arrowstyle="->", color=COLORS["bluish_green"], linewidth=2.5),
+        arrowprops={"arrowstyle": "->", "color": COLORS["bluish_green"], "linewidth": 2.5},
     )
     ax.text(6, 7.3, "1. Sets policy regime", fontsize=10, ha="center", va="bottom")
 
@@ -106,7 +106,7 @@ def generate_module_a_diagram(output_dir: Path, dpi: int, formats: list):
         "",
         xy=(5, 7),
         xytext=(3, 7),
-        arrowprops=dict(arrowstyle="->", color=COLORS["blue"], linewidth=2.5),
+        arrowprops={"arrowstyle": "->", "color": COLORS["blue"], "linewidth": 2.5},
     )
     ax.text(4, 6.6, "2. Testing decision", fontsize=10, ha="center", va="top")
 
@@ -115,7 +115,7 @@ def generate_module_a_diagram(output_dir: Path, dpi: int, formats: list):
         "",
         xy=(8, 7),
         xytext=(7, 7),
-        arrowprops=dict(arrowstyle="->", color=COLORS["vermilion"], linewidth=2.5),
+        arrowprops={"arrowstyle": "->", "color": COLORS["vermilion"], "linewidth": 2.5},
     )
     ax.text(7.5, 7.3, "3. Sets premiums", fontsize=10, ha="center", va="bottom")
 
@@ -182,7 +182,7 @@ def generate_module_c_diagram(output_dir: Path, dpi: int, formats: list):
         ha="center",
         va="center",
         style="italic",
-        bbox=dict(boxstyle="round", facecolor=COLORS["yellow"], alpha=0.3),
+        bbox={"boxstyle": "round", "facecolor": COLORS["yellow"], "alpha": 0.3},
     )
 
     # Players
@@ -275,7 +275,7 @@ def generate_module_c_diagram(output_dir: Path, dpi: int, formats: list):
         fontsize=10,
         ha="center",
         va="center",
-        bbox=dict(boxstyle="round", facecolor=COLORS["gray"], alpha=0.2),
+        bbox={"boxstyle": "round", "facecolor": COLORS["gray"], "alpha": 0.2},
     )
 
     save_figure(fig, output_dir / "module_c_insurance_eq", dpi, formats)
@@ -345,7 +345,7 @@ def generate_module_d_diagram(output_dir: Path, dpi: int, formats: list):
         "",
         xy=(10, 5.6),
         xytext=(9.5, 5.6),
-        arrowprops=dict(arrowstyle="->", color=COLORS["black"], linewidth=2),
+        arrowprops={"arrowstyle": "->", "color": COLORS["black"], "linewidth": 2},
     )
 
     # Risk score
@@ -389,7 +389,7 @@ def generate_module_d_diagram(output_dir: Path, dpi: int, formats: list):
         fontsize=10,
         ha="center",
         va="center",
-        bbox=dict(boxstyle="round", facecolor=COLORS["yellow"], alpha=0.3),
+        bbox={"boxstyle": "round", "facecolor": COLORS["yellow"], "alpha": 0.3},
     )
 
     save_figure(fig, output_dir / "module_d_proxy", dpi, formats)
@@ -465,7 +465,7 @@ def generate_module_e_diagram(output_dir: Path, dpi: int, formats: list):
         ha="center",
         va="center",
         family="monospace",
-        bbox=dict(boxstyle="round", facecolor=COLORS["yellow"], alpha=0.3),
+        bbox={"boxstyle": "round", "facecolor": COLORS["yellow"], "alpha": 0.3},
     )
 
     ax.text(
@@ -510,7 +510,7 @@ def generate_module_f_diagram(output_dir: Path, dpi: int, formats: list):
         ha="center",
         va="center",
         fontweight="bold",
-        bbox=dict(boxstyle="round", facecolor=COLORS["bluish_green"], alpha=0.2),
+        bbox={"boxstyle": "round", "facecolor": COLORS["bluish_green"], "alpha": 0.2},
     )
 
     # Players
@@ -557,7 +557,7 @@ def generate_module_f_diagram(output_dir: Path, dpi: int, formats: list):
         "",
         xy=(7.5, 5.5),
         xytext=(4.5, 5.5),
-        arrowprops=dict(arrowstyle="->", color=COLORS["bluish_green"], linewidth=3),
+        arrowprops={"arrowstyle": "->", "color": COLORS["bluish_green"], "linewidth": 3},
     )
     ax.text(
         6,
@@ -579,7 +579,7 @@ def generate_module_f_diagram(output_dir: Path, dpi: int, formats: list):
         ha="center",
         va="center",
         family="monospace",
-        bbox=dict(boxstyle="round", facecolor=COLORS["yellow"], alpha=0.3),
+        bbox={"boxstyle": "round", "facecolor": COLORS["yellow"], "alpha": 0.3},
     )
 
     ax.text(
@@ -624,7 +624,7 @@ def generate_enforcement_diagram(output_dir: Path, dpi: int, formats: list):
         ha="center",
         va="center",
         fontweight="bold",
-        bbox=dict(boxstyle="round", facecolor=COLORS["orange"], alpha=0.2),
+        bbox={"boxstyle": "round", "facecolor": COLORS["orange"], "alpha": 0.2},
     )
 
     # Insurer decision
@@ -678,7 +678,7 @@ def generate_enforcement_diagram(output_dir: Path, dpi: int, formats: list):
         "",
         xy=(7, 6.5),
         xytext=(5, 6.5),
-        arrowprops=dict(arrowstyle="->", color=COLORS["black"], linewidth=2),
+        arrowprops={"arrowstyle": "->", "color": COLORS["black"], "linewidth": 2},
     )
 
     ax.text(6, 7, "Expected Penalty", fontsize=10, ha="center", va="bottom")
@@ -692,7 +692,7 @@ def generate_enforcement_diagram(output_dir: Path, dpi: int, formats: list):
         ha="center",
         va="center",
         family="monospace",
-        bbox=dict(boxstyle="round", facecolor=COLORS["yellow"], alpha=0.3),
+        bbox={"boxstyle": "round", "facecolor": COLORS["yellow"], "alpha": 0.3},
     )
 
     # Complaint rate
@@ -797,7 +797,7 @@ def generate_equilibrium_concepts_diagram(output_dir: Path, dpi: int, formats: l
         "",
         xy=(7.25, 4.5),
         xytext=(2.75, 4.5),
-        arrowprops=dict(arrowstyle="->", color=COLORS["black"], linewidth=2),
+        arrowprops={"arrowstyle": "->", "color": COLORS["black"], "linewidth": 2},
     )
     ax.text(5, 4.8, "Policy Constraint", fontsize=10, ha="center", va="bottom")
 
@@ -872,7 +872,7 @@ def generate_equilibrium_concepts_diagram(output_dir: Path, dpi: int, formats: l
         "",
         xy=(7, 6.5),
         xytext=(4, 4.5),
-        arrowprops=dict(arrowstyle="<->", color=COLORS["black"], linewidth=2),
+        arrowprops={"arrowstyle": "<->", "color": COLORS["black"], "linewidth": 2},
     )
     ax.text(5.8, 5.7, "Externality", fontsize=10, ha="center", va="bottom", style="italic")
 
@@ -1025,7 +1025,7 @@ def generate_payoff_matrices_diagram(output_dir: Path, dpi: int, formats: list):
         xy=(0.25, 0.68),
         xytext=(0.35, 0.55),
         fontsize=9,
-        arrowprops=dict(arrowstyle="->", color=COLORS["black"]),
+        arrowprops={"arrowstyle": "->", "color": COLORS["black"]},
     )
 
     ax.set_xlabel("False Positive Rate (1-Specificity)", fontsize=10)

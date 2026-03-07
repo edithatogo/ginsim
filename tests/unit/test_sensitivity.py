@@ -1,7 +1,8 @@
 """
-Unit tests for sensitivity analysis.
+Unit tests for Sensitivity Analysis.
 """
 
+from src.model.parameters import ModelParameters, PolicyConfig
 from src.model.sensitivity import (
     one_way_sensitivity,
     scenario_analysis,
@@ -13,40 +14,27 @@ class TestOneWaySensitivity:
     """Tests for one_way_sensitivity."""
 
     def test_returns_sensitivity_result(self):
-        """Test that one-way sensitivity returns complete result."""
+        """Test that analysis returns a SensitivityResult."""
 
-        def model(params):
-            return params["x"] * 2
+        def model(p):
+            return p.deterrence_elasticity * 10
 
-        base_params = {"x": 10.0}
+        params = ModelParameters(deterrence_elasticity=0.5)
+        result = one_way_sensitivity(model, params, "deterrence_elasticity")
 
-        result = one_way_sensitivity(
-            model,
-            base_params,
-            "x",
-            range_pct=0.1,
-        )
-
-        assert result.parameter == "x"
-        assert result.base_value == 10.0
-        assert result.range[0] == 9.0
-        assert result.range[1] == 11.0
+        assert result.parameter_name == "deterrence_elasticity"
+        assert result.base_outcome == 5.0
 
     def test_sensitivity_index_positive(self):
-        """Test that sensitivity index is positive."""
+        """Test that sensitivity index is correctly calculated."""
 
-        def model(params):
-            return params["x"] ** 2
+        def model(p):
+            return p.deterrence_elasticity
 
-        base_params = {"x": 10.0}
+        params = ModelParameters(deterrence_elasticity=1.0)
+        result = one_way_sensitivity(model, params, "deterrence_elasticity", variation=0.5)
 
-        result = one_way_sensitivity(
-            model,
-            base_params,
-            "x",
-            range_pct=0.25,
-        )
-
+        # Base=1.0, Low=0.5, High=1.5. Swing = 1.0. Index = 1.0/1.0 = 1.0
         assert result.sensitivity_index > 0
 
 
@@ -54,60 +42,34 @@ class TestTornadoAnalysis:
     """Tests for tornado_analysis."""
 
     def test_returns_sorted_results(self):
-        """Test that tornado results are sorted by sensitivity."""
+        """Test that results are sorted by impact."""
 
-        def model(params):
-            return params["x"] + params["y"] * 2
+        def model(p):
+            return p.deterrence_elasticity + 2 * p.moratorium_effect
 
-        base_params = {"x": 10.0, "y": 5.0}
+        params = ModelParameters(deterrence_elasticity=1.0, moratorium_effect=1.0)
+        results = tornado_analysis(model, params, ["deterrence_elasticity", "moratorium_effect"])
 
-        results = tornado_analysis(
-            model,
-            base_params,
-            ["x", "y"],
-            range_pct=0.1,
-        )
-
-        # Should be sorted by sensitivity (descending)
         assert len(results) == 2
-        assert results[0].sensitivity_index >= results[1].sensitivity_index
+        # Moratorium should have higher impact (coefficient 2 vs 1)
+        assert results[0].parameter_name == "moratorium_effect"
 
 
 class TestScenarioAnalysis:
     """Tests for scenario_analysis."""
 
     def test_returns_scenario_results(self):
-        """Test that scenario analysis returns all scenarios."""
+        """Test that scenario analysis returns results."""
 
-        def model(params):
-            return params["x"] * params["y"]
+        def model(p, pol):
+            return p.deterrence_elasticity * (2.0 if pol.allow_genetic_test_results else 1.0)
 
-        base_params = {"x": 10.0, "y": 5.0}
+        params = ModelParameters(deterrence_elasticity=10.0)
+        baseline = PolicyConfig(name="base", description="d", allow_genetic_test_results=True)
+        reform = PolicyConfig(name="reform", description="d", allow_genetic_test_results=False)
 
-        scenarios = {
-            "optimistic": {"x": 15.0, "y": 7.5},
-            "pessimistic": {"x": 5.0, "y": 2.5},
-        }
+        results = scenario_analysis(model, params, baseline, reform)
 
-        results = scenario_analysis(model, base_params, scenarios)
-
-        assert "base" in results
-        assert "optimistic" in results
-        assert "pessimistic" in results
-
-    def test_computes_change_from_base(self):
-        """Test that change from base is computed."""
-
-        def model(params):
-            return params["x"]
-
-        base_params = {"x": 10.0}
-
-        scenarios = {
-            "increase": {"x": 15.0},
-        }
-
-        results = scenario_analysis(model, base_params, scenarios)
-
-        # Change should be (15 - 10) / 10 = 0.5
-        assert abs(results["increase"]["change_from_base"] - 0.5) < 0.01
+        assert results["baseline_outcome"] == 20.0
+        assert results["reform_outcome"] == 10.0
+        assert results["delta"] == -10.0

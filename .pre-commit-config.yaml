@@ -49,3 +49,10 @@ repos:
         language: system
         pass_filenames: false
         files: context/references.bib
+  - repo: local
+    hooks:
+      - id: red-team-check
+        name: Enforce Adversarial Red Teaming
+        entry: python scripts/check_red_team.py
+        language: system
+        files: PHASE_.*_SUMMARY\.md

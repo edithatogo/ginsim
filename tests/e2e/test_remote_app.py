@@ -135,7 +135,9 @@ def test_remote_app_loads():
             for label in EXPECTED_RESULT_LABELS:
                 assert label in body_text
 
-            dashboard_frame.get_by_role("button", name="📊 Go to Sensitivity Analysis").click(timeout=30_000)
+            dashboard_frame.get_by_role("button", name="📊 Go to Sensitivity Analysis").click(
+                timeout=30_000
+            )
             page.wait_for_timeout(5_000)
             body_text = _frame_body_text(dashboard_frame)
             assert "Comprehensive Sensitivity Analysis" in body_text

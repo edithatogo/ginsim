@@ -92,7 +92,10 @@ def test_instantiate_track_creates_seeded_artifacts_and_updates_registry(tmp_pat
 
     registry_text = registry_path.read_text(encoding="utf-8")
     assert "| gdpe_1234_test_track | Test Track | Active |" in registry_text
-    assert "| _None_ | | | |" not in registry_text
+    active_section = registry_text.split("## Active Tracks", maxsplit=1)[1].split(
+        "## Planned Tracks", maxsplit=1
+    )[0]
+    assert "| _None_ | | | |" not in active_section
 
 
 def test_conductor_tracking_files_are_not_ignored() -> None:

@@ -75,4 +75,4 @@ def test_deployment_requirements_install_project_runtime():
     gin_sim_requirements = GIN_SIM_REQUIREMENTS.read_text(encoding="utf-8").splitlines()
 
     assert "-e ." in root_requirements
-    assert "-e .." in gin_sim_requirements
+    assert "-e ." in gin_sim_requirements

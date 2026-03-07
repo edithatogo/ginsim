@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Copy and install Python dependencies
 COPY pyproject.toml .
-RUN pip install --no-cache-dir -e ".[dev,validation,workflow]"
+RUN pip install --no-cache-dir -e ".[dev,workflow]"
 
 # Copy source code
 COPY src/ src/

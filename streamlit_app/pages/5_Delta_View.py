@@ -215,7 +215,7 @@ if "delta_analysis" in st.session_state:
         )
 
     df = pd.DataFrame(data)
-    st.dataframe(df, width="stretch", hide_index=True)
+    st.dataframe(df, hide_index=True)
     st.caption(
         "Interpretation: positive deltas mean the comparison scenario outperforms the selected baseline on that metric. Welfare metrics are currency-denominated decision metrics; QALYs are reported separately."
     )

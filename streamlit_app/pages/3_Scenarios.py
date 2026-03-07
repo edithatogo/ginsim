@@ -156,7 +156,7 @@ if "scenario_comparison" in st.session_state:
         )
 
     df = pd.DataFrame(data)
-    st.dataframe(df, width="stretch", hide_index=True)
+    st.dataframe(df, hide_index=True)
     st.caption(
         "Interpretation: benchmark scenarios differ through both model parameters and the canonical policy regime shown in the scenario config."
     )

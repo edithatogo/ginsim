@@ -7,3 +7,6 @@
 	path = study
 	url = https://github.com/yourusername/genetic-discrimination-policy-study.git
 	update = checkout
+[submodule "external/streamlit-agent-skills"]
+	path = external/streamlit-agent-skills
+	url = https://github.com/streamlit/agent-skills.git

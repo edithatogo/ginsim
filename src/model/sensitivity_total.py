@@ -14,6 +14,7 @@ from __future__ import annotations
 import json
 from collections.abc import Callable
 from dataclasses import dataclass
+from functools import partial
 from pathlib import Path
 from typing import Any
 
@@ -72,7 +73,7 @@ class CEACResult:
     optimal_policy: str  # Optimal policy name
 
 
-@jit
+@partial(jit, static_argnums=(0,))
 def _evaluate_model_jax(
     model_func: ModelFunc,
     params_batch: Float[Array, "..."],
@@ -98,6 +99,14 @@ def _evaluate_model_jax(
         return model_func(params)
 
     return vmap(single_eval)(jnp.stack([param_indices, param_values], axis=1))
+
+
+def _batched_python_eval(
+    model_func: ModelFunc,
+    params_batch: list[Float[Array, "..."]] | Float[Array, "..."],
+) -> Float[Array, "..."]:
+    """Fallback batch evaluation for non-JAX-traceable model functions."""
+    return jnp.asarray([float(model_func(params)) for params in params_batch], dtype=jnp.float32)
 
 
 def tornado_sensitivity(
@@ -137,12 +146,16 @@ def tornado_sensitivity(
         test_indices = jnp.full(n_points, idx, dtype=jnp.int32)
 
         # Vectorized evaluation
-        outcomes = _evaluate_model_jax(
-            model_func,
-            base_params,
-            test_indices,
-            test_values,
-        )
+        try:
+            outcomes = _evaluate_model_jax(
+                model_func,
+                base_params,
+                test_indices,
+                test_values,
+            )
+        except TypeError:
+            varied_params = [base_params.at[idx].set(val) for val in test_values]
+            outcomes = _batched_python_eval(model_func, varied_params)
 
         low_outcome = float(jnp.min(outcomes))
         high_outcome = float(jnp.max(outcomes))
@@ -210,7 +223,14 @@ def twoway_sensitivity(
         return model_func(params)
 
     # Vectorized evaluation
-    outcomes = vmap(evaluate_pair)(p1_flat, p2_flat)
+    try:
+        outcomes = vmap(evaluate_pair)(p1_flat, p2_flat)
+    except TypeError:
+        varied_params = [
+            base_params.at[param1_idx].set(p1_val).at[param2_idx].set(p2_val)
+            for p1_val, p2_val in zip(p1_flat, p2_flat, strict=False)
+        ]
+        outcomes = _batched_python_eval(model_func, varied_params)
     outcomes_grid = outcomes.reshape(n_points, n_points)
 
     return HeatMapResult(
@@ -276,8 +296,14 @@ def sobol_sensitivity(
     A_params = jax.vmap(params_from_scaled)(A)
     B_params = jax.vmap(params_from_scaled)(B)
 
-    f_A = jax.vmap(model_func)(A_params)
-    f_B = jax.vmap(model_func)(B_params)
+    try:
+        f_A = jax.vmap(model_func)(A_params)
+        f_B = jax.vmap(model_func)(B_params)
+        use_jax_batch = True
+    except TypeError:
+        f_A = _batched_python_eval(model_func, list(A_params))
+        f_B = _batched_python_eval(model_func, list(B_params))
+        use_jax_batch = False
 
     # Build A_B matrices and evaluate using JAX-friendly operations
     f_A_B = []
@@ -286,7 +312,10 @@ def sobol_sensitivity(
         mask = jnp.arange(n_params)[None, :] == i
         A_B = jnp.where(mask, B, A)
         A_B_params = jax.vmap(params_from_scaled)(A_B)
-        f_A_B.append(jax.vmap(model_func)(A_B_params))
+        if use_jax_batch:
+            f_A_B.append(jax.vmap(model_func)(A_B_params))
+        else:
+            f_A_B.append(_batched_python_eval(model_func, list(A_B_params)))
 
     f_A_B = jnp.stack(f_A_B, axis=1)  # [n_samples, n_params]
 

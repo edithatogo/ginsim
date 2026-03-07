@@ -15,6 +15,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
+import jax.numpy as jnp
 import plotly.graph_objects as go
 import streamlit as st
 
@@ -103,10 +104,10 @@ if run_clicked or f"{game_selection}_results" in st.session_state:
         )
 
         result = information_leakage_game(
-            baseline_uptake=baseline_uptake,
-            ban_effectiveness=ban_effectiveness,
-            proxy_accuracy=proxy_accuracy,
-            insurer_inference_strength=insurer_inference,
+            baseline_uptake=jnp.asarray(float(baseline_uptake)),
+            ban_effectiveness=jnp.asarray(float(ban_effectiveness)),
+            proxy_accuracy=jnp.asarray(float(proxy_accuracy)),
+            insurer_inference_strength=jnp.asarray(float(insurer_inference)),
         )
 
         st.session_state["leakage_results"] = result
@@ -150,10 +151,10 @@ if run_clicked or f"{game_selection}_results" in st.session_state:
         )
 
         result = genetic_altruism_game(
-            baseline_uptake=baseline_uptake,
-            family_risk_level=family_risk,
-            altruism_strength=altruism_strength,
-            family_size=family_size,
+            baseline_uptake=jnp.asarray(float(baseline_uptake)),
+            family_risk_level=jnp.asarray(float(family_risk)),
+            altruism_strength=jnp.asarray(float(altruism_strength)),
+            family_size=jnp.asarray(float(family_size)),
         )
 
         st.session_state["altruism_results"] = result
@@ -215,12 +216,12 @@ if run_clicked or f"{game_selection}_results" in st.session_state:
         )
 
         result = cascade_testing_game(
-            index_case_rate=index_rate,
-            family_contact_rate=contact_rate,
-            uptake_after_contact=cascade_uptake,
-            average_family_size=family_size,
-            cost_per_test=test_cost,
-            detection_yield=detection_yield,
+            index_case_rate=jnp.asarray(float(index_rate)),
+            family_contact_rate=jnp.asarray(float(contact_rate)),
+            uptake_after_contact=jnp.asarray(float(cascade_uptake)),
+            average_family_size=jnp.asarray(float(family_size)),
+            cost_per_test=jnp.asarray(float(test_cost)),
+            detection_yield=jnp.asarray(float(detection_yield)),
         )
 
         st.session_state["cascade_results"] = result

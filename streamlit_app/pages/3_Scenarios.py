@@ -151,7 +151,7 @@ if "scenario_comparison" in st.session_state:
         )
 
     df = pd.DataFrame(data)
-    st.dataframe(df, use_container_width=True, hide_index=True)
+    st.dataframe(df, width="stretch", hide_index=True)
     st.caption(
         "Interpretation: benchmark scenarios differ through both model parameters and the canonical policy regime shown in the scenario config."
     )
@@ -198,7 +198,7 @@ if "scenario_comparison" in st.session_state:
         showlegend=False,
     )
 
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
     # Welfare Impact Comparison
     st.divider()
@@ -234,7 +234,7 @@ if "scenario_comparison" in st.session_state:
         showlegend=False,
     )
 
-    st.plotly_chart(fig2, use_container_width=True)
+    st.plotly_chart(fig2, width="stretch")
 
     # Detailed results expander
     with st.expander("📋 View Detailed Results"):

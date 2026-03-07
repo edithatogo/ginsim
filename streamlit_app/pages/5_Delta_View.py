@@ -175,10 +175,10 @@ if st.sidebar.button("🔬 Run Comparative Analysis", type="primary"):
 
         # Run comparative analysis
         cost_params = {
-            "implementation_cost": implementation_cost,
-            "administrative_cost": administrative_cost,
-            "time_horizon": time_horizon,
-            "discount_rate": discount_rate,
+            "implementation_cost": float(implementation_cost),
+            "administrative_cost": float(administrative_cost),
+            "time_horizon": float(time_horizon),
+            "discount_rate": float(discount_rate),
         }
 
         analysis = comparative_delta_analysis(baseline_dict, policy_results, cost_params)
@@ -214,7 +214,7 @@ if "delta_analysis" in st.session_state:
         )
 
     df = pd.DataFrame(data)
-    st.dataframe(df, use_container_width=True, hide_index=True)
+    st.dataframe(df, width="stretch", hide_index=True)
     st.caption(
         "Interpretation: positive deltas mean the comparison scenario outperforms the selected baseline on that metric. Welfare metrics are currency-denominated decision metrics; QALYs are reported separately."
     )
@@ -248,7 +248,7 @@ if "delta_analysis" in st.session_state:
         showlegend=False,
     )
 
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
     # Visualization: Net Welfare Gain
     st.divider()
@@ -278,7 +278,7 @@ if "delta_analysis" in st.session_state:
         showlegend=False,
     )
 
-    st.plotly_chart(fig2, use_container_width=True)
+    st.plotly_chart(fig2, width="stretch")
 
     # Rankings
     st.divider()

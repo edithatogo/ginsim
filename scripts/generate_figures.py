@@ -45,7 +45,7 @@ def save_figure(fig: plt.Figure, output_path: Path, dpi: int, formats: list[str]
             fig.savefig(path, dpi=dpi, bbox_inches="tight", facecolor="white")
         else:
             fig.savefig(path, bbox_inches="tight", facecolor="white")
-        print(f"  ✓ Saved {path.name}")
+        print(f"  Saved {path.name}")
     plt.close(fig)
 
 
@@ -53,7 +53,7 @@ def _write_caption(output_dir: Path, stem: str, caption: str) -> None:
     """Write a plain-text caption alongside generated figure files."""
     caption_path = output_dir / f"{stem}_caption.md"
     caption_path.write_text(caption.strip() + "\n", encoding="utf-8")
-    print(f"  ✓ Saved {caption_path.name}")
+    print(f"  Saved {caption_path.name}")
 
 
 def plot_policy_bars(
@@ -261,7 +261,7 @@ def main() -> None:
 
     print(f"Source runs: {', '.join(jurisdictions)}")
     print("=" * 60)
-    print(f"✓ Reporting figures generated in {output_dir}")
+    print(f"Reporting figures generated in {output_dir}")
     print("=" * 60)
 
 

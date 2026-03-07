@@ -1,27 +1,26 @@
 # Reviewer Navigation Map
 
-**Status:** Draft scaffold created in `gdpe_0021` Phase 1  
-**Purpose:** Give a journal reviewer a direct path from major manuscript/repository claims to the supporting code, outputs, assumptions, and references.
+**Status:** Updated against the current generated package on 2026-03-07  
+**Primary package root:** `outputs/runs/meta_pipeline/20260307T064546Z`  
+**Purpose:** Give a reviewer a direct path from major claims to the implemented code, generated outputs, assumptions, and remaining caveats.
 
 ---
 
 ## How to use this map
 
-Start with the reviewer question or claim category in the first column. Each row points to the main document surface, the implemented code path, the supporting output artifact, the governing assumptions, and the canonical references that should be checked.
+Start with the reviewer question in the first column. Each row points to the main narrative surface, the implemented code path, the current generated artifact, and the main caveat that should shape interpretation.
 
-This map is intentionally conservative. If a surface is exploratory or adapted rather than fully calibrated, that should be stated explicitly in the caveat column.
+## Claim-to-evidence map
 
-## Claim-to-Evidence Map
+| Reviewer question or claim | Primary document surface | Implemented code path | Current generated artifact | Governing assumptions / references | Caveat / interpretation note |
+|---|---|---|---|---|---|
+| What policy comparators are actually implemented? | `README.md`, `docs/CURRENT_STATUS.md`, methods/protocol docs | `src/model/module_a_behavior.py`, `src/model/scenario_analysis.py`, `streamlit_app/app.py` | `outputs/runs/meta_pipeline/20260307T064546Z/publish_pack/policy_summary.csv` | `context/assumptions_registry.yaml`, `study/references/references.json` | The active comparator canon is `status_quo`, `moratorium`, `ban`. |
+| How are policy outcomes computed on the active path? | `docs/METHODS_SECTION_DRAFT.md`, `docs/MODEL_CARD.md` | `src/model/pipeline.py`, `src/model/dcba_ledger.py`, `src/model/module_d_proxy.py` | `outputs/runs/meta_pipeline/20260307T064546Z/compare/REPORT.md` and publish-pack summary tables | assumptions registry plus evidence-register citations | The active output surface is implemented, but the package still lacks rebuilt decomposition and EVPPI sidecars. |
+| What concrete reviewer package exists right now? | `docs/MANUSCRIPT_ASSET_INVENTORY.md`, `docs/SUBMISSION_GAP_REGISTER.md` | `scripts/run_meta_pipeline.py`, `scripts/publish_pack.py`, `scripts/generate_figures.py` | `outputs/runs/meta_pipeline/20260307T064546Z/publish_pack/` | reporting manifest and run manifests | The current package is real and reproducible, but it is still a policy-brief package rather than a final manuscript submission bundle. |
+| Which figures and tables are currently available? | `docs/MANUSCRIPT_ASSET_INVENTORY.md` | `scripts/generate_figures.py`, `scripts/reporting_common.py` | Net-benefit figures and summary CSVs under `outputs/runs/meta_pipeline/20260307T064546Z/publish_pack/` | reporting manifest | EVPPI and decomposition figures are not currently generated because the legacy runners are broken against removed APIs. |
+| What still blocks a cleaner journal submission package? | `docs/SUBMISSION_GAP_REGISTER.md` | n/a | `outputs/runs/meta_pipeline/20260307T064546Z/compare/REPORT.md` plus the gap register | n/a | The authoritative current blockers are decomposition/EVPPI rebuild, manuscript-grade asset lift, and substantive interpretation review. |
 
-| Reviewer question or claim | Primary document surface | Implemented code path | Supporting output artifact | Governing assumptions | Canonical references | Caveat / interpretation note |
-|---|---|---|---|---|---|---|
-| What policy comparators are actually implemented? | `README.md`, `docs/CURRENT_STATUS.md`, protocol/methods docs | `src/model/module_a_behavior.py`, `src/model/scenario_analysis.py`, `streamlit_app/app.py` | publish-pack policy summary tables and dashboard benchmark comparison | comparator canon in assumptions registry and jurisdiction profiles | `study/references/references.json` IDs used by configs/evidence registers | Active canonical set is `status_quo`, `moratorium`, `ban`; sandbox surfaces remain exploratory where stated. |
-| How are welfare and policy outcomes computed on the active path? | `docs/METHODS_SECTION_DRAFT.md`, `docs/MODEL_CARD.md` | `src/model/pipeline.py`, `src/model/dcba_ledger.py`, `src/model/module_d_proxy.py` | policy summary tables, net benefit figures, uncertainty figures | assumptions registry entries for welfare mapping, transferability, proxy substitution | canonical reference IDs linked through evidence registers | The active path is implemented; some broader extensions remain outside the active manuscript-ready scope. |
-| Which outputs are calibrated versus exploratory? | `docs/MODEL_CARD.md`, dashboard explanation copy, methods/protocol docs | `streamlit_app/app.py`, `streamlit_app/pages/*.py`, reporting scripts | dashboard pages, publish-pack outputs, caption files | assumptions registry and scenario disclosure notes | canonical reference IDs and scenario config citations | Scenario sandbox and extended-game surfaces must be read with their exploratory labels. |
-| Where do key empirical assumptions come from? | `docs/METHODS_SECTION_DRAFT.md`, assumptions and traceability docs | `context/assumptions_registry.yaml`, `context/jurisdiction_profiles/*`, `scripts/validate_references.py` | traceability report and manuscript-facing assumption summaries | assumption IDs in registry | `study/references/references.json` plus alias reconciliation | Adapted NZ inputs must be read with transferability notes, not as direct NZ measurement unless stated. |
-| What still blocks clean journal submission? | `docs/SUBMISSION_GAP_REGISTER.md` | n/a | submission-gap register and track completion notes | n/a | n/a | This is the authoritative current blocker list for manuscript packaging. |
+## Reading note
 
-## Notes
-
-- This scaffold is expected to be expanded in `gdpe_0021` Phase 2.
-- File paths and artifact names should stay aligned with the active implementation rather than archival milestone documents.
+- Treat the generated package as the authoritative current output surface.
+- Treat older milestone or scaffold wording elsewhere in the repository as historical unless it matches the current package path above.

@@ -5,6 +5,7 @@ import datetime
 import subprocess
 import sys
 from pathlib import Path
+from typing import Any
 
 import pandas as pd
 
@@ -12,6 +13,23 @@ import pandas as pd
 def run(cmd: list[str]) -> None:
     print("\n$ " + " ".join(cmd))
     subprocess.check_call(cmd)
+
+
+def run_stage(cmd: list[str]) -> dict[str, Any]:
+    print("\n$ " + " ".join(cmd))
+    proc = subprocess.run(cmd, capture_output=True, text=True)
+    result = {
+        "cmd": cmd,
+        "returncode": proc.returncode,
+        "stdout": proc.stdout or "",
+        "stderr": proc.stderr or "",
+        "ok": proc.returncode == 0,
+    }
+    if not result["ok"]:
+        print(f"[warn] stage failed with exit code {proc.returncode}: {' '.join(cmd)}")
+        if proc.stderr:
+            print(proc.stderr.strip())
+    return result
 
 
 def newest_subdir(path: Path) -> Path:
@@ -67,6 +85,7 @@ def main():
 
     jurisdictions = ["australia", "new_zealand"]
     run_dirs: dict[str, Path] = {}
+    stage_results: list[dict[str, Any]] = []
 
     for j in jurisdictions:
         if args.use_joint:
@@ -117,40 +136,46 @@ def main():
         run_dirs[j] = run_dir
 
         # Decomposition S1
-        run(
-            [
-                sys.executable,
-                "-m",
-                "scripts.run_uncertainty_decomposition",
-                "--run_dir",
-                str(run_dir),
-                "--out",
-                str(s1_out),
-            ]
+        stage_results.append(
+            run_stage(
+                [
+                    sys.executable,
+                    "-m",
+                    "scripts.run_uncertainty_decomposition",
+                    "--run_dir",
+                    str(run_dir),
+                    "--out",
+                    str(s1_out),
+                ]
+            )
         )
         # Decomposition total order
-        run(
-            [
-                sys.executable,
-                "-m",
-                "scripts.run_uncertainty_decomposition_total",
-                "--run_dir",
-                str(run_dir),
-                "--out",
-                str(st_out),
-            ]
+        stage_results.append(
+            run_stage(
+                [
+                    sys.executable,
+                    "-m",
+                    "scripts.run_uncertainty_decomposition_total",
+                    "--run_dir",
+                    str(run_dir),
+                    "--out",
+                    str(st_out),
+                ]
+            )
         )
         # EVPPI by group from theta matrices
-        run(
-            [
-                sys.executable,
-                "-m",
-                "scripts.run_evppi_by_group_from_run_dir",
-                "--run_dir",
-                str(run_dir),
-                "--out",
-                str(evppi_out),
-            ]
+        stage_results.append(
+            run_stage(
+                [
+                    sys.executable,
+                    "-m",
+                    "scripts.run_evppi_by_group_from_run_dir",
+                    "--run_dir",
+                    str(run_dir),
+                    "--out",
+                    str(evppi_out),
+                ]
+            )
         )
 
     # Build comparison tables
@@ -203,6 +228,14 @@ def main():
     report.append(f"- Total-order decomposition: `{st_out}`")
     report.append(f"- EVPPI by group: `{evppi_out}`")
     report.append(f"- Comparison tables: `{compare_out}`\n")
+    report.append("\n## Optional stage status\n")
+    if stage_results:
+        for result in stage_results:
+            status = "ok" if result["ok"] else "failed"
+            report.append(f"- `{status}`: `{' '.join(result['cmd'])}`")
+            if not result["ok"] and result["stderr"]:
+                error_line = result["stderr"].strip().splitlines()[-1]
+                report.append(f"  - stderr: `{error_line}`")
     (compare_out / "REPORT.md").write_text("\n".join(report) + "\n", encoding="utf-8")
 
     print("\nWrote meta outputs to:", base_out)

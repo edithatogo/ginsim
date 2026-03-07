@@ -2,22 +2,16 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
-from typing import cast
+from typing import Any
 
-import jax
 import numpy as np
 import pandas as pd
+
+from src.model.parameters import ModelParameters, PolicyConfig
+from src.model.pipeline import evaluate_single_policy
 from src.model.policy_loader import load_policies_config
 from src.utils.manifest import write_manifest
 from src.utils.posterior import deterministic_subsample, load_draws_npy
-
-from src.model.dcba_ledger import LedgerSpec, compute_ledger
-from src.model.glue_policy_eval import GlobalParams, simulate_policy
-from src.model.module_a_behavior import BehaviorParams
-from src.model.module_b_clinical import ClinicalParams
-from src.model.module_c_insurance_eq import InsuranceParams
-from src.model.module_e_passthrough import PassThroughParams
-from src.model.module_f_data_quality import DataQualityParams
 from src.utils.sampling import SamplingMode, select_draw
 
 
@@ -29,50 +23,97 @@ def get_policies_path(jurisdiction: str) -> Path:
         "au": Path("configs/policies_australia.yaml"),
     }
     if jurisdiction not in mapping:
-        message = f"Unknown jurisdiction: {jurisdiction}. Use australia or new_zealand."
-        raise ValueError(message)
+        raise ValueError(f"Unknown jurisdiction: {jurisdiction}. Use australia or new_zealand.")
     return mapping[jurisdiction]
 
 
-def _read_seed(base_cfg_path: Path) -> int:
-    seed = 20260302
-    for ln in base_cfg_path.read_text(encoding="utf-8").splitlines():
-        if ln.strip().startswith("seed:"):
-            seed = int(ln.split(":", 1)[1].strip())
-            break
-    return seed
-
-
-def maybe_load(path_str: str, n: int):
+def maybe_load(path_str: str, n: int) -> list[dict[str, Any]] | None:
     if not path_str:
         return None
-    p = Path(path_str)
-    if p.exists():
-        return deterministic_subsample(load_draws_npy(p), n)
-    return None
-
-
-def theta_matrix(draws, keys: list[str], n: int) -> np.ndarray | None:
-    if draws is None:
+    path = Path(path_str)
+    if not path.exists():
         return None
-    cols = []
-    for k in keys:
-        col = []
-        for i in range(n):
-            d = draws[i % len(draws)]
-            v = d.get(k, 0.0)
-            if isinstance(v, (int, float)):
-                col.append(float(v))
-            else:
-                try:
-                    col.append(float(np.mean(np.array(v, dtype=float))))
-                except Exception:
-                    col.append(0.0)
-        cols.append(col)
-    return np.column_stack(cols).astype(float)
+    return deterministic_subsample(load_draws_npy(path), n)
 
 
-def main():
+def _clip(value: float, lower: float, upper: float) -> float:
+    return float(np.clip(value, lower, upper))
+
+
+def _sample_model_parameters(
+    base: ModelParameters,
+    draw: dict[str, Any] | None,
+    rng: np.random.Generator,
+) -> ModelParameters:
+    if draw:
+        return base.model_copy(update={key: value for key, value in draw.items() if key in base.model_fields})
+
+    sampled = {
+        "baseline_testing_uptake": _clip(rng.normal(base.baseline_testing_uptake, 0.03), 0.01, 0.99),
+        "deterrence_elasticity": _clip(rng.normal(base.deterrence_elasticity, 0.02), 0.0, 1.0),
+        "moratorium_effect": _clip(rng.normal(base.moratorium_effect, 0.03), 0.0, 1.0),
+        "adverse_selection_elasticity": max(0.0, rng.normal(base.adverse_selection_elasticity, 0.01)),
+        "demand_elasticity_high_risk": min(
+            0.0,
+            rng.normal(base.demand_elasticity_high_risk, 0.03),
+        ),
+        "baseline_loading": max(0.0, rng.normal(base.baseline_loading, 0.02)),
+        "family_history_sensitivity": _clip(rng.normal(base.family_history_sensitivity, 0.03), 0.0, 1.0),
+        "proxy_substitution_rate": _clip(rng.normal(base.proxy_substitution_rate, 0.03), 0.0, 1.0),
+        "pass_through_rate": _clip(rng.normal(base.pass_through_rate, 0.04), 0.0, 1.0),
+        "research_participation_elasticity": min(
+            0.0,
+            rng.normal(base.research_participation_elasticity, 0.02),
+        ),
+        "enforcement_effectiveness": _clip(
+            rng.normal(base.enforcement_effectiveness, 0.04),
+            0.0,
+            1.0,
+        ),
+        "complaint_rate": _clip(rng.normal(base.complaint_rate, 0.005), 0.0, 1.0),
+    }
+    return base.model_copy(update=sampled)
+
+
+def _theta_row(params: ModelParameters) -> dict[str, dict[str, float]]:
+    return {
+        "mapping": {
+            "baseline_testing_uptake": float(params.baseline_testing_uptake),
+            "deterrence_elasticity": float(params.deterrence_elasticity),
+            "moratorium_effect": float(params.moratorium_effect),
+        },
+        "behavior": {
+            "baseline_testing_uptake": float(params.baseline_testing_uptake),
+            "deterrence_elasticity": float(params.deterrence_elasticity),
+            "moratorium_effect": float(params.moratorium_effect),
+        },
+        "clinical": {
+            "research_participation_elasticity": float(params.research_participation_elasticity),
+        },
+        "insurance": {
+            "adverse_selection_elasticity": float(params.adverse_selection_elasticity),
+            "demand_elasticity_high_risk": float(params.demand_elasticity_high_risk),
+            "baseline_loading": float(params.baseline_loading),
+        },
+        "passthrough": {
+            "pass_through_rate": float(params.pass_through_rate),
+        },
+        "data_quality": {
+            "family_history_sensitivity": float(params.family_history_sensitivity),
+            "proxy_substitution_rate": float(params.proxy_substitution_rate),
+            "research_participation_elasticity": float(params.research_participation_elasticity),
+            "enforcement_effectiveness": float(params.enforcement_effectiveness),
+            "complaint_rate": float(params.complaint_rate),
+        },
+    }
+
+
+def _theta_matrix(rows: list[dict[str, float]]) -> np.ndarray:
+    columns = sorted(rows[0])
+    return np.array([[float(row[column]) for column in columns] for row in rows], dtype=float)
+
+
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--jurisdiction", default="australia")
     parser.add_argument("--n_draws", type=int, default=500)
@@ -82,11 +123,7 @@ def main():
         choices=["independent", "common_index", "random"],
     )
     parser.add_argument("--out", default="outputs/runs/full_uncertainty")
-
-    parser.add_argument(
-        "--mapping_posterior",
-        default="outputs/posterior_samples/policy_mapping_posterior.npy",
-    )
+    parser.add_argument("--mapping_posterior", default="")
     parser.add_argument("--behavior_posterior", default="")
     parser.add_argument("--clinical_posterior", default="")
     parser.add_argument("--insurance_posterior", default="")
@@ -94,192 +131,105 @@ def main():
     parser.add_argument("--data_quality_posterior", default="")
     args = parser.parse_args()
 
-    base_cfg_path = Path("configs/base.yaml")
-    pol_cfg_path = get_policies_path(args.jurisdiction)
-    pol_cfg = load_policies_config(pol_cfg_path)
+    policies_path = get_policies_path(args.jurisdiction)
+    policies_config = load_policies_config(policies_path)
+    base_params = ModelParameters(jurisdiction=policies_config.jurisdiction)
 
-    seed = _read_seed(base_cfg_path)
-    key = jax.random.PRNGKey(seed)
-    rng = np.random.default_rng(seed)
+    n_draws = args.n_draws
+    mode: SamplingMode = args.sampling_mode
+    rng = np.random.default_rng(20260307)
 
-    n = args.n_draws
-    mode = cast("SamplingMode", args.sampling_mode)
-
-    mapping_draws = maybe_load(args.mapping_posterior, n) if args.mapping_posterior else None
-    behavior_draws = maybe_load(args.behavior_posterior, n)
-    clinical_draws = maybe_load(args.clinical_posterior, n)
-    insurance_draws = maybe_load(args.insurance_posterior, n)
-    passthrough_draws = maybe_load(args.passthrough_posterior, n)
-    dq_draws = maybe_load(args.data_quality_posterior, n)
-
-    # Defaults
-    default_behavior = {"baseline_logit": -2.0, "policy_shock": 1.0, "trend": 0.01}
-    default_clinical = {
-        "baseline_event_rate": 0.02,
-        "uptake_to_prevention": 0.5,
-        "prevention_effect": 0.6,
-        "cost_per_event": 20000.0,
-        "qaly_loss_per_event": 0.3,
-    }
-    default_insurance = {
-        "base_premium": 1000.0,
-        "loss_cost": 700.0,
-        "expense_load": 0.2,
-        "markup": 0.1,
-        "adverse_selection_sensitivity": 0.3,
-        "price_elasticity": 1.2,
-    }
-    default_passthrough = {
-        "base_pass_through": 0.7,
-        "concentration_slope": -0.3,
-        "noise_sd": 0.05,
-    }
-    default_dq = {
-        "base_participation_logit": 0.0,
-        "fear_sensitivity": 2.0,
-        "base_auc": 0.75,
-        "auc_sensitivity": 0.08,
-        "noise_sd": 0.01,
+    posterior_groups = {
+        "mapping": maybe_load(args.mapping_posterior, n_draws),
+        "behavior": maybe_load(args.behavior_posterior, n_draws),
+        "clinical": maybe_load(args.clinical_posterior, n_draws),
+        "insurance": maybe_load(args.insurance_posterior, n_draws),
+        "passthrough": maybe_load(args.passthrough_posterior, n_draws),
+        "data_quality": maybe_load(args.data_quality_posterior, n_draws),
     }
 
-    policies = [r.model_dump() for r in pol_cfg.policies.values()]
-    n_policies = len(policies)
-
-    spec = LedgerSpec()
-
-    rows = []
-    nb = np.zeros((n, n_policies), dtype=float)
-
-    for i in range(n):
-        draw_key = jax.random.fold_in(key, i)
-
-        mp = select_draw(mapping_draws, i, n, mode, rng) if mapping_draws is not None else None
-        b = select_draw(behavior_draws, i, n, mode, rng) or default_behavior
-        c = select_draw(clinical_draws, i, n, mode, rng) or default_clinical
-        ins = select_draw(insurance_draws, i, n, mode, rng) or default_insurance
-        pt = select_draw(passthrough_draws, i, n, mode, rng) or default_passthrough
-        dq = select_draw(dq_draws, i, n, mode, rng) or default_dq
-
-        params = GlobalParams(
-            behavior=BehaviorParams(**b),
-            clinical=ClinicalParams(**c),
-            insurance=InsuranceParams(**ins),
-            passthrough=PassThroughParams(**pt),
-            data_quality=DataQualityParams(**dq),
+    policies = [
+        PolicyConfig(
+            name=policy.name,
+            description=policy.description,
+            allow_genetic_test_results=policy.allow_genetic_test_results,
+            allow_family_history=policy.allow_family_history,
+            sum_insured_caps=policy.sum_insured_caps,
+            enforcement_strength=policy.enforcement_strength,
         )
+        for policy in policies_config.policies.values()
+    ]
 
-        for j, pol in enumerate(policies):
-            pol2 = dict(pol)
-            if mp is not None:
-                pol2["_mapping_params"] = mp
+    rows: list[dict[str, Any]] = []
+    theta_rows = {group: [] for group in posterior_groups}
+    net_benefit_matrix = np.zeros((n_draws, len(policies)), dtype=float)
 
-            out = simulate_policy(draw_key, pol2, params)
-            led = compute_ledger(out, spec)
-            nb[i, j] = float(led["net_benefit"])
+    for draw_index in range(n_draws):
+        merged_draw: dict[str, Any] = {}
+        for group_name, draws in posterior_groups.items():
+            selected = select_draw(draws, draw_index, n_draws, mode, rng) if draws is not None else None
+            if isinstance(selected, dict):
+                merged_draw.update(selected)
 
+        sampled_params = _sample_model_parameters(base_params, merged_draw or None, rng)
+        theta_row = _theta_row(sampled_params)
+        for group_name, values in theta_row.items():
+            theta_rows[group_name].append(values)
+
+        for policy_index, policy in enumerate(policies):
+            result = evaluate_single_policy(sampled_params, policy)
+            welfare_metrics = result.all_metrics["welfare"]
+            net_benefit = float(welfare_metrics["net_welfare"])
+            health_benefits = float(welfare_metrics["health_benefits"])
+            avg_premium = float(result.insurance_premiums["avg_premium"])
+
+            net_benefit_matrix[draw_index, policy_index] = net_benefit
             rows.append(
                 {
-                    "jurisdiction": pol_cfg.jurisdiction,
-                    "domain": pol_cfg.domain,
-                    "draw": i,
-                    "policy": out["policy"],
-                    "net_qalys": float(out.get("net_qalys", 0.0)),
-                    "avg_premium": float(out.get("avg_premium", 0.0)),
-                    "nb": float(led["net_benefit"]),
-                },
+                    "jurisdiction": policies_config.jurisdiction,
+                    "domain": policies_config.domain,
+                    "draw": draw_index,
+                    "policy": policy.name,
+                    "net_qalys": health_benefits / 50_000.0,
+                    "avg_premium": avg_premium,
+                    "nb": net_benefit,
+                }
             )
 
-    df = pd.DataFrame(rows)
-    out_dir = (
-        Path(args.out)
-        / f"{pol_cfg.jurisdiction}_{pd.Timestamp.utcnow().strftime('%Y%m%dT%H%M%SZ')}"
-    )
+    out_dir = Path(args.out) / f"{policies_config.jurisdiction}_{pd.Timestamp.utcnow().strftime('%Y%m%dT%H%M%SZ')}"
     out_dir.mkdir(parents=True, exist_ok=True)
 
     write_manifest(
         out_dir,
         repo_root=Path(),
-        jurisdiction=pol_cfg.jurisdiction,
-        domain=pol_cfg.domain,
-        policies_file=pol_cfg_path,
-        base_config_file=base_cfg_path,
-        notes="Full uncertainty run with sampling modes; writes NB matrix and theta matrices for decomposition.",
-        extra={"n_draws": n, "sampling_mode": mode},
+        jurisdiction=policies_config.jurisdiction,
+        domain=policies_config.domain,
+        policies_file=policies_path,
+        base_config_file=Path("configs/base.yaml"),
+        notes="Full uncertainty run using current pipeline evaluation with parameter perturbation fallback.",
+        extra={"n_draws": n_draws, "sampling_mode": args.sampling_mode},
     )
 
-    df.to_csv(out_dir / "full_uncertainty_draws.csv", index=False)
-    np.save(out_dir / "net_benefit_matrix.npy", nb)
+    draws_df = pd.DataFrame(rows)
+    draws_df.to_csv(out_dir / "full_uncertainty_draws.csv", index=False)
+    np.save(out_dir / "net_benefit_matrix.npy", net_benefit_matrix)
 
-    theta_map = theta_matrix(
-        mapping_draws,
-        ["intercept", "beta_allow", "beta_caps", "beta_enforcement"],
-        n,
-    )
-    theta_beh = theta_matrix(behavior_draws, ["baseline_logit", "policy_shock", "trend"], n)
-    theta_clin = theta_matrix(
-        clinical_draws,
-        [
-            "baseline_event_rate",
-            "uptake_to_prevention",
-            "prevention_effect",
-            "cost_per_event",
-            "qaly_loss_per_event",
-        ],
-        n,
-    )
-    theta_ins = theta_matrix(
-        insurance_draws,
-        [
-            "base_premium",
-            "loss_cost",
-            "expense_load",
-            "markup",
-            "adverse_selection_sensitivity",
-            "price_elasticity",
-        ],
-        n,
-    )
-    theta_pt = theta_matrix(
-        passthrough_draws,
-        ["base_pass_through", "concentration_slope", "noise_sd"],
-        n,
-    )
-    theta_dq = theta_matrix(
-        dq_draws,
-        [
-            "base_participation_logit",
-            "fear_sensitivity",
-            "base_auc",
-            "auc_sensitivity",
-            "noise_sd",
-        ],
-        n,
-    )
-
-    if theta_map is not None:
-        np.save(out_dir / "theta_mapping.npy", theta_map)
-    if theta_beh is not None:
-        np.save(out_dir / "theta_behavior.npy", theta_beh)
-    if theta_clin is not None:
-        np.save(out_dir / "theta_clinical.npy", theta_clin)
-    if theta_ins is not None:
-        np.save(out_dir / "theta_insurance.npy", theta_ins)
-    if theta_pt is not None:
-        np.save(out_dir / "theta_passthrough.npy", theta_pt)
-    if theta_dq is not None:
-        np.save(out_dir / "theta_data_quality.npy", theta_dq)
+    for group_name, values in theta_rows.items():
+        if values:
+            np.save(out_dir / f"theta_{group_name}.npy", _theta_matrix(values))
 
     summary = (
-        df.groupby(["policy"])
+        draws_df.groupby("policy")
         .agg(
             nb_mean=("nb", "mean"),
-            nb_p05=("nb", lambda x: float(np.quantile(x, 0.05))),
-            nb_p95=("nb", lambda x: float(np.quantile(x, 0.95))),
+            nb_p05=("nb", lambda series: float(np.quantile(series, 0.05))),
+            nb_p95=("nb", lambda series: float(np.quantile(series, 0.95))),
         )
         .reset_index()
         .sort_values("nb_mean", ascending=False)
     )
     summary.to_csv(out_dir / "full_uncertainty_summary.csv", index=False)
+
     print("Wrote:", out_dir)
     print(summary.to_string(index=False))
 

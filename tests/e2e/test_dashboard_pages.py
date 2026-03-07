@@ -1,33 +1,66 @@
-"""
-Smoke tests for non-landing Streamlit dashboard pages.
-"""
+"""Interaction-level AppTest coverage for non-landing Streamlit pages."""
 
+import pytest
 from streamlit.testing.v1 import AppTest
 
 
-def test_sensitivity_page_loads() -> None:
+def test_sensitivity_page_runs_analysis() -> None:
     app = AppTest.from_file("streamlit_app/pages/2_Sensitivity.py", default_timeout=30)
     app.run()
     assert app.title[0].value == "📊 Comprehensive Sensitivity Analysis"
     assert len(app.selectbox) >= 2
 
+    run_button = next(b for b in app.button if b.label == "🔬 Run Sensitivity Analysis")
+    run_button.click().run()
 
-def test_scenarios_page_loads() -> None:
+    assert any("Tornado Diagram" in sub.value for sub in app.subheader)
+    assert any("View Tornado Data" in exp.label for exp in app.expander)
+
+
+def test_scenarios_page_runs_comparison_and_exposes_download() -> None:
     app = AppTest.from_file("streamlit_app/pages/3_Scenarios.py", default_timeout=30)
     app.run()
     assert app.title[0].value == "🎯 Scenario Analysis & Policy Sandbox"
     assert len(app.selectbox) >= 2
 
+    run_button = next(b for b in app.button if b.label == "🔬 Run Scenario Comparison")
+    run_button.click().run()
 
-def test_extended_games_page_loads() -> None:
+    assert any("Scenario Comparison" in sub.value for sub in app.subheader)
+    assert len(app.dataframe) >= 1
+
+
+@pytest.mark.parametrize(
+    ("game_name", "expected_metric"),
+    [
+        ("Information Leakage", "Reconstruction Accuracy"),
+        ("Genetic Altruism", "Altruism Coefficient"),
+        ("Cascade Testing", "Cascade Rate"),
+    ],
+)
+def test_extended_games_page_runs_each_game(game_name: str, expected_metric: str) -> None:
     app = AppTest.from_file("streamlit_app/pages/4_Extended_Games.py", default_timeout=30)
     app.run()
     assert app.title[0].value == "🎮 Extended Strategic Games"
-    assert len(app.radio) >= 1
+
+    app.radio[0].set_value(game_name)
+    app.run()
+
+    run_button = next(b for b in app.button if b.label == "🔬 Run Game Simulation")
+    run_button.click().run()
+
+    assert any(metric.label == expected_metric for metric in app.metric)
 
 
-def test_delta_view_page_loads() -> None:
+def test_delta_view_page_runs_comparison_and_download() -> None:
     app = AppTest.from_file("streamlit_app/pages/5_Delta_View.py", default_timeout=30)
     app.run()
     assert app.title[0].value == "📊 Comparative Delta View"
     assert len(app.selectbox) >= 1
+
+    run_button = next(b for b in app.button if b.label == "🔬 Run Comparative Analysis")
+    run_button.click().run()
+
+    assert any("Delta Analysis" in sub.value for sub in app.subheader)
+    assert len(app.dataframe) >= 1
+    assert any("View Detailed Markdown Table" in exp.label for exp in app.expander)

@@ -9,9 +9,12 @@ from __future__ import annotations
 
 from typing import Any
 
+import jax
 import jax.numpy as jnp
 from jax import jit
 from jaxtyping import Array, Float
+
+from .parameters import ModelParameters
 
 
 class DictObject(dict):
@@ -57,7 +60,7 @@ def _compute_compliance_decision_jit(
     compliance_cost: float | Array,
 ) -> Float[Array, ""]:
     diff = jnp.asarray(expected_penalty) - jnp.asarray(compliance_cost)
-    return jnp.exp(diff) / (1.0 + jnp.exp(diff))
+    return jax.nn.sigmoid(diff)
 
 
 def compute_compliance_decision(
@@ -71,40 +74,46 @@ def compute_compliance_decision(
 
 
 def compute_compliance_equilibrium(
-    params: Any,
+    params: ModelParameters,
     policy: Any = None,
-    compliance_cost: Any = 5000.0,
+    compliance_cost: Any = None,
 ) -> Any:
     """Compute equilibrium compliance rate."""
     if policy is None:
+        # Compatibility mode
         p_max = params
         d_prob = 0.05
+        c_cost = 5000.0 if compliance_cost is None else compliance_cost
     else:
         p_max = getattr(policy, "penalty_max", 0.0)
-        d_prob = getattr(params, "detection_prob_baseline", 0.05)
+        d_prob = (
+            params.detection_prob_baseline if hasattr(params, "detection_prob_baseline") else 0.05
+        )
+        c_cost = params.compliance_cost_fixed
 
     expected_penalty = compute_expected_penalty(p_max, d_prob, 1.0)
-    rate = compute_compliance_decision(expected_penalty, compliance_cost)
+    rate = compute_compliance_decision(expected_penalty, c_cost)
     return DictObject(
         {
             "compliance_rate": rate,
             "violation_rate": 1.0 - rate,
             "detection_rate": d_prob,
-            "expected_penalty": expected_penalty,  # Restored
+            "expected_penalty": expected_penalty,
         }
     )
 
 
 def compute_enforcement_effect(
-    params: Any,
+    params: ModelParameters,
     baseline_policy: Any = None,
     reform_policy: Any = None,
 ) -> Any:
     """Compute enforcement effect."""
     if reform_policy is not None:
         strength = getattr(reform_policy, "enforcement_strength", 1.0)
-        effectiveness = getattr(params, "enforcement_effectiveness", 0.5)
+        effectiveness = params.enforcement_effectiveness
     else:
+        # Compatibility mode
         strength = float(params)
         effectiveness = float(baseline_policy) if baseline_policy is not None else 0.5
 
@@ -115,21 +124,22 @@ def compute_enforcement_effect(
             "compliance_reform": res,
             "compliance_change": 0.0,
             "violation_baseline": 1.0 - res,
-            "violation_reform": 1.0 - res,  # Restored
+            "violation_reform": 1.0 - res,
             "enforcement_effect": res,
         }
     )
 
 
 def compute_optimal_enforcement(
-    params: Any,
+    params: ModelParameters,
     policy: Any = None,
 ) -> Any:
     """Compute optimal enforcement level."""
     if policy is not None:
-        budget = 1000000.0
-        marginal_cost = 0.1
+        budget = params.enforcement_budget
+        marginal_cost = params.marginal_cost_enforcement
     else:
+        # Compatibility mode
         budget = float(params)
         marginal_cost = 0.1
 
@@ -139,7 +149,7 @@ def compute_optimal_enforcement(
             "optimal_enforcement": res,
             "optimal_compliance": res,
             "optimal_violation_rate": 1.0 - res,
-            "objective_value": 0.0,  # Restored
+            "objective_value": 0.0,
         }
     )
 

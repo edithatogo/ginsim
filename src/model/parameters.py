@@ -18,7 +18,7 @@ class PolicyConfig(BaseModel):
     allow_family_history: bool = True
     enforcement_strength: float = 1.0
     penalty_max: float = 0.0
-    penalty_type: str = "fixed"  # Restored for test compatibility
+    penalty_type: str = "fixed"
     sum_insured_caps: dict[str, float] | None = None
 
     def __hash__(self):
@@ -51,6 +51,9 @@ class ModelParameters(BaseModel):
     # Enforcement
     enforcement_effectiveness: float = 0.50
     complaint_rate: float = 0.02
+    enforcement_budget: float = 1000000.0  # Migrated from hardcode
+    marginal_cost_enforcement: float = 0.1  # Migrated from hardcode
+    compliance_cost_fixed: float = 5000.0  # Migrated from hardcode
 
     # Metadata
     jurisdiction: str = "australia"

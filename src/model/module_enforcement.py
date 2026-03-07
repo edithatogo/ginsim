@@ -14,19 +14,17 @@ import jax.numpy as jnp
 from jax import jit
 from jaxtyping import Array, Float
 
-from .parameters import ModelParameters
 
-
-class DictObject(dict):
+class DictObject(dict[str, Any]):
     """Helper that allows both attribute and dictionary access."""
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str) -> Any:
         try:
             return self[name]
         except KeyError:
             raise AttributeError(name) from None
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: Any) -> None:
         self[name] = value
 
 
@@ -74,25 +72,20 @@ def compute_compliance_decision(
 
 
 def compute_compliance_equilibrium(
-    params: ModelParameters,
+    params: Any,
     policy: Any = None,
-    compliance_cost: Any = None,
+    compliance_cost: Any = 5000.0,
 ) -> Any:
     """Compute equilibrium compliance rate."""
     if policy is None:
-        # Compatibility mode
         p_max = params
         d_prob = 0.05
-        c_cost = 5000.0 if compliance_cost is None else compliance_cost
     else:
         p_max = getattr(policy, "penalty_max", 0.0)
-        d_prob = (
-            params.detection_prob_baseline if hasattr(params, "detection_prob_baseline") else 0.05
-        )
-        c_cost = params.compliance_cost_fixed
+        d_prob = getattr(params, "detection_prob_baseline", 0.05)
 
     expected_penalty = compute_expected_penalty(p_max, d_prob, 1.0)
-    rate = compute_compliance_decision(expected_penalty, c_cost)
+    rate = compute_compliance_decision(expected_penalty, compliance_cost)
     return DictObject(
         {
             "compliance_rate": rate,
@@ -104,16 +97,15 @@ def compute_compliance_equilibrium(
 
 
 def compute_enforcement_effect(
-    params: ModelParameters,
+    params: Any,
     baseline_policy: Any = None,
     reform_policy: Any = None,
 ) -> Any:
     """Compute enforcement effect."""
     if reform_policy is not None:
         strength = getattr(reform_policy, "enforcement_strength", 1.0)
-        effectiveness = params.enforcement_effectiveness
+        effectiveness = getattr(params, "enforcement_effectiveness", 0.5)
     else:
-        # Compatibility mode
         strength = float(params)
         effectiveness = float(baseline_policy) if baseline_policy is not None else 0.5
 
@@ -131,19 +123,18 @@ def compute_enforcement_effect(
 
 
 def compute_optimal_enforcement(
-    params: ModelParameters,
+    params: Any,
     policy: Any = None,
 ) -> Any:
     """Compute optimal enforcement level."""
     if policy is not None:
-        budget = params.enforcement_budget
-        marginal_cost = params.marginal_cost_enforcement
+        budget = getattr(params, "enforcement_budget", 1000000.0)
+        marginal_cost = getattr(params, "marginal_cost_enforcement", 0.1)
     else:
-        # Compatibility mode
         budget = float(params)
         marginal_cost = 0.1
 
-    res = jnp.clip(budget / (marginal_cost + 1e-10), 0.0, 1.0)
+    res = jnp.clip(jnp.asarray(budget) / (jnp.asarray(marginal_cost) + 1e-10), 0.0, 1.0)
     return DictObject(
         {
             "optimal_enforcement": res,

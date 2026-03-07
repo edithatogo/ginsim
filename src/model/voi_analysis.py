@@ -94,4 +94,4 @@ def identify_research_priority(result: VOIResult) -> str:
     """Identify the top research priority based on EVPPI."""
     if not result.evppi_by_group:
         return "None"
-    return max(result.evppi_by_group, key=result.evppi_by_group.get)
+    return max(result.evppi_by_group, key=lambda k: result.evppi_by_group[k])

@@ -51,9 +51,10 @@ class ModelParameters(BaseModel):
     # Enforcement
     enforcement_effectiveness: float = 0.50
     complaint_rate: float = 0.02
-    enforcement_budget: float = 1000000.0  # Migrated from hardcode
-    marginal_cost_enforcement: float = 0.1  # Migrated from hardcode
-    compliance_cost_fixed: float = 5000.0  # Migrated from hardcode
+    enforcement_budget: float = 1000000.0
+    marginal_cost_enforcement: float = 0.1
+    compliance_cost_fixed: float = 5000.0
+    detection_prob_baseline: float = 0.05
 
     # Metadata
     jurisdiction: str = "australia"
@@ -61,6 +62,11 @@ class ModelParameters(BaseModel):
 
     def __hash__(self):
         return hash((self.jurisdiction, self.calibration_date, self.baseline_loading))
+
+
+# Use direct assignment instead of TypeAlias for older tools/compatibility
+InsuranceParams = ModelParameters
+DataQualityParams = ModelParameters
 
 
 class HyperParameters(BaseModel):

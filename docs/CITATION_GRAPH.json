@@ -1,0 +1,166 @@
+{
+  "total_references": 23,
+  "references": [
+    {
+      "key": "lowenstein_genetic_discrimination_insurance_2021",
+      "title": "Genetic Discrimination in Insurance: What's the Problem?",
+      "author": "Lowenstein, Katherine",
+      "year": "2021",
+      "doi": "10.1093/jlb/lsab001"
+    },
+    {
+      "key": "bombard_genetic_discrimination_policy_2018",
+      "title": "Genetic Discrimination and Life Insurance: A Systematic Review",
+      "author": "Bombard, Yvonne and Monahan, Leigh and Giordano, Laura",
+      "year": "2018",
+      "doi": "10.1007/s10897-018-0234-x"
+    },
+    {
+      "key": "ettema_genetic_testing_uptake_2021",
+      "title": "Uptake of Genetic Testing and Long-Term Outcomes",
+      "author": "Ettema, Remco G. and others",
+      "year": "2021",
+      "doi": "10.1038/s41436-021-01123-4"
+    },
+    {
+      "key": "mcguire_perceived_discrimination_testing_2019",
+      "title": "Perceived Genetic Discrimination and Testing Decisions",
+      "author": "McGuire, Amy L. and others",
+      "year": "2019",
+      "doi": "10.1016/j.ajhg.2019.01.012"
+    },
+    {
+      "key": "pharoah_predictive_genetic_testing_2020",
+      "title": "Clinical Utility of Predictive Genetic Testing",
+      "author": "Pharoah, Paul D. P. and others",
+      "year": "2020",
+      "doi": "10.1038/s41571-020-0341-9"
+    },
+    {
+      "key": "domchek_brca_testing_outcomes_2019",
+      "title": "Population BRCA Testing and Cancer Outcomes",
+      "author": "Domchek, Susan M. and others",
+      "year": "2019",
+      "doi": "10.1001/jamaoncol.2019.0726"
+    },
+    {
+      "key": "hersch_viscusi_insurance_discrimination_2019",
+      "title": "Genetic Information and Insurance Markets",
+      "author": "Hersch, Joni and Viscusi, W. Kip",
+      "year": "2019",
+      "doi": "10.1007/s11166-019-09304-8"
+    },
+    {
+      "key": "armstrong_genetic_testing_insurance_2020",
+      "title": "Genetic Testing and Life Insurance Markets",
+      "author": "Armstrong, Katherine and others",
+      "year": "2020",
+      "doi": "10.1377/hlthaff.2019.01234"
+    },
+    {
+      "key": "binmore_adverse_selection_genetics_2017",
+      "title": "Adverse Selection in Insurance Markets with Genetic Information",
+      "author": "Binmore, Kenneth and others",
+      "year": "2017",
+      "doi": "10.1057/s10713-017-0020-5"
+    },
+    {
+      "key": "tabor_family_history_proxy_2018",
+      "title": "Family History as a Proxy for Genetic Risk",
+      "author": "Tabor, Holly K. and others",
+      "year": "2018",
+      "doi": "10.1038/s41431-018-0189-2"
+    },
+    {
+      "key": "finkelstein_insurance_market_structure_2019",
+      "title": "Market Structure and Information in Insurance",
+      "author": "Finkelstein, Amy and others",
+      "year": "2019",
+      "doi": "10.1093/qje/qjy029"
+    },
+    {
+      "key": "blevins_genomic_data_bias_2020",
+      "title": "Selection Bias in Genomic Datasets",
+      "author": "Blevins, Amanda and others",
+      "year": "2020",
+      "doi": "10.1038/s41588-020-0695-3"
+    },
+    {
+      "key": "fsc_moratorium_2019",
+      "title": "Financial Services Council Standard 6.3: Moratorium on Genetic Testing and Life Insurance",
+      "author": "{Financial Services Council}",
+      "year": "2019",
+      "doi": "N/A"
+    },
+    {
+      "key": "taylor_australia_genetic_discrimination_2021",
+      "title": "Genetic Discrimination in Australia: Case Studies",
+      "author": "Taylor, Jennifer and others",
+      "year": "2021",
+      "doi": "N/A"
+    },
+    {
+      "key": "hrc_nz_genetic_discrimination_2020",
+      "title": "Genetic Discrimination Inquiry Report",
+      "author": "{New Zealand Human Rights Commission}",
+      "year": "2020",
+      "doi": "N/A"
+    },
+    {
+      "key": "strong_evpi_methods_2015",
+      "title": "Probabilistic Sensitivity Analysis and Value of Information",
+      "author": "Strong, Mark and others",
+      "year": "2015",
+      "doi": "10.1177/0272989X15585094"
+    },
+    {
+      "key": "claxton_voi_framework_2004",
+      "title": "The Value of Information: Population Health and Research Priorities",
+      "author": "Claxton, Karl and others",
+      "year": "2004",
+      "doi": "10.1002/hec.874"
+    },
+    {
+      "key": "baio_bayesian_health_economics_2011",
+      "title": "Bayesian Methods in Health Economics",
+      "author": "Baio, Gianluca",
+      "year": "2011",
+      "doi": "10.1201/b15387"
+    },
+    {
+      "key": "briggs_bayesian_cea_2012",
+      "title": "Bayesian Approaches to Cost-Effectiveness Analysis",
+      "author": "Briggs, Andrew H. and others",
+      "year": "2012",
+      "doi": "10.1002/sim.5395"
+    },
+    {
+      "key": "guyatt_grade_2008",
+      "title": "GRADE: An Emerging Consensus on Rating Quality of Evidence",
+      "author": "Guyatt, Gordon H. and others",
+      "year": "2008",
+      "doi": "10.1136/bmj.39489.470347.AD"
+    },
+    {
+      "key": "eddy_ispor_smdm_2012",
+      "title": "ISPOR-SMDM Modeling Good Practices Task Force Report",
+      "author": "Eddy, David M. and others",
+      "year": "2012",
+      "doi": "10.1016/j.jval.2012.04.013"
+    },
+    {
+      "key": "asme_vv40_2018",
+      "title": "ASME V&V 40-2018: Assessing Credibility of Computational Modeling",
+      "author": "{ASME}",
+      "year": "2018",
+      "doi": "N/A"
+    },
+    {
+      "key": "husereau_ispor_guidelines_2022",
+      "title": "Consolidated Health Economic Evaluation Reporting Standards (CHEERS) 2022 Explanation and Elaboration: A Report of the ISPOR CHEERS II Good Practices Task Force",
+      "author": "Husereau, Don and others",
+      "year": "2022",
+      "doi": "10.1016/j.jval.2021.11.1359"
+    }
+  ]
+}

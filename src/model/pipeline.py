@@ -8,7 +8,7 @@ genetic discrimination policy regimes.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, cast
 
 from jaxtyping import Array, Float
 
@@ -53,6 +53,9 @@ class PolicyEvaluationResult:
             "welfare": {
                 "net_welfare": self.welfare_impact,
                 "long_term_net_welfare": self.welfare_impact,
+                "short_term_net_welfare": self.welfare_impact,  # For dashboard
+                "health_benefits": 0.0,
+                "consumer_surplus": 0.0,
                 "research_value_gain": 0.0,
             },
             "proxy": {
@@ -120,27 +123,30 @@ def compare_policies(
 ) -> dict[str, Any]:
     """Compute deltas between two policy evaluations."""
     if isinstance(baseline, dict) and reform is None:
-        base_res = baseline.get(baseline_name)
+        typed_baseline = cast(dict[str, PolicyEvaluationResult], baseline)
+        base_res = typed_baseline.get(baseline_name)
         comparisons = {}
-        for name, res in baseline.items():
+        for name, res in typed_baseline.items():
             if name == baseline_name:
                 continue
-            comparisons[name] = {
-                "testing_uptake_change": float(res.testing_uptake - base_res.testing_uptake),
-                "premium_high_change": res.insurance_premiums["premium_high"]
-                - base_res.insurance_premiums["premium_high"],
-                "uptake_delta": float(res.testing_uptake - base_res.testing_uptake),
-                "premium_high_delta": res.insurance_premiums["premium_high"]
-                - base_res.insurance_premiums["premium_high"],
-                "welfare_change": res.welfare_impact - base_res.welfare_impact,
-                "compliance_change": 0.0,
-                "premium_change": res.insurance_premiums["premium_high"]
-                - base_res.insurance_premiums["premium_high"],
-            }
+            if base_res is not None:
+                comparisons[name] = {
+                    "testing_uptake_change": float(res.testing_uptake - base_res.testing_uptake),
+                    "premium_high_change": res.insurance_premiums["premium_high"]
+                    - base_res.insurance_premiums["premium_high"],
+                    "uptake_delta": float(res.testing_uptake - base_res.testing_uptake),
+                    "premium_high_delta": res.insurance_premiums["premium_high"]
+                    - base_res.insurance_premiums["premium_high"],
+                    "welfare_change": res.welfare_impact - base_res.welfare_impact,
+                    "premium_change": res.insurance_premiums["premium_high"]
+                    - base_res.insurance_premiums["premium_high"],
+                    "compliance_change": 0.0,
+                }
         return comparisons
     else:
-        base_res = baseline
-        reform_res = reform
+        # Case where direct objects are passed
+        base_res = cast(PolicyEvaluationResult, baseline)
+        reform_res = cast(PolicyEvaluationResult, reform)
 
     if base_res is None or reform_res is None:
         return {"uptake_delta": 0.0, "premium_high_delta": 0.0}
@@ -149,15 +155,16 @@ def compare_policies(
         "uptake_delta": float(reform_res.testing_uptake - base_res.testing_uptake),
         "premium_high_delta": reform_res.insurance_premiums["premium_high"]
         - base_res.insurance_premiums["premium_high"],
-        "welfare_change": reform_res.welfare_impact - base_res.welfare_impact,
+        "welfare_change": float(reform_res.welfare_impact - base_res.welfare_impact),
     }
 
 
 def generate_policy_summary(result: Any) -> str:
     """Generate summary string."""
     if isinstance(result, dict):
+        typed_dict = cast(dict[str, PolicyEvaluationResult], result)
         summary_lines = []
-        for name, res in result.items():
+        for name, res in typed_dict.items():
             summary_lines.append(f"Policy: {name}")
             summary_lines.append(f"Uptake: {float(res.testing_uptake):.2%}")
             summary_lines.append(f"Premium: {res.insurance_premiums['premium_high']}")
@@ -165,7 +172,8 @@ def generate_policy_summary(result: Any) -> str:
             summary_lines.append("Testing Uptake")
         return "\n".join(summary_lines)
 
-    return f"Policy: {result.policy_name}\nUptake: {float(result.testing_uptake):.2%}\nWelfare: {result.welfare_impact}"
+    typed_res = cast(PolicyEvaluationResult, result)
+    return f"Policy: {typed_res.policy_name}\nUptake: {float(typed_res.testing_uptake):.2%}\nWelfare: {typed_res.welfare_impact}"
 
 
 def get_standard_policies() -> dict[str, PolicyConfig]:

@@ -31,3 +31,5 @@ compliance_cost_fixed: 10000.0
 detection_prob_baseline: 0.08
 
 high_sum_insured_share: 0.25
+
+equity_factor: 1.10

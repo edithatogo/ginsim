@@ -2,6 +2,7 @@
 DCBA (Distributional Cost-Benefit Analysis) Ledger.
 
 Aggregates welfare impacts across stakeholders with consistent temporal discounting.
+Supports Utilitarian and Equity-Weighted aggregation.
 """
 
 from __future__ import annotations
@@ -26,13 +27,15 @@ class DCBAResult:
     DCBA ledger results. Fields are Any to allow JAX tracers.
     """
 
-    net_welfare: Any
+    net_welfare: Any  # Standard Utilitarian
+    equity_weighted_welfare: Any  # Māori/Quintile weighted
     consumer_surplus: Any
     producer_surplus: Any
     health_benefits: Any
     fiscal_impact: Any
     research_externalities: Any
-    distributional_weight: Any
+    distributional_weight: Any  # The base weight applied
+    equity_factor: Any  # The specific localization factor
     time_horizon: int = 20
 
 
@@ -42,12 +45,14 @@ jax.tree_util.register_pytree_node(
     lambda x: (
         (
             x.net_welfare,
+            x.equity_weighted_welfare,
             x.consumer_surplus,
             x.producer_surplus,
             x.health_benefits,
             x.fiscal_impact,
             x.research_externalities,
             x.distributional_weight,
+            x.equity_factor,
         ),
         (x.time_horizon,),
     ),
@@ -152,12 +157,13 @@ def compute_dcba(
     baseline_profits: Array | float,
     research_value_loss: Array | float = 0.0,
     distributional_weight: float = 1.0,
+    equity_factor: float = 1.0,
     time_horizon: int = 20,
     discount_rate: float = 0.03,
     ppp_conversion_factor: float = 1.0,
 ) -> DCBAResult:
     """
-    Compute full DCBA ledger with PPP normalization.
+    Compute full DCBA ledger with PPP normalization and Equity weighting.
     """
     cs = compute_consumer_surplus(
         testing_uptake,
@@ -177,21 +183,27 @@ def compute_dcba(
     )
     re = _to_float_scalar(research_value_loss)
     
-    # 1. Compute net local welfare
+    # 1. Compute net local welfare (Utilitarian)
     net_welfare_local = cs + ps + hb + fi - re
-    weighted_welfare_local = net_welfare_local * distributional_weight
     
-    # 2. Apply PPP normalization to all components
-    ppp = jnp.asarray(float(ppp_conversion_factor))
+    # 2. Compute Equity-Adjusted Welfare
+    # We apply the equity_factor primarily to health and consumer surplus (direct people impact)
+    weighted_welfare_local = (cs + hb) * equity_factor + (ps + fi - re)
+    
+    # 3. Apply PPP normalization to all components
+    ppp = jnp.asarray(ppp_conversion_factor)
+    dist_weight = _to_float_scalar(distributional_weight)
     
     return DCBAResult(
-        net_welfare=weighted_welfare_local * ppp,
+        net_welfare=net_welfare_local * ppp * dist_weight,
+        equity_weighted_welfare=weighted_welfare_local * ppp * dist_weight,
         consumer_surplus=cs * ppp,
         producer_surplus=ps * ppp,
         health_benefits=hb * ppp,
         fiscal_impact=fi * ppp,
         research_externalities=re * ppp,
-        distributional_weight=_to_float_scalar(distributional_weight),
+        distributional_weight=dist_weight,
+        equity_factor=_to_float_scalar(equity_factor),
         time_horizon=time_horizon
     )
 
@@ -216,8 +228,9 @@ def format_dcba_result(result: DCBAResult) -> str:
         f"Fiscal Impact:       ${float(result.fiscal_impact):>15,.2f}",
         f"Research Ext:       -${float(result.research_externalities):>15,.2f}",
         "-" * 60,
-        f"Net Welfare:         ${float(result.net_welfare):>15,.2f}",
-        f"Distributional Weight: {float(result.distributional_weight):.2f}x",
+        f"Utilitarian Welfare: ${float(result.net_welfare):>15,.2f}",
+        f"Equity-Adjusted:     ${float(result.equity_weighted_welfare):>15,.2f}",
+        f"Equity Factor:       {float(result.equity_factor):.2f}x",
         "=" * 60,
     ]
     return "\n".join(lines)

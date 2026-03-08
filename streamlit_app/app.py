@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 GINSIM: Genetic Information Non-Discrimination Policy Integrated Economic Evaluation
-Main Dashboard - SOTA Global Benchmarking Edition.
+Main Dashboard - SOTA Equity Localization Edition.
 """
 
 import sys
@@ -72,12 +72,21 @@ moratorium_belief = st.sidebar.select_slider(
 )
 trust_map = {"Low": 0.05, "Standard": 0.15, "High": 0.30}
 
+# NEW: EQUITY TOGGLE
+st.sidebar.markdown("---")
+st.sidebar.subheader("⚖️ Distributional Equity")
+use_equity_weights = st.sidebar.toggle(
+    "Enable Jurisdictional Equity Weighting",
+    value=False,
+    help="Applies weights based on Māori Health Sovereignty (NZ) or Vertical Equity (AU)."
+)
+
 with st.sidebar.expander("⚙️ Advanced Controls"):
     jurisdiction = st.selectbox("Base Jurisdiction", ["Australia", "New Zealand", "UK", "Canada", "US"])
     baseline_uptake = st.slider("Baseline Testing Share", 0.1, 0.9, 0.52)
 
 st.title("🧬 Genetic Discrimination: Global Policy Explorer")
-st.markdown("### Benchmarking and Cross-Pollination Analysis (Track gdpe_0030)")
+st.markdown("### Benchmarking and Equity-Weighted Analysis (Track gdpe_0031)")
 
 STANDARD_POLICIES = get_standard_policies()
 
@@ -116,9 +125,14 @@ with tab_main:
 
     if "main_result" in st.session_state:
         res = st.session_state["main_result"]
+        
+        # Decide which welfare to show
+        w_impact = float(res.equity_weighted_welfare) if use_equity_weights else float(res.welfare_impact)
+        w_label = "Net Social Benefit (Equity-Weighted)" if use_equity_weights else "Net Social Benefit (Utilitarian)"
+        
         c1, c2, c3, c4 = st.columns(4)
         with c1: st.metric("Testing Uptake", f"{float(res.testing_uptake):.1%}")
-        with c2: st.metric("Net Social Benefit (PPP)", f"${float(res.welfare_impact):,.0f}")
+        with c2: st.metric(w_label, f"${w_impact:,.0f}")
         with c3: st.metric("Market Compliance", f"{float(res.compliance_rate):.1%}")
         with c4: st.metric("Clinical QALY Gains", f"{float(res.clinical_outcomes['total_qaly_gains']):.2f}")
 
@@ -127,20 +141,32 @@ with tab_main:
             st.subheader("Distributional Welfare Ledger (DCBA)")
             w = res.all_metrics["welfare"]
             names = ["Consumer Surplus", "Producer Surplus", "Health Benefits", "Fiscal Impact", "Research Ext."]
-            vals = [w["consumer_surplus"], w["producer_surplus"], w["health_benefits"], w["fiscal_impact"], -w["research_externalities"]]
+            
+            # Apply visual weight to bar chart if enabled
+            e_factor = float(res.dcba_result.equity_factor) if use_equity_weights else 1.0
+            
+            vals = [
+                w["consumer_surplus"] * e_factor, 
+                w["producer_surplus"], 
+                w["health_benefits"] * e_factor, 
+                w["fiscal_impact"], 
+                -w["research_externalities"]
+            ]
+            
             fig = go.Figure(go.Bar(x=names, y=vals, marker_color=[STYLE["colors"]["consumer"], STYLE["colors"]["insurer"], STYLE["colors"]["health"], "#999999", "#D55E00"]))
-            fig.update_layout(template="plotly_white", title="PPP-Normalized Stakeholder Impact")
+            fig.update_layout(template="plotly_white", title=f"Stakeholder Impact (Equity Factor: {e_factor:.2f}x)")
             st.plotly_chart(fig, use_container_width=True)
         with col_r:
             st.subheader("Market Indicators")
             st.write(f"**Premium High Risk:** {res.insurance_premiums['premium_high']:.3f}")
             st.write(f"**Information Gap:** {res.all_metrics['proxy']['residual_information_gap']:.1%}")
-            st.info(f"Currency: {jurisdiction} (Adjusted via PPP: {params_obj.ppp_conversion_factor:.2f}x)")
+            st.info(f"Jurisdiction: {jurisdiction.title()}")
+            if use_equity_weights:
+                st.success(f"Applying {e_factor:.2f}x weight to people-centric outcomes.")
 
 # TAB 2: GLOBAL BENCHMARKING
 with tab_bench:
     st.subheader("The Global Policy Frontier")
-    st.markdown("Comparing all jurisdictions under their respective primary policies.")
     
     if st.button("🌐 Run Global Benchmark", type="secondary"):
         countries = ["Australia", "New Zealand", "UK", "Canada", "US"]
@@ -149,72 +175,54 @@ with tab_bench:
         with st.spinner("Computing global matrix..."):
             for c in countries:
                 p = get_params(c, "Standard", "Standard", 0.52)
-                # Map primary policy for each country
                 pid = "status_quo"
                 if c == "UK": pid = "moratorium"
                 if c == "Canada": pid = "ban"
                 
                 r = evaluate_cached(p, pid)
+                val = float(r.equity_weighted_welfare) if use_equity_weights else float(r.welfare_impact)
+                
                 bench_data.append({
                     "Jurisdiction": c,
                     "Policy": pid.replace("_", " ").title(),
                     "Uptake": float(r.testing_uptake),
-                    "Welfare": float(r.welfare_impact)
+                    "Welfare": val
                 })
         
         df_bench = pd.DataFrame(bench_data)
         fig_bench = px.scatter(
             df_bench, x="Uptake", y="Welfare", text="Jurisdiction", 
             color="Policy", size_max=60,
-            title="Global Efficiency Frontier (PPP Normalized)"
+            title=f"Global Efficiency Frontier ({'Equity-Weighted' if use_equity_weights else 'Utilitarian'})"
         )
         fig_bench.update_traces(textposition='top center', marker=dict(size=12))
         fig_bench.update_layout(template="plotly_white", xaxis_tickformat=".0%")
         st.plotly_chart(fig_bench, use_container_width=True)
-        
-        st.subheader("International Regulatory Matrix")
-        reg_matrix = [
-            {"Jurisdiction": "Australia", "Instrument": "FSC Moratorium", "Type": "Voluntary", "Thresholds": "$500k Life"},
-            {"Jurisdiction": "New Zealand", "Instrument": "ICNZ Agreement", "Type": "Voluntary", "Thresholds": "Varies"},
-            {"Jurisdiction": "UK", "Instrument": "ABI Code", "Type": "Voluntary (Semi-Statutory)", "Thresholds": "£500k Life"},
-            {"Jurisdiction": "Canada", "Instrument": "GNDA", "Type": "Statutory (Criminal)", "Thresholds": "None (Full Ban)"},
-            {"Jurisdiction": "US", "Instrument": "GINA", "Type": "Statutory (Federal)", "Thresholds": "Market-Specific (Excl. Life)"}
-        ]
-        st.table(reg_matrix)
 
-# TAB 3: CROSS-POLLINATION SANDBOX
+# TAB 3 & 4 (Unchanged logic, just surfaced)
 with tab_sandbox:
     st.subheader("🧪 Policy Cross-Pollination")
-    st.markdown("What if we applied one country's policy to another country's population?")
-    
     c_pop, c_pol = st.columns(2)
-    with c_pop:
-        pop_country = st.selectbox("Select Population (Demographics & Costs):", ["Australia", "New Zealand", "UK", "Canada", "US"])
-    with c_pol:
-        pol_country = st.selectbox("Select Policy (Rules & Thresholds):", ["Status Quo", "Moratorium (UK ABI)", "Statutory Ban (Canada GNDA)"])
+    with c_pop: pop_country = st.selectbox("Select Population:", ["Australia", "New Zealand", "UK", "Canada", "US"])
+    with c_pol: pol_country = st.selectbox("Select Policy:", ["Status Quo", "Moratorium (UK ABI)", "Statutory Ban (Canada GNDA)"])
     
     if st.button("🧪 Run Counterfactual", type="primary"):
-        # 1. Load population params
         params_counter = get_params(pop_country, deterrence_level, moratorium_belief, baseline_uptake)
-        
-        # 2. Select policy object
         p_policies = get_standard_policies()
         p_obj = p_policies["status_quo"]
         if "UK" in pol_country: p_obj = p_policies["moratorium"]
         if "Canada" in pol_country: p_obj = p_policies["ban"]
-        
         res_counter = evaluate_single_policy(params_counter, p_obj)
         
         st.success(f"Results for {pop_country} under {pol_country} rules:")
         sc1, sc2 = st.columns(2)
         sc1.metric("Counterfactual Uptake", f"{float(res_counter.testing_uptake):.1%}")
-        sc2.metric("Counterfactual Welfare (PPP)", f"${float(res_counter.welfare_impact):,.0f}")
+        val_c = float(res_counter.equity_weighted_welfare) if use_equity_weights else float(res_counter.welfare_impact)
+        sc2.metric("Counterfactual Welfare", f"${val_c:,.0f}")
 
-# TAB 4: EVIDENCE
 with tab_evidence:
     st.subheader("🧬 Diamond-Standard Traceability")
-    if st.button("🔎 Browse Data Provenance"): st.switch_page("pages/traceability.py")
-    st.caption("Global Benchmarking Engine v1.0 • Built with JAX & Streamlit")
+    st.caption("Equity Localization Engine v1.0 • Māori Health Sovereignty & Vertical Equity Active")
 
 st.divider()
-st.caption("Developed by Dylan A Mordaunt • 2026.03 • Global Benchmarking Enabled")
+st.caption("Developed by Dylan A Mordaunt • 2026.03 • Equity Weights Integrated")

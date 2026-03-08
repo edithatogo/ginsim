@@ -115,6 +115,8 @@ def evaluate_single_policy(
         insurer_profits=market_eq.insurer_profits,
         baseline_profits=0.05,
         research_value_loss=float(1.0 - data_quality.participation_rate) * p_params.research_participation_value,
+        ppp_conversion_factor=float(p_params.ppp_conversion_factor),
+        equity_factor=float(getattr(p_params, "equity_factor", 1.0)),
     )
 
     logger.success(f"Full logic integration complete for {p_policy.name}")

@@ -78,7 +78,8 @@ class TestScenarioResult:
             welfare_impact=100000.0,
             qalys_gained=10.5,
             compliance_rate=0.8,
-            insurance_premiums={"premium_high": 0.5, "premium_low": 0.1}, all_metrics={"testing_uptake": 0.55},
+            insurance_premiums={"premium_high": 0.5, "premium_low": 0.1},
+            all_metrics={"testing_uptake": 0.55},
         )
         assert result.scenario_name == "test"
         assert result.jurisdiction == "AU"
@@ -101,7 +102,8 @@ class TestFormatComparisonTable:
                 welfare_impact=50000.0,
                 qalys_gained=5.0,
                 compliance_rate=0.7,
-                insurance_premiums={"premium_high": 0.5, "premium_low": 0.1}, all_metrics={},
+                insurance_premiums={"premium_high": 0.5, "premium_low": 0.1},
+                all_metrics={},
             ),
             ScenarioResult(
                 scenario_name="treatment",
@@ -110,7 +112,8 @@ class TestFormatComparisonTable:
                 welfare_impact=75000.0,
                 qalys_gained=7.5,
                 compliance_rate=0.85,
-                insurance_premiums={"premium_high": 0.5, "premium_low": 0.1}, all_metrics={},
+                insurance_premiums={"premium_high": 0.5, "premium_low": 0.1},
+                all_metrics={},
             ),
         ]
 

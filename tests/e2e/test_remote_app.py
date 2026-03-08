@@ -105,7 +105,7 @@ def _wait_for_dashboard(page: Page, remote_url: str) -> tuple[Frame, str]:
     )
 
 
-@pytest.mark.slow
+@pytest.mark.slow()
 def test_remote_app_loads():
     """Verify the deployed Streamlit app loads and core controls execute."""
     if not REMOTE_DASHBOARD_URL:

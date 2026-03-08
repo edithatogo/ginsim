@@ -160,7 +160,8 @@ class TestFormatDCBAResult:
             producer_surplus=jnp.array(200),
             health_benefits=jnp.array(400),
             fiscal_impact=jnp.array(-100),
-            distributional_weight=jnp.array(1.0), research_externalities=jnp.array(0.0),
+            distributional_weight=jnp.array(1.0),
+            research_externalities=jnp.array(0.0),
         )
 
         formatted = format_dcba_result(result)

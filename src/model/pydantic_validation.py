@@ -31,7 +31,9 @@ class ModelInputs(BaseModel):
 @beartype
 def validate_inputs(inputs: ModelInputs) -> bool:
     """Rigorous entry-gate for all model inputs."""
-    logger.info(f"Validating {len(inputs.parameters)} parameters and {len(inputs.assumptions)} assumptions.")
+    logger.info(
+        f"Validating {len(inputs.parameters)} parameters and {len(inputs.assumptions)} assumptions."
+    )
     try:
         # Cross-verification logic...
         logger.success("Model inputs validated successfully.")

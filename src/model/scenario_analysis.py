@@ -161,7 +161,11 @@ def evaluate_scenario(
     welfare_impact = float(result.welfare_impact) if hasattr(result, "welfare_impact") else 0.0
     qalys_gained = float(result.qalys_gained) if hasattr(result, "qalys_gained") else 0.0
     compliance_rate = float(result.compliance_rate) if hasattr(result, "compliance_rate") else 0.0
-    insurance_premiums = result.insurance_premiums if hasattr(result, "insurance_premiums") else {"premium_high": 0.0, "premium_low": 0.0}
+    insurance_premiums = (
+        result.insurance_premiums
+        if hasattr(result, "insurance_premiums")
+        else {"premium_high": 0.0, "premium_low": 0.0}
+    )
 
     return ScenarioResult(
         scenario_name=scenario_name,

@@ -83,7 +83,9 @@ def evaluate_single_policy(
 
     # 2. Compute insurance equilibrium (Module C)
     market_eq = mod_c.compute_equilibrium(params, policy)
-    logger.debug(f"Market Equilibrium: High Premium={float(market_eq.premium_high):.4f}, Low={float(market_eq.premium_low):.4f}")
+    logger.debug(
+        f"Market Equilibrium: High Premium={float(market_eq.premium_high):.4f}, Low={float(market_eq.premium_low):.4f}"
+    )
 
     # 3. Compute data quality externalities (Module F)
     data_quality = mod_f.compute_data_quality_externality(params, policy)

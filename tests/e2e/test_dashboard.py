@@ -11,7 +11,7 @@ import pytest
 from streamlit.testing.v1 import AppTest
 
 
-@pytest.fixture
+@pytest.fixture()
 def app_test():
     """Create AppTest fixture with increased timeout for JAX compilation."""
     return AppTest.from_file("streamlit_app/app.py", default_timeout=120)

@@ -2,6 +2,7 @@
 Central path resolver for genetic-discrimination-policy-econ.
 Handles fallback between public and local_only directories.
 """
+
 from __future__ import annotations
 
 from pathlib import Path

@@ -242,9 +242,7 @@ def main() -> None:
     )
     output_dir.mkdir(parents=True, exist_ok=True)
 
-
     logger.info("Starting figure generation...")
-
 
     bundle = build_reporting_bundle(meta_dir=meta_dir, run_dir=run_dir)
     jurisdictions = sorted(bundle["run_dirs"])
@@ -263,7 +261,6 @@ def main() -> None:
     logger.info(f"Source runs: {', '.join(jurisdictions)}")
 
     logger.success(f"Reporting figures generated in {output_dir}")
-
 
 
 if __name__ == "__main__":

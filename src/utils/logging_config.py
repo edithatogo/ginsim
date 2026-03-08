@@ -39,7 +39,7 @@ def setup_logging(level: str = "INFO", log_to_file: bool = True):
             retention="1 month",
             compression="zip",
             format=format_str,
-            level="DEBUG"
+            level="DEBUG",
         )
 
     logger.info(f"Logging initialized at level: {level}")

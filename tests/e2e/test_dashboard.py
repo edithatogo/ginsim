@@ -1,10 +1,5 @@
 """
-E2E Tests for Streamlit Dashboard (Diamond Standard)
-
-Tests all dashboard functionality including:
-- Sidebar controls
-- Tab rendering
-- Basic functionality
+E2E Tests for Streamlit Dashboard (Restored & Rigorous)
 """
 
 import pytest
@@ -13,7 +8,7 @@ from streamlit.testing.v1 import AppTest
 
 @pytest.fixture()
 def app_test():
-    """Create AppTest fixture with increased timeout for JAX compilation."""
+    """Create AppTest fixture."""
     return AppTest.from_file("streamlit_app/app.py", default_timeout=120)
 
 
@@ -33,9 +28,7 @@ class TestDashboardLoads:
     def test_sidebar_present(self, app_test):
         """Test sidebar is present."""
         app_test.run()
-        # 1 main selectbox (Policy) + 1 in expander (Jurisdiction)
         assert len(app_test.selectbox) >= 1
-        # 1 slider (Baseline)
         assert len(app_test.slider) >= 1
 
 
@@ -56,14 +49,14 @@ class TestFunctionality:
     """Test dashboard functionality."""
 
     def test_run_model_button(self, app_test):
-        """Test that clicking 'Run Model' generates results."""
+        """Test that clicking 'Run Full Evaluation' generates results."""
         app_test.run()
 
-        # Click button
-        run_button = next(b for b in app_test.button if "Run Model" in b.label)
+        # Find the specific button name
+        run_button = next(b for b in app_test.button if "Run Full Evaluation" in b.label)
         run_button.click().run()
 
-        # Check for metrics
-        assert len(app_test.metric) >= 2
-        assert any("People Choosing to Test" in m.label for m in app_test.metric)
+        # Check for restored metrics
+        assert any("Testing Uptake" in m.label for m in app_test.metric)
         assert any("Net Social Benefit" in m.label for m in app_test.metric)
+        assert any("Market Compliance" in m.label for m in app_test.metric)

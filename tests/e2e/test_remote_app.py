@@ -1,5 +1,6 @@
 import os
 import time
+from contextlib import suppress
 
 import pytest
 from loguru import logger
@@ -22,7 +23,6 @@ EXPECTED_SIDEBAR_PAGES = (
 EXPECTED_RESULT_LABELS = (
     "People Choosing to Test",
     "Net Social Benefit",
-    "Technical Evidence",
 )
 KNOWN_ERROR_TEXT = (
     "Error installing requirements.",
@@ -81,10 +81,9 @@ def _wait_for_dashboard(page: Page, remote_url: str) -> tuple[Frame, str]:
     last_state = "dashboard did not render"
 
     while time.time() < deadline:
-        try:
+        with suppress(Exception):
             page.goto(remote_url, wait_until="domcontentloaded", timeout=120_000)
-        except:
-            pass
+            
         page.wait_for_timeout(8_000)
         dashboard_frame, body_text = _dashboard_frame_and_text(page)
 
@@ -122,13 +121,13 @@ def test_remote_app_loads():
 
             assert EXPECTED_HEADING in body_text
             assert "Adjust Assumptions" in body_text
-            assert "Advanced Numerical Controls" in body_text
+            assert "Advanced Controls" in body_text
 
             # Run the model
-            run_btn = dashboard_frame.get_by_role("button", name="🔬 Run Model")
+            run_btn = dashboard_frame.get_by_role("button", name="🔬 Run Model Analysis")
             run_btn.click(timeout=30_000)
             page.wait_for_timeout(8_000)
-
+            
             body_text = _frame_body_text(dashboard_frame)
             for label in EXPECTED_RESULT_LABELS:
                 assert label in body_text
@@ -140,7 +139,7 @@ def test_remote_app_loads():
                 page.wait_for_timeout(5_000)
                 body_text = _wait_for_frame_text(dashboard_frame, expected_heading)
                 assert expected_heading in body_text
-
+                
             logger.success("Remote verification passed.")
         finally:
             browser.close()

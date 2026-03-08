@@ -83,7 +83,7 @@ def _wait_for_dashboard(page: Page, remote_url: str) -> tuple[Frame, str]:
     while time.time() < deadline:
         with suppress(Exception):
             page.goto(remote_url, wait_until="domcontentloaded", timeout=120_000)
-            
+
         page.wait_for_timeout(8_000)
         dashboard_frame, body_text = _dashboard_frame_and_text(page)
 
@@ -127,7 +127,7 @@ def test_remote_app_loads():
             run_btn = dashboard_frame.get_by_role("button", name="🔬 Run Model Analysis")
             run_btn.click(timeout=30_000)
             page.wait_for_timeout(8_000)
-            
+
             body_text = _frame_body_text(dashboard_frame)
             for label in EXPECTED_RESULT_LABELS:
                 assert label in body_text
@@ -139,7 +139,7 @@ def test_remote_app_loads():
                 page.wait_for_timeout(5_000)
                 body_text = _wait_for_frame_text(dashboard_frame, expected_heading)
                 assert expected_heading in body_text
-                
+
             logger.success("Remote verification passed.")
         finally:
             browser.close()

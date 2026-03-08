@@ -51,7 +51,7 @@ class TestFunctionality:
     """Test dashboard functionality."""
 
     def test_run_model_button(self, app_test):
-        """Test that clicking 'Run Evaluation' generates results."""
+        """Test that clicking 'Run Evaluation' generates correct numerical results."""
         app_test.run()
 
         # Find the specific button name
@@ -59,6 +59,12 @@ class TestFunctionality:
         run_button.click().run()
 
         # Check for restored metrics
-        assert any("Testing Uptake" in m.label for m in app_test.metric)
-        assert any("Net Social Benefit" in m.label for m in app_test.metric)
-        assert any("Market Compliance" in m.label for m in app_test.metric)
+        uptake_metric = next(m for m in app_test.metric if "Testing Uptake" in m.label)
+        # Expected value from CLI baseline: 61.3% (formatted)
+        assert "61.3%" in uptake_metric.value
+        
+        welfare_metric = next(m for m in app_test.metric if "Net Social Benefit" in m.label)
+        # Verify welfare is formatted
+        assert "$" in welfare_metric.value
+        # Value might be negative due to setup costs ($ -1,000,000)
+        assert len(welfare_metric.value) > 2

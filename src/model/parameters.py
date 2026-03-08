@@ -24,6 +24,7 @@ class PolicyConfig(BaseModel):
     penalty_max: float = 0.0
     penalty_type: str = "fixed"
     sum_insured_caps: dict[str, float] | None = None
+    taper_range: float = 0.0  # Range over which protection phases out
 
     def __hash__(self):
         return hash((self.name, self.allow_genetic_test_results, self.enforcement_strength))

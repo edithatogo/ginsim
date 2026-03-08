@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 GINSIM: Genetic Information Non-Discrimination Policy Integrated Economic Evaluation
-Main Dashboard - SOTA Equity Localization Edition.
+Main Dashboard - SOTA Regulatory Tapering Edition.
 """
 
 import sys
@@ -84,9 +84,10 @@ use_equity_weights = st.sidebar.toggle(
 with st.sidebar.expander("⚙️ Advanced Controls"):
     jurisdiction = st.selectbox("Base Jurisdiction", ["Australia", "New Zealand", "UK", "Canada", "US"])
     baseline_uptake = st.slider("Baseline Testing Share", 0.1, 0.9, 0.52)
+    taper_range_val = st.slider("Taper Range (Glide Path $)", 0, 500000, 100000, step=10000)
 
 st.title("🧬 Genetic Discrimination: Global Policy Explorer")
-st.markdown("### Benchmarking and Equity-Weighted Analysis (Track gdpe_0031)")
+st.markdown("### Benchmarking and Regulatory Tapering Analysis (Track gdpe_0032)")
 
 STANDARD_POLICIES = get_standard_policies()
 
@@ -100,7 +101,11 @@ tab_main, tab_bench, tab_sandbox, tab_evidence = st.tabs([
 
 @st.cache_data
 def evaluate_cached(_params, policy_id):
-    return evaluate_single_policy(_params, STANDARD_POLICIES[policy_id])
+    # Ensure policy also gets the taper_range from UI if it's a moratorium
+    policy = STANDARD_POLICIES[policy_id]
+    if policy_id == "moratorium":
+        policy = policy.model_copy(update={"taper_range": float(taper_range_val)})
+    return evaluate_single_policy(_params, policy)
 
 def get_params(j_name, d_lvl, m_bel, b_uptake):
     p = load_jurisdiction_parameters(j_name.lower().replace(" ", "_"))
@@ -118,7 +123,7 @@ with tab_main:
     params_obj = get_params(jurisdiction, deterrence_level, moratorium_belief, baseline_uptake)
 
     if st.button("🔬 Run Evaluation", type="primary", key="main_run"):
-        with st.spinner("Executing full pipeline..."):
+        with st.spinner("Executing full pipeline (with Tapering)..."):
             result = evaluate_cached(params_obj, selected_policy_id)
             st.session_state["main_result"] = result
             st.session_state["main_params"] = params_obj
@@ -157,12 +162,12 @@ with tab_main:
             fig.update_layout(template="plotly_white", title=f"Stakeholder Impact (Equity Factor: {e_factor:.2f}x)")
             st.plotly_chart(fig, use_container_width=True)
         with col_r:
-            st.subheader("Market Indicators")
+            st.subheader("Market Dynamics")
             st.write(f"**Premium High Risk:** {res.insurance_premiums['premium_high']:.3f}")
             st.write(f"**Information Gap:** {res.all_metrics['proxy']['residual_information_gap']:.1%}")
+            if selected_policy_id == "moratorium":
+                st.info(f"Taper Range active: ${taper_range_val:,.0f}")
             st.info(f"Jurisdiction: {jurisdiction.title()}")
-            if use_equity_weights:
-                st.success(f"Applying {e_factor:.2f}x weight to people-centric outcomes.")
 
 # TAB 2: GLOBAL BENCHMARKING
 with tab_bench:
@@ -199,7 +204,7 @@ with tab_bench:
         fig_bench.update_layout(template="plotly_white", xaxis_tickformat=".0%")
         st.plotly_chart(fig_bench, use_container_width=True)
 
-# TAB 3 & 4 (Unchanged logic, just surfaced)
+# TAB 3: SANDBOX
 with tab_sandbox:
     st.subheader("🧪 Policy Cross-Pollination")
     c_pop, c_pol = st.columns(2)
@@ -222,7 +227,7 @@ with tab_sandbox:
 
 with tab_evidence:
     st.subheader("🧬 Diamond-Standard Traceability")
-    st.caption("Equity Localization Engine v1.0 • Māori Health Sovereignty & Vertical Equity Active")
+    st.caption("Regulatory Tapering Engine v1.0 • Glide Paths Active")
 
 st.divider()
-st.caption("Developed by Dylan A Mordaunt • 2026.03 • Equity Weights Integrated")
+st.caption("Developed by Dylan A Mordaunt • 2026.03 • Tapering Logic Integrated")

@@ -28,6 +28,24 @@ class BehaviorParams:
     trend: float
 
 
+@jax.jit
+def taper_function(x: Array, cap: Array, taper_range: Array) -> Array:
+    """
+    Compute a smooth tapering protection factor.
+    Returns 1.0 if x <= cap, 0.0 if x >= cap + taper_range.
+    Interpolates smoothly in between.
+    """
+    # Normalized position in taper: 0 at cap, 1 at cap + range
+    # Avoid division by zero for hard caps
+    safe_range = jnp.maximum(taper_range, 1e-10)
+    z = (x - cap) / safe_range
+    z = jnp.clip(z, 0.0, 1.0)
+    
+    # Cosine smoothing (SmoothStep)
+    # 0.5 * (1 + cos(pi * z)) gives 1 at z=0, 0 at z=1
+    return 0.5 * (1.0 + jnp.cos(jnp.pi * z))
+
+
 # Don't use @jit here - boolean arguments don't work with JIT
 def compute_perceived_penalty(
     adverse_selection_elasticity: float,
@@ -38,9 +56,11 @@ def compute_perceived_penalty(
     moratorium_effect: float,
     sum_insured_caps: dict[str, float] | None = None,
     high_sum_insured_share: float = 0.25,
+    taper_range: float = 0.0,
 ) -> Float[Array, ""]:
     """
     Compute perceived discrimination penalty under policy regime.
+    Now supports smooth regulatory tapering.
     """
     # Base penalty from adverse selection
     base_penalty = adverse_selection_elasticity * baseline_loading
@@ -51,9 +71,32 @@ def compute_perceived_penalty(
     if allow_genetic_test_results:
         restriction_strength = 0.0
     elif sum_insured_caps is not None:
-        # Rigorous threshold logic: only those below cap are protected.
-        # We also scale by moratorium trust effect.
-        restriction_strength = (1.0 - high_sum_insured_share) * (0.7 + 0.3 * moratorium_effect)
+        # Tapering logic:
+        # We model a 'Representative Individual' whose insurance demand is split.
+        # The protection factor is 1.0 for those below cap, 0.0 for those above,
+        # and smooth for those in the taper range.
+        
+        # Approximate the aggregate protection by evaluating at the median high-buyer
+        # or by using the high_sum_insured_share.
+        
+        # Continuous approximation:
+        # We assume the 'representative' high buyer is at (Cap + 0.5 * Taper)
+        # and the share of people in the taper is part of the high_sum_insured_share.
+        
+        # restriction = (Share_Low * 1.0) + (Share_High * Taper_at_High_Buyer)
+        # For now, we use high_sum_insured_share as the 'unprotected' group
+        # but let the taper_range reduce their perceived risk if it's wide.
+        
+        avg_protection_high = taper_function(
+            jnp.asarray(1.0), # Normalized proxy for high buyers
+            jnp.asarray(0.0), 
+            jnp.asarray(taper_range / 1000000.0) # Scaled range
+        )
+        
+        base_restriction = (1.0 - high_sum_insured_share)
+        taper_bonus = high_sum_insured_share * avg_protection_high
+        
+        restriction_strength = (base_restriction + taper_bonus) * (0.7 + 0.3 * moratorium_effect)
     else:
         restriction_strength = 1.0
 
@@ -81,6 +124,7 @@ def compute_perceived_penalty_wrapper(
         params.moratorium_effect,
         policy.sum_insured_caps,
         getattr(params, "high_sum_insured_share", 0.25),
+        policy.taper_range
     )
     return float(penalty)
 
@@ -137,6 +181,8 @@ def compute_testing_uptake(
         params.enforcement_effectiveness,
         params.moratorium_effect,
         policy.sum_insured_caps,
+        getattr(params, "high_sum_insured_share", 0.25),
+        policy.taper_range
     )
 
     # Simulate heterogeneous benefits
@@ -215,6 +261,7 @@ def get_standard_policies() -> dict[str, PolicyConfig]:
             allow_family_history=True,
             # Exact FSC Moratorium thresholds (AUD)
             sum_insured_caps={"life": 500000.0, "tpd": 500000.0, "trauma": 200000.0, "income_protection": 4000.0},
+            taper_range=100000.0, # 100k AUD taper zone
             enforcement_strength=0.5,
         ),
         "ban": PolicyConfig(

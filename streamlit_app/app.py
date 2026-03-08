@@ -203,7 +203,15 @@ with tab_main:
         with col_r:
             st.subheader("Market Indicators")
             st.write(f"**Premium High Risk:** {res.insurance_premiums['premium_high']:.3f}")
-            st.write(f"**Information Gap:** {res.all_metrics['proxy']['residual_information_gap']:.1%}")
+
+            gap = res.all_metrics["proxy"]["residual_information_gap"]
+            redundancy = res.all_metrics["proxy"].get("informational_redundancy", 0.0)
+            ev_key = res.all_metrics["proxy"].get("source_evidence_key", "N/A")
+
+            st.write(f"**Information Gap:** {gap:.1%}")
+            st.write(f"**Informational Redundancy:** {redundancy:.1%}")
+            st.caption(f"Evidence Anchor: `{ev_key}`")
+
             if selected_policy_id == "moratorium":
                 st.info(f"Taper Range active: ${taper_range_val:,.0f}")
             st.info(f"Jurisdiction: {jurisdiction.title()}")

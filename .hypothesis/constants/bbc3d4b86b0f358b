@@ -1,4 +1,0 @@
-# file: C:\Users\60217257\OneDrive - Victoria University of Wellington - STAFF\Project - 2026.03 - Economics and Genetic Discrimination\scripts\reporting_common.py
-# hypothesis_version: 6.151.9
-
-[0.01, 0.05, 0.95, 1.0, 256, 20260302, 4294967295, 'S1_avg_policy_NB', 'S1_optimal_NB', 'ST_avg_policy_NB', 'ST_optimal_NB', 'au_', 'australia', 'australia_', 'avg_premium', 'behavior', 'clinical', 'created_utc', 'data_quality', 'evpi', 'evppi', 'evppi_by_group', 'evppi_by_group.csv', 'full_uncertainty', 'generated_files', 'group', 'insurance', 'jax', 'jax.numpy', 'jurisdiction', 'manifests', 'mapping', 'mean', 'nan', 'nb', 'nb_mean', 'net_qalys', 'new_zealand', 'new_zealand_', 'nz_', 'passthrough', 'policies_file', 'policies_file_sha256', 'policy', 'policy_summary', 'policy_summary.csv', 'repo_tree_hash', 'reporting_manifest', 'run_dirs', 'run_id', 'run_manifest.json', 'source_runs', 'src.model.evppi_rff', 'src.model.voi', 'utf-8']

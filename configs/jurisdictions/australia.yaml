@@ -38,3 +38,6 @@ taper_range: 100000.0
 
 acc_deterrence_offset: 0.0
 pharmac_qaly_threshold: 50000.0
+
+medicare_cost_share: 0.75
+audit_intensity: 0.60

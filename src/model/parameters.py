@@ -67,6 +67,10 @@ class ModelParameters(BaseModel):
     acc_deterrence_offset: float = 0.0
     pharmac_qaly_threshold: float = 50000.0
 
+    # AU System Specifics
+    medicare_cost_share: float = 0.0
+    audit_intensity: float = 0.50
+
     # Metadata
     jurisdiction: str
     calibration_date: str

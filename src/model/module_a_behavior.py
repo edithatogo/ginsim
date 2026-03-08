@@ -58,27 +58,31 @@ def compute_perceived_penalty(
     high_sum_insured_share: float = 0.25,
     taper_range: float = 0.0,
     acc_deterrence_offset: float = 0.0,
+    audit_intensity: float = 0.50,
 ) -> Float[Array, ""]:
     """
     Compute perceived discrimination penalty under policy regime.
-    Now supports smooth regulatory tapering and NZ ACC offsets.
+    Now supports smooth regulatory tapering, NZ ACC offsets, and AU Audit Intensity.
     """
     # Base penalty from adverse selection
     base_penalty = adverse_selection_elasticity * baseline_loading
 
     # Policy reduces penalty
-    enforcement_factor = enforcement_strength * enforcement_effectiveness
+    # Use audit_intensity instead of generic effectiveness if specified
+    eff = jnp.maximum(jnp.asarray(enforcement_effectiveness), jnp.asarray(audit_intensity))
+    enforcement_factor = enforcement_strength * eff
 
     if allow_genetic_test_results:
         restriction_strength = 0.0
     elif sum_insured_caps is not None:
+        # Tapering logic
         avg_protection_high = taper_function(
-            jnp.asarray(1.0), # Normalized proxy for high buyers
+            jnp.asarray(1.0),  # Normalized proxy for high buyers
             jnp.asarray(0.0),
-            jnp.asarray(taper_range / 1000000.0) # Scaled range
+            jnp.asarray(taper_range / 1000000.0),  # Scaled range
         )
 
-        base_restriction = (1.0 - high_sum_insured_share)
+        base_restriction = 1.0 - high_sum_insured_share
         taper_bonus = high_sum_insured_share * avg_protection_high
 
         restriction_strength = (base_restriction + taper_bonus) * (0.7 + 0.3 * moratorium_effect)
@@ -88,8 +92,7 @@ def compute_perceived_penalty(
     penalty_reduction = restriction_strength * (0.5 + 0.5 * enforcement_factor)
     penalty_reduction = jnp.clip(penalty_reduction, 0.0, 0.95)
 
-    # ACC Offset: Reduces the perceived 'pain' of insurance discrimination
-    # because of the no-fault safety net for injury/treatment injury.
+    # ACC Offset (NZ Specific)
     effective_penalty_base = base_penalty * (1.0 - acc_deterrence_offset)
 
     # Final perceived penalty
@@ -115,19 +118,24 @@ def compute_perceived_penalty_wrapper(
         getattr(params, "high_sum_insured_share", 0.25),
         policy.taper_range,
         getattr(params, "acc_deterrence_offset", 0.0),
+        getattr(params, "audit_intensity", 0.50),
     )
     return float(penalty)
+
 
 def compute_testing_utility(
     benefits: Float[Array, "*"],
     perceived_penalty: Float[Array, ""],
     individual_characteristics: dict[str, Float[Array, "*"]] | None = None,
+    medicare_cost_share: float = 0.0,
 ) -> Float[Array, "*"]:
     """
     Compute utility of genetic testing.
     """
-    # Base utility
-    utility = benefits - perceived_penalty
+    # Base utility: benefits reduced by insurance penalty and test cost (net of Medicare)
+    # Assume base cost of testing is 0.1 in utility units for normalization
+    test_cost_utility = 0.1 * (1.0 - medicare_cost_share)
+    utility = benefits - perceived_penalty - test_cost_utility
 
     # Add individual characteristics
     if individual_characteristics is not None:
@@ -171,7 +179,9 @@ def compute_testing_uptake(
         params.moratorium_effect,
         policy.sum_insured_caps,
         getattr(params, "high_sum_insured_share", 0.25),
-        policy.taper_range
+        policy.taper_range,
+        getattr(params, "acc_deterrence_offset", 0.0),
+        getattr(params, "audit_intensity", 0.50),
     )
 
     # Simulate heterogeneous benefits
@@ -185,8 +195,12 @@ def compute_testing_uptake(
             n_individuals,
         )
 
-    # Compute utility
-    utilities = compute_testing_utility(benefits, perceived_penalty)
+    # Compute utility (with Medicare cost sharing)
+    utilities = compute_testing_utility(
+        benefits,
+        perceived_penalty,
+        medicare_cost_share=getattr(params, "medicare_cost_share", 0.0)
+    )
 
     # Compute testing probabilities
     probabilities = compute_testing_probability(utilities)
@@ -249,8 +263,13 @@ def get_standard_policies() -> dict[str, PolicyConfig]:
             allow_genetic_test_results=False,
             allow_family_history=True,
             # Exact FSC Moratorium thresholds (AUD)
-            sum_insured_caps={"life": 500000.0, "tpd": 500000.0, "trauma": 200000.0, "income_protection": 4000.0},
-            taper_range=100000.0, # 100k AUD taper zone
+            sum_insured_caps={
+                "life": 500000.0,
+                "tpd": 500000.0,
+                "trauma": 200000.0,
+                "income_protection": 4000.0,
+            },
+            taper_range=100000.0,  # 100k AUD taper zone
             enforcement_strength=0.5,
         ),
         "ban": PolicyConfig(

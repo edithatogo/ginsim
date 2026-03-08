@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 GINSIM: Genetic Information Non-Discrimination Policy Integrated Economic Evaluation
-Main Dashboard - SOTA Spatial Equity Edition.
+Main Dashboard - SOTA Temporal Evolution Edition.
 """
 
 import sys
@@ -11,15 +11,16 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
+import numpy as np
 
-from src.model.module_a_behavior import compute_testing_uptake, get_standard_policies
+from src.model.module_a_behavior import get_standard_policies, compute_testing_uptake
 from src.model.parameters import load_jurisdiction_parameters
 from src.model.pipeline import evaluate_single_policy
+from src.model.temporal_engine import simulate_evolution
 
 # =============================================================================
 # Visual Design System
@@ -90,7 +91,7 @@ with st.sidebar.expander("⚙️ Advanced Controls"):
     taper_range_val = st.slider("Taper Range (Glide Path $)", 0, 500000, 100000, step=10000)
 
 st.title("🧬 Genetic Discrimination: Global Policy Explorer")
-st.markdown("### Benchmarking and Spatial Equity Analysis (Track gdpe_0036)")
+st.markdown("### Benchmarking and Temporal Evolution Analysis (Track gdpe_0042)")
 
 STANDARD_POLICIES = get_standard_policies()
 
@@ -108,7 +109,6 @@ tab_main, tab_bench, tab_sandbox, tab_spatial, tab_evidence = st.tabs(
 
 @st.cache_data
 def evaluate_cached(_params, policy_id):
-    # Ensure policy also gets the taper_range from UI if it's a moratorium
     policy = STANDARD_POLICIES[policy_id]
     if policy_id == "moratorium":
         policy = policy.model_copy(update={"taper_range": float(taper_range_val)})
@@ -133,16 +133,24 @@ with tab_main:
 
     params_obj = get_params(jurisdiction, deterrence_level, moratorium_belief, baseline_uptake)
 
-    if st.button("🔬 Run Evaluation", type="primary", key="main_run"):
-        with st.spinner("Executing full pipeline..."):
-            result = evaluate_cached(params_obj, selected_policy_id)
-            st.session_state["main_result"] = result
-            st.session_state["main_params"] = params_obj
+    c_run, c_temp = st.columns(2)
+    with c_run:
+        if st.button("🔬 Run Evaluation", type="primary", key="main_run"):
+            with st.spinner("Executing full pipeline..."):
+                result = evaluate_cached(params_obj, selected_policy_id)
+                st.session_state["main_result"] = result
+                st.session_state["main_params"] = params_obj
+    
+    with c_temp:
+        if st.button("📈 Project 10-Year Trajectory", type="secondary"):
+            with st.spinner("Simulating temporal evolution..."):
+                target_policy = STANDARD_POLICIES[selected_policy_id]
+                history = simulate_evolution(params_obj, target_policy, n_years=10)
+                st.session_state["temporal_history"] = history
 
     if "main_result" in st.session_state:
         res = st.session_state["main_result"]
 
-        # Decide which welfare to show
         if use_equity_weights:
             w_impact = float(res.equity_weighted_welfare)
             w_label = "Net Social Benefit (Equity-Weighted)"
@@ -164,19 +172,10 @@ with tab_main:
 
         col_l, col_r = st.columns([2, 1])
         with col_l:
-            st.subheader("Distributional Welfare Ledger (DCBA)")
+            st.subheader("Stakeholder Impact Ledger")
             w = res.all_metrics["welfare"]
-            names = [
-                "Consumer Surplus",
-                "Producer Surplus",
-                "Health Benefits",
-                "Fiscal Impact",
-                "Research Ext.",
-            ]
-
-            # Apply visual weight to bar chart if enabled
+            names = ["Consumer", "Insurer", "Health", "Fiscal", "Research"]
             e_factor = float(res.dcba_result.equity_factor) if use_equity_weights else 1.0
-
             vals = [
                 w["consumer_surplus"] * e_factor,
                 w["producer_surplus"],
@@ -184,50 +183,50 @@ with tab_main:
                 w["fiscal_impact"],
                 -w["research_externalities"],
             ]
-
-            fig = go.Figure(
-                go.Bar(
-                    x=names,
-                    y=vals,
-                    marker_color=[
-                        STYLE["colors"]["consumer"],
-                        STYLE["colors"]["insurer"],
-                        STYLE["colors"]["health"],
-                        "#999999",
-                        "#D55E00",
-                    ],
-                )
-            )
-            fig.update_layout(
-                template="plotly_white", title=f"Stakeholder Impact (Equity Factor: {e_factor:.2f}x)"
-            )
+            fig = go.Figure(go.Bar(x=names, y=vals, marker_color=["#56B4E9", "#E69F00", "#CC79A7", "#999999", "#D55E00"]))
+            fig.update_layout(template="plotly_white")
             st.plotly_chart(fig, use_container_width=True)
+            
         with col_r:
             st.subheader("Market Indicators")
             st.write(f"**Premium High Risk:** {res.insurance_premiums['premium_high']:.3f}")
-
-            gap = res.all_metrics["proxy"]["residual_information_gap"]
-            redundancy = res.all_metrics["proxy"].get("informational_redundancy", 0.0)
-            ev_key = res.all_metrics["proxy"].get("source_evidence_key", "N/A")
-
+            gap = res.all_metrics['proxy']['residual_information_gap']
+            redundancy = res.all_metrics['proxy'].get('informational_redundancy', 0.0)
+            ev_key = res.all_metrics['proxy'].get('source_evidence_key', 'N/A')
             st.write(f"**Information Gap:** {gap:.1%}")
             st.write(f"**Informational Redundancy:** {redundancy:.1%}")
             st.caption(f"Evidence Anchor: `{ev_key}`")
-
-            if selected_policy_id == "moratorium":
-                st.info(f"Taper Range active: ${taper_range_val:,.0f}")
-            st.info(f"Jurisdiction: {jurisdiction.title()}")
-            if use_equity_weights:
-                st.success(f"Applying {e_factor:.2f}x weight to people-centric outcomes.")
+            
+    if "temporal_history" in st.session_state:
+        st.divider()
+        st.subheader("📅 10-Year Market Trajectory")
+        hist = st.session_state["temporal_history"]
+        df_hist = pd.DataFrame([{
+            "Year": s.year,
+            "Uptake": float(s.uptake),
+            "Premium (High)": float(s.premium_high),
+            "Premium (Low)": float(s.premium_low),
+            "Welfare": float(s.net_welfare)
+        } for s in hist])
+        
+        c_h1, c_h2 = st.columns(2)
+        with c_h1:
+            fig_u = px.line(df_hist, x="Year", y="Uptake", title="Testing Uptake Projection")
+            fig_u.update_layout(template="plotly_white", yaxis_tickformat=".0%")
+            st.plotly_chart(fig_u, use_container_width=True)
+        with c_h2:
+            fig_p = px.line(df_hist, x="Year", y=["Premium (High)", "Premium (Low)"], title="Premium Evolution")
+            fig_p.update_layout(template="plotly_white")
+            st.plotly_chart(fig_p, use_container_width=True)
+        
+        st.info("The projection accounts for annual technological drift (increasing proxy accuracy) and inflationary pressure on regulatory thresholds.")
 
 # TAB 2: GLOBAL BENCHMARKING
 with tab_bench:
     st.subheader("The Global Policy Frontier")
-
     if st.button("🌐 Run Global Benchmark", type="secondary"):
         countries = ["Australia", "New Zealand", "UK", "Canada", "US"]
         bench_data = []
-
         with st.spinner("Computing global matrix..."):
             for c in countries:
                 p = get_params(c, "Standard", "Standard", 0.52)
@@ -236,33 +235,12 @@ with tab_bench:
                     pid = "moratorium"
                 if c == "Canada":
                     pid = "ban"
-
                 r = evaluate_cached(p, pid)
-                if use_equity_weights:
-                    val = float(r.equity_weighted_welfare)
-                else:
-                    val = float(r.welfare_impact)
-
-                bench_data.append(
-                    {
-                        "Jurisdiction": c,
-                        "Policy": pid.replace("_", " ").title(),
-                        "Uptake": float(r.testing_uptake),
-                        "Welfare": val,
-                    }
-                )
-
+                val = float(r.equity_weighted_welfare) if use_equity_weights else float(r.welfare_impact)
+                bench_data.append({"Jurisdiction": c, "Policy": pid.replace("_", " ").title(), "Uptake": float(r.testing_uptake), "Welfare": val})
         df_bench = pd.DataFrame(bench_data)
         title_suffix = "Equity-Weighted" if use_equity_weights else "Utilitarian"
-        fig_bench = px.scatter(
-            df_bench,
-            x="Uptake",
-            y="Welfare",
-            text="Jurisdiction",
-            color="Policy",
-            size_max=60,
-            title=f"Global Efficiency Frontier ({title_suffix})",
-        )
+        fig_bench = px.scatter(df_bench, x="Uptake", y="Welfare", text="Jurisdiction", color="Policy", title=f"Global Efficiency Frontier ({title_suffix})")
         fig_bench.update_traces(textposition="top center", marker={"size": 12})
         fig_bench.update_layout(template="plotly_white", xaxis_tickformat=".0%")
         st.plotly_chart(fig_bench, use_container_width=True)
@@ -272,14 +250,9 @@ with tab_sandbox:
     st.subheader("🧪 Policy Cross-Pollination")
     c_pop, c_pol = st.columns(2)
     with c_pop:
-        pop_country = st.selectbox(
-            "Select Population:", ["Australia", "New Zealand", "UK", "Canada", "US"]
-        )
+        pop_country = st.selectbox("Select Population:", ["Australia", "New Zealand", "UK", "Canada", "US"])
     with c_pol:
-        pol_country = st.selectbox(
-            "Select Policy:", ["Status Quo", "Moratorium (UK ABI)", "Statutory Ban (Canada GNDA)"]
-        )
-
+        pol_country = st.selectbox("Select Policy:", ["Status Quo", "Moratorium (UK ABI)", "Statutory Ban (Canada GNDA)"])
     if st.button("🧪 Run Counterfactual", type="primary"):
         params_counter = get_params(pop_country, deterrence_level, moratorium_belief, baseline_uptake)
         p_policies = get_standard_policies()
@@ -289,51 +262,32 @@ with tab_sandbox:
         if "Canada" in pol_country:
             p_obj = p_policies["ban"]
         res_counter = evaluate_single_policy(params_counter, p_obj)
-
         st.success(f"Results for {pop_country} under {pol_country} rules:")
         sc1, sc2 = st.columns(2)
         sc1.metric("Counterfactual Uptake", f"{float(res_counter.testing_uptake):.1%}")
-        if use_equity_weights:
-            val_c = float(res_counter.equity_weighted_welfare)
-        else:
-            val_c = float(res_counter.welfare_impact)
+        val_c = float(res_counter.equity_weighted_welfare) if use_equity_weights else float(res_counter.welfare_impact)
         sc2.metric("Counterfactual Welfare", f"${val_c:,.0f}")
 
-# TAB 4: SPATIAL EQUITY (NEW)
+# TAB 4: SPATIAL EQUITY
 with tab_spatial:
     st.subheader("Map of 'Diagnostic Deserts' and Access Equity")
-    st.markdown("Visualizing how geographic distance interacting with insurance policy creates uptake disparities.")
-
     current_params = get_params(jurisdiction, deterrence_level, moratorium_belief, baseline_uptake)
-
     if st.button("🗺️ Generate Remoteness Profile", type="primary"):
         remoteness_levels = np.linspace(0.0, 1.0, 10)
         spatial_results = []
-
         with st.spinner("Simulating geographic sweep..."):
             for policy_name, policy_obj in STANDARD_POLICIES.items():
                 for r_idx in remoteness_levels:
                     uptake = compute_testing_uptake(current_params, policy_obj, remoteness_index=float(r_idx))
-                    spatial_results.append({
-                        "Policy": policy_name.replace("_", " ").title(),
-                        "Remoteness": r_idx,
-                        "Uptake": float(uptake)
-                    })
-
+                    spatial_results.append({"Policy": policy_name.replace("_", " ").title(), "Remoteness": r_idx, "Uptake": float(uptake)})
         df_spatial = pd.DataFrame(spatial_results)
-        fig_spatial = px.line(
-            df_spatial, x="Remoteness", y="Uptake", color="Policy",
-            title=f"Testing Uptake Decay by Geographic Remoteness ({jurisdiction.title()})",
-            labels={"Remoteness": "Remoteness Index (0=Urban, 1=Remote)", "Uptake": "Predicted Testing Share"}
-        )
+        fig_spatial = px.line(df_spatial, x="Remoteness", y="Uptake", color="Policy", title=f"Testing Uptake Decay by Geographic Remoteness ({jurisdiction.title()})")
         fig_spatial.update_layout(template="plotly_white", yaxis_tickformat=".0%")
         st.plotly_chart(fig_spatial, use_container_width=True)
 
-        st.info("The 'Decay Curve' shows that policy interventions (like bans) have a smaller marginal effect in remote areas due to the dominant physical cost of access.")
-
 with tab_evidence:
     st.subheader("🧬 Diamond-Standard Traceability")
-    st.caption("Spatial Equity Engine v1.0 • Diagnostic Desert Mapping Active")
+    st.caption("Temporal Evolution Engine v1.0 • 10-Year Market Drift Active")
 
 st.divider()
-st.caption("Developed by Dylan A Mordaunt • 2026.03 • Spatial Logic Integrated")
+st.caption("Developed by Dylan A Mordaunt • 2026.03 • Temporal Logic Integrated")

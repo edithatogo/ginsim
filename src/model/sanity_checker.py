@@ -1,13 +1,14 @@
 """
 Economic Sanity Checker (Diamond Standard).
 
-Automated enforcement of fundamental economic invariants during 
+Automated enforcement of fundamental economic invariants during
 the policy evaluation pipeline.
 """
 
 from __future__ import annotations
 
 from typing import Any
+
 import jax
 import jax.numpy as jnp
 from loguru import logger
@@ -28,13 +29,13 @@ class EconomicSanityChecker:
         # 1. Non-negative testing uptake
         # We use jnp.any to check if any element violates the invariant
         uptake = jnp.asarray(result.testing_uptake)
-        neg_uptake = jnp.any(uptake < -1e-6)
-        
+
+
         # 2. Premium Ordering
         ph = jnp.asarray(result.insurance_premiums.get("premium_high", 0.0))
         pl = jnp.asarray(result.insurance_premiums.get("premium_low", 0.0))
-        bad_premiums = jnp.any(ph < pl - 1e-6)
-        
+
+
         # Note: We cannot branch on tracers during JIT/vmap.
         # We rely on the fact that JAX arrays will propagate these values.
         # For non-traced runs (concrete), we can log.
@@ -52,7 +53,7 @@ class EconomicSanityChecker:
         if "status_quo" in results and "ban" in results:
             u_sq = jnp.asarray(results["status_quo"].testing_uptake)
             u_ban = jnp.asarray(results["ban"].testing_uptake)
-            
-            if not isinstance(u_sq, jax.core.Tracer):
-                if float(jnp.mean(u_ban)) < float(jnp.mean(u_sq)) - 1e-6:
+
+            if not isinstance(u_sq, jax.core.Tracer) and float(jnp.mean(u_ban)) < float(jnp.mean(u_sq)) - 1e-6:
+
                     logger.error("INVARIANT VIOLATION: Ban uptake < Status Quo uptake")

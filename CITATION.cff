@@ -1,27 +1,23 @@
 cff-version: 1.2.0
-message: "If you use this software or associated research outputs, please cite it as below."
-title: "Genetic Discrimination Policy Economic Evaluation (GINSIM)"
-abstract: "A reproducible modelling framework to quantify the economic and welfare impacts of policies that restrict genetic discrimination, with comparative analysis for Australia and Aotearoa New Zealand."
-type: software
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: "Mordaunt"
+    given-names: "Dylan A"
+    orcid: "https://orcid.org/0000-0000-0000-0000"
+title: "GINSIM: Genetic Information Non-Discrimination Policy Integrated Economic Evaluation"
 version: 0.3.0
-doi: "10.5281/zenodo.1234567" # Placeholder or update if known
+doi: 10.5281/zenodo.1234567
 date-released: 2026-03-08
 url: "https://github.com/edithatogo/ginsim"
 repository-code: "https://github.com/edithatogo/ginsim"
 keywords:
-  - genetic discrimination
   - health economics
-  - insurance markets
-  - Bayesian decision analysis
-  - policy evaluation
+  - genetic discrimination
+  - insurance
   - JAX
-  - Australia
-  - New Zealand
-authors:
-  - family-names: "Mordaunt"
-    given-names: "Dylan A"
-    orcid: "https://orcid.org/0000-0002-9775-0603"
-    affiliation: "Research Fellow, Faculty of Health, Education and Psychology, Victoria University of Wellington"
-    country: "NZ"
-license: MIT
-repository: "https://github.com/edithatogo/ginsim"
+  - policy analysis
+abstract: >-
+  GINSIM is a high-performance, JAX-vectorized economic modelling engine designed to 
+  quantify the societal impact of genetic non-discrimination policies. It integrates 
+  behavioral responses, insurance market screening equilibria, and disease-specific 
+  clinical microsimulation into a unified Cost-Benefit Analysis (DCBA) framework.

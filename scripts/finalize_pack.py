@@ -1,5 +1,12 @@
-import os
+import sys
 import zipfile
+from pathlib import Path
+
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+from src.utils.path_resolver import resolve_path
 
 
 def create_final_pack():
@@ -11,12 +18,14 @@ def create_final_pack():
         "docs/CITATION_GRAPH.json",
         "context/references.bib",
         "context/assumptions_registry.yaml",
-        "scripts/conductor_gate.py",
+        "scripts/quality_gate.py",
     ]
     with zipfile.ZipFile("diamond_submission_pack.zip", "w") as z:
         for f in files:
-            if os.path.exists(f):
-                z.write(f)
+            resolved = resolve_path(f)
+            if resolved.exists():
+                # Store relative to root in zip
+                z.write(resolved, arcname=f)
     print("Final Diamond Pack Created.")
 
 

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Instantiate a Conductor nature-depth-cycle track from the repo template.
+Initialize a research-grade development track from the repository template.
 
 Usage:
-    python -m scripts.create_nature_depth_track \
+    python -m scripts.create_research_track \
         --track-id gdpe_0022_example \
         --title "Example title" \
         --aspect "example repo aspect"
@@ -14,13 +14,19 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
 from datetime import date
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-TEMPLATE_DIR = REPO_ROOT / "conductor" / "templates" / "nature_depth_cycle"
-TRACKS_DIR = REPO_ROOT / "conductor" / "tracks"
-TRACKS_REGISTRY = REPO_ROOT / "conductor" / "tracks.md"
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+from src.utils.path_resolver import resolve_path
+
+TEMPLATE_DIR = resolve_path("conductor/templates/nature_depth_cycle")
+TRACKS_DIR = resolve_path("conductor/tracks")
+TRACKS_REGISTRY = resolve_path("conductor/tracks.md")
 
 
 def slugify_title(title: str) -> str:
@@ -49,7 +55,7 @@ def build_index(track_id: str, title: str) -> str:
                 "- [Specification](./spec.md)",
                 "- [Plan](./plan.md)",
                 "- [Metadata](./metadata.json)",
-                "- [Autonomous Cycle](./AUTONOMOUS_CYCLE.md)",
+                "- [Development Cycle](./AUTONOMOUS_CYCLE.md)",
                 "- [Handoff](./HANDOFF.md)",
                 "- [Track Complete](./TRACK_COMPLETE.md)",
                 "",
@@ -65,7 +71,7 @@ def build_index(track_id: str, title: str) -> str:
                 "## Current status",
                 "",
                 "- Planned.",
-                "- Created from the `nature_depth_cycle` template.",
+                "- Created from the standard research template.",
             ]
         )
         + "\n"
@@ -90,6 +96,9 @@ def build_placeholder_artifact(title: str) -> str:
 
 def update_tracks_registry(track_id: str, title: str, status: str) -> None:
     """Insert the generated track into the requested registry section."""
+    if not TRACKS_REGISTRY.exists():
+        return
+        
     registry_text = TRACKS_REGISTRY.read_text(encoding="utf-8")
     normalized_status = status.strip().lower()
     if normalized_status not in {"planned", "active"}:
@@ -180,14 +189,17 @@ def instantiate_track(
     for source_name, dest_name in template_map.items():
         source_path = TEMPLATE_DIR / source_name
         dest_path = track_dir / dest_name
+        if not source_path.exists():
+            continue
         content = source_path.read_text(encoding="utf-8")
         dest_path.write_text(render_template(content, replacements), encoding="utf-8")
 
     reflection_template = TEMPLATE_DIR / "TEMPLATE_REFLECTION_LOG.md"
-    (track_dir / "TEMPLATE_REFLECTION_LOG.seed.md").write_text(
-        reflection_template.read_text(encoding="utf-8"),
-        encoding="utf-8",
-    )
+    if reflection_template.exists():
+        (track_dir / "TEMPLATE_REFLECTION_LOG.seed.md").write_text(
+            reflection_template.read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
 
     (track_dir / "index.md").write_text(build_index(track_id, title), encoding="utf-8")
 
@@ -204,12 +216,13 @@ def instantiate_track(
         )
 
     metadata_path = track_dir / "metadata.json"
-    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
-    metadata["track_id"] = track_id
-    metadata["title"] = title
-    metadata["aspect"] = aspect
-    metadata["status"] = status.lower()
-    metadata_path.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
+    if metadata_path.exists():
+        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+        metadata["track_id"] = track_id
+        metadata["title"] = title
+        metadata["aspect"] = aspect
+        metadata["status"] = status.lower()
+        metadata_path.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
 
     update_tracks_registry(track_id, title, status)
 
@@ -218,7 +231,7 @@ def instantiate_track(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Create a Conductor nature-depth-cycle track from the repository template."
+        description="Create a research development track from the repository template."
     )
     parser.add_argument(
         "--track-id", required=True, help="Track identifier, e.g. gdpe_0022_example"
@@ -250,11 +263,11 @@ def main() -> None:
         status=args.status,
     )
 
-    print(f"Created track template at: {track_dir}")
+    print(f"Created development track at: {track_dir}")
     print("Next steps:")
-    print("1. Run 3-5 track refinement rounds before implementation")
+    print("1. Run 3-5 refinement rounds before implementation")
     print("2. Update spec.md and plan.md with aspect-specific findings")
-    print("3. Start the autonomous phase loop")
+    print("3. Start the implementation cycle")
 
 
 if __name__ == "__main__":

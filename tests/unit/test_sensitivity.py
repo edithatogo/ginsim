@@ -1,17 +1,17 @@
 """
-Unit tests for Sensitivity Analysis.
+Unit tests for sensitivity analysis functions.
 """
 
-from src.model.parameters import ModelParameters, PolicyConfig
+from src.model.parameters import ModelParameters, PolicyConfig, get_default_parameters
 from src.model.sensitivity import (
-    one_way_sensitivity,
-    scenario_analysis,
+    SensitivityResult,
+    run_scenario_analysis,
     tornado_analysis,
 )
 
 
 class TestOneWaySensitivity:
-    """Tests for one_way_sensitivity."""
+    """Tests for one-way sensitivity analysis."""
 
     def test_returns_sensitivity_result(self):
         """Test that analysis returns a SensitivityResult."""
@@ -19,11 +19,17 @@ class TestOneWaySensitivity:
         def model(p):
             return p.deterrence_elasticity * 10
 
-        params = ModelParameters(deterrence_elasticity=0.5)
-        result = one_way_sensitivity(model, params, "deterrence_elasticity")
+        params = get_default_parameters()
+        params = params.model_copy(update={"deterrence_elasticity": 0.5})
 
-        assert result.parameter_name == "deterrence_elasticity"
-        assert result.base_outcome == 5.0
+        results = tornado_analysis(
+            model_fn=model,
+            params=params,
+            param_names=["deterrence_elasticity"],
+        )
+
+        assert len(results) == 1
+        assert isinstance(results[0], SensitivityResult)
 
     def test_sensitivity_index_positive(self):
         """Test that sensitivity index is correctly calculated."""
@@ -31,15 +37,22 @@ class TestOneWaySensitivity:
         def model(p):
             return p.deterrence_elasticity
 
-        params = ModelParameters(deterrence_elasticity=1.0)
-        result = one_way_sensitivity(model, params, "deterrence_elasticity", variation=0.5)
+        params = get_default_parameters()
+        params = params.model_copy(update={"deterrence_elasticity": 1.0})
 
-        # Base=1.0, Low=0.5, High=1.5. Swing = 1.0. Index = 1.0/1.0 = 1.0
-        assert result.sensitivity_index > 0
+        results = tornado_analysis(
+            model_fn=model,
+            params=params,
+            param_names=["deterrence_elasticity"],
+            variation=0.1,
+        )
+
+        # Index should be positive for increasing function
+        assert results[0].sensitivity_index > 0
 
 
 class TestTornadoAnalysis:
-    """Tests for tornado_analysis."""
+    """Tests for tornado analysis aggregation."""
 
     def test_returns_sorted_results(self):
         """Test that results are sorted by impact."""
@@ -47,16 +60,22 @@ class TestTornadoAnalysis:
         def model(p):
             return p.deterrence_elasticity + 2 * p.moratorium_effect
 
-        params = ModelParameters(deterrence_elasticity=1.0, moratorium_effect=1.0)
-        results = tornado_analysis(model, params, ["deterrence_elasticity", "moratorium_effect"])
+        params = get_default_parameters()
+        params = params.model_copy(update={"deterrence_elasticity": 1.0, "moratorium_effect": 1.0})
+
+        results = tornado_analysis(
+            model_fn=model,
+            params=params,
+            param_names=["deterrence_elasticity", "moratorium_effect"],
+        )
 
         assert len(results) == 2
-        # Moratorium should have higher impact (coefficient 2 vs 1)
+        # moratorium_effect has larger weight (2 vs 1)
         assert results[0].parameter_name == "moratorium_effect"
 
 
 class TestScenarioAnalysis:
-    """Tests for scenario_analysis."""
+    """Tests for scenario analysis."""
 
     def test_returns_scenario_results(self):
         """Test that scenario analysis returns results."""
@@ -64,12 +83,20 @@ class TestScenarioAnalysis:
         def model(p, pol):
             return p.deterrence_elasticity * (2.0 if pol.allow_genetic_test_results else 1.0)
 
-        params = ModelParameters(deterrence_elasticity=10.0)
-        baseline = PolicyConfig(name="base", description="d", allow_genetic_test_results=True)
-        reform = PolicyConfig(name="reform", description="d", allow_genetic_test_results=False)
+        params = get_default_parameters()
+        params = params.model_copy(update={"deterrence_elasticity": 10.0})
 
-        results = scenario_analysis(model, params, baseline, reform)
+        policies = [
+            PolicyConfig(name="sq", description="SQ", allow_genetic_test_results=True),
+            PolicyConfig(name="ban", description="Ban", allow_genetic_test_results=False),
+        ]
 
-        assert results["baseline_outcome"] == 20.0
-        assert results["reform_outcome"] == 10.0
-        assert results["delta"] == -10.0
+        results = run_scenario_analysis(
+            model_fn=model,
+            base_params=params,
+            policies=policies,
+        )
+
+        assert len(results) == 2
+        assert results["sq"] == 20.0
+        assert results["ban"] == 10.0

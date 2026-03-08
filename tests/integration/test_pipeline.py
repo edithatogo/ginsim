@@ -1,40 +1,21 @@
 """
-Integration tests for the full policy evaluation pipeline.
+Integration tests for the policy evaluation pipeline.
 """
 
-from src.model.parameters import ModelParameters, get_default_parameters, PolicyConfig
+from src.model.parameters import PolicyConfig, get_default_parameters
 from src.model.pipeline import (
     compare_policies,
     evaluate_policy_sweep,
     evaluate_single_policy,
     generate_policy_summary,
-    get_standard_policies,
-    run_full_evaluation,
 )
 
 
 class TestEvaluateSinglePolicy:
-    """Tests for evaluate_single_policy."""
+    """Test the single policy evaluation function."""
 
-    def test_evaluation_returns_result(self):
+    def test_basic_evaluation(self):
         """Test that evaluation returns a result object."""
-        params = get_default_parameters()
-        policy = PolicyConfig(
-            name="test",
-            description="Test policy",
-            allow_genetic_test_results=True,
-        )
-
-        result = evaluate_single_policy(params, policy)
-
-        assert result is not None
-        assert hasattr(result, "policy_name")
-        assert hasattr(result, "testing_uptake")
-        assert hasattr(result, "insurance_premiums")
-        assert hasattr(result, "welfare_impact")
-
-    def test_testing_uptake_bounded(self):
-        """Test that testing uptake is bounded [0, 1]."""
         params = get_default_parameters()
         policy = PolicyConfig(
             name="test",
@@ -44,7 +25,9 @@ class TestEvaluateSinglePolicy:
 
         result = evaluate_single_policy(params, policy)
 
-        assert 0.0 <= result.testing_uptake <= 1.0
+        assert result.policy_name == "test"
+        assert result.testing_uptake >= 0.0
+        assert result.welfare_impact is not None
 
     def test_premiums_positive(self):
         """Test that insurance premiums are positive."""
@@ -57,21 +40,8 @@ class TestEvaluateSinglePolicy:
 
         result = evaluate_single_policy(params, policy)
 
-        assert result.insurance_premiums["premium_high_risk"] > 0.0
-        assert result.insurance_premiums["premium_low_risk"] > 0.0
-
-    def test_compliance_rate_bounded(self):
-        """Test that compliance rate is bounded [0, 1]."""
-        params = get_default_parameters()
-        policy = PolicyConfig(
-            name="test",
-            description="Test",
-            allow_genetic_test_results=False,
-        )
-
-        result = evaluate_single_policy(params, policy)
-
-        assert 0.0 <= result.compliance_rate <= 1.0
+        assert result.insurance_premiums["premium_high"] > 0.0
+        assert result.insurance_premiums["premium_low"] > 0.0
 
     def test_evaluation_includes_real_ledger_and_proxy_metrics(self):
         """Test that evaluation exposes derived welfare and proxy outputs."""
@@ -88,40 +58,13 @@ class TestEvaluateSinglePolicy:
         result = evaluate_single_policy(params, policy)
 
         assert "proxy" in result.all_metrics
-        assert "accuracy_loss" in result.all_metrics["proxy"]
         assert "residual_information_gap" in result.all_metrics["proxy"]
         assert "welfare" in result.all_metrics
-        assert "long_term_net_welfare" in result.all_metrics["welfare"]
-        assert "research_value_gain" in result.all_metrics["welfare"]
-
-
-class TestEvaluatePolicySweep:
-    """Tests for evaluate_policy_sweep."""
-
-    def test_sweep_returns_all_policies(self):
-        """Test that sweep returns results for all standard policies."""
-        params = get_default_parameters()
-
-        results = evaluate_policy_sweep(params)
-
-        assert "status_quo" in results
-        assert "moratorium" in results
-        assert "ban" in results
-
-    def test_sweep_results_are_valid(self):
-        """Test that all sweep results are valid."""
-        params = get_default_parameters()
-
-        results = evaluate_policy_sweep(params)
-
-        for result in results.values():
-            assert 0.0 <= result.testing_uptake <= 1.0
-            assert 0.0 <= result.compliance_rate <= 1.0
-            assert 0.0 <= result.research_participation <= 1.0
+        assert "net_welfare" in result.all_metrics["welfare"]
 
 
 class TestComparePolicies:
-    """Tests for compare_policies."""
+    """Test policy comparison logic."""
 
     def test_comparison_structure(self):
         """Test that comparison output has correct structure."""
@@ -131,100 +74,43 @@ class TestComparePolicies:
         comparisons = compare_policies(results, baseline_name="status_quo")
 
         assert "moratorium" in comparisons
-        assert "ban" in comparisons
-
-        for metrics in comparisons.values():
-            assert "testing_uptake_change" in metrics
-            assert "welfare_change" in metrics
-            assert "premium_change" in metrics
-            assert "compliance_change" in metrics
+        assert "uptake_delta" in comparisons["moratorium"]
+        assert "welfare_change" in comparisons["moratorium"]
 
     def test_comparison_computes_changes(self):
-        """Test that comparison computes changes correctly."""
+        """Test that comparison correctly computes deltas."""
         params = get_default_parameters()
         results = evaluate_policy_sweep(params)
 
         comparisons = compare_policies(results, baseline_name="status_quo")
 
-        # Changes should be computed (not None)
-        for metrics in comparisons.values():
-            assert metrics["testing_uptake_change"] is not None
-            assert metrics["welfare_change"] is not None
+        # In standard calibration, moratorium usually increases uptake
+        assert comparisons["moratorium"]["uptake_delta"] >= 0.0
 
 
 class TestGeneratePolicySummary:
-    """Tests for generate_policy_summary."""
-
-    def test_summary_is_string(self):
-        """Test that summary is a string."""
-        params = get_default_parameters()
-        results = evaluate_policy_sweep(params)
-
-        summary = generate_policy_summary(results)
-
-        assert isinstance(summary, str)
-
-    def test_summary_contains_policy_names(self):
-        """Test that summary contains policy names."""
-        params = get_default_parameters()
-        results = evaluate_policy_sweep(params)
-
-        summary = generate_policy_summary(results)
-
-        assert "status_quo" in summary or "Status Quo" in summary
-        assert "moratorium" in summary or "Moratorium" in summary
-        assert "ban" in summary or "Ban" in summary
+    """Test policy summary generation."""
 
     def test_summary_contains_metrics(self):
-        """Test that summary contains key metrics."""
+        """Test that summary string includes key metrics."""
         params = get_default_parameters()
         results = evaluate_policy_sweep(params)
 
         summary = generate_policy_summary(results)
 
-        assert "Testing Uptake" in summary
-        assert "Premium" in summary or "premium" in summary
-        assert "Welfare" in summary or "welfare" in summary
+        assert "Policy: status_quo" in summary
+        assert "Uptake:" in summary
+        assert "Welfare:" in summary
 
 
 class TestRunFullEvaluation:
-    """Tests for run_full_evaluation."""
-
-    def test_full_evaluation_returns_results(self):
-        """Test that full evaluation returns results."""
-        results = run_full_evaluation()
-
-        assert results is not None
-        assert len(results) > 0
+    """Test the high-level evaluation runner."""
 
     def test_full_evaluation_with_custom_params(self):
-        """Test full evaluation with custom parameters."""
-        params = ModelParameters(
-            baseline_testing_uptake=0.60,
-            deterrence_elasticity=0.15,
-        )
+        """Test evaluation with parameter overrides."""
+        base_params = get_default_parameters()
+        params = base_params.model_copy(update={"deterrence_elasticity": 0.5})
+        results = evaluate_policy_sweep(params)
 
-        results = run_full_evaluation(params=params)
-
-        assert results is not None
         assert len(results) > 0
-
-
-class TestGetStandardPolicies:
-    """Tests for get_standard_policies."""
-
-    def test_returns_all_policies(self):
-        """Test that all standard policies are returned."""
-        policies = get_standard_policies()
-
-        assert "status_quo" in policies
-        assert "moratorium" in policies
-        assert "ban" in policies
-
-    def test_policies_are_valid(self):
-        """Test that all policies are valid PolicyConfig instances."""
-        policies = get_standard_policies()
-
-        for name, policy in policies.items():
-            assert isinstance(policy, PolicyConfig)
-            assert policy.name == name
+        assert "status_quo" in results

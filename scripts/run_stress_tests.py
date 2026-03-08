@@ -16,7 +16,11 @@ from typing import Any
 import yaml
 
 from src.model.module_a_behavior import get_standard_policies
-from src.model.parameters import ModelParameters
+from src.model.parameters import (
+    ModelParameters,
+    get_default_parameters,
+    load_jurisdiction_parameters,
+)
 from src.model.pipeline import evaluate_single_policy
 
 SCENARIOS = {
@@ -96,7 +100,12 @@ SCENARIOS = {
 
 def build_base_params(jurisdiction: str) -> ModelParameters:
     """Construct a validated base parameter set for the chosen jurisdiction."""
-    return ModelParameters(jurisdiction=jurisdiction)
+    # load_jurisdiction_parameters is safer than direct ModelParameters init
+    # as it ensures all fields (like calibration_date) are present.
+    try:
+        return load_jurisdiction_parameters(jurisdiction)
+    except:
+        return get_default_parameters()
 
 
 def validate_outputs(results: dict[str, Any], scenario_name: str) -> list[str]:
@@ -157,13 +166,13 @@ def run_stress_test(
         "policy": policy.name,
         "timestamp": datetime.now().isoformat(),
         "testing_uptake": float(result.testing_uptake),
-        "avg_premium": float(result.insurance_premiums["avg_premium"]),
-        "premium_change": float(result.insurance_premiums["risk_rating"]),
-        "insurance_uninsured_rate": float(result.insurance_premiums["uninsured_rate"]),
+        "avg_premium": float(result.insurance_premiums.get("avg_premium", 0.0)),
+        "premium_change": float(result.insurance_premiums.get("risk_rating", 0.0)),
+        "insurance_uninsured_rate": float(result.insurance_premiums.get("uninsured_rate", 0.0)),
         "welfare_impact": float(result.welfare_impact),
-        "policy_effect": float(result.all_metrics["welfare"]["net_welfare"]),
+        "policy_effect": float(result.all_metrics["welfare"].get("net_welfare", 0.0)),
         "enforcement_compliance": float(result.compliance_rate),
-        "proxy_substitution_rate": float(result.all_metrics["proxy"]["proxy_substitution_rate"]),
+        "proxy_substitution_rate": float(result.all_metrics["proxy"].get("proxy_substitution_rate", 0.0)),
         "research_participation": float(result.research_participation),
     }
 

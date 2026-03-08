@@ -92,15 +92,10 @@ if "tornado_results" in st.session_state:
     lows = [r.lower_outcome for r in results]
     highs = [r.upper_outcome for r in results]
 
-    fig.add_trace(
-        go.Bar(
-            y=y_labels,
-            x=[h - l for h, l in zip(highs, lows, strict=False)],
-            base=lows,
-            orientation="h",
-            marker_color="#3498db",
-        )
-    )
+    # FIXED: avoid ambiguous variable names h and l
+    swings = [hv - lv for hv, lv in zip(highs, lows, strict=False)]
+
+    fig.add_trace(go.Bar(y=y_labels, x=swings, base=lows, orientation="h", marker_color="#3498db"))
     fig.update_layout(title="Impact on Testing Uptake", xaxis_tickformat=".1%")
     st.plotly_chart(fig, use_container_width=True)
 

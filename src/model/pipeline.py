@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from typing import Any, cast
 
 from jaxtyping import Array, Float
+from loguru import logger
 
 from . import (
     module_a_behavior as mod_a,
@@ -74,16 +75,22 @@ def evaluate_single_policy(
     """
     Run full evaluation pipeline for a single policy configuration.
     """
+    logger.info(f"Evaluating policy: {policy.name} (Jurisdiction: {params.jurisdiction})")
+
     # 1. Compute testing uptake (Module A)
     testing_uptake = mod_a.compute_testing_uptake(params, policy, rng_key=rng_key)
+    logger.debug(f"Computed testing uptake: {float(testing_uptake):.4f}")
 
     # 2. Compute insurance equilibrium (Module C)
     market_eq = mod_c.compute_equilibrium(params, policy)
+    logger.debug(f"Market Equilibrium: High Premium={float(market_eq.premium_high):.4f}, Low={float(market_eq.premium_low):.4f}")
 
     # 3. Compute data quality externalities (Module F)
     data_quality = mod_f.compute_data_quality_externality(params, policy)
+    logger.debug(f"Data Participation Rate: {float(data_quality.participation_rate):.4f}")
 
     # 4. Construct result
+    logger.success(f"Successfully evaluated policy: {policy.name}")
     return PolicyEvaluationResult(
         policy_name=policy.name,
         testing_uptake=testing_uptake,

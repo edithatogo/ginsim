@@ -128,7 +128,7 @@ def _genetic_altruism_core(
     family_risk_level: Float[Array, ""],
     altruism_strength: Float[Array, ""],
     family_size: Float[Array, ""],
-    kinship_multiplier: Float[Array, ""] = 1.0,
+    kinship_multiplier: Float[Array, ""] | float = 1.0,
 ) -> GeneticAltruismResult:
     # Altruism coefficient increases with family size and kinship
     altruism_coefficient = altruism_strength * (family_size / 4.0) * kinship_multiplier

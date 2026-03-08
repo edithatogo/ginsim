@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING
 
 import matplotlib as mpl
 import numpy as np
+from loguru import logger
 
 from scripts.reporting_common import build_reporting_bundle
 
@@ -45,7 +46,7 @@ def save_figure(fig: plt.Figure, output_path: Path, dpi: int, formats: list[str]
             fig.savefig(path, dpi=dpi, bbox_inches="tight", facecolor="white")
         else:
             fig.savefig(path, bbox_inches="tight", facecolor="white")
-        print(f"  Saved {path.name}")
+        logger.info(f"  Saved {path.name}")
     plt.close(fig)
 
 
@@ -53,7 +54,7 @@ def _write_caption(output_dir: Path, stem: str, caption: str) -> None:
     """Write a plain-text caption alongside generated figure files."""
     caption_path = output_dir / f"{stem}_caption.md"
     caption_path.write_text(caption.strip() + "\n", encoding="utf-8")
-    print(f"  Saved {caption_path.name}")
+    logger.info(f"  Saved {caption_path.name}")
 
 
 def plot_policy_bars(
@@ -241,9 +242,9 @@ def main() -> None:
     )
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    print("=" * 60)
-    print("FIGURE GENERATION")
-    print("=" * 60)
+
+    logger.info("Starting figure generation...")
+
 
     bundle = build_reporting_bundle(meta_dir=meta_dir, run_dir=run_dir)
     jurisdictions = sorted(bundle["run_dirs"])
@@ -259,10 +260,10 @@ def main() -> None:
             args.formats,
         )
 
-    print(f"Source runs: {', '.join(jurisdictions)}")
-    print("=" * 60)
-    print(f"Reporting figures generated in {output_dir}")
-    print("=" * 60)
+    logger.info(f"Source runs: {', '.join(jurisdictions)}")
+
+    logger.success(f"Reporting figures generated in {output_dir}")
+
 
 
 if __name__ == "__main__":

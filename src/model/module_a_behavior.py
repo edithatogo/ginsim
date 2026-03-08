@@ -14,6 +14,7 @@ import jax
 import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import Array, Float
+from loguru import logger
 
 from .parameters import PolicyConfig
 
@@ -122,6 +123,7 @@ def compute_testing_uptake(
     """
     Compute aggregate testing uptake.
     """
+    logger.debug(f"Computing testing uptake for policy: {policy.name}")
     # Compute perceived penalty
     perceived_penalty = compute_perceived_penalty(
         params.adverse_selection_elasticity,

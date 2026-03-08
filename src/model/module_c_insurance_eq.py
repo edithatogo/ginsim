@@ -183,8 +183,9 @@ def compute_equilibrium(
     proportion_high: Float[Array, ""] | float = 0.2,
 ) -> InsuranceEquilibrium:
     """
-    Compute market equilibrium based on policy regime.
+    Determine which equilibrium type exists under current parameters.
     """
+    # Note: cannot use logger inside @jit unless wrapped in lax.debug.callback
     return lax.cond(
         policy.allow_genetic_test_results,
         lambda _: separating_equilibrium(params, risk_high, risk_low, proportion_high),

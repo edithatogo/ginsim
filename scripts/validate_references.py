@@ -19,6 +19,8 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from loguru import logger
+
 SCAN_PATTERNS = ("*.md", "*.tex", "*.py", "*.yaml", "*.yml", "*.json")
 SKIP_PARTS = {".git", ".venv", "outputs", "__pycache__", ".pytest_cache", ".mypy_cache"}
 
@@ -238,24 +240,24 @@ def main() -> None:
     alias_file = project_root / args.alias_file
 
     if not references_file.exists():
-        print(f"ERROR: canonical references file not found: {references_file}")
+        logger.error(f"canonical references file not found: {references_file}")
         sys.exit(1)
 
     validator = ReferenceValidator(references_file, alias_file, project_root)
     report = validator.run()
 
-    print(report.summary())
+    logger.info(report.summary())
 
     if args.report:
         output_path = project_root / args.output
         output_path.write_text(report.detailed_report(), encoding="utf-8")
-        print(f"Detailed report saved to: {output_path}")
+        logger.info(f"Detailed report saved to: {output_path}")
 
     if report.unresolved_keys or report.missing_alias_targets:
-        print("Validation failed: unresolved or broken reference mappings remain.")
+        logger.error("Validation failed: unresolved or broken reference mappings remain.")
         sys.exit(1)
 
-    print("Validation passed.")
+    logger.success("Validation passed.")
     sys.exit(0)
 
 

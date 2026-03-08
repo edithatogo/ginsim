@@ -47,6 +47,7 @@ class ModelParameters(BaseModel):
     # Economics
     pass_through_rate: float = 0.75
     research_participation_elasticity: float = -0.1
+    research_participation_value: float = 50000.0
 
     # Enforcement
     enforcement_effectiveness: float = 0.50

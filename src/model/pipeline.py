@@ -114,7 +114,7 @@ def evaluate_single_policy(
         baseline_premium=0.2,
         insurer_profits=market_eq.insurer_profits,
         baseline_profits=0.05,
-        research_value_loss=float(1.0 - data_quality.participation_rate) * 50000.0,
+        research_value_loss=float(1.0 - data_quality.participation_rate) * p_params.research_participation_value,
     )
 
     logger.success(f"Full logic integration complete for {p_policy.name}")

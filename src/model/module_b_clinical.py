@@ -20,11 +20,11 @@ from jaxtyping import Array, Float
 class DiseaseCohort:
     """Represents a specific genetic condition cohort."""
     name: str
-    prevalence: Any
-    baseline_risk: Any
-    prevention_efficacy: Any
-    qaly_loss_per_event: Any
-    cost_per_event: Any
+    prevalence: float | Array
+    baseline_risk: float | Array
+    prevention_efficacy: float | Array
+    qaly_loss_per_event: float | Array
+    cost_per_event: float | Array
 
 # Register PyTree for JAX compatibility
 jax.tree_util.register_pytree_node(

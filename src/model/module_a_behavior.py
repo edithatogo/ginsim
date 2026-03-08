@@ -57,10 +57,11 @@ def compute_perceived_penalty(
     sum_insured_caps: dict[str, float] | None = None,
     high_sum_insured_share: float = 0.25,
     taper_range: float = 0.0,
+    acc_deterrence_offset: float = 0.0,
 ) -> Float[Array, ""]:
     """
     Compute perceived discrimination penalty under policy regime.
-    Now supports smooth regulatory tapering.
+    Now supports smooth regulatory tapering and NZ ACC offsets.
     """
     # Base penalty from adverse selection
     base_penalty = adverse_selection_elasticity * baseline_loading
@@ -71,22 +72,6 @@ def compute_perceived_penalty(
     if allow_genetic_test_results:
         restriction_strength = 0.0
     elif sum_insured_caps is not None:
-        # Tapering logic:
-        # We model a 'Representative Individual' whose insurance demand is split.
-        # The protection factor is 1.0 for those below cap, 0.0 for those above,
-        # and smooth for those in the taper range.
-
-        # Approximate the aggregate protection by evaluating at the median high-buyer
-        # or by using the high_sum_insured_share.
-
-        # Continuous approximation:
-        # We assume the 'representative' high buyer is at (Cap + 0.5 * Taper)
-        # and the share of people in the taper is part of the high_sum_insured_share.
-
-        # restriction = (Share_Low * 1.0) + (Share_High * Taper_at_High_Buyer)
-        # For now, we use high_sum_insured_share as the 'unprotected' group
-        # but let the taper_range reduce their perceived risk if it's wide.
-
         avg_protection_high = taper_function(
             jnp.asarray(1.0), # Normalized proxy for high buyers
             jnp.asarray(0.0),
@@ -103,8 +88,12 @@ def compute_perceived_penalty(
     penalty_reduction = restriction_strength * (0.5 + 0.5 * enforcement_factor)
     penalty_reduction = jnp.clip(penalty_reduction, 0.0, 0.95)
 
+    # ACC Offset: Reduces the perceived 'pain' of insurance discrimination
+    # because of the no-fault safety net for injury/treatment injury.
+    effective_penalty_base = base_penalty * (1.0 - acc_deterrence_offset)
+
     # Final perceived penalty
-    perceived_penalty = base_penalty * (1.0 - penalty_reduction)
+    perceived_penalty = effective_penalty_base * (1.0 - penalty_reduction)
 
     return jnp.asarray(perceived_penalty, dtype=jnp.float32)
 
@@ -124,10 +113,10 @@ def compute_perceived_penalty_wrapper(
         params.moratorium_effect,
         policy.sum_insured_caps,
         getattr(params, "high_sum_insured_share", 0.25),
-        policy.taper_range
+        policy.taper_range,
+        getattr(params, "acc_deterrence_offset", 0.0),
     )
     return float(penalty)
-
 
 def compute_testing_utility(
     benefits: Float[Array, "*"],

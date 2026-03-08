@@ -23,7 +23,6 @@ from src.model.game_diagrams import (
     create_module_a_diagram,
     create_module_c_diagram,
     create_module_d_diagram,
-    create_enforcement_diagram,
     create_module_f_diagram,
 )
 

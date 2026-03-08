@@ -14,7 +14,7 @@ from typing import Any
 
 import jax
 import jax.numpy as jnp
-from jax import jit, vmap
+from jax import jit
 from jaxtyping import Array, Float
 
 
@@ -27,10 +27,11 @@ class InformationLeakageResult:
     effective_uptake: Any
     welfare_loss: Any
 
+
 jax.tree_util.register_pytree_node(
     InformationLeakageResult,
     lambda x: ((x.reconstruction_accuracy, x.bypass_rate, x.effective_uptake, x.welfare_loss), ()),
-    lambda aux, children: InformationLeakageResult(*children)
+    lambda aux, children: InformationLeakageResult(*children),
 )
 
 
@@ -43,10 +44,14 @@ class GeneticAltruismResult:
     spillover_effect: Any
     welfare_impact: Any
 
+
 jax.tree_util.register_pytree_node(
     GeneticAltruismResult,
-    lambda x: ((x.family_testing_rate, x.altruism_coefficient, x.spillover_effect, x.welfare_impact), ()),
-    lambda aux, children: GeneticAltruismResult(*children)
+    lambda x: (
+        (x.family_testing_rate, x.altruism_coefficient, x.spillover_effect, x.welfare_impact),
+        (),
+    ),
+    lambda aux, children: GeneticAltruismResult(*children),
 )
 
 
@@ -60,10 +65,14 @@ class CascadeTestingResult:
     total_tests: Any
     cost_effectiveness: Any
 
+
 jax.tree_util.register_pytree_node(
     CascadeTestingResult,
-    lambda x: ((x.cascade_rate, x.index_cases, x.secondary_cases, x.total_tests, x.cost_effectiveness), ()),
-    lambda aux, children: CascadeTestingResult(*children)
+    lambda x: (
+        (x.cascade_rate, x.index_cases, x.secondary_cases, x.total_tests, x.cost_effectiveness),
+        (),
+    ),
+    lambda aux, children: CascadeTestingResult(*children),
 )
 
 
@@ -84,7 +93,7 @@ def _information_leakage_core(
     bypass_rate = jnp.clip(base_bypass * acceleration, 0.0, 1.0)
 
     # Effective uptake = baseline + (ban effect reduced by leakage)
-    ban_boost = 0.20  
+    ban_boost = 0.20
     effective_uptake = baseline_uptake + ban_boost * (1 - bypass_rate)
 
     # Welfare loss from leakage
@@ -97,6 +106,7 @@ def _information_leakage_core(
         welfare_loss=welfare_loss,
     )
 
+
 def information_leakage_game(
     baseline_uptake: Array | float,
     ban_effectiveness: Array | float,
@@ -108,7 +118,7 @@ def information_leakage_game(
         jnp.asarray(baseline_uptake),
         jnp.asarray(ban_effectiveness),
         jnp.asarray(proxy_accuracy),
-        jnp.asarray(insurer_inference_strength)
+        jnp.asarray(insurer_inference_strength),
     )
 
 
@@ -122,22 +132,23 @@ def _genetic_altruism_core(
 ) -> GeneticAltruismResult:
     # Altruism coefficient increases with family size and kinship
     altruism_coefficient = altruism_strength * (family_size / 4.0) * kinship_multiplier
-    
+
     # Spillover effect: information benefits non-testers
     spillover_effect = family_risk_level * altruism_coefficient * 0.5
-    
+
     # Effective testing rate
     family_testing_rate = jnp.clip(baseline_uptake + spillover_effect, 0.0, 1.0)
-    
+
     # Welfare impact
     welfare_impact = family_testing_rate * 100000 * altruism_coefficient
-    
+
     return GeneticAltruismResult(
         family_testing_rate=family_testing_rate,
         altruism_coefficient=altruism_coefficient,
         spillover_effect=spillover_effect,
         welfare_impact=welfare_impact,
     )
+
 
 def genetic_altruism_game(
     baseline_uptake: Array | float,
@@ -150,7 +161,7 @@ def genetic_altruism_game(
         jnp.asarray(baseline_uptake),
         jnp.asarray(family_risk_level),
         jnp.asarray(altruism_strength),
-        jnp.asarray(family_size)
+        jnp.asarray(family_size),
     )
 
 
@@ -165,18 +176,18 @@ def _cascade_testing_core(
 ) -> CascadeTestingResult:
     # Cascade rate: additional tests per index case
     cascade_rate = family_contact_rate * uptake_after_contact * (average_family_size - 1)
-    
+
     # Calculate cases
     n_individuals = 10000
     index_cases = index_case_rate * n_individuals
     secondary_cases = index_cases * cascade_rate
     total_tests = index_cases + secondary_cases
-    
+
     # Cost effectiveness: cost per detection
     total_cost = total_tests * cost_per_test
     total_detections = (index_cases * detection_yield) + (secondary_cases * (detection_yield / 2.0))
     cost_effectiveness = total_cost / (total_detections + 1e-10)
-    
+
     return CascadeTestingResult(
         cascade_rate=cascade_rate,
         index_cases=index_cases,
@@ -184,6 +195,7 @@ def _cascade_testing_core(
         total_tests=total_tests,
         cost_effectiveness=cost_effectiveness,
     )
+
 
 def cascade_testing_game(
     index_case_rate: Array | float,
@@ -200,5 +212,5 @@ def cascade_testing_game(
         jnp.asarray(uptake_after_contact),
         jnp.asarray(average_family_size),
         jnp.asarray(cost_per_test),
-        jnp.asarray(detection_yield)
+        jnp.asarray(detection_yield),
     )

@@ -65,3 +65,8 @@ This registry is the index of Conductor tracks for this repository.
 - `gdpe_0019_review_and_author_metadata` is complete and records the next implementation priorities: canonical policy-ID unification, scenario-engine repair, and broader page-level dashboard coverage.
 - `gdpe_0020_dashboard_policy_alignment_and_publication_sync` is complete and records the closure of active-path placeholder debt, traceability reconciliation, dashboard plain-language usability, reporting hardening, and primary protocol/document synchronization.
 - `gdpe_0021_manuscript_harmonization_and_submission_pack` is complete and records the reviewer-facing harmonization, manuscript asset inventory, submission-gap register, and archival qualification pass.
+
+---
+
+- [ ] **Track: Cleanse remote repo of AI artifacts/context, relocate to local_only, and perform high-rigor audit.**
+*Link: [./tracks/repo_scrub_audit_20260308/](./tracks/repo_scrub_audit_20260308/)*

@@ -1,6 +1,8 @@
 import pytest
+
 from src.model.parameters import load_jurisdiction_parameters
 from src.model.pipeline import evaluate_single_policy, get_standard_policies
+
 
 @pytest.mark.parametrize("jurisdiction", ["australia", "new_zealand", "uk", "canada", "us"])
 def test_pipeline_execution_matrix(jurisdiction):
@@ -35,12 +37,12 @@ def test_threshold_blending_impact(jurisdiction):
 
     # Status Quo has no thresholds
     sq = policies["status_quo"]
-    res_sq = evaluate_single_policy(params, sq)
+    _ = evaluate_single_policy(params, sq)
 
     # Check that premiums are populated and contain high/low
     assert "premium_high" in res_moratorium.insurance_premiums
     assert "premium_low" in res_moratorium.insurance_premiums
-    
+
     # Premium high should be >= premium low
     ph = float(res_moratorium.insurance_premiums["premium_high"])
     pl = float(res_moratorium.insurance_premiums["premium_low"])

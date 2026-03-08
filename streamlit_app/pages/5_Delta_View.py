@@ -14,8 +14,7 @@ import pandas as pd
 import streamlit as st
 
 from src.model.fairness import audit_policy_fairness
-from src.model.parameters import load_jurisdiction_parameters
-from src.model.pipeline import evaluate_single_policy, get_standard_policies
+from src.model.pipeline import evaluate_single_policy
 from src.model.scenario_analysis import evaluate_scenario, load_scenarios
 
 st.set_page_config(page_title="Fairness Audit", page_icon="⚖️", layout="wide")
@@ -25,13 +24,12 @@ st.markdown("Auditing policy reforms against the 'Separating' Status Quo baselin
 
 # Controls
 jurisdiction = st.sidebar.selectbox("Jurisdiction", ["Australia", "New Zealand", "UK", "Canada", "US"])
-baseline_key = "au_status_quo" # Standard anchor
+baseline_key = "au_status_quo"
 
 scenarios = load_scenarios(project_root / "configs" / "scenarios.yaml")
 
 if st.button("⚖️ Audit Policies", type="primary"):
     with st.spinner("Executing fairness audit matrix..."):
-        # We use standard model function
         def model_func(params, policy):
             return evaluate_single_policy(params, policy)
         
@@ -39,10 +37,11 @@ if st.button("⚖️ Audit Policies", type="primary"):
         b_res = evaluate_scenario(baseline_key, scenarios[baseline_key], model_func)
         
         results = []
-        selected_policies = ["au_moratorium", "au_ban"] # Focus on primary comparisons
+        selected_policies = ["au_moratorium", "au_ban"]
         
         for pk in selected_policies:
-            if pk not in scenarios: continue
+            if pk not in scenarios:
+                continue
             r = evaluate_scenario(pk, scenarios[pk], model_func)
             
             u_delta = float(r.testing_uptake) - float(b_res.testing_uptake)

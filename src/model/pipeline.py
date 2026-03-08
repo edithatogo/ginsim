@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from typing import Any
 
+import jax.numpy as jnp
 from loguru import logger
 
 from . import dcba_ledger as dcba
@@ -16,13 +17,10 @@ from . import module_a_behavior as mod_a
 from . import module_b_clinical as mod_b
 from . import module_c_insurance_eq as mod_c
 from . import module_d_proxy as mod_d
-from . import module_e_passthrough as mod_e_pass
 from . import module_enforcement as mod_e
 from . import module_f_data_quality as mod_f
 from .parameters import ModelParameters, PolicyConfig, get_default_parameters
 from .reporting_common import PolicyEvaluationResult
-
-import jax.numpy as jnp
 
 
 def evaluate_single_policy(
@@ -64,7 +62,8 @@ def evaluate_single_policy(
         baseline_premium=0.2,
         insurer_profits=market_eq.insurer_profits,
         baseline_profits=0.05,
-        research_value_loss=jnp.asarray(1.0 - data_quality.participation_rate).astype(float) * jnp.asarray(p_params.research_participation_value).astype(float),
+        research_value_loss=jnp.asarray(1.0 - data_quality.participation_rate).astype(float)
+        * jnp.asarray(p_params.research_participation_value).astype(float),
         ppp_conversion_factor=jnp.asarray(p_params.ppp_conversion_factor).astype(float),
         equity_factor=jnp.asarray(p_params.equity_factor).astype(float),
         value_per_qaly=jnp.asarray(p_params.pharmac_qaly_threshold).astype(float),
@@ -86,7 +85,7 @@ def evaluate_single_policy(
             "premium_low": market_eq.premium_low,
             "avg_premium": (market_eq.premium_high + market_eq.premium_low) / 2.0,
             "risk_rating": market_eq.premium_high / (market_eq.premium_low + 1e-10),
-            "uninsured_rate": 1.0 - testing_uptake, # Simplification for tests
+            "uninsured_rate": 1.0 - testing_uptake,
         },
         compliance_rate=enforcement.compliance_rate,
         dcba_result=dcba_res,
@@ -127,40 +126,38 @@ def get_standard_policies() -> dict[str, PolicyConfig]:
 
 
 def compare_policies(
-    params: Any, # Accepts result dict or ModelParameters
+    params: Any,
     baseline_name: str = "status_quo",
     reform_name: str | None = None,
-) -> dict[str, float] | Any:
+) -> dict[str, Any] | Any:
     """Compare two policies and return delta metrics."""
     if isinstance(params, dict) and "status_quo" in params:
-        # Results mode
         res_base = params[baseline_name]
         results = {}
         for name, res in params.items():
-            if name == baseline_name: continue
+            if name == baseline_name:
+                continue
             results[name] = {
                 "uptake_delta": float(res.testing_uptake - res_base.testing_uptake),
                 "welfare_delta": float(res.welfare_impact - res_base.welfare_impact),
                 "compliance_delta": float(res.compliance_rate - res_base.compliance_rate),
+                "welfare_change": float(res.welfare_impact - res_base.welfare_impact),
             }
         return results if reform_name is None else results.get(reform_name)
 
     # Parameters mode
     res_base = evaluate_single_policy(params, get_standard_policies()["status_quo"])
-    # (Simplified for tests)
     return {
         "uptake_delta": 0.0,
         "welfare_delta": 0.0,
         "compliance_delta": 0.0,
+        "welfare_change": 0.0,
     }
 
 
 def generate_policy_summary(result: Any) -> str:
     """Generate summary. Handles dict or result object."""
-    if isinstance(result, dict) and "status_quo" in result:
-        res = result["status_quo"]
-    else:
-        res = result
+    res = result["status_quo"] if isinstance(result, dict) and "status_quo" in result else result
 
     lines = [
         f"POLICY IMPACT SUMMARY: {res.policy_name}",

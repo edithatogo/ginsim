@@ -4,9 +4,10 @@ Common reporting types and data structures.
 
 from __future__ import annotations
 
-import jax
 from dataclasses import dataclass
 from typing import Any
+
+import jax
 
 from .dcba_ledger import DCBAResult
 

@@ -33,7 +33,7 @@ class PolicyConfig:
     def __eq__(self, other):
         if not isinstance(other, PolicyConfig):
             return False
-        return (self.name == other.name and 
+        return (self.name == other.name and
                 self.allow_genetic_test_results == other.allow_genetic_test_results and
                 self.allow_family_history == other.allow_family_history and
                 self.penalty_type == other.penalty_type)
@@ -108,7 +108,7 @@ class ModelParameters:
         if not isinstance(other, ModelParameters):
             return False
         # Only compare static fields to avoid TracerBoolConversionError
-        return (self.jurisdiction == other.jurisdiction and 
+        return (self.jurisdiction == other.jurisdiction and
                 self.calibration_date == other.calibration_date)
 
     def model_copy(self, update: dict[str, Any]) -> ModelParameters:

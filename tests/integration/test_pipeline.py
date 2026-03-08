@@ -1,6 +1,11 @@
-import pytest
-from src.model.parameters import get_default_parameters, PolicyConfig
-from src.model.pipeline import evaluate_single_policy, evaluate_policy_sweep, compare_policies, generate_policy_summary
+from src.model.parameters import PolicyConfig, get_default_parameters
+from src.model.pipeline import (
+    compare_policies,
+    evaluate_policy_sweep,
+    evaluate_single_policy,
+    generate_policy_summary,
+)
+
 
 class TestEvaluateSinglePolicy:
     def test_basic_evaluation(self):
@@ -67,7 +72,7 @@ class TestComparePolicies:
         results = evaluate_policy_sweep(params)
 
         comparisons = compare_policies(results, baseline_name="status_quo")
-        
+
         # Welfare delta should be non-zero for ban vs sq
         assert abs(comparisons["ban"]["welfare_delta"]) > 0
 

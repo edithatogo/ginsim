@@ -13,7 +13,6 @@ import jax
 import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import Array, Float
-from loguru import logger
 
 from .parameters import PolicyConfig
 
@@ -163,8 +162,8 @@ def compute_testing_uptake(
         )
 
     utilities = compute_testing_utility(
-        benefits, 
-        perceived_penalty, 
+        benefits,
+        perceived_penalty,
         medicare_cost_share=getattr(params, "medicare_cost_share", 0.0),
         remoteness_index=remoteness_index,
         remoteness_weight=getattr(params, "remoteness_weight", 0.20)

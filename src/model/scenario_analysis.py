@@ -107,7 +107,7 @@ def _build_policy_config(scenario_name: str, scenario_config: dict[str, Any]) ->
 
     parameter_values = scenario_config.get("parameters", {})
     valid_policy_fields = {f.name for f in fields(PolicyConfig)}
-    
+
     for key, value in parameter_values.items():
         if key in valid_policy_fields and key not in policy_updates:
             policy_updates[key] = value

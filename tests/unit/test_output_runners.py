@@ -1,5 +1,5 @@
-import pytest
 from scripts import run_posterior_predictive, run_stress_tests
+
 
 def test_simulate_model_outputs_uses_active_pipeline() -> None:
     draws = {
@@ -8,7 +8,7 @@ def test_simulate_model_outputs_uses_active_pipeline() -> None:
     }
 
     simulations = run_posterior_predictive.simulate_model_outputs(draws, 3)
-    
+
     # Check one of the output arrays
     assert len(simulations["testing_uptake"]) == 3
     assert float(simulations["testing_uptake"][0]) > 0

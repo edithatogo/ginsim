@@ -28,7 +28,7 @@ def audit_policy_fairness(
     Uses Any to allow JAX tracers.
     """
     reasons = []
-    
+
     # 1. Equity of Access (Uptake)
     # If uptake increases, it's generally fairer (less deterrence)
     u_fair = float(uptake_delta) >= -0.01
@@ -48,7 +48,7 @@ def audit_policy_fairness(
     # Aggregate
     is_fair = u_fair and w_fair and p_fair
     score = (float(u_fair) + float(w_fair) + float(p_fair)) / 3.0
-    
+
     if is_fair:
         verdict = "FAIR: Policy enhances or maintains social equity."
     elif score >= 0.6:

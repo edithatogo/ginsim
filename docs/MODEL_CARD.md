@@ -1,7 +1,7 @@
 # Model card (draft)
 
-**Project:** Genetic discrimination policy economic evaluation  
-**Repo version:** active `gdpe_0020` working state  
+**Project:** Genetic discrimination policy economic evaluation
+**Repo version:** active `gdpe_0020` working state
 **Date:** 07 March 2026
 
 ## Intended use

@@ -1,5 +1,5 @@
 # Scenario Definitions for Genetic Discrimination Policy Analysis
-# 
+#
 # This file defines standardized policy scenarios for comparative analysis.
 # Each scenario specifies parameter values for different policy regimes.
 
@@ -7,7 +7,7 @@ scenarios:
   # ========================================================================
   # AUSTRALIA 2025 SCENARIOS
   # ========================================================================
-  
+
   au_2025_ban:
     name: "Australia 2025 Genetic Ban"
     description: "Complete ban on use of genetic test results in life insurance"
@@ -23,7 +23,7 @@ scenarios:
     expected_outcomes:
       testing_uptake_increase: 0.18  # +18% vs status quo
       welfare_impact: "Positive for high-risk individuals"
-      
+
   au_fsc_moratorium:
     name: "FSC Moratorium (Australia)"
     description: "Financial Services Council moratorium on genetic discrimination"
@@ -38,7 +38,7 @@ scenarios:
     expected_outcomes:
       testing_uptake_increase: 0.12  # +12% vs status quo
       welfare_impact: "Moderate positive"
-      
+
   au_status_quo:
     name: "Australia Status Quo"
     description: "Current Australian policy framework (pre-2025)"
@@ -58,7 +58,7 @@ scenarios:
   # ========================================================================
   # NEW ZEALAND SCENARIOS
   # ========================================================================
-  
+
   nz_current:
     name: "New Zealand Current Policy"
     description: "Current NZ approach to genetic discrimination"
@@ -77,7 +77,7 @@ scenarios:
   # ========================================================================
   # INTERNATIONAL BENCHMARKS
   # ========================================================================
-  
+
   usa_gina:
     name: "USA GINA (Health Only)"
     description: "Genetic Information Nondiscrimination Act - health insurance/employment only"
@@ -93,7 +93,7 @@ scenarios:
     expected_outcomes:
       testing_uptake_increase: 0.08  # Limited to health insurance
       welfare_impact: "Positive for health insurance, neutral for life"
-      
+
   uk_code:
     name: "UK Code on Genetic Testing"
     description: "Voluntary code with Huntington's disease exception"
@@ -109,7 +109,7 @@ scenarios:
     expected_outcomes:
       testing_uptake_increase: 0.10
       welfare_impact: "Moderate positive with exceptions"
-      
+
   canada_gnda:
     name: "Canada GNDA"
     description: "Genetic Non-Discrimination Act - criminal prohibition"
@@ -131,7 +131,7 @@ scenarios:
   # ========================================================================
   # POLICY SANDBOX - CUSTOM SCENARIOS
   # ========================================================================
-  
+
   sandbox_strong_enforcement:
     name: "Strong Enforcement Scenario"
     description: "High enforcement with moderate penalties"
@@ -147,7 +147,7 @@ scenarios:
     expected_outcomes:
       testing_uptake_increase: 0.15
       welfare_impact: "Positive"
-      
+
   sandbox_weak_enforcement:
     name: "Weak Enforcement Scenario"
     description: "Low enforcement with low penalties"

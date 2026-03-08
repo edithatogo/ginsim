@@ -7,7 +7,7 @@
 # =============================================================================
 # NOTES: NZ EVIDENCE CONTEXT
 # =============================================================================
-# 
+#
 # New Zealand has an extremely weak evidence base:
 # - 0 quantitative studies on genetic discrimination and insurance
 # - 1 HRC Inquiry report (2020) with qualitative submissions
@@ -38,7 +38,7 @@ module_a_calibration_nz:
         jurisdiction: "Netherlands (applied to NZ)"
         notes: "No NZ-specific data; assume similar to developed health systems"
         uncertainty: "Wide uncertainty due to extrapolation"
-      
+
       prior:
         distribution: "Beta"
         parameters:
@@ -60,7 +60,7 @@ module_a_calibration_nz:
         jurisdiction: "NZ (HRC) + US (quantitative)"
         notes: "HRC Inquiry suggests lower concerns than US; ACC may reduce insurance worries"
         uncertainty: "Very wide: 0.05-0.25"
-      
+
       prior:
         distribution: "Beta"
         parameters:
@@ -83,7 +83,7 @@ module_a_calibration_nz:
         jurisdiction: "New Zealand"
         notes: "Informal adoption of AU FSC moratorium; no formal NZ policy"
         uncertainty: "Extremely wide: 0.02-0.25"
-      
+
       prior:
         distribution: "Beta"
         parameters:
@@ -123,7 +123,7 @@ module_c_calibration_nz:
         jurisdiction: "US model applied to NZ"
         notes: "Lower than AU due to higher market concentration"
         uncertainty: "Very wide: 0.02-0.12"
-      
+
       prior:
         distribution: "Normal"
         parameters:
@@ -146,7 +146,7 @@ module_c_calibration_nz:
         jurisdiction: "United States (applied to NZ)"
         notes: "Assume similar to AU; no NZ data"
         uncertainty: "Very wide: -0.40 to -0.05"
-      
+
       prior:
         distribution: "Normal"
         parameters:
@@ -169,7 +169,7 @@ module_c_calibration_nz:
         jurisdiction: "New Zealand (informal)"
         notes: "Informal adoption of AU caps; no formal NZ loading data"
         uncertainty: "Extremely wide: 0.05-0.25"
-      
+
       prior:
         distribution: "Normal"
         parameters:
@@ -207,7 +207,7 @@ module_d_calibration_nz:
         value: 0.68
         source: "tabor_family_history_proxy_2018 (extrapolated)"
         jurisdiction: "US (applied to NZ)"
-      
+
       prior:
         distribution: "Beta"
         parameters:
@@ -222,7 +222,7 @@ module_d_calibration_nz:
         value: 0.40
         source: "lowenstein_genetic_discrimination_insurance_2021 (extrapolated)"
         jurisdiction: "Multiple (applied to NZ)"
-      
+
       prior:
         distribution: "Beta"
         parameters:
@@ -243,7 +243,7 @@ module_e_calibration_nz:
         value: 0.70
         source: "finkelstein_insurance_market_structure_2019 (adapted)"
         jurisdiction: "US (adapted for NZ concentration)"
-      
+
       prior:
         distribution: "Beta"
         parameters:
@@ -267,7 +267,7 @@ module_f_calibration_nz:
         value: -0.10
         source: "blevins_genomic_data_bias_2020 (extrapolated)"
         jurisdiction: "International (applied to NZ)"
-      
+
       prior:
         distribution: "Normal"
         parameters:
@@ -300,7 +300,7 @@ enforcement_calibration_nz:
         jurisdiction: "New Zealand"
         notes: "HRC complaints process; ~2 complaints/year"
         uncertainty: "Extremely wide: 0.15-0.70"
-      
+
       prior:
         distribution: "Beta"
         parameters:
@@ -323,7 +323,7 @@ enforcement_calibration_nz:
         jurisdiction: "New Zealand"
         notes: "~2 complaints per year; ~200 genetic tests/year → ~0.01"
         uncertainty: "Extremely wide: 0.002-0.03"
-      
+
       prior:
         distribution: "Beta"
         parameters:
@@ -348,40 +348,40 @@ enforcement_calibration_nz:
 
 nz_priors_summary:
   total_parameters: 12
-  
+
   by_quality:
     moderate: 0
     low: 0
     very_low: 12  # 100% very low quality
-  
+
   by_source:
     nz_specific: 3  # HRC Inquiry only
     extrapolated: 9  # International/AU adapted
-  
+
   prior_inflation_factor:
     description: "NZ priors have wider SDs than AU equivalents"
     average_inflation: 1.4  # Average SD is 40% wider than AU
     range: "1.0x to 1.75x"
-  
+
   by_evpppi_priority:
     very_high: 7
     high: 3
     medium: 2
     low: 0
-  
+
   key_uncertainties:
     - enforcement_effectiveness (SD: 0.14)
     - proxy_substitution_rate (SD: 0.11)
     - adverse_selection_elasticity (SD: 0.035)
     - moratorium_effect (SD: 0.035)
-  
+
   evidence_gaps:
     - "No quantitative NZ studies on any parameter"
     - "HRC Inquiry (2020) is only NZ-specific evidence"
     - "All other parameters extrapolated from AU/international"
     - "Market structure differences not well understood"
     - "ACC scheme effects unknown"
-  
+
   voi_implications:
     - "EVPI expected to be very high for NZ"
     - "Nearly all parameters are high priority for evidence generation"
@@ -396,23 +396,23 @@ au_nz_comparison:
   parameter_count:
     australia: 12
     new_zealand: 12
-  
+
   evidence_quality:
     australia: "25% Moderate, 33% Low, 42% Very Low"
     new_zealand: "0% Moderate, 0% Low, 100% Very Low"
-  
+
   prior_uncertainty:
     australia_mean_sd: 0.055
     new_zealand_mean_sd: 0.077
     ratio: "NZ SDs are 40% wider on average"
-  
+
   key_differences:
     - "NZ has no quantitative evidence (AU has 3 moderate/low quality studies)"
     - "NZ enforcement weaker (no formal policy)"
     - "NZ market more concentrated (may affect adverse selection)"
     - "NZ has ACC scheme (may reduce insurance concerns)"
     - "NZ follows AU policy informally (not formal adoption)"
-  
+
   modelling_implications:
     - "NZ results will have much wider uncertainty intervals"
     - "Cross-Tasman comparisons should emphasize uncertainty differences"

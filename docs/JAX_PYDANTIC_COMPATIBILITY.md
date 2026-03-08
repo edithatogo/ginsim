@@ -119,7 +119,7 @@ from jax import jit
 class Model(eqx.Module):
     """JAX-compatible module."""
     weight: chex.Array
-    
+
     @jit
     def __call__(self, x):
         return self.weight * x

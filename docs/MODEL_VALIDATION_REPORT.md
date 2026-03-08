@@ -1,8 +1,8 @@
 # Model Validation Report
 
-**Track:** gdpe_0013_external_validation  
-**Phase:** 3 — Final Synthesis  
-**Date:** 2026-03-05  
+**Track:** gdpe_0013_external_validation
+**Phase:** 3 — Final Synthesis
+**Date:** 2026-03-05
 **Version:** 2.1 (historical milestone record)
 
 ---
@@ -96,6 +96,6 @@ This document reports the historical validation results recorded at the `gdpe_00
 
 ---
 
-**Version:** 2.1  
-**Date:** 2026-03-07  
+**Version:** 2.1
+**Date:** 2026-03-07
 **Status:** Historical milestone record

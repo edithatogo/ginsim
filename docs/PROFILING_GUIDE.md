@@ -1,7 +1,7 @@
 # Profiling Guide
 
-**Track:** gdpe_0003_model_implementation  
-**Purpose:** Performance profiling and optimization  
+**Track:** gdpe_0003_model_implementation
+**Purpose:** Performance profiling and optimization
 **Date:** 2026-03-03
 
 ---
@@ -337,6 +337,6 @@ def loss(params):
 
 ---
 
-**Version:** 1.0  
-**Date:** 2026-03-03  
+**Version:** 1.0
+**Date:** 2026-03-03
 **Track:** gdpe_0003_model_implementation

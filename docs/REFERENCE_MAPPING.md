@@ -1,8 +1,8 @@
 # Reference Mapping Report
 
-**Track:** gdpe_0004_quality_assurance  
-**Phase:** 4 — Reference Mapping  
-**Date:** 2026-03-03  
+**Track:** gdpe_0004_quality_assurance
+**Phase:** 4 — Reference Mapping
+**Date:** 2026-03-03
 **Status:** IN PROGRESS
 
 ---
@@ -79,8 +79,8 @@
 | **Enforcement** | 2 | 0 | 0 | 2 |
 | **TOTAL** | **12** | **0** | **6** | **6** |
 
-**Coverage:** 50% (6/12) have at least 1 reference  
-**Target:** 100% have ≥1 reference, ≥50% have ≥2 references  
+**Coverage:** 50% (6/12) have at least 1 reference
+**Target:** 100% have ≥1 reference, ≥50% have ≥2 references
 **Current:** 0% have ≥2 references
 
 ---

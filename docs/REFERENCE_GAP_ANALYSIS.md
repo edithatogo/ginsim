@@ -1,20 +1,20 @@
 # Reference Gap Analysis
 
-**Track:** gdpe_0004_quality_assurance  
-**Phase:** 4 — Reference Mapping  
+**Track:** gdpe_0004_quality_assurance
+**Phase:** 4 — Reference Mapping
 **Date:** 2026-03-03
 
 ---
 
 ## Summary
 
-**Total parameters:** 12  
-**With ≥2 references:** 0 (0%)  
-**With 1 reference:** 6 (50%)  
+**Total parameters:** 12
+**With ≥2 references:** 0 (0%)
+**With 1 reference:** 6 (50%)
 **With 0 references:** 6 (50%)
 
-**Target:** ≥50% with ≥2 references  
-**Current:** 0%  
+**Target:** ≥50% with ≥2 references
+**Current:** 0%
 **Gap:** 50%
 
 ---

@@ -1,6 +1,6 @@
 # Implementation Plan: Implement Dashboard/Policy Alignment, Plain-Language UX, and Document Sync
 
-**Track ID:** gdpe_0020_dashboard_policy_alignment_and_publication_sync  
+**Track ID:** gdpe_0020_dashboard_policy_alignment_and_publication_sync
 **Estimated duration:** 5-7 days
 
 ---
@@ -51,5 +51,5 @@
 
 ---
 
-**Version:** 1.2  
+**Version:** 1.2
 **Status:** Complete

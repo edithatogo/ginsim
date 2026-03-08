@@ -1,7 +1,7 @@
 # Track Specification: Comprehensive Codebase Review and Author-Metadata Alignment
 
-**Track ID:** gdpe_0019_review_and_author_metadata  
-**Type:** Review / Quality and Documentation  
+**Track ID:** gdpe_0019_review_and_author_metadata
+**Type:** Review / Quality and Documentation
 **Date:** 2026-03-06
 
 ---
@@ -37,5 +37,5 @@ Conduct a holistic review of the repository to identify high-value improvements 
 
 ---
 
-**Version:** 1.0  
+**Version:** 1.0
 **Status:** Complete

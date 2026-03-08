@@ -1,7 +1,7 @@
 # Game Validation Criteria
 
-**Track:** gdpe_0005_game_validation  
-**Date:** 2026-03-03  
+**Track:** gdpe_0005_game_validation
+**Date:** 2026-03-03
 **Version:** 1.0
 
 ---
@@ -190,6 +190,6 @@ For each game, the validation report will include:
 
 ---
 
-**Version:** 1.0  
-**Date:** 2026-03-03  
+**Version:** 1.0
+**Date:** 2026-03-03
 **Status:** Ready for use

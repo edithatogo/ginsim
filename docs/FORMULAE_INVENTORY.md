@@ -1,7 +1,7 @@
 # Formulae Inventory
 
-**Track:** gdpe_0006_formulae_verification  
-**Date:** 2026-03-03  
+**Track:** gdpe_0006_formulae_verification
+**Date:** 2026-03-03
 **Version:** 1.0
 
 ---
@@ -39,4 +39,3 @@
 | VOI/Sensitivity | 0 |
 | Other | 0 |
 | **Total** | **1** |
-

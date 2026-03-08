@@ -1,7 +1,7 @@
 # Policy Timeline: Australia and New Zealand Genetic Discrimination Regulations
 
-**Track:** gdpe_0002_evidence_anchoring — Phase 1  
-**Last updated:** 2026-03-03  
+**Track:** gdpe_0002_evidence_anchoring — Phase 1
+**Last updated:** 2026-03-03
 **Purpose:** Comparative timeline of policy developments affecting genetic discrimination in life insurance
 
 ---

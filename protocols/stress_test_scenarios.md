@@ -1,6 +1,6 @@
 # Stress Test Scenarios
 
-**Track:** gdpe_0002_evidence_anchoring — Phase 4  
+**Track:** gdpe_0002_evidence_anchoring — Phase 4
 **Purpose:** Define extreme scenarios for model validation
 
 ---
@@ -227,45 +227,45 @@ SCENARIOS = {
 def run_stress_test(scenario_name, params):
     """Run single stress test scenario."""
     print(f"Running scenario: {scenario_name}")
-    
+
     # Load base config
     with open('configs/calibration_australia.yaml') as f:
         config = yaml.safe_load(f)
-    
+
     # Override with scenario parameters
     for module, overrides in params.items():
         if module in config:
             config[module].update(overrides)
-    
+
     # Run evaluation
     results = run_policy_evaluation(config)
-    
+
     # Validate outputs
     assert results['testing_uptake'] >= 0, "Negative testing uptake"
     assert results['premiums'] >= 0, "Negative premiums"
     # ... more checks
-    
+
     return results
 
 def main():
     output_dir = Path('outputs/stress_tests')
     output_dir.mkdir(parents=True, exist_ok=True)
-    
+
     all_results = {}
-    
+
     for name, params in SCENARIOS.items():
         results = run_stress_test(name, params)
         all_results[name] = results
-        
+
         # Save individual results
         with open(output_dir / f'{name}.yaml', 'w') as f:
             yaml.dump(results, f)
-    
+
     # Summary
     summary = generate_summary(all_results)
     with open(output_dir / 'summary.md', 'w') as f:
         f.write(summary)
-    
+
     print(f"Stress tests complete. Results saved to {output_dir}")
 
 if __name__ == '__main__':
@@ -302,6 +302,6 @@ After running all scenarios:
 
 ---
 
-**Version:** 1.0  
-**Date:** 2026-03-03  
+**Version:** 1.0
+**Date:** 2026-03-03
 **Track:** gdpe_0002_evidence_anchoring

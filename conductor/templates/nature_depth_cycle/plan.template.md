@@ -1,8 +1,8 @@
 # Implementation Plan: <title>
 
-**Track ID:** <track_id>  
-**Aspect:** <repo_aspect>  
-**Execution mode:** Autonomous Ralph-loop depth cycle  
+**Track ID:** <track_id>
+**Aspect:** <repo_aspect>
+**Execution mode:** Autonomous Ralph-loop depth cycle
 **Estimated duration:** <estimate>
 
 ---

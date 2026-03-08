@@ -98,22 +98,22 @@ steps:
     operation: "Filter"
     description: "Retain only predictive genetic tests"
     code_reference: "scripts/etl/au_testing_etl.py:line_45"
-    
+
   - step: 2
     operation: "Recoding"
     description: "Standardize test type codes to ontology"
     code_reference: "scripts/etl/au_testing_etl.py:line_62"
-    
+
   - step: 3
     operation: "Date parsing"
     description: "Convert test_date to ISO 8601 format"
     code_reference: "scripts/etl/au_testing_etl.py:line_78"
-    
+
   - step: 4
     operation: "Derived variable"
     description: "Calculate age at testing from DOB and test_date"
     code_reference: "scripts/etl/au_testing_etl.py:line_91"
-    
+
   - step: 5
     operation: "Quality check"
     description: "Remove records with missing age or invalid dates"

@@ -1,6 +1,6 @@
 # Expert Reviewer Invitation Template
 
-**Track:** gdpe_0002_evidence_anchoring — Phase 4  
+**Track:** gdpe_0002_evidence_anchoring — Phase 4
 **Purpose:** Invite external experts for face validity review
 
 ---
@@ -59,8 +59,8 @@ Thank you for considering this request.
 
 **Ngā mihi / Best regards,**
 
-Dylan A Mordaunt  
-Research Fellow, Faculty of Health, Education and Psychology, Victoria University of Wellington  
+Dylan A Mordaunt
+Research Fellow, Faculty of Health, Education and Psychology, Victoria University of Wellington
 [Email] | [Phone]
 
 ---
@@ -79,7 +79,7 @@ If you are able to review, I will send the review package promptly. If timing is
 
 Thank you for considering.
 
-**Best regards,**  
+**Best regards,**
 Dylan
 
 ---
@@ -114,6 +114,6 @@ Dylan
 
 ---
 
-**Version:** 1.0  
-**Date:** 2026-03-03  
+**Version:** 1.0
+**Date:** 2026-03-03
 **Track:** gdpe_0002_evidence_anchoring

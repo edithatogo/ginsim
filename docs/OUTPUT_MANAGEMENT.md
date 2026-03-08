@@ -1,7 +1,7 @@
 # Output Management Guide
 
-**Track:** gdpe_0004_quality_assurance  
-**Phase:** 5 — Output Management  
+**Track:** gdpe_0004_quality_assurance
+**Phase:** 5 — Output Management
 **Date:** 2026-03-03
 
 ---

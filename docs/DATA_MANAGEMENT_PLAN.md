@@ -1,7 +1,7 @@
 # Data Management Plan
 
-**Track:** gdpe_0004_quality_assurance  
-**Version:** 1.0  
+**Track:** gdpe_0004_quality_assurance
+**Version:** 1.0
 **Date:** 2026-03-03
 
 ---
@@ -38,7 +38,7 @@ This document outlines data management procedures for the genetic discrimination
 
 **Source:** Model simulations
 
-**Format:** 
+**Format:**
 - NumPy arrays (.npy)
 - JSON files
 - CSV tables
@@ -143,7 +143,7 @@ genetic-discrimination-policy-econ/
 
 **Secondary:** Zenodo deposition (DOI assignment)
 
-**Frequency:** 
+**Frequency:**
 - Git: Continuous (each commit)
 - Zenodo: At major releases
 
@@ -159,7 +159,7 @@ genetic-discrimination-policy-econ/
 - All documentation
 - All code
 
-**License:** 
+**License:**
 - Code: MIT License
 - Data: CC-BY 4.0
 - Documentation: CC-BY 4.0
@@ -209,11 +209,11 @@ genetic-discrimination-policy-econ/
 def compute_evpi(net_benefits: np.ndarray, optimal_net_benefit: float) -> float:
     """
     Compute Expected Value of Perfect Information.
-    
+
     Args:
         net_benefits: Array of net benefits for each policy
         optimal_net_benefit: Net benefit under current optimal decision
-        
+
     Returns:
         EVPI value
     """

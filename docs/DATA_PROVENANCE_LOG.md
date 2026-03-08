@@ -1,7 +1,7 @@
 # Data Provenance and Transformation Log
 
-**Track:** gdpe_0002_evidence_anchoring — Phase 3  
-**Date:** 2026-03-03  
+**Track:** gdpe_0002_evidence_anchoring — Phase 3
+**Date:** 2026-03-03
 **Version:** 1.0
 
 ---
@@ -98,16 +98,16 @@ steps:
   - step: 1
     operation: "Date parsing"
     description: "Convert service_date to ISO 8601"
-    
+
   - step: 2
     operation: "Filter"
     description: "Retain genetic testing MBS items only"
     codes: ["73300", "73301", "73302", "..."]
-    
+
   - step: 3
     operation: "Aggregate"
     description: "Monthly counts by item code"
-    
+
   - step: 4
     operation: "Quality check"
     description: "Verify no missing dates, codes"
@@ -345,6 +345,6 @@ dependencies:
 
 ---
 
-**Version:** 1.0  
-**Date:** 2026-03-03  
+**Version:** 1.0
+**Date:** 2026-03-03
 **Track:** gdpe_0002_evidence_anchoring

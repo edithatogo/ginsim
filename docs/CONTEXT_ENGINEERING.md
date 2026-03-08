@@ -1,6 +1,6 @@
 # Context Engineering for This Project
 
-**Version:** v1.1  
+**Version:** v1.1
 **Date:** 02 March 2026
 
 This repo treats modelling as a *decision system* rather than a single model. To reduce ambiguity and improve reproducibility,

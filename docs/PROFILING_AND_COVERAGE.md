@@ -1,8 +1,8 @@
 # SOTA Profiling and Coverage Guide
 
-**Track:** gdpe_0003_model_implementation  
-**Purpose:** Comprehensive SOTA profiling and coverage  
-**Date:** 2026-03-03  
+**Track:** gdpe_0003_model_implementation
+**Purpose:** Comprehensive SOTA profiling and coverage
+**Date:** 2026-03-03
 **Version:** 2.0
 
 ---
@@ -51,12 +51,12 @@ scalene --gpu scripts/run_model.py
 **Output:**
 ```
                               Scalene: Summary by Filename
-  
-  Filename                           CPU Time    GPU Time    Memory Time  
-  ─────────────────────────────────  ──────────  ──────────  ────────────  
-  src/model/module_c_equilibrium.py     45.2s       0.0s         12.3s    
-  src/model/module_a_behavior.py        23.1s       0.0s          5.6s    
-  scripts/run_model.py                  12.4s       0.0s          2.1s    
+
+  Filename                           CPU Time    GPU Time    Memory Time
+  ─────────────────────────────────  ──────────  ──────────  ────────────
+  src/model/module_c_equilibrium.py     45.2s       0.0s         12.3s
+  src/model/module_a_behavior.py        23.1s       0.0s          5.6s
+  scripts/run_model.py                  12.4s       0.0s          2.1s
 ```
 
 **Key Features:**
@@ -437,21 +437,21 @@ results = process_batch(batch)  # ✅ Fast
 - name: Run tests with coverage
   run: |
     pytest --cov=src --cov-report=xml --cov-report=term-missing
-    
+
 - name: Check coverage
   run: |
     coverage report --fail-under=85
-    
+
 - name: Check diff coverage
   run: |
     diff-cover coverage.xml --fail-under=80 --compare-branch=origin/main
-    
+
 - name: Upload coverage
   uses: codecov/codecov-action@v3
 ```
 
 ---
 
-**Version:** 2.0  
-**Date:** 2026-03-03  
+**Version:** 2.0
+**Date:** 2026-03-03
 **Track:** gdpe_0003_model_implementation

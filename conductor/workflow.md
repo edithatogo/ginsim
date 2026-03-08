@@ -53,7 +53,7 @@ Create `conductor/tracks/<track_id>/phase_<N>_review.md`:
 ```markdown
 # Phase N Review
 
-**Track:** <track_id>  
+**Track:** <track_id>
 **Review date:** YYYY-MM-DD
 
 ## Checklist

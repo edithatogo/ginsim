@@ -1,9 +1,9 @@
 # OSF Presubmission: Protocol Summary (Copy-Paste Ready)
 
-**Title:** Integrated Economic Evaluation of Policy Options to Restrict Genetic Discrimination  
-**Version:** v1.0  
-**Date:** 02 March 2026  
-**Primary investigator:** Dylan A Mordaunt  
+**Title:** Integrated Economic Evaluation of Policy Options to Restrict Genetic Discrimination
+**Version:** v1.0
+**Date:** 02 March 2026
+**Primary investigator:** Dylan A Mordaunt
 
 
 
@@ -24,9 +24,9 @@ Policy evaluation using linked empirical estimation and decision-analytic modell
 4. Which uncertainties most influence the preferred policy choice (VOI)?
 
 ## Hypotheses
-H1. More protective regimes reduce deterrence and increase uptake of clinically indicated genetic testing and cascade testing.  
-H2. Increased testing yields net health gains and, for selected conditions, offsets some downstream costs through prevention and early detection.  
-H3. More restrictive information regimes increase adverse selection pressure in voluntary risk-rated insurance, raising premiums relative to less restrictive regimes, but the magnitude depends on product design, caps, and risk-sharing.  
+H1. More protective regimes reduce deterrence and increase uptake of clinically indicated genetic testing and cascade testing.
+H2. Increased testing yields net health gains and, for selected conditions, offsets some downstream costs through prevention and early detection.
+H3. More restrictive information regimes increase adverse selection pressure in voluntary risk-rated insurance, raising premiums relative to less restrictive regimes, but the magnitude depends on product design, caps, and risk-sharing.
 H4. Net distributional welfare improves for people with higher genetic risk, with overall net effect depending on premium incidence and fiscal spillovers.
 
 ## Design plan
@@ -41,10 +41,10 @@ H4. Net distributional welfare improves for people with higher genetic risk, wit
 Population-level time series for utilisation and insurance outcomes, with subgroup stratification where data permit. Condition-level modelling for prioritised genetic conditions.
 
 ### Primary outcomes
-1. Change in testing uptake and cascade testing (relative and absolute).  
-2. Change in premiums and take-up for selected insurance products.  
-3. Net QALYs and net costs (health system and prevention).  
-4. Net fiscal impact.  
+1. Change in testing uptake and cascade testing (relative and absolute).
+2. Change in premiums and take-up for selected insurance products.
+3. Net QALYs and net costs (health system and prevention).
+4. Net fiscal impact.
 5. Net distributional welfare impacts (DCBA) and uncertainty around preferred policy.
 
 ### Secondary outcomes

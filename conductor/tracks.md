@@ -49,9 +49,9 @@ This registry is the index of Conductor tracks for this repository.
 
 ## Milestone Summary
 
-**Completed milestone tracks:** 14/14  
-**Repository baseline:** Historical milestone marked Publication Ready (SOTA); superseded by follow-up review findings  
-**Current active follow-up track:** none  
+**Completed milestone tracks:** 14/14
+**Repository baseline:** Historical milestone marked Publication Ready (SOTA); superseded by follow-up review findings
+**Current active follow-up track:** none
 **Next planned follow-up track:** none
 
 ---

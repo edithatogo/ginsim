@@ -65,6 +65,6 @@ The model is calibrated against structured evidence registers, with active assum
 
 ---
 
-**Author:** Dylan A Mordaunt  
-**Affiliation:** Research Fellow, Faculty of Health, Education and Psychology, Victoria University of Wellington  
+**Author:** Dylan A Mordaunt
+**Affiliation:** Research Fellow, Faculty of Health, Education and Psychology, Victoria University of Wellington
 **Live App:** [https://ginsim.streamlit.app/](https://ginsim.streamlit.app/)

@@ -156,6 +156,6 @@ Where:
 
 ---
 
-**Version:** 1.0  
-**Last Updated:** 2026-03-05  
+**Version:** 1.0
+**Last Updated:** 2026-03-05
 **Authors:** Authors' analysis

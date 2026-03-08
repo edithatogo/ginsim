@@ -1,7 +1,7 @@
 # Track Specification: Publication-Grade Model Closure, Traceability, Dashboard Alignment, and Submission-Surface Sync
 
-**Track ID:** gdpe_0020_dashboard_policy_alignment_and_publication_sync  
-**Type:** Feature / Publication Readiness Hardening  
+**Track ID:** gdpe_0020_dashboard_policy_alignment_and_publication_sync
+**Type:** Feature / Publication Readiness Hardening
 **Date:** 2026-03-07
 
 ---
@@ -75,5 +75,5 @@ For this track, "publication standard" means the repository can survive both:
 
 ---
 
-**Version:** 1.2  
+**Version:** 1.2
 **Status:** Complete

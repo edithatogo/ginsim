@@ -208,7 +208,7 @@ Create `conductor/tracks/<track_id>/phase_<N>_review.md`:
 ```markdown
 # Phase N Review
 
-**Track:** <track_id>  
+**Track:** <track_id>
 **Review date:** YYYY-MM-DD
 
 ## Checklist
@@ -237,13 +237,13 @@ Create `conductor/tracks/<track_id>/phase_<N>_review.md`:
 
 ### Common Issues
 
-**Issue:** Reference validation fails  
+**Issue:** Reference validation fails
 **Solution:** Run `python -m scripts.validate_references --fix`
 
-**Issue:** Import errors  
+**Issue:** Import errors
 **Solution:** `pip install -e ".[dev,validation]"`
 
-**Issue:** Calibration config not found  
+**Issue:** Calibration config not found
 **Solution:** Check `configs/calibration_*.yaml` exists
 
 ---
@@ -258,5 +258,5 @@ Create `conductor/tracks/<track_id>/phase_<N>_review.md`:
 
 ---
 
-**Last updated:** 2026-03-03  
+**Last updated:** 2026-03-03
 **Version:** 2.0 (Phase 3 update)

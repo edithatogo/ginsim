@@ -1,7 +1,7 @@
 # Submission Gap Register
 
-**Status:** Updated against the current generated submission package on 2026-03-07  
-**Current package:** `outputs/runs/meta_pipeline/20260307T064546Z/publish_pack`  
+**Status:** Updated against the current generated submission package on 2026-03-07
+**Current package:** `outputs/runs/meta_pipeline/20260307T064546Z/publish_pack`
 **Purpose:** Record the remaining blockers between the current repository state and a cleaner top-tier journal submission package.
 
 ---

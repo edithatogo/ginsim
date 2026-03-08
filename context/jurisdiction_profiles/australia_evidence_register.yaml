@@ -21,7 +21,7 @@ module_a_behaviour_deterrence:
       jurisdiction: "United States"
       population: "Adults considering predictive genetic testing (n=1,250)"
       sample_size: 1250
-      
+
       # Quality assessment (GRADE-adapted)
       initial_grade: "D"  # Cross-sectional
       directness: "Indirect"  # US, not AU
@@ -29,13 +29,13 @@ module_a_behaviour_deterrence:
       consistency: "Consistent"  # Aligns with other studies
       risk_of_bias: "Moderate"  # Self-reported measures
       final_grade: "Low"
-      
+
       # Effect estimate
       point_estimate: 0.18
       confidence_interval_lower: 0.11
       confidence_interval_upper: 0.25
       measure_type: "Proportion avoiding testing due to insurance concerns"
-      
+
       # Prior conversion
       prior_distribution: "Beta"
       prior_alpha: 22.5
@@ -43,7 +43,7 @@ module_a_behaviour_deterrence:
       prior_rationale: |
         Low quality evidence; widened variance to reflect uncertainty.
         US data may overestimate AU effect due to different insurance system.
-      
+
       notes: |
         Key study for baseline deterrence. Consider EVPPI for this parameter.
         Requires AU-specific validation.
@@ -55,7 +55,7 @@ module_a_behaviour_deterrence:
       jurisdiction: "Australia"
       population: "Australian adults with family history of genetic conditions"
       sample_size: 47
-      
+
       # Quality assessment
       initial_grade: "E"  # Case series
       directness: "Direct"  # Australian context
@@ -63,13 +63,13 @@ module_a_behaviour_deterrence:
       consistency: "Unknown"  # Limited comparable data
       risk_of_bias: "High"  # Selection bias likely
       final_grade: "Very Low"
-      
+
       # Effect estimate (qualitative converted to quantitative)
       point_estimate: 0.15
       confidence_interval_lower: 0.05
       confidence_interval_upper: 0.30
       measure_type: "Estimated reduction in deterrence post-moratorium"
-      
+
       # Prior conversion
       prior_distribution: "Beta"
       prior_alpha: 12
@@ -77,7 +77,7 @@ module_a_behaviour_deterrence:
       prior_rationale: |
         Very low quality evidence; very wide variance.
         Direct AU context partially offsets quality concerns.
-      
+
       notes: |
         Only AU-specific evidence available.
         Qualitative findings converted to quantitative estimate.
@@ -90,7 +90,7 @@ module_a_behaviour_deterrence:
       jurisdiction: "Netherlands"
       population: "Family members of mutation carriers"
       sample_size: 892
-      
+
       # Quality assessment
       initial_grade: "B"  # Prospective cohort
       directness: "Indirect"  # Different healthcare system
@@ -98,13 +98,13 @@ module_a_behaviour_deterrence:
       consistency: "Consistent"
       risk_of_bias: "Low"
       final_grade: "Moderate"
-      
+
       # Effect estimate
       point_estimate: 0.52
       confidence_interval_lower: 0.48
       confidence_interval_upper: 0.56
       measure_type: "Baseline cascade testing uptake (no discrimination concerns)"
-      
+
       # Prior conversion
       prior_distribution: "Beta"
       prior_alpha: 462
@@ -112,7 +112,7 @@ module_a_behaviour_deterrence:
       prior_rationale: |
         Moderate quality evidence.
         Baseline uptake rate (not affected by discrimination).
-      
+
       notes: |
         Used for baseline cascade testing in Module B.
         Assumes similar baseline in AU population.
@@ -123,23 +123,23 @@ module_a_behaviour_deterrence:
       point: 0.52
       prior: "Beta(462, 426)"
       source: "ettema_genetic_testing_uptake_2021"
-    
+
     deterrence_elasticity:
       point: 0.18
       prior: "Beta(22.5, 102.5)"
       source: "mcguire_perceived_discrimination_testing_2019"
-    
+
     moratorium_effect:
       point: 0.15
       prior: "Beta(12, 68)"
       source: "taylor_australia_genetic_discrimination_2021"
-    
+
     evidence_gaps:
       - "No AU longitudinal data on testing behaviour"
       - "Limited evidence on cascade testing specific to AU"
       - "No discrete choice experiments for AU population"
       - "Uncertain generalizability from US/EU to AU context"
-    
+
     voi_priorities:
       - "Testing uptake elasticity (high EVPPI expected)"
       - "Moratorium effectiveness in AU context"
@@ -163,7 +163,7 @@ module_c_insurance_equilibrium:
       jurisdiction: "United States"
       population: "Theoretical insurance market"
       sample_size: null
-      
+
       # Quality assessment
       initial_grade: "E"  # Modelling study
       directness: "Indirect"  # US market structure
@@ -171,13 +171,13 @@ module_c_insurance_equilibrium:
       consistency: "Consistent"  # Aligns with theory
       risk_of_bias: "Moderate"  # Model assumptions
       final_grade: "Low"
-      
+
       # Effect estimate
       point_estimate: 0.08
       confidence_interval_lower: 0.03
       confidence_interval_upper: 0.15
       measure_type: "Premium increase per 10% increase in informed high-risks"
-      
+
       # Prior conversion
       prior_distribution: "Normal"
       prior_mean: 0.08
@@ -185,7 +185,7 @@ module_c_insurance_equilibrium:
       prior_rationale: |
         Low quality evidence (modelling).
         Truncated normal for positive values.
-      
+
       notes: |
         Theoretical estimate; requires empirical calibration.
         Key parameter for Module C equilibrium solver.
@@ -197,7 +197,7 @@ module_c_insurance_equilibrium:
       jurisdiction: "United States"
       population: "BRCA mutation carriers (n=340)"
       sample_size: 340
-      
+
       # Quality assessment
       initial_grade: "C"  # Retrospective
       directness: "Indirect"  # US insurance market
@@ -205,13 +205,13 @@ module_c_insurance_equilibrium:
       consistency: "Consistent"
       risk_of_bias: "Moderate"
       final_grade: "Low"
-      
+
       # Effect estimate
       point_estimate: -0.22
       confidence_interval_lower: -0.35
       confidence_interval_upper: -0.09
       measure_type: "Change in insurance take-up post-positive test"
-      
+
       # Prior conversion
       prior_distribution: "Normal"
       prior_mean: -0.22
@@ -219,7 +219,7 @@ module_c_insurance_equilibrium:
       prior_rationale: |
         Low quality evidence.
         Negative elasticity (higher risk → lower take-up at given price).
-      
+
       notes: |
         Informs demand shift in Module C.
         May differ in AU with different product structures.
@@ -231,7 +231,7 @@ module_c_insurance_equilibrium:
       jurisdiction: "Australia"
       population: "Australian life insurance market"
       sample_size: null
-      
+
       # Quality assessment
       initial_grade: "E"  # Industry report
       directness: "Direct"  # AU market
@@ -239,13 +239,13 @@ module_c_insurance_equilibrium:
       consistency: "Unknown"
       risk_of_bias: "High"  # Industry source
       final_grade: "Very Low"
-      
+
       # Effect estimate
       point_estimate: 0.15
       confidence_interval_lower: 0.10
       confidence_interval_upper: 0.25
       measure_type: "Average loading for genetic conditions under FSC moratorium"
-      
+
       # Prior conversion
       prior_distribution: "Normal"
       prior_mean: 0.15
@@ -253,7 +253,7 @@ module_c_insurance_equilibrium:
       prior_rationale: |
         Very low quality evidence.
         Direct AU context partially offsets quality concerns.
-      
+
       notes: |
         FSC moratorium caps: $500k life, $200k TPD, $200k trauma.
         Loading applies above caps or for non-disclosed conditions.
@@ -264,23 +264,23 @@ module_c_insurance_equilibrium:
       point: 0.08
       prior: "Normal(0.08, 0.04) truncated [0, ∞)"
       source: "hersch_viscusi_insurance_discrimination_2019"
-    
+
     demand_elasticity_high_risk:
       point: -0.22
       prior: "Normal(-0.22, 0.08)"
       source: "armstrong_genetic_testing_insurance_2020"
-    
+
     baseline_loading:
       point: 0.15
       prior: "Normal(0.15, 0.06)"
       source: "fsc_moratorium_2019"
-    
+
     evidence_gaps:
       - "No AU empirical data on adverse selection magnitude"
       - "Limited evidence on demand elasticity by genetic risk"
       - "Uncertain pass-through under different market structures"
       - "No data on reinsurance impacts"
-    
+
     voi_priorities:
       - "Adverse selection elasticity (structural parameter)"
       - "Demand elasticity for high-risk individuals"
@@ -304,7 +304,7 @@ module_d_proxy_substitution:
       jurisdiction: "United States"
       population: "Individuals undergoing genetic counselling"
       sample_size: 523
-      
+
       # Quality assessment
       initial_grade: "B"  # Diagnostic accuracy
       directness: "Indirect"  # US healthcare
@@ -312,13 +312,13 @@ module_d_proxy_substitution:
       consistency: "Consistent"
       risk_of_bias: "Low"
       final_grade: "Moderate"
-      
+
       # Effect estimate
       point_estimate: 0.68
       confidence_interval_lower: 0.62
       confidence_interval_upper: 0.74
       measure_type: "Sensitivity of family history for mutation detection"
-      
+
       # Prior conversion
       prior_distribution: "Beta"
       prior_alpha: 357
@@ -326,7 +326,7 @@ module_d_proxy_substitution:
       prior_rationale: |
         Moderate quality evidence.
         Diagnostic accuracy parameter.
-      
+
       notes: |
         Informs underwriting accuracy when genetic info restricted.
         Family history less accurate than genetic testing.
@@ -338,7 +338,7 @@ module_d_proxy_substitution:
       jurisdiction: "Multiple"
       population: "Synthesis"
       sample_size: null
-      
+
       # Quality assessment
       initial_grade: "E"  # Narrative review
       directness: "Indirect"
@@ -346,13 +346,13 @@ module_d_proxy_substitution:
       consistency: "Unknown"
       risk_of_bias: "High"
       final_grade: "Very Low"
-      
+
       # Effect estimate (expert elicitation-style)
       point_estimate: 0.40
       confidence_interval_lower: 0.20
       confidence_interval_upper: 0.60
       measure_type: "Proportion of genetic risk captured by proxies"
-      
+
       # Prior conversion
       prior_distribution: "Beta"
       prior_alpha: 20
@@ -360,7 +360,7 @@ module_d_proxy_substitution:
       prior_rationale: |
         Very low quality evidence.
         Wide variance reflects uncertainty.
-      
+
       notes: |
         Highly uncertain parameter.
         Key driver of moratorium effectiveness.
@@ -371,17 +371,17 @@ module_d_proxy_substitution:
       point: 0.68
       prior: "Beta(357, 168)"
       source: "tabor_family_history_proxy_2018"
-    
+
     proxy_substitution_rate:
       point: 0.40
       prior: "Beta(20, 30)"
       source: "lowenstein_genetic_discrimination_insurance_2021"
-    
+
     evidence_gaps:
       - "No AU data on proxy substitution in insurance context"
       - "Limited evidence on underwriting accuracy with proxies"
       - "Uncertain behavioural response to proxy-based underwriting"
-    
+
     voi_priorities:
       - "Proxy substitution rate (high uncertainty, high impact)"
 
@@ -403,7 +403,7 @@ module_e_pass_through:
       jurisdiction: "United States"
       population: "Insurance markets"
       sample_size: null
-      
+
       # Quality assessment
       initial_grade: "B"  # Empirical
       directness: "Indirect"  # US market
@@ -411,13 +411,13 @@ module_e_pass_through:
       consistency: "Consistent"
       risk_of_bias: "Low"
       final_grade: "Moderate"
-      
+
       # Effect estimate
       point_estimate: 0.75
       confidence_interval_lower: 0.60
       confidence_interval_upper: 0.90
       measure_type: "Pass-through of risk costs to consumers"
-      
+
       # Prior conversion
       prior_distribution: "Beta"
       prior_alpha: 60
@@ -425,7 +425,7 @@ module_e_pass_through:
       prior_rationale: |
         Moderate quality evidence.
         High pass-through expected in competitive markets.
-      
+
       notes: |
         AU market concentration may differ.
         Affects incidence of genetic information restrictions.
@@ -436,12 +436,12 @@ module_e_pass_through:
       point: 0.75
       prior: "Beta(60, 20)"
       source: "finkelstein_insurance_market_structure_2019"
-    
+
     evidence_gaps:
       - "No AU-specific pass-through estimates"
       - "Limited evidence on genetic information in pass-through"
       - "Market concentration effects uncertain"
-    
+
     voi_priorities:
       - "Pass-through rate (moderate EVPPI expected)"
 
@@ -463,7 +463,7 @@ module_f_data_quality:
       jurisdiction: "International"
       population: "Genomic research participants"
       sample_size: 15000
-      
+
       # Quality assessment
       initial_grade: "C"  # Cross-sectional
       directness: "Indirect"
@@ -471,13 +471,13 @@ module_f_data_quality:
       consistency: "Consistent"
       risk_of_bias: "Moderate"
       final_grade: "Low"
-      
+
       # Effect estimate
       point_estimate: -0.10
       confidence_interval_lower: -0.15
       confidence_interval_upper: -0.05
       measure_type: "Reduction in research participation with privacy concerns"
-      
+
       # Prior conversion
       prior_distribution: "Normal"
       prior_mean: -0.10
@@ -485,7 +485,7 @@ module_f_data_quality:
       prior_rationale: |
         Low quality evidence.
         Negative elasticity (concerns reduce participation).
-      
+
       notes: |
         Data quality externality from testing restrictions.
         Affects long-term research benefits.
@@ -496,12 +496,12 @@ module_f_data_quality:
       point: -0.10
       prior: "Normal(-0.10, 0.03)"
       source: "blevins_genomic_data_bias_2020"
-    
+
     evidence_gaps:
       - "No AU data on research participation effects"
       - "Limited evidence on data quality impacts"
       - "Long-term effects uncertain"
-    
+
     voi_priorities:
       - "Research participation elasticity (low-moderate EVPPI)"
 
@@ -523,7 +523,7 @@ enforcement_compliance:
       jurisdiction: "Australia"
       population: "FSC member insurers"
       sample_size: null
-      
+
       # Quality assessment
       initial_grade: "E"  # Policy document
       directness: "Direct"
@@ -531,13 +531,13 @@ enforcement_compliance:
       consistency: "Unknown"
       risk_of_bias: "High"
       final_grade: "Very Low"
-      
+
       # Effect estimate (qualitative)
       point_estimate: 0.50
       confidence_interval_lower: 0.20
       confidence_interval_upper: 0.80
       measure_type: "Estimated compliance rate with FSC moratorium"
-      
+
       # Prior conversion
       prior_distribution: "Beta"
       prior_alpha: 10
@@ -545,7 +545,7 @@ enforcement_compliance:
       prior_rationale: |
         Very low quality evidence.
         Uninformative prior reflects high uncertainty.
-      
+
       notes: |
         FSC has limited enforcement power.
         Non-members not bound by moratorium.
@@ -558,7 +558,7 @@ enforcement_compliance:
       jurisdiction: "Australia"
       population: "Reported discrimination cases"
       sample_size: 12
-      
+
       # Quality assessment
       initial_grade: "E"  # Case series
       directness: "Direct"
@@ -566,13 +566,13 @@ enforcement_compliance:
       consistency: "Unknown"
       risk_of_bias: "High"
       final_grade: "Very Low"
-      
+
       # Effect estimate
       point_estimate: 0.02
       confidence_interval_lower: 0.005
       confidence_interval_upper: 0.05
       measure_type: "Complaints per 100 genetic tests"
-      
+
       # Prior conversion
       prior_distribution: "Beta"
       prior_alpha: 2
@@ -580,7 +580,7 @@ enforcement_compliance:
       prior_rationale: |
         Very low quality evidence.
         Likely under-reporting.
-      
+
       notes: |
         Low observed complaints may reflect under-reporting.
         True discrimination rate uncertain.
@@ -591,18 +591,18 @@ enforcement_compliance:
       point: 0.50
       prior: "Beta(10, 10)"
       source: "fsc_moratorium_2019"
-    
+
     complaint_rate:
       point: 0.02
       prior: "Beta(2, 98)"
       source: "taylor_australia_genetic_discrimination_2021"
-    
+
     evidence_gaps:
       - "No systematic monitoring of moratorium compliance"
       - "Under-reporting of discrimination likely"
       - "Enforcement mechanisms weak (industry self-regulation)"
       - "No data on non-member insurer behaviour"
-    
+
     voi_priorities:
       - "Enforcement effectiveness (high uncertainty, policy-relevant)"
 
@@ -613,7 +613,7 @@ enforcement_compliance:
 
 policy_timeline:
   jurisdiction: "Australia"
-  
+
   key_events:
     - date: "2019-07-01"
       event: "FSC Moratorium commences"
@@ -621,28 +621,28 @@ policy_timeline:
       description: |
         Financial Services Council moratorium on use of genetic test results
         for life insurance products up to caps ($500k life, $200k TPD/trauma).
-    
+
     - date: "2024-06-30"
       event: "FSC Moratorium expires"
       type: "Industry self-regulation"
       description: |
         Moratorium set to expire unless renewed.
         Parliamentary inquiry ongoing.
-    
+
     - date: "2023-03-15"
       event: "Parliamentary Inquiry announced"
       type: "Legislative"
       description: |
         Joint Committee on Corporations and Financial Services inquiry into
         genetic discrimination and life insurance.
-    
+
     - date: "2023-11-30"
       event: "Inquiry recommendations released"
       type: "Legislative"
       description: |
         Recommendations include legislated moratorium or strengthened FSC code.
         Government response pending.
-  
+
   current_regime:
     type: "Industry moratorium (self-regulation)"
     start_date: "2019-07-01"
@@ -654,13 +654,13 @@ policy_timeline:
       income_protection: null  # Not covered
     enforcement: "FSC complaints process"
     coverage: "FSC member insurers only"
-  
+
   proposed_regimes:
     - name: "Legislated moratorium"
       status: "Under consideration"
       description: "Statutory ban on using genetic test results"
       enforcement: "AHRC complaints + penalties"
-    
+
     - name: "Strengthened FSC code"
       status: "Industry proposal"
       description: "Enhanced self-regulation with independent review"
@@ -673,7 +673,7 @@ policy_timeline:
 
 data_access:
   jurisdiction: "Australia"
-  
+
   available_datasets:
     - dataset_id: "AU_testing_001"
       name: "Medicare Benefits Schedule (MBS) genetic testing data"
@@ -683,7 +683,7 @@ data_access:
       time_period: "2015-present"
       access_conditions: "Research application required"
       limitations: "No clinical outcomes; limited demographics"
-    
+
     - dataset_id: "AU_insurance_001"
       name: "APRA insurance statistics"
       custodian: "Australian Prudential Regulation Authority"
@@ -692,7 +692,7 @@ data_access:
       time_period: "2010-present"
       access_conditions: "Public aggregate data"
       limitations: "No genetic-specific breakdowns"
-    
+
     - dataset_id: "AU_clinical_001"
       name: "Australian Cancer Database"
       custodian: "Australian Institute of Health and Welfare"
@@ -701,18 +701,18 @@ data_access:
       time_period: "1982-present"
       access_conditions: "Ethics + jurisdictional approval"
       limitations: "No genetic testing linkage"
-  
+
   data_gaps:
     - "No linked genetic testing + insurance outcomes data"
     - "Limited patient-reported discrimination experiences"
     - "No prospective cohort on testing behaviour"
     - "Insurance claims data not accessible for research"
-  
+
   data_linkage_opportunities:
     - "MBS + PBS + hospital data (via state linkages)"
     - "Cancer registry + genetic testing (research projects)"
     - "Survey linkage (e.g., 45 and Up Study)"
-  
+
   governance_notes: |
     Genetic data highly sensitive under Privacy Act 1988 (Cth).
     Additional state/territory health privacy laws apply.

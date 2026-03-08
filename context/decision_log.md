@@ -4,7 +4,7 @@ This log tracks key modelling, methodological, and infrastructure decisions with
 
 **Usage:** For single-author research, document decisions when:
 - Choosing between multiple viable options
-- Setting key model parameters or structures  
+- Setting key model parameters or structures
 - Making assumptions that affect results
 - Responding to unexpected findings
 
@@ -18,7 +18,7 @@ This log tracks key modelling, methodological, and infrastructure decisions with
 - **Track:** [Track ID if applicable]
 - **Category:** [Infrastructure/Methods/Policy/Evidence/Code]
 - **Context:** Why this decision was needed
-- **Options considered:** 
+- **Options considered:**
   - Option A: [description]
   - Option B: [description]
 - **Decision:** [What was chosen]
@@ -43,16 +43,16 @@ This log tracks key modelling, methodological, and infrastructure decisions with
   - Option B: Full probabilistic Bayesian decision analysis with VOI
   - Option C: Hybrid (deterministic base + probabilistic VOI)
 - **Decision:** Option B — Full probabilistic Bayesian decision analysis
-- **Rationale:** 
+- **Rationale:**
   - Genetic discrimination policy has high uncertainty across multiple parameters
   - Decision makers need explicit uncertainty quantification (EVPI/EVPPI)
   - Bayesian framework allows evidence synthesis from heterogeneous sources
   - JAX/XLA enables scalable computation for multi-module propagation
-- **Evidence:** 
+- **Evidence:**
   - Claxton K. The philosophical foundations of cost-effectiveness analysis.
   - Strong M et al. Probabilistic sensitivity analysis in NICE technology appraisals.
 - **Impact:** All modelling modules (A-F), VOI computations, publish pack outputs
-- **Alternatives rejected:** 
+- **Alternatives rejected:**
   - Option A: Insufficient for high-uncertainty policy context
   - Option C: Inconsistent treatment of uncertainty
 - **Review date:** N/A (foundational decision)
@@ -74,7 +74,7 @@ This log tracks key modelling, methodological, and infrastructure decisions with
   - NumPyro + BlackJAX offer state-of-the-art samplers (NUTS, HMC, SMC)
   - Functional programming paradigm suits reproducible research
   - Better suited for research laptop deployment (lighter than PyTorch)
-- **Evidence:** 
+- **Evidence:**
   - NumPyro documentation and benchmarks
   - BlackJAX paper (2023)
 - **Impact:** All inference code, computational performance, dependency stack
@@ -102,7 +102,7 @@ This log tracks key modelling, methodological, and infrastructure decisions with
   - Different policy approaches (moratorium vs legislative proposals)
   - Manageable scope for initial implementation
   - Personal research context and data access considerations
-- **Evidence:** 
+- **Evidence:**
   - Australian Financial Services Council moratorium (2019-2024)
   - NZ Human Rights Commission genetic discrimination inquiries
 - **Impact:** Config structure, evidence registers, publish pack design
@@ -130,7 +130,7 @@ This log tracks key modelling, methodological, and infrastructure decisions with
   - Clearest adverse selection mechanism (death benefit pricing)
   - Data availability considerations
   - Keep initial scope tractable
-- **Evidence:** 
+- **Evidence:**
   - Policy debates focus on life insurance
   - FSC moratorium covers life insurance products
 - **Impact:** Module C structure, calibration targets, data requirements
@@ -156,7 +156,7 @@ This log tracks key modelling, methodological, and infrastructure decisions with
   - MIT: Maximizes adoption and reuse; compatible with most licenses
   - CC-BY: Requires attribution; allows commercial use (appropriate for public policy research)
   - Aligns with funder open access requirements
-- **Evidence:** 
+- **Evidence:**
   - Open Source Initiative license comparisons
   - University open access policy
 - **Impact:** All code and documentation outputs
@@ -185,7 +185,7 @@ This log tracks key modelling, methodological, and infrastructure decisions with
   - Provides clear downgrade/upgrade criteria
   - Familiar to target audience (HTA bodies, policymakers)
   - Can be adapted for modelling context
-- **Evidence:** 
+- **Evidence:**
   - Guyatt GH et al. GRADE: An emerging consensus. BMJ. 2008
   - ISPOR-SMDM good practices (as supplementary guidance)
 - **Impact:** Evidence registers, prior conversion, transparency
@@ -214,7 +214,7 @@ This log tracks key modelling, methodological, and infrastructure decisions with
   - Structured enough for programmatic access
   - Compatible with existing config infrastructure
   - Supports comments and documentation inline
-- **Evidence:** 
+- **Evidence:**
   - Existing use in configs/ directory
   - Python PyYAML support
 - **Impact:** Evidence register structure, future automation
@@ -243,7 +243,7 @@ This log tracks key modelling, methodological, and infrastructure decisions with
   - Human review needed for subjective quality (evidence grading, model validity)
   - Reduces cognitive load by handling routine checks automatically
   - Creates audit trail for reproducibility
-- **Evidence:** 
+- **Evidence:**
   - Software engineering best practices (CI/CD)
   - Research reproducibility frameworks
 - **Impact:** All future phases; workflow enforcement
@@ -271,7 +271,7 @@ This log tracks key modelling, methodological, and infrastructure decisions with
   - Need integration with evidence registers (YAML)
   - Custom rules for research project (GRADE quality, prior conversion)
   - Can extend for future needs (DOI resolution, duplicate detection)
-- **Evidence:** 
+- **Evidence:**
   - Review of bibtex-tidy features
   - Project-specific requirements
 - **Impact:** Reference quality, citation consistency
@@ -299,7 +299,7 @@ This log tracks key modelling, methodological, and infrastructure decisions with
   - Ensures consistency across documents
   - Explicit guidance on uncertainty communication
   - Supports future collaboration (shared understanding)
-- **Evidence:** 
+- **Evidence:**
   - CHEERS 2022 reporting guidelines
   - Health communication best practices
 - **Impact:** All written outputs; publication strategy
@@ -327,7 +327,7 @@ This log tracks key modelling, methodological, and infrastructure decisions with
   - Academic writing refinement appropriate for research outputs
   - Automated checking reduces errors
   - Configurable for different audiences (academic, policy)
-- **Evidence:** 
+- **Evidence:**
   - Extension documentation
   - Writing quality improvements from AI assistance
 - **Impact:** Writing workflow, output quality
@@ -355,7 +355,7 @@ This log tracks key modelling, methodological, and infrastructure decisions with
   - Clear traceability from evidence to parameters
   - Supports module-by-module calibration
   - Easier to identify evidence gaps per module
-- **Evidence:** 
+- **Evidence:**
   - Model architecture documentation
   - Traceability best practices
 - **Impact:** Evidence organization, calibration workflow
@@ -383,7 +383,7 @@ This log tracks key modelling, methodological, and infrastructure decisions with
   - Wider priors reflect additional uncertainty from extrapolation
   - More defensible than assuming no difference
   - Can be updated as NZ-specific evidence becomes available
-- **Evidence:** 
+- **Evidence:**
   - Comparative health system analysis
   - Insurance market similarities
 - **Impact:** NZ parameter estimates, uncertainty quantification
@@ -411,7 +411,7 @@ This log tracks key modelling, methodological, and infrastructure decisions with
   - Easier to update as policies change
   - Clear reference for modelling scenarios
   - Supports policy scenario analysis
-- **Evidence:** 
+- **Evidence:**
   - Policy documents from both jurisdictions
   - Parliamentary inquiry reports
 - **Impact:** Policy scenario modelling, comparative analysis
@@ -439,7 +439,7 @@ This log tracks key modelling, methodological, and infrastructure decisions with
   - Wide priors appropriately reflect uncertainty
   - VOI analysis will identify highest-value evidence gaps
   - Can be updated as better evidence emerges
-- **Evidence:** 
+- **Evidence:**
   - HRC Inquiry (2020) - qualitative submissions
   - International evidence extrapolated
 - **Impact:** NZ parameter estimates, VOI priorities
@@ -467,7 +467,7 @@ This log tracks key modelling, methodological, and infrastructure decisions with
   - Warnings (missing DOI, corporate author) are acceptable limitations
   - Phase 2 work can proceed in parallel with minor reference updates
   - Perfectionism should not block progress
-- **Evidence:** 
+- **Evidence:**
   - Reference validation report
   - Nature of warnings (not critical)
 - **Impact:** Phase 1 completion, Phase 2 initiation
@@ -494,7 +494,7 @@ This log tracks key modelling, methodological, and infrastructure decisions with
   - Te Mana Raraunga provides clear framework
   - Research should demonstrate cultural competence
   - Future data access will require Māori governance anyway
-- **Evidence:** 
+- **Evidence:**
   - Te Mana Raraunga - Māori Data Sovereignty Network principles
   - NZ health research guidelines
 - **Impact:** Data access planning, ethics applications
@@ -521,7 +521,7 @@ This log tracks key modelling, methodological, and infrastructure decisions with
   - Option B: Prioritize political time-horizons (Budget Impact Analysis)
   - Option C: Multi-period reporting (Dual-Horizon)
 - **Decision:** Option C — Multi-period reporting
-- **Rationale:** 
+- **Rationale:**
   - Acknowledges both the scientific reality of long-term health gains and the political reality of short-term costs.
   - Improves persuasiveness to Treasury while maintaining HTA rigor.
 - **Impact:** DCBA ledger must be updated to output Year 3 and Year 20 metrics.
@@ -539,7 +539,7 @@ This log tracks key modelling, methodological, and infrastructure decisions with
   - Option B: Prohibit proxy re-optimization in model (Policy preference)
   - Option C: Adversarial fairness audit with group-specific noise (Equity preference)
 - **Decision:** Option C — Adversarial fairness audit
-- **Rationale:** 
+- **Rationale:**
   - Allows the model to simulate realistic insurer behavior (adversarial re-optimization) but forces visibility into the disproportionate impact on sparse-data groups.
   - Aligns with SOTA Algorithmic Fairness literature.
 - **Impact:** Module D must include data-quality quintile reporting.

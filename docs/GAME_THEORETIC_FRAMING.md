@@ -10,8 +10,8 @@ It is intended to reduce “hidden degrees of freedom” by documenting modellin
 ## 1) Strategic interactions represented (conceptual “games”)
 
 ### A) Underwriting and contract choice under asymmetric information (adverse selection / screening)
-**Conceptual game:** Bayesian screening / adverse selection (Rothschild–Stiglitz intuition).  
-**Players:** applicants (informed about their risk or ability to learn it), insurers (pricing/contract design under regulation), regulator (ruleset).  
+**Conceptual game:** Bayesian screening / adverse selection (Rothschild–Stiglitz intuition).
+**Players:** applicants (informed about their risk or ability to learn it), insurers (pricing/contract design under regulation), regulator (ruleset).
 **Core mechanism:** regulation constrains information; applicants’ private information affects demand; insurers adjust premiums/terms; equilibrium may change.
 
 **Where represented:** Module C (insurance equilibrium) + policy ruleset.
@@ -19,8 +19,8 @@ It is intended to reduce “hidden degrees of freedom” by documenting modellin
 ---
 
 ### B) Testing / research participation under perceived downstream penalty (participation with an anticipated cost)
-**Conceptual game:** participation under penalty risk; can be framed as signalling or strategic participation.  
-**Players:** individuals deciding to test/participate; insurers/employers as downstream “audiences”; policymakers as rule-setters.  
+**Conceptual game:** participation under penalty risk; can be framed as signalling or strategic participation.
+**Players:** individuals deciding to test/participate; insurers/employers as downstream “audiences”; policymakers as rule-setters.
 **Core mechanism:** perceived discrimination risk reduces testing/research participation; protections reduce the expected penalty and increase uptake.
 
 **Where represented:** Module A (behaviour/uptake). Currently reduced-form rather than explicit signalling equilibrium.
@@ -28,8 +28,8 @@ It is intended to reduce “hidden degrees of freedom” by documenting modellin
 ---
 
 ### C) Proxy substitution under regulatory constraint (constrained optimisation / regulatory substitution)
-**Conceptual game:** constrained optimisation by insurers (or “mechanism design with constraints”).  
-**Players:** insurers (choose features/proxies and decision rules), applicants (respond through selection), regulator (constraints).  
+**Conceptual game:** constrained optimisation by insurers (or “mechanism design with constraints”).
+**Players:** insurers (choose features/proxies and decision rules), applicants (respond through selection), regulator (constraints).
 **Core mechanism:** banning genetic test results may shift underwriting to other correlated proxies (family history, diagnosis, postcode, etc.),
 changing mispricing and selection pressure.
 
@@ -38,8 +38,8 @@ changing mispricing and selection pressure.
 ---
 
 ### D) Data-quality externality (participation as a public good)
-**Conceptual game:** public goods / free-rider externality.  
-**Players:** individuals (participate or not), health system and future patients (benefit from better models), researchers/industry (build tools).  
+**Conceptual game:** public goods / free-rider externality.
+**Players:** individuals (participate or not), health system and future patients (benefit from better models), researchers/industry (build tools).
 **Core mechanism:** participation improves dataset representativeness and future predictive tools; fear-induced non-participation reduces data quality.
 
 **Where represented:** Module F (data-quality), stylised selection model → representativeness proxy → performance proxy.
@@ -47,8 +47,8 @@ changing mispricing and selection pressure.
 ---
 
 ### E) Enforcement and compliance (regulator–insurer compliance game)
-**Conceptual game:** enforcement/compliance game.  
-**Players:** regulator (audit/enforcement intensity), insurers (compliance effort), consumers (complaints).  
+**Conceptual game:** enforcement/compliance game.
+**Players:** regulator (audit/enforcement intensity), insurers (compliance effort), consumers (complaints).
 **Core mechanism:** “policy on paper” is not equivalent to “policy in effect”; enforcement changes effective protection.
 
 **Where represented:** currently reduced-form via `enforcement_strength` encoded into protection intensity; can be upgraded to an explicit audit/compliance module.

@@ -1,8 +1,8 @@
 # Track Specification: <title>
 
-**Track ID:** <track_id>  
-**Type:** Nature-Depth Improvement Cycle  
-**Aspect:** <repo_aspect>  
+**Track ID:** <track_id>
+**Type:** Nature-Depth Improvement Cycle
+**Aspect:** <repo_aspect>
 **Date:** <yyyy-mm-dd>
 
 ---

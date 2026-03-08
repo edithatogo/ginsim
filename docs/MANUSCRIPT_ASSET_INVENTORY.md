@@ -1,7 +1,7 @@
 # Manuscript Asset Inventory
 
-**Status:** Validated against the current generated package on 2026-03-07  
-**Current package root:** `outputs/runs/meta_pipeline/20260307T064546Z/publish_pack`  
+**Status:** Validated against the current generated package on 2026-03-07
+**Current package root:** `outputs/runs/meta_pipeline/20260307T064546Z/publish_pack`
 **Purpose:** Provide one reviewer-facing inventory of the assets actually produced by the active reporting path.
 
 ---

@@ -42,7 +42,7 @@ MIT License - see [LICENSE](LICENSE) for details.
 If you use this code, please cite:
 
 ```
-Mordaunt, D. A. (2026). Genetic Discrimination Policy Economic Model [Computer software]. 
+Mordaunt, D. A. (2026). Genetic Discrimination Policy Economic Model [Computer software].
 https://github.com/yourusername/genetic-discrimination-policy-code
 ```
 

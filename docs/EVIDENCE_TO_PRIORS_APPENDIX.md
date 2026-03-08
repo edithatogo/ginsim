@@ -1,8 +1,8 @@
 # Evidence to Priors Appendix
 
-**Track:** gdpe_0002_evidence_anchoring  
-**Purpose:** Policy brief supplement documenting evidence-to-prior mappings  
-**Date:** 2026-03-03  
+**Track:** gdpe_0002_evidence_anchoring
+**Purpose:** Policy brief supplement documenting evidence-to-prior mappings
+**Date:** 2026-03-03
 **Audience:** Policymakers, HTA bodies, regulatory agencies
 
 ---
@@ -298,9 +298,9 @@ All evidence-to-prior mappings documented in:
 
 ---
 
-**Version:** 1.0  
-**Date:** 2026-03-03  
-**Track:** gdpe_0002_evidence_anchoring  
+**Version:** 1.0
+**Date:** 2026-03-03
+**Track:** gdpe_0002_evidence_anchoring
 **Phase:** 5 — Research outputs and dissemination
 ## v2.0 Diamond Standard Hardening (08 March 2026)
 

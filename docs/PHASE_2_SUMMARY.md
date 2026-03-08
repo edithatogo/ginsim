@@ -1,8 +1,8 @@
 # Phase 2 Complete: Summary Report
 
-**Track:** gdpe_0002_evidence_anchoring  
-**Phase:** Phase 2 — Calibration targets and priors  
-**Date:** 2026-03-03  
+**Track:** gdpe_0002_evidence_anchoring
+**Phase:** Phase 2 — Calibration targets and priors
+**Date:** 2026-03-03
 **Status:** ✅ COMPLETE
 
 ---
@@ -252,9 +252,9 @@ See `context/decision_log.md` for full details.
 
 ## Sign-off
 
-**Phase 2 complete:** ✅  
-**Review date:** 2026-03-03  
-**Reviewer:** AI Assistant (Conductor workflow)  
+**Phase 2 complete:** ✅
+**Review date:** 2026-03-03
+**Reviewer:** AI Assistant (Conductor workflow)
 **Next phase:** Phase 3 — Identification plan and data access
 
 **Ready to proceed:** Yes

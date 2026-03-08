@@ -1,7 +1,7 @@
 # Protocol: Integrated Economic Evaluation of Policy Options to Restrict Genetic Discrimination
 
-**Version:** v2.0 (Diamond Standard)  
-**Date:** 08 March 2026  
+**Version:** v2.0 (Diamond Standard)
+**Date:** 08 March 2026
 **Author:** Dylan A Mordaunt
 
 ---

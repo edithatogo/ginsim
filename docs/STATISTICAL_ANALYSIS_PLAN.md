@@ -1,7 +1,7 @@
 # Statistical Analysis Plan
 
-**Track:** gdpe_0004_quality_assurance  
-**Version:** 1.0  
+**Track:** gdpe_0004_quality_assurance
+**Version:** 1.0
 **Date:** 2026-03-03
 
 ---
@@ -33,12 +33,12 @@ This document outlines the statistical analysis plan for the genetic discriminat
 for policy in [status_quo, moratorium, ban]:
     # Run model with 2000 posterior draws
     results = run_policy_evaluation(policy, n_draws=2000)
-    
+
     # Compute outcomes
     uptake = results.testing_uptake
     premiums = results.insurance_premiums
     welfare = results.welfare_impact
-    
+
     # Store results
     store_results(policy, results)
 ```
@@ -253,10 +253,10 @@ for param in key_parameters:
 
 ## 9. Approvals
 
-**Prepared by:** Dylan A Mordaunt  
+**Prepared by:** Dylan A Mordaunt
 **Date:** 2026-03-03
 
-**Reviewed by:** [Pending expert review]  
+**Reviewed by:** [Pending expert review]
 **Date:** [Pending]
 
 ---

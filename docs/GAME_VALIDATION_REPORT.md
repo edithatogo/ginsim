@@ -1,7 +1,7 @@
 # Game Validation Report
 
-**Track:** gdpe_0005_game_validation  
-**Date:** 2026-03-03  
+**Track:** gdpe_0005_game_validation
+**Date:** 2026-03-03
 **Version:** 1.0
 
 ---
@@ -220,7 +220,7 @@ This report validates all 6 game-theoretic models implemented in the genetic dis
 
 **Status:** ✅ **PASS** (Issue addressed)
 
-**Resolution:** 
+**Resolution:**
 - Added sensitivity analysis for proxy substitution rate (0.20-0.60 range)
 - Added 3 additional references on proxy discrimination
 - Parameter now has robust empirical support
@@ -414,6 +414,6 @@ See `study/references/references.json` for complete bibliography.
 
 ---
 
-**Version:** 1.0  
-**Date:** 2026-03-03  
+**Version:** 1.0
+**Date:** 2026-03-03
 **Status:** All 6 games validated

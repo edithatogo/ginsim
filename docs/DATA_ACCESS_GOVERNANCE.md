@@ -1,7 +1,7 @@
 # Data Access and Governance Appendix
 
-**Track:** gdpe_0002_evidence_anchoring — Phase 3  
-**Date:** 2026-03-03  
+**Track:** gdpe_0002_evidence_anchoring — Phase 3
+**Date:** 2026-03-03
 **Version:** 1.0
 
 ---

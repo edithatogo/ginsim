@@ -1,7 +1,7 @@
 # Streamlit Dashboard Deployment Guide
 
-**Track:** gdpe_0009_streamlit_dashboard  
-**Date:** 2026-03-03  
+**Track:** gdpe_0009_streamlit_dashboard
+**Date:** 2026-03-03
 **Version:** 1.0
 
 ---
@@ -121,6 +121,6 @@ if st.sidebar.button("Run Analysis"):
 
 ---
 
-**Version:** 1.0  
-**Date:** 2026-03-03  
+**Version:** 1.0
+**Date:** 2026-03-03
 **Status:** Complete ✅

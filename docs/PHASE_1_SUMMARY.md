@@ -1,8 +1,8 @@
 # Phase 1 Complete: Summary Report
 
-**Track:** gdpe_0002_evidence_anchoring  
-**Phase:** Phase 1 — Evidence registers  
-**Date:** 2026-03-03  
+**Track:** gdpe_0002_evidence_anchoring
+**Phase:** Phase 1 — Evidence registers
+**Date:** 2026-03-03
 **Status:** ✅ COMPLETE
 
 ---
@@ -249,9 +249,9 @@ Duplicates: 0
 
 ## Sign-off
 
-**Phase 1 complete:** ✅  
-**Review date:** 2026-03-03  
-**Reviewer:** AI Assistant (Conductor workflow)  
+**Phase 1 complete:** ✅
+**Review date:** 2026-03-03
+**Reviewer:** AI Assistant (Conductor workflow)
 **Next phase:** Phase 2 — Calibration targets and priors
 
 **Ready to proceed:** Yes

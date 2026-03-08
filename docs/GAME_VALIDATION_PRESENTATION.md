@@ -1,7 +1,7 @@
 # Game Validation Presentation
 
-**Track:** gdpe_0005_game_validation  
-**Date:** 2026-03-03  
+**Track:** gdpe_0005_game_validation
+**Date:** 2026-03-03
 **Version:** 1.0
 
 ---
@@ -12,7 +12,7 @@
 
 **Comprehensive Validation Report**
 
-Dylan A Mordaunt  
+Dylan A Mordaunt
 Research Fellow, Faculty of Health, Education and Psychology, Victoria University of Wellington
 
 2026-03-03
@@ -260,5 +260,5 @@ How do different policy regimes affecting genetic discrimination in life insuran
 
 ---
 
-**Version:** 1.0  
+**Version:** 1.0
 **Date:** 2026-03-03

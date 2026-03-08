@@ -1,7 +1,7 @@
 # Formulae Verification and Documentation Report
 
-**Track:** gdpe_0006_formulae_verification  
-**Date:** 2026-03-03  
+**Track:** gdpe_0006_formulae_verification
+**Date:** 2026-03-03
 **Version:** 1.0
 
 ---
@@ -10,8 +10,8 @@
 
 This report documents all mathematical formulae used in the genetic discrimination policy evaluation model, including verification results, academic references, and comprehensive documentation.
 
-**Total Formulae:** 50+ formulae identified and verified  
-**Verification Status:** All formulae verified ✅  
+**Total Formulae:** 50+ formulae identified and verified
+**Verification Status:** All formulae verified ✅
 **Reference Coverage:** 100% (≥1 reference per formula) ✅
 
 ---
@@ -500,6 +500,6 @@ EVPPI(θ) = E_θ[E[max NB|θ]] - max E[NB]
 
 ---
 
-**Version:** 1.0  
-**Date:** 2026-03-03  
+**Version:** 1.0
+**Date:** 2026-03-03
 **Status:** Complete ✅

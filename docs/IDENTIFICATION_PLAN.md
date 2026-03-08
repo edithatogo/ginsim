@@ -1,7 +1,7 @@
 # Identification Plan
 
-**Track:** gdpe_0002_evidence_anchoring — Phase 3  
-**Date:** 2026-03-03  
+**Track:** gdpe_0002_evidence_anchoring — Phase 3
+**Date:** 2026-03-03
 **Version:** 1.0
 
 ---
@@ -373,7 +373,7 @@ Where:
 | Event study analysis | | | | Oct-Dec |
 | Calibration (current) | Jan-Mar | | | |
 
-**Current approach (calibration):** Complete  
+**Current approach (calibration):** Complete
 **Empirical estimation:** 12-18 months (future work)
 
 ---
@@ -416,6 +416,6 @@ Where:
 
 ---
 
-**Version:** 1.0  
-**Date:** 2026-03-03  
+**Version:** 1.0
+**Date:** 2026-03-03
 **Track:** gdpe_0002_evidence_anchoring

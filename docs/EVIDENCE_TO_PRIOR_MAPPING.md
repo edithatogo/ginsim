@@ -1,7 +1,7 @@
 # Evidence-to-Prior Mapping Documentation
 
-**Track:** gdpe_0002_evidence_anchoring — Phase 2  
-**Date:** 2026-03-03  
+**Track:** gdpe_0002_evidence_anchoring — Phase 2
+**Date:** 2026-03-03
 **Purpose:** Transparent documentation of how evidence was converted to prior distributions
 
 ---
@@ -322,6 +322,6 @@ Before finalizing priors, conduct:
 
 ---
 
-**Version:** 1.0  
-**Date:** 2026-03-03  
+**Version:** 1.0
+**Date:** 2026-03-03
 **Track:** gdpe_0002_evidence_anchoring

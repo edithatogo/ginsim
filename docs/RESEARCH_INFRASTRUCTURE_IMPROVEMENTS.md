@@ -1,6 +1,6 @@
 # Research Infrastructure Improvements
 
-**Date:** 3 March 2026  
+**Date:** 3 March 2026
 **Track:** gdpe_0002_evidence_anchoring (Phase 5 integration)
 
 ---

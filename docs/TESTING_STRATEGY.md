@@ -1,7 +1,7 @@
 # Testing Strategy Documentation
 
-**Track:** gdpe_0008_testing_strategy  
-**Date:** 2026-03-03  
+**Track:** gdpe_0008_testing_strategy
+**Date:** 2026-03-03
 **Version:** 1.0
 
 ---
@@ -134,6 +134,6 @@ pytest --cov=src --cov-report=term-missing
 
 ---
 
-**Version:** 1.0  
-**Date:** 2026-03-03  
+**Version:** 1.0
+**Date:** 2026-03-03
 **Status:** Complete ✅

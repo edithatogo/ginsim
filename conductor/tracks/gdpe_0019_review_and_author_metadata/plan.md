@@ -1,6 +1,6 @@
 # Implementation Plan: Comprehensive Codebase Review and Author-Metadata Alignment
 
-**Track ID:** gdpe_0019_review_and_author_metadata  
+**Track ID:** gdpe_0019_review_and_author_metadata
 **Estimated duration:** 3-4 days
 
 ---
@@ -32,5 +32,5 @@
 
 ---
 
-**Version:** 1.0  
+**Version:** 1.0
 **Status:** Complete

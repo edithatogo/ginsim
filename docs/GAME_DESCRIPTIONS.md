@@ -262,7 +262,7 @@ All games should be run with sensitivity analysis to understand parameter uncert
 
 ---
 
-**Version:** 1.0  
-**Last Updated:** 2026-03-05  
-**Authors:** Authors' analysis  
+**Version:** 1.0
+**Last Updated:** 2026-03-05
+**Authors:** Authors' analysis
 **Related Documentation:** `docs/UNCERTAINTY_DECOMPOSITION.md`

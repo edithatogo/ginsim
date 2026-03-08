@@ -1,6 +1,6 @@
 # Face Validity Review Package
 
-**Track:** gdpe_0002_evidence_anchoring — Phase 4  
+**Track:** gdpe_0002_evidence_anchoring — Phase 4
 **Purpose:** Expert review materials for model validation
 
 ---
@@ -323,6 +323,6 @@ Policy Rules → Module A (Behavior) → Module B (Clinical)
 
 ---
 
-**Version:** 1.0  
-**Date:** 2026-03-03  
+**Version:** 1.0
+**Date:** 2026-03-03
 **Track:** gdpe_0002_evidence_anchoring

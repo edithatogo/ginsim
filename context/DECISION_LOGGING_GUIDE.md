@@ -122,7 +122,7 @@ At each phase review, verify:
 
 The track plan includes decision logging as implicit in all tasks. Specific tasks:
 
-**Phase 1:** 
+**Phase 1:**
 - ✅ Decision log created with 12+ decisions
 - ✅ Reflexive journal entry #1 written
 - ✅ Template established for future entries
@@ -229,6 +229,6 @@ Consider sharing:
 
 ---
 
-**Version:** 1.0  
-**Date:** 2026-03-03  
+**Version:** 1.0
+**Date:** 2026-03-03
 **Track:** gdpe_0002_evidence_anchoring

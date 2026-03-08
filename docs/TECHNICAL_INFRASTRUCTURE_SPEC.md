@@ -1,8 +1,8 @@
 # Technical Infrastructure Specification
 
-**Track:** gdpe_0003_model_implementation  
-**Purpose:** Define SOTA technical stack for game-theoretic economic modelling  
-**Date:** 2026-03-03  
+**Track:** gdpe_0003_model_implementation
+**Purpose:** Define SOTA technical stack for game-theoretic economic modelling
+**Date:** 2026-03-03
 **Version:** 1.0
 
 ---
@@ -172,7 +172,7 @@ class ModelParameters(BaseModel):
     baseline_testing_uptake: float
     deterrence_elasticity: float
     # ... all parameters
-    
+
     class Config:
         extra = 'forbid'  # Catch typos
 
@@ -272,17 +272,17 @@ class RNGManager:
     def __init__(self, base_seed: int = 20260303):
         self.base_key = jr.PRNGKey(base_seed)
         self.counters = {}
-    
+
     def get_key(self, stream_name: str) -> jax.Array:
         """Get unique key for computation stream."""
         if stream_name not in self.counters:
             self.counters[stream_name] = 0
-        
+
         subkey, self.base_key = jr.split(self.base_key)
         self.counters[stream_name] += 1
-        
+
         return subkey
-    
+
     def get_policy_comparison_keys(self, n_policies: int) -> jax.Array:
         """Get CRN keys for policy comparison (variance reduction)."""
         return jr.split(self.get_key('policy_comparison'), n_policies)
@@ -374,8 +374,8 @@ snakemake outputs/voi/evppi_by_group.csv
 
 ### 5.1 Current State
 
-**Git:** ✅ Configured  
-**DVC:** ❌ Missing  
+**Git:** ✅ Configured
+**DVC:** ❌ Missing
 **Data versioning:** ❌ Missing
 
 ---
@@ -436,28 +436,28 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.10", "3.11", "3.12"]
-    
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    
+
     - name: Install dependencies
       run: |
         pip install -e ".[dev,validation]"
-    
+
     - name: Lint (ruff)
       run: ruff check src/ scripts/
-    
+
     - name: Type check (mypy)
       run: mypy src/
-    
+
     - name: Test (pytest)
       run: pytest -v --cov=src
-    
+
     - name: Upload coverage
       uses: codecov/codecov-action@v3
 
@@ -465,12 +465,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Run validation tests
       run: |
         python -m scripts.run_stress_tests
         python -m scripts.run_posterior_predictive --n_draws 100
-    
+
     - name: Validate reference integrity
       run: python -m scripts.validate_references --report
 ```
@@ -553,11 +553,11 @@ mlflow.set_experiment("genetic-discrimination-policy")
 with mlflow.start_run():
     # Log parameters
     mlflow.log_params(params.dict())
-    
+
     # Log metrics
     mlflow.log_metric("evpi", evpi_value)
     mlflow.log_metric("runtime_seconds", runtime)
-    
+
     # Log artifacts
     mlflow.log_artifact("outputs/results/posterior_samples.csv")
     mlflow.log_artifact("outputs/figures/policy_comparison.png")
@@ -654,6 +654,6 @@ docs/
 
 ---
 
-**Version:** 1.0  
-**Date:** 2026-03-03  
+**Version:** 1.0
+**Date:** 2026-03-03
 **Track:** gdpe_0003_model_implementation

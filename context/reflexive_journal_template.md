@@ -15,8 +15,8 @@
 ```markdown
 # Reflexive Journal Entry #[Number]
 
-**Date:** YYYY-MM-DD  
-**Track/Phase:** [Track ID / Phase]  
+**Date:** YYYY-MM-DD
+**Track/Phase:** [Track ID / Phase]
 **Trigger:** [Decision made / Evidence reviewed / Phase complete / Conflict encountered]
 
 ---
@@ -150,7 +150,7 @@
 
 ---
 
-**Signed:** _________________  
+**Signed:** _________________
 **Date:** _________________
 ```
 
@@ -161,8 +161,8 @@
 ```markdown
 # Reflexive Journal Entry #1
 
-**Date:** 2026-03-03  
-**Track/Phase:** gdpe_0002_evidence_anchoring / Phase 1  
+**Date:** 2026-03-03
+**Track/Phase:** gdpe_0002_evidence_anchoring / Phase 1
 **Trigger:** NZ evidence base extremely weak (all "Very Low" quality)
 
 ---
@@ -314,7 +314,7 @@ End of Phase 2 (after calibration)
 
 ---
 
-**Signed:** [Initials]  
+**Signed:** [Initials]
 **Date:** 2026-03-03
 ```
 

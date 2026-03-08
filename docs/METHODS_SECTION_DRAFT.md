@@ -1,7 +1,7 @@
 # Methods Section Draft: Genetic Discrimination Policy Economic Evaluation
 
-**Version:** 2.0 (Diamond Standard)  
-**Date:** 2026-03-08  
+**Version:** 2.0 (Diamond Standard)
+**Date:** 2026-03-08
 **Rigor Level:** Mathematically Verified & Numerically Stabilized
 
 ---

@@ -1,7 +1,7 @@
 # Repository Structure Guide
 
-**Track:** gdpe_0004_quality_assurance  
-**Phase:** 3 — Repository Structure  
+**Track:** gdpe_0004_quality_assurance
+**Phase:** 3 — Repository Structure
 **Date:** 2026-03-03
 
 ---

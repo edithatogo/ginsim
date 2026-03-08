@@ -1,8 +1,8 @@
 # Current Status
 
-**Last updated:** 2026-03-07  
-**Current track:** none  
-**Most recently completed track:** `gdpe_0021_manuscript_harmonization_and_submission_pack`  
+**Last updated:** 2026-03-07
+**Current track:** none
+**Most recently completed track:** `gdpe_0021_manuscript_harmonization_and_submission_pack`
 **Next planned track:** none
 
 ---

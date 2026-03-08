@@ -1,6 +1,6 @@
 # Cross-Validation Study Protocol
 
-**Track:** gdpe_0002_evidence_anchoring — Phase 4  
+**Track:** gdpe_0002_evidence_anchoring — Phase 4
 **Purpose:** Identify and compare model outputs against published studies
 
 ---
@@ -215,6 +215,6 @@ Model passes cross-validation if:
 
 ---
 
-**Version:** 1.0  
-**Date:** 2026-03-03  
+**Version:** 1.0
+**Date:** 2026-03-03
 **Track:** gdpe_0002_evidence_anchoring

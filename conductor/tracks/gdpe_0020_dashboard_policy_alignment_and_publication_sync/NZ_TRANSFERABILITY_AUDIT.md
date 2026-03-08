@@ -1,7 +1,7 @@
 # New Zealand Transferability Audit
 
-**Track:** `gdpe_0020_dashboard_policy_alignment_and_publication_sync`  
-**Date:** 2026-03-07  
+**Track:** `gdpe_0020_dashboard_policy_alignment_and_publication_sync`
+**Date:** 2026-03-07
 **Status:** In progress
 
 ---

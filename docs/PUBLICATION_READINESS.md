@@ -1,7 +1,7 @@
 # Publication Readiness Checklist
 
-**Track:** gdpe_0013_external_validation  
-**Date:** 2026-03-05  
+**Track:** gdpe_0013_external_validation
+**Date:** 2026-03-05
 **Version:** 2.0 (Post-SOTA Validation)
 
 ---
@@ -73,9 +73,9 @@ The repository has a strong technical foundation, but follow-up work is still re
 
 ---
 
-**Version:** 2.0  
-**Date:** 2026-03-05  
+**Version:** 2.0
+**Date:** 2026-03-05
 **Status:** Historical milestone record only
 
-**Total Tracks Completed:** 14/14 at publication-ready milestone  
+**Total Tracks Completed:** 14/14 at publication-ready milestone
 **Repository Status:** Follow-up hardening track active before any publication-readiness claim

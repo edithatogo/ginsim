@@ -75,6 +75,6 @@ The study artefacts and model code live in the same repository. The core impleme
 
 ## Contact
 
-Dylan A Mordaunt  
-Research Fellow, Faculty of Health, Education and Psychology, Victoria University of Wellington  
+Dylan A Mordaunt
+Research Fellow, Faculty of Health, Education and Psychology, Victoria University of Wellington
 dylan.mordaunt@vuw.ac.nz

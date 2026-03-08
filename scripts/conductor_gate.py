@@ -1,6 +1,6 @@
 import subprocess
 import sys
-import xml.etree.ElementTree as etree
+import xml.etree.ElementTree
 from pathlib import Path
 
 
@@ -17,7 +17,7 @@ def get_coverage():
     cov_file = Path("coverage.xml")
     if not cov_file.exists():
         return 0.0
-    tree = etree.parse(cov_file)
+    tree = xml.etree.ElementTree.parse(cov_file)
     root = tree.getroot()
     line_rate = float(root.attrib.get("line-rate", 0))
     return line_rate * 100.0

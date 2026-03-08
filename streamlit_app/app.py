@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 GINSIM: Genetic Information Non-Discrimination Policy Integrated Economic Evaluation
-Main Dashboard - SOTA Equity Localization Edition.
+Main Dashboard - SOTA Spatial Equity Edition.
 """
 
 import sys
@@ -15,8 +15,9 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
+import numpy as np
 
-from src.model.module_a_behavior import get_standard_policies
+from src.model.module_a_behavior import compute_testing_uptake, get_standard_policies
 from src.model.parameters import load_jurisdiction_parameters
 from src.model.pipeline import evaluate_single_policy
 
@@ -72,7 +73,7 @@ moratorium_belief = st.sidebar.select_slider(
 )
 trust_map = {"Low": 0.05, "Standard": 0.15, "High": 0.30}
 
-# NEW: EQUITY TOGGLE
+# EQUITY TOGGLE
 st.sidebar.markdown("---")
 st.sidebar.subheader("⚖️ Distributional Equity")
 use_equity_weights = st.sidebar.toggle(
@@ -89,16 +90,17 @@ with st.sidebar.expander("⚙️ Advanced Controls"):
     taper_range_val = st.slider("Taper Range (Glide Path $)", 0, 500000, 100000, step=10000)
 
 st.title("🧬 Genetic Discrimination: Global Policy Explorer")
-st.markdown("### Benchmarking and Equity-Weighted Analysis (Track gdpe_0031)")
+st.markdown("### Benchmarking and Spatial Equity Analysis (Track gdpe_0036)")
 
 STANDARD_POLICIES = get_standard_policies()
 
 # 2. Main Narrative Tabs
-tab_main, tab_bench, tab_sandbox, tab_evidence = st.tabs(
+tab_main, tab_bench, tab_sandbox, tab_spatial, tab_evidence = st.tabs(
     [
         "🏠 Primary Evaluation",
         "🌐 Global Benchmarking",
         "🧪 Cross-Pollination Sandbox",
+        "🗺️ Spatial Equity",
         "🔬 Evidence & Traceability",
     ]
 )
@@ -265,41 +267,6 @@ with tab_bench:
         fig_bench.update_layout(template="plotly_white", xaxis_tickformat=".0%")
         st.plotly_chart(fig_bench, use_container_width=True)
 
-        st.subheader("International Regulatory Matrix")
-        reg_matrix = [
-            {
-                "Jurisdiction": "Australia",
-                "Instrument": "FSC Moratorium",
-                "Type": "Voluntary",
-                "Thresholds": "$500k Life",
-            },
-            {
-                "Jurisdiction": "New Zealand",
-                "Instrument": "ICNZ Agreement",
-                "Type": "Voluntary",
-                "Thresholds": "Varies",
-            },
-            {
-                "Jurisdiction": "UK",
-                "Instrument": "ABI Code",
-                "Type": "Voluntary (Semi-Statutory)",
-                "Thresholds": "£500k Life",
-            },
-            {
-                "Jurisdiction": "Canada",
-                "Instrument": "GNDA",
-                "Type": "Statutory (Criminal)",
-                "Thresholds": "None (Full Ban)",
-            },
-            {
-                "Jurisdiction": "US",
-                "Instrument": "GINA",
-                "Type": "Statutory (Federal)",
-                "Thresholds": "Market-Specific (Excl. Life)",
-            },
-        ]
-        st.table(reg_matrix)
-
 # TAB 3: SANDBOX
 with tab_sandbox:
     st.subheader("🧪 Policy Cross-Pollination")
@@ -332,9 +299,41 @@ with tab_sandbox:
             val_c = float(res_counter.welfare_impact)
         sc2.metric("Counterfactual Welfare", f"${val_c:,.0f}")
 
+# TAB 4: SPATIAL EQUITY (NEW)
+with tab_spatial:
+    st.subheader("Map of 'Diagnostic Deserts' and Access Equity")
+    st.markdown("Visualizing how geographic distance interacting with insurance policy creates uptake disparities.")
+
+    current_params = get_params(jurisdiction, deterrence_level, moratorium_belief, baseline_uptake)
+
+    if st.button("🗺️ Generate Remoteness Profile", type="primary"):
+        remoteness_levels = np.linspace(0.0, 1.0, 10)
+        spatial_results = []
+
+        with st.spinner("Simulating geographic sweep..."):
+            for policy_name, policy_obj in STANDARD_POLICIES.items():
+                for r_idx in remoteness_levels:
+                    uptake = compute_testing_uptake(current_params, policy_obj, remoteness_index=float(r_idx))
+                    spatial_results.append({
+                        "Policy": policy_name.replace("_", " ").title(),
+                        "Remoteness": r_idx,
+                        "Uptake": float(uptake)
+                    })
+
+        df_spatial = pd.DataFrame(spatial_results)
+        fig_spatial = px.line(
+            df_spatial, x="Remoteness", y="Uptake", color="Policy",
+            title=f"Testing Uptake Decay by Geographic Remoteness ({jurisdiction.title()})",
+            labels={"Remoteness": "Remoteness Index (0=Urban, 1=Remote)", "Uptake": "Predicted Testing Share"}
+        )
+        fig_spatial.update_layout(template="plotly_white", yaxis_tickformat=".0%")
+        st.plotly_chart(fig_spatial, use_container_width=True)
+
+        st.info("The 'Decay Curve' shows that policy interventions (like bans) have a smaller marginal effect in remote areas due to the dominant physical cost of access.")
+
 with tab_evidence:
     st.subheader("🧬 Diamond-Standard Traceability")
-    st.caption("Equity Localization Engine v1.0 • Māori Health Sovereignty & Vertical Equity Active")
+    st.caption("Spatial Equity Engine v1.0 • Diagnostic Desert Mapping Active")
 
 st.divider()
-st.caption("Developed by Dylan A Mordaunt • 2026.03 • Equity Weights Integrated")
+st.caption("Developed by Dylan A Mordaunt • 2026.03 • Spatial Logic Integrated")

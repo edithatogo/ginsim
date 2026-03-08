@@ -70,6 +70,7 @@ class ModelParameters(BaseModel):
     # AU System Specifics
     medicare_cost_share: float = 0.0
     audit_intensity: float = 0.50
+    remoteness_weight: float = 0.20
 
     # Metadata
     jurisdiction: str

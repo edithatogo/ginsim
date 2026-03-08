@@ -128,14 +128,21 @@ def compute_testing_utility(
     perceived_penalty: Float[Array, ""],
     individual_characteristics: dict[str, Float[Array, "*"]] | None = None,
     medicare_cost_share: float = 0.0,
+    remoteness_index: float | Array = 0.0,
+    remoteness_weight: float | Array = 0.20,
 ) -> Float[Array, "*"]:
     """
     Compute utility of genetic testing.
+    Now accounts for spatial 'Diagnostic Desert' effects.
     """
     # Base utility: benefits reduced by insurance penalty and test cost (net of Medicare)
-    # Assume base cost of testing is 0.1 in utility units for normalization
-    test_cost_utility = 0.1 * (1.0 - medicare_cost_share)
-    utility = benefits - perceived_penalty - test_cost_utility
+    # Assume base cost of testing is 0.1 in utility units
+    base_test_cost = 0.1 * (1.0 - medicare_cost_share)
+
+    # Spatial penalty: Cost increases with remoteness
+    spatial_test_cost = base_test_cost * (1.0 + _to_float_scalar(remoteness_weight) * _to_float_scalar(remoteness_index))
+
+    utility = benefits - perceived_penalty - spatial_test_cost
 
     # Add individual characteristics
     if individual_characteristics is not None:
@@ -143,6 +150,10 @@ def compute_testing_utility(
             utility = utility + weight * individual_characteristics.get(factor, 0.0)
 
     return utility
+
+
+def _to_float_scalar(val: Any) -> Array:
+    return jnp.asarray(float(val), dtype=jnp.float32)
 
 
 def compute_testing_probability(
@@ -164,11 +175,13 @@ def compute_testing_uptake(
     benefits_sd: float = 0.1,
     n_individuals: int = 1000,
     rng_key: Array | None = None,
+    remoteness_index: float = 0.0,
 ) -> Float[Array, ""]:
     """
     Compute aggregate testing uptake.
+    Supports spatial analysis via remoteness_index.
     """
-    logger.debug(f"Computing testing uptake for policy: {policy.name}")
+    logger.debug(f"Computing testing uptake for policy: {policy.name} (Remoteness: {remoteness_index:.2f})")
     # Compute perceived penalty
     perceived_penalty = compute_perceived_penalty(
         params.adverse_selection_elasticity,
@@ -195,11 +208,13 @@ def compute_testing_uptake(
             n_individuals,
         )
 
-    # Compute utility (with Medicare cost sharing)
+    # Compute utility (with Medicare cost sharing and Spatial effects)
     utilities = compute_testing_utility(
         benefits,
         perceived_penalty,
-        medicare_cost_share=getattr(params, "medicare_cost_share", 0.0)
+        medicare_cost_share=getattr(params, "medicare_cost_share", 0.0),
+        remoteness_index=remoteness_index,
+        remoteness_weight=getattr(params, "remoteness_weight", 0.20)
     )
 
     # Compute testing probabilities

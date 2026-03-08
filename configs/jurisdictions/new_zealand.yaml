@@ -41,3 +41,5 @@ pharmac_qaly_threshold: 35000.0
 
 medicare_cost_share: 0.0
 audit_intensity: 0.50
+
+remoteness_weight: 0.40

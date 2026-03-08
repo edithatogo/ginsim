@@ -5,7 +5,7 @@ Shared helpers for dashboard pages and deployment wrappers.
 from __future__ import annotations
 
 from src.model.module_a_behavior import get_standard_policies
-from src.model.parameters import ModelParameters, PolicyConfig
+from src.model.parameters import PolicyConfig
 from src.model.pipeline import PolicyEvaluationResult, evaluate_single_policy
 
 _SANDBOX_PENALTY_MAX = 1_000_000.0
@@ -37,7 +37,7 @@ def evaluate_sandbox_policy(
 ) -> PolicyEvaluationResult:
     """Evaluate the dashboard sandbox using the core policy pipeline."""
     from src.model.parameters import load_jurisdiction_parameters
-    
+
     # Use Australia as the sandbox base population
     base_params = load_jurisdiction_parameters("australia")
     params = base_params.model_copy(update={

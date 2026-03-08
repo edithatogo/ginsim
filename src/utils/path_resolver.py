@@ -4,9 +4,10 @@ Handles fallback between public and local_only directories.
 """
 from __future__ import annotations
 
-import os
 from pathlib import Path
+
 from loguru import logger
+
 
 def resolve_path(relative_path: str | Path) -> Path:
     """

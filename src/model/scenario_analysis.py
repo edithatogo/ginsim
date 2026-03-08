@@ -45,7 +45,7 @@ def _build_model_parameters(scenario_config: dict[str, Any]) -> Any:
     from src.model.parameters import ModelParameters, PolicyConfig, load_jurisdiction_parameters
 
     params_dict = dict(scenario_config.get("parameters", {}))
-    
+
     # 1. Determine jurisdiction
     j_code = scenario_config.get("jurisdiction", "AU").strip().upper()
     j_map = {
@@ -56,10 +56,10 @@ def _build_model_parameters(scenario_config: dict[str, Any]) -> Any:
         "US": "us"
     }
     j_id = j_map.get(j_code, "australia")
-    
+
     # 2. Load base parameters for that jurisdiction
     base_params = load_jurisdiction_parameters(j_id)
-    
+
     # 3. Apply updates
     model_fields = set(ModelParameters.model_fields)
     policy_fields = set(PolicyConfig.model_fields)

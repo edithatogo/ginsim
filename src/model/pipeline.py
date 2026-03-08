@@ -13,6 +13,8 @@ from typing import Any, cast
 from jaxtyping import Array, Float
 from loguru import logger
 
+from . import dcba_ledger as dcba
+
 # Import the FULL logic suite
 from . import module_a_behavior as mod_a
 from . import module_b_clinical as mod_b
@@ -20,7 +22,6 @@ from . import module_c_insurance_eq as mod_c
 from . import module_d_proxy as mod_d
 from . import module_enforcement as mod_e
 from . import module_f_data_quality as mod_f
-from . import dcba_ledger as dcba
 from .parameters import ModelParameters, PolicyConfig, get_default_parameters
 
 
@@ -168,7 +169,7 @@ def compare_policies(
                     "compliance_change": float(res.compliance_rate - base_res.compliance_rate),
                 }
         return comparisons
-    
+
     base_res = cast(PolicyEvaluationResult, baseline)
     reform_res = cast(PolicyEvaluationResult, reform)
     return {

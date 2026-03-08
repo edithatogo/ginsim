@@ -5,7 +5,7 @@ Unit tests for Value of Information (VOI) Analysis.
 import jax.numpy as jnp
 import numpy as np
 
-from src.model.parameters import ModelParameters, get_default_parameters, PolicyConfig
+from src.model.parameters import PolicyConfig, get_default_parameters
 from src.model.voi_analysis import (
     VOIResult,
     compute_evpi,

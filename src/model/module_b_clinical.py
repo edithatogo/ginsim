@@ -11,7 +11,6 @@ from dataclasses import dataclass
 from typing import Any
 
 import jax
-import jax.numpy as jnp
 from jax import jit
 from jaxtyping import Array, Float
 
@@ -43,10 +42,10 @@ def simulate_cohort_outcomes(
     """
     # Effective prevention: uptake * efficacy in the prevalent population
     events_prevented = uptake * cohort.prevalence * cohort.baseline_risk * cohort.prevention_efficacy
-    
+
     qaly_gains = events_prevented * cohort.qaly_loss_per_event
     cost_savings = events_prevented * cohort.cost_per_event
-    
+
     return {
         "events_prevented": events_prevented,
         "qaly_gains": qaly_gains,
@@ -56,9 +55,9 @@ def simulate_cohort_outcomes(
 def get_standard_cohorts() -> list[DiseaseCohort]:
     """Get high-impact clinical cohorts for simulation."""
     return [
-        DiseaseCohort("BRCA1/2 (HBOC)", float(0.0025), float(0.60), float(0.50), float(5.0), float(80000.0)),
-        DiseaseCohort("Lynch Syndrome (CRC)", float(0.0035), float(0.40), float(0.60), float(4.0), float(65000.0)),
-        DiseaseCohort("FH (Cardiovascular)", float(0.0050), float(0.30), float(0.70), float(3.0), float(45000.0))
+        DiseaseCohort("BRCA1/2 (HBOC)", 0.0025, 0.60, 0.50, 5.0, 80000.0),
+        DiseaseCohort("Lynch Syndrome (CRC)", 0.0035, 0.40, 0.60, 4.0, 65000.0),
+        DiseaseCohort("FH (Cardiovascular)", 0.0050, 0.30, 0.70, 3.0, 45000.0)
     ]
 
 def compute_clinical_outcomes(uptake: Float[Array, ""]) -> dict[str, Any]:
@@ -67,12 +66,12 @@ def compute_clinical_outcomes(uptake: Float[Array, ""]) -> dict[str, Any]:
     """
     cohorts = get_standard_cohorts()
     results = [simulate_cohort_outcomes(uptake, c) for c in cohorts]
-    
+
     total_qaly = sum(r["qaly_gains"] for r in results)
     total_savings = sum(r["cost_savings"] for r in results)
-    
+
     return {
         "total_qaly_gains": total_qaly,
         "total_cost_savings": total_savings,
-        "cohort_breakdown": {c.name: r for c, r in zip(cohorts, results)}
+        "cohort_breakdown": {c.name: r for c, r in zip(cohorts, results, strict=True)}
     }

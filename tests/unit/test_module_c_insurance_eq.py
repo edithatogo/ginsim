@@ -15,7 +15,7 @@ from src.model.module_c_insurance_eq import (
     separating_equilibrium,
     zero_profit_premium,
 )
-from src.model.parameters import ModelParameters, get_default_parameters, PolicyConfig
+from src.model.parameters import PolicyConfig, get_default_parameters
 
 
 class TestRiskPremium:

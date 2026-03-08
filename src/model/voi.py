@@ -7,9 +7,6 @@ logic for genetic policy uncertainty.
 
 from __future__ import annotations
 
-from typing import Any
-
-import jax
 import jax.numpy as jnp
 from jax import jit
 from jaxtyping import Array, Float

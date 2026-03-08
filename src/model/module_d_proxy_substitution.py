@@ -2,7 +2,7 @@
 Module D: Proxy Substitution model (Advanced Edition).
 
 Implements constrained optimization for underwriting when genetic information
-is restricted. Models the degree to which non-genetic features act as 
+is restricted. Models the degree to which non-genetic features act as
 correlated proxies for genetic risk.
 """
 

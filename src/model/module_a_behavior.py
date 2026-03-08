@@ -40,7 +40,7 @@ def taper_function(x: Array, cap: Array, taper_range: Array) -> Array:
     safe_range = jnp.maximum(taper_range, 1e-10)
     z = (x - cap) / safe_range
     z = jnp.clip(z, 0.0, 1.0)
-    
+
     # Cosine smoothing (SmoothStep)
     # 0.5 * (1 + cos(pi * z)) gives 1 at z=0, 0 at z=1
     return 0.5 * (1.0 + jnp.cos(jnp.pi * z))
@@ -75,27 +75,27 @@ def compute_perceived_penalty(
         # We model a 'Representative Individual' whose insurance demand is split.
         # The protection factor is 1.0 for those below cap, 0.0 for those above,
         # and smooth for those in the taper range.
-        
+
         # Approximate the aggregate protection by evaluating at the median high-buyer
         # or by using the high_sum_insured_share.
-        
+
         # Continuous approximation:
         # We assume the 'representative' high buyer is at (Cap + 0.5 * Taper)
         # and the share of people in the taper is part of the high_sum_insured_share.
-        
+
         # restriction = (Share_Low * 1.0) + (Share_High * Taper_at_High_Buyer)
         # For now, we use high_sum_insured_share as the 'unprotected' group
         # but let the taper_range reduce their perceived risk if it's wide.
-        
+
         avg_protection_high = taper_function(
             jnp.asarray(1.0), # Normalized proxy for high buyers
-            jnp.asarray(0.0), 
+            jnp.asarray(0.0),
             jnp.asarray(taper_range / 1000000.0) # Scaled range
         )
-        
+
         base_restriction = (1.0 - high_sum_insured_share)
         taper_bonus = high_sum_insured_share * avg_protection_high
-        
+
         restriction_strength = (base_restriction + taper_bonus) * (0.7 + 0.3 * moratorium_effect)
     else:
         restriction_strength = 1.0

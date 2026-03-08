@@ -14,7 +14,7 @@ from src.model.module_f_data_quality import (
     compute_selection_bias,
     get_standard_participation_parameters,
 )
-from src.model.parameters import ModelParameters, get_default_parameters, PolicyConfig
+from src.model.parameters import PolicyConfig, get_default_parameters
 
 
 class TestParticipationProbability:

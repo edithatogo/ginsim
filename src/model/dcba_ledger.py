@@ -182,18 +182,18 @@ def compute_dcba(
         testing_uptake, baseline_uptake, time_horizon=time_horizon, discount_rate=discount_rate
     )
     re = _to_float_scalar(research_value_loss)
-    
+
     # 1. Compute net local welfare (Utilitarian)
     net_welfare_local = cs + ps + hb + fi - re
-    
+
     # 2. Compute Equity-Adjusted Welfare
     # We apply the equity_factor primarily to health and consumer surplus (direct people impact)
     weighted_welfare_local = (cs + hb) * equity_factor + (ps + fi - re)
-    
+
     # 3. Apply PPP normalization to all components
     ppp = jnp.asarray(ppp_conversion_factor)
     dist_weight = _to_float_scalar(distributional_weight)
-    
+
     return DCBAResult(
         net_welfare=net_welfare_local * ppp * dist_weight,
         equity_weighted_welfare=weighted_welfare_local * ppp * dist_weight,

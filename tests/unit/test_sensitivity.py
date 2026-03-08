@@ -2,7 +2,7 @@
 Unit tests for sensitivity analysis functions.
 """
 
-from src.model.parameters import ModelParameters, PolicyConfig, get_default_parameters
+from src.model.parameters import PolicyConfig, get_default_parameters
 from src.model.sensitivity import (
     SensitivityResult,
     run_scenario_analysis,

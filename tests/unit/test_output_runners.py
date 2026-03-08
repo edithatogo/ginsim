@@ -2,9 +2,7 @@
 Unit tests for high-level output runner scripts.
 """
 
-import numpy as np
 from scripts import run_posterior_predictive, run_stress_tests
-from src.model.parameters import get_default_parameters
 
 
 def test_simulate_model_outputs_uses_active_pipeline() -> None:

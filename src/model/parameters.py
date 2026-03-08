@@ -5,7 +5,6 @@ Parameter schemas and loading logic for the economic model.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
 import yaml
 from pydantic import BaseModel, ConfigDict
@@ -64,6 +63,10 @@ class ModelParameters(BaseModel):
     compliance_cost_fixed: float
     detection_prob_baseline: float
 
+    # NZ System Specifics
+    acc_deterrence_offset: float = 0.0
+    pharmac_qaly_threshold: float = 50000.0
+
     # Metadata
     jurisdiction: str
     calibration_date: str
@@ -79,20 +82,20 @@ def load_jurisdiction_parameters(jurisdiction: str) -> ModelParameters:
     # Look for config relative to project root
     # Try multiple common locations for reliability
     roots = [Path.cwd(), Path(__file__).parent.parent.parent]
-    
+
     config_path = None
     for root in roots:
         target = root / "configs" / "jurisdictions" / f"{jurisdiction}.yaml"
         if target.exists():
             config_path = target
             break
-            
+
     if not config_path:
         raise FileNotFoundError(f"Config for jurisdiction '{jurisdiction}' not found.")
-        
-    with open(config_path, "r", encoding="utf-8") as f:
+
+    with open(config_path, encoding="utf-8") as f:
         data = yaml.safe_load(f)
-        
+
     return ModelParameters(**data)
 
 

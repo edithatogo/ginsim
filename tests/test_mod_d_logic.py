@@ -2,8 +2,8 @@ import jax.numpy as jnp
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from src.model.module_d_proxy import compute_proxy_substitution_effect
 from src.model.module_a_behavior import get_standard_policies
+from src.model.module_d_proxy import compute_proxy_substitution_effect
 from src.model.parameters import get_default_parameters
 
 
@@ -18,7 +18,7 @@ def test_information_gap_monotonicity(proxy_rate):
     params = get_default_parameters()
     # Override with hypothesis value
     params = params.model_copy(update={"proxy_substitution_rate": proxy_rate})
-    
+
     policies = get_standard_policies()
     sq = policies["status_quo"]
     reform = policies["ban"]

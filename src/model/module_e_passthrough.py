@@ -7,7 +7,6 @@ into the primary policy evaluation pipeline.
 
 from __future__ import annotations
 
-import jax.numpy as jnp
 from jax import jit
 from jaxtyping import Array, Float
 

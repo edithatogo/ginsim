@@ -35,3 +35,6 @@ high_sum_insured_share: 0.25
 equity_factor: 1.20
 
 taper_range: 50000.0
+
+acc_deterrence_offset: 0.0
+pharmac_qaly_threshold: 50000.0

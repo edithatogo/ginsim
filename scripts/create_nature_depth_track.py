@@ -98,7 +98,7 @@ def update_tracks_registry(track_id: str, title: str, status: str) -> None:
     """Insert the generated track into the requested registry section."""
     if not TRACKS_REGISTRY.exists():
         return
-        
+
     registry_text = TRACKS_REGISTRY.read_text(encoding="utf-8")
     normalized_status = status.strip().lower()
     if normalized_status not in {"planned", "active"}:

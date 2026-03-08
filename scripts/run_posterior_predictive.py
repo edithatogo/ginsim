@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
 from datetime import datetime
 from pathlib import Path
 
@@ -18,11 +17,11 @@ import numpy as np
 from loguru import logger
 from scipy.stats import beta, norm
 
-from src.utils.logging_config import setup_logging
 from src.model.module_a_behavior import get_standard_policies
 from src.model.module_c_insurance_eq import compute_premium_divergence
 from src.model.parameters import ModelParameters, get_default_parameters
 from src.model.pipeline import evaluate_single_policy
+from src.utils.logging_config import setup_logging
 
 # Initialize logging
 setup_logging(level="INFO")

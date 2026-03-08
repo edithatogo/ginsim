@@ -22,7 +22,7 @@ from pathlib import Path
 from loguru import logger
 
 SCAN_PATTERNS = ("*.md", "*.tex", "*.py", "*.yaml", "*.yml", "*.json")
-SKIP_PARTS = {".git", ".venv", "outputs", "__pycache__", ".pytest_cache", ".mypy_cache"}
+SKIP_PARTS = {".git", ".venv", "outputs", "__pycache__", ".pytest_cache", ".mypy_cache", "external"}
 
 LATEX_PATTERNS = (
     r"\\cite\{([^}]+)\}",

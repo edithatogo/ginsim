@@ -3,7 +3,6 @@ Unit tests for dashboard helper functions.
 """
 
 from streamlit_app.dashboard_helpers import evaluate_sandbox_policy
-from src.model.parameters import get_default_parameters
 
 
 def test_evaluate_sandbox_policy_runs_through_core_pipeline():

@@ -188,13 +188,13 @@ def compute_equilibrium(
     """
     # 1. Pure separating (Status Quo)
     sep_eq = separating_equilibrium(params, risk_high, risk_low, proportion_high)
-    
+
     # 2. Pure pooling (Complete Ban)
     pool_eq = pooling_equilibrium(params, risk_high, risk_low, proportion_high)
-    
+
     # 3. Blended (Threshold Moratorium)
     share_high = getattr(params, "high_sum_insured_share", 0.25)
-    
+
     blended_eq = InsuranceEquilibrium(
         premium_high=share_high * sep_eq.premium_high + (1.0 - share_high) * pool_eq.premium_high,
         premium_low=share_high * sep_eq.premium_low + (1.0 - share_high) * pool_eq.premium_low,

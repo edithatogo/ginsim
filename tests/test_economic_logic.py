@@ -10,11 +10,11 @@ from src.model.parameters import get_default_parameters
 @given(prop_high=st.floats(min_value=0.01, max_value=0.99))
 def test_insurer_zero_profit_identity(prop_high):
     """
-    Fundamental Identity: In a competitive screening equilibrium with 
+    Fundamental Identity: In a competitive screening equilibrium with
     actuarially fair pricing, insurer profits must be zero.
     """
     params = get_default_parameters()
-    
+
     eq_sep = separating_equilibrium(params, proportion_high=prop_high)
     assert jnp.abs(eq_sep.insurer_profits) < 1e-5
 

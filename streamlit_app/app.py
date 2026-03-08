@@ -13,7 +13,6 @@ sys.path.insert(0, str(project_root))
 
 import plotly.graph_objects as go
 import streamlit as st
-import numpy as np
 
 from src.model.module_a_behavior import get_standard_policies
 from src.model.parameters import ModelParameters
@@ -30,19 +29,21 @@ STYLE = {
         "neutral": "#999999",
         "consumer": "#56B4E9",
         "insurer": "#E69F00",
-        "health": "#CC79A7"
+        "health": "#CC79A7",
     },
 }
 
+
 def get_policy_color(policy_name: str) -> str:
     name = policy_name.lower().replace(" ", "_")
-    if 'status_quo' in name:
-        return STYLE['colors']['status_quo']
-    if 'moratorium' in name:
-        return STYLE['colors']['moratorium']
-    if 'ban' in name:
-        return STYLE['colors']['ban']
-    return STYLE['colors']['neutral']
+    if "status_quo" in name:
+        return STYLE["colors"]["status_quo"]
+    if "moratorium" in name:
+        return STYLE["colors"]["moratorium"]
+    if "ban" in name:
+        return STYLE["colors"]["ban"]
+    return STYLE["colors"]["neutral"]
+
 
 # =============================================================================
 # Page Layout
@@ -63,7 +64,7 @@ deterrence_level = st.sidebar.select_slider(
     "Deterrence Elasticity",
     options=["Low", "Standard", "High"],
     value="Standard",
-    help="How much insurance costs deter testing."
+    help="How much insurance costs deter testing.",
 )
 deterrence_map = {"Low": 0.05, "Standard": 0.18, "High": 0.40}
 
@@ -71,7 +72,7 @@ moratorium_belief = st.sidebar.select_slider(
     "Moratorium Effect",
     options=["Low", "Standard", "High"],
     value="Standard",
-    help="Public trust in industry agreements."
+    help="Public trust in industry agreements.",
 )
 trust_map = {"Low": 0.05, "Standard": 0.15, "High": 0.30}
 
@@ -88,16 +89,18 @@ STANDARD_POLICIES = get_standard_policies()
 policy_label = st.selectbox("Select Policy to Evaluate:", ["Status Quo", "Moratorium", "Ban"])
 selected_policy_id = policy_label.lower().replace(" ", "_")
 
+
 # 3. Model Execution
 @st.cache_data
 def evaluate_cached(_params, policy_id):
     return evaluate_single_policy(_params, STANDARD_POLICIES[policy_id])
 
+
 params_obj = ModelParameters(
     deterrence_elasticity=deterrence_map[deterrence_level],
     moratorium_effect=trust_map[moratorium_belief],
     baseline_testing_uptake=baseline_uptake,
-    jurisdiction=jurisdiction.lower().replace(" ", "_")
+    jurisdiction=jurisdiction.lower().replace(" ", "_"),
 )
 
 if st.sidebar.button("🔬 Run Model Analysis", type="primary"):
@@ -109,7 +112,7 @@ if st.sidebar.button("🔬 Run Model Analysis", type="primary"):
 # 4. Display Results
 if "result" in st.session_state:
     res = st.session_state["result"]
-    
+
     # KPIs
     c1, c2, c3, c4 = st.columns(4)
     with c1:
@@ -122,36 +125,66 @@ if "result" in st.session_state:
         st.metric("Research Participation", f"{float(res.research_participation):.1%}")
 
     # Tabs
-    tab1, tab2, tab3 = st.tabs(["📊 Welfare Decomposition", "📈 Multi-Criteria Analysis", "🔬 Evidence Linkage"])
+    tab1, tab2, tab3 = st.tabs(
+        ["📊 Welfare Decomposition", "📈 Multi-Criteria Analysis", "🔬 Evidence Linkage"]
+    )
 
     with tab1:
         col_l, col_r = st.columns([2, 1])
         with col_l:
             st.subheader("Distributional Welfare Ledger (DCBA)")
             w = res.all_metrics["welfare"]
-            names = ["Consumer Surplus", "Producer Surplus", "Health Benefits", "Fiscal Impact", "Research Ext."]
-            vals = [w["consumer_surplus"], w["producer_surplus"], w["health_benefits"], w["fiscal_impact"], -w["research_externalities"]]
-            
-            fig = go.Figure(go.Bar(
-                x=names, y=vals,
-                marker_color=[STYLE["colors"]["consumer"], STYLE["colors"]["insurer"], STYLE["colors"]["health"], "#999999", "#D55E00"]
-            ))
-            fig.update_layout(title=f"Welfare Impact Component Breakdown (Total: ${float(res.welfare_impact):,.0f})", template="plotly_white")
+            names = [
+                "Consumer Surplus",
+                "Producer Surplus",
+                "Health Benefits",
+                "Fiscal Impact",
+                "Research Ext.",
+            ]
+            vals = [
+                w["consumer_surplus"],
+                w["producer_surplus"],
+                w["health_benefits"],
+                w["fiscal_impact"],
+                -w["research_externalities"],
+            ]
+
+            fig = go.Figure(
+                go.Bar(
+                    x=names,
+                    y=vals,
+                    marker_color=[
+                        STYLE["colors"]["consumer"],
+                        STYLE["colors"]["insurer"],
+                        STYLE["colors"]["health"],
+                        "#999999",
+                        "#D55E00",
+                    ],
+                )
+            )
+            fig.update_layout(
+                title=f"Welfare Impact Component Breakdown (Total: ${float(res.welfare_impact):,.0f})",
+                template="plotly_white",
+            )
             st.plotly_chart(fig, use_container_width=True)
-        
+
         with col_r:
             st.subheader("Market Dynamics")
             st.write(f"**Premium High Risk:** {res.insurance_premiums['premium_high']:.3f}")
             st.write(f"**Premium Low Risk:** {res.insurance_premiums['premium_low']:.3f}")
-            st.write(f"**Residual Information Gap:** {res.all_metrics['proxy']['residual_information_gap']:.1%}")
-            st.info("The Information Gap measures the insurer's remaining ability to infer genetic risk using proxy data.")
+            st.write(
+                f"**Residual Information Gap:** {res.all_metrics['proxy']['residual_information_gap']:.1%}"
+            )
+            st.info(
+                "The Information Gap measures the insurer's remaining ability to infer genetic risk using proxy data."
+            )
 
     with tab2:
         st.subheader("Comparative Radar: All Policies")
         p_names = ["Status Quo", "Moratorium", "Ban"]
         m_keys = ["Uptake", "Welfare", "Equity", "Research"]
         fig_r = go.Figure()
-        
+
         for name in p_names:
             pid = name.lower().replace(" ", "_")
             r_obj = evaluate_cached(st.session_state["params_obj"], pid)
@@ -159,15 +192,20 @@ if "result" in st.session_state:
                 float(r_obj.testing_uptake) / 0.8,
                 min(float(r_obj.welfare_impact) / 100000, 1.0),
                 1.0 if "ban" in pid else (0.6 if "moratorium" in pid else 0.2),
-                float(r_obj.research_participation)
+                float(r_obj.research_participation),
             ]
-            fig_r.add_trace(go.Scatterpolar(
-                r=[*r_vals, r_vals[0]], 
-                theta=[*m_keys, m_keys[0]], 
-                name=name, fill='toself', 
-                line_color=get_policy_color(name)
-            ))
-        fig_r.update_layout(polar={"radialaxis": {"visible": True, "range": [0, 1]}}, template="plotly_white")
+            fig_r.add_trace(
+                go.Scatterpolar(
+                    r=[*r_vals, r_vals[0]],
+                    theta=[*m_keys, m_keys[0]],
+                    name=name,
+                    fill="toself",
+                    line_color=get_policy_color(name),
+                )
+            )
+        fig_r.update_layout(
+            polar={"radialaxis": {"visible": True, "range": [0, 1]}}, template="plotly_white"
+        )
         st.plotly_chart(fig_r, use_container_width=True)
 
     with tab3:

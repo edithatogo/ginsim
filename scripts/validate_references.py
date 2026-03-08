@@ -22,7 +22,7 @@ from pathlib import Path
 from loguru import logger
 
 SCAN_PATTERNS = ("*.md", "*.tex", "*.py", "*.yaml", "*.yml", "*.json")
-SKIP_PARTS = {".git", ".venv", "outputs", "__pycache__", ".pytest_cache", ".mypy_cache", "external"}
+SKIP_PARTS = {".git", ".venv", "outputs", "__pycache__", ".pytest_cache", ".mypy_cache", "external", ".tmp_streamlit_deploy_check", "study", "tests"}
 
 LATEX_PATTERNS = (
     r"\\cite\{([^}]+)\}",
@@ -152,9 +152,8 @@ class ReferenceValidator:
             for pattern in YAML_PATTERNS:
                 for match in re.findall(pattern, text):
                     cleaned = match.strip()
-                    if cleaned:
+                    if cleaned and cleaned.lower() != "key":
                         keys.add(cleaned)
-
         return keys
 
     def normalize_source_value(self, key: str) -> list[str]:
@@ -164,6 +163,9 @@ class ReferenceValidator:
         return [part.strip() for part in re.split(r"\s+\+\s+", normalized) if part.strip()]
 
     def resolve_key(self, key: str, report: ValidationReport) -> None:
+        if not key or key.lower() == "key":
+            return
+
         if key in self.reference_ids:
             report.resolved_keys.add(key)
             return

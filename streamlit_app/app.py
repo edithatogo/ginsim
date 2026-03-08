@@ -11,13 +11,13 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
-import numpy as np
 
-from src.model.module_a_behavior import get_standard_policies, compute_testing_uptake
+from src.model.module_a_behavior import compute_testing_uptake, get_standard_policies
 from src.model.parameters import load_jurisdiction_parameters
 from src.model.pipeline import evaluate_single_policy
 from src.model.temporal_engine import simulate_evolution
@@ -140,7 +140,7 @@ with tab_main:
                 result = evaluate_cached(params_obj, selected_policy_id)
                 st.session_state["main_result"] = result
                 st.session_state["main_params"] = params_obj
-    
+
     with c_temp:
         if st.button("📈 Project 10-Year Trajectory", type="secondary"):
             with st.spinner("Simulating temporal evolution..."):
@@ -186,17 +186,17 @@ with tab_main:
             fig = go.Figure(go.Bar(x=names, y=vals, marker_color=["#56B4E9", "#E69F00", "#CC79A7", "#999999", "#D55E00"]))
             fig.update_layout(template="plotly_white")
             st.plotly_chart(fig, use_container_width=True)
-            
+
         with col_r:
             st.subheader("Market Indicators")
             st.write(f"**Premium High Risk:** {res.insurance_premiums['premium_high']:.3f}")
-            gap = res.all_metrics['proxy']['residual_information_gap']
-            redundancy = res.all_metrics['proxy'].get('informational_redundancy', 0.0)
-            ev_key = res.all_metrics['proxy'].get('source_evidence_key', 'N/A')
+            gap = res.all_metrics["proxy"]["residual_information_gap"]
+            redundancy = res.all_metrics["proxy"].get("informational_redundancy", 0.0)
+            ev_key = res.all_metrics["proxy"].get("source_evidence_key", "N/A")
             st.write(f"**Information Gap:** {gap:.1%}")
             st.write(f"**Informational Redundancy:** {redundancy:.1%}")
             st.caption(f"Evidence Anchor: `{ev_key}`")
-            
+
     if "temporal_history" in st.session_state:
         st.divider()
         st.subheader("📅 10-Year Market Trajectory")
@@ -208,7 +208,7 @@ with tab_main:
             "Premium (Low)": float(s.premium_low),
             "Welfare": float(s.net_welfare)
         } for s in hist])
-        
+
         c_h1, c_h2 = st.columns(2)
         with c_h1:
             fig_u = px.line(df_hist, x="Year", y="Uptake", title="Testing Uptake Projection")
@@ -218,7 +218,7 @@ with tab_main:
             fig_p = px.line(df_hist, x="Year", y=["Premium (High)", "Premium (Low)"], title="Premium Evolution")
             fig_p.update_layout(template="plotly_white")
             st.plotly_chart(fig_p, use_container_width=True)
-        
+
         st.info("The projection accounts for annual technological drift (increasing proxy accuracy) and inflationary pressure on regulatory thresholds.")
 
 # TAB 2: GLOBAL BENCHMARKING

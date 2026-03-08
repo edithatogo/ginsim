@@ -37,6 +37,7 @@ def compute_perceived_penalty(
     enforcement_effectiveness: float,
     moratorium_effect: float,
     sum_insured_caps: dict[str, float] | None = None,
+    high_sum_insured_share: float = 0.25,
 ) -> Float[Array, ""]:
     """
     Compute perceived discrimination penalty under policy regime.
@@ -50,7 +51,9 @@ def compute_perceived_penalty(
     if allow_genetic_test_results:
         restriction_strength = 0.0
     elif sum_insured_caps is not None:
-        restriction_strength = 0.5 + moratorium_effect
+        # Rigorous threshold logic: only those below cap are protected.
+        # We also scale by moratorium trust effect.
+        restriction_strength = (1.0 - high_sum_insured_share) * (0.7 + 0.3 * moratorium_effect)
     else:
         restriction_strength = 1.0
 
@@ -77,6 +80,7 @@ def compute_perceived_penalty_wrapper(
         params.enforcement_effectiveness,
         params.moratorium_effect,
         policy.sum_insured_caps,
+        getattr(params, "high_sum_insured_share", 0.25),
     )
     return float(penalty)
 
@@ -206,10 +210,11 @@ def get_standard_policies() -> dict[str, PolicyConfig]:
         ),
         "moratorium": PolicyConfig(
             name="moratorium",
-            description="Moratorium",
+            description="Moratorium (Self-Regulation)",
             allow_genetic_test_results=False,
             allow_family_history=True,
-            sum_insured_caps={"death": 600000.0, "tpd": 200000.0, "trauma": 200000.0},
+            # Exact FSC Moratorium thresholds (AUD)
+            sum_insured_caps={"life": 500000.0, "tpd": 500000.0, "trauma": 200000.0, "income_protection": 4000.0},
             enforcement_strength=0.5,
         ),
         "ban": PolicyConfig(

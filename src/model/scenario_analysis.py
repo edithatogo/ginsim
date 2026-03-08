@@ -42,9 +42,25 @@ class ScenarioComparison:
 
 def _build_model_parameters(scenario_config: dict[str, Any]) -> Any:
     """Build validated ModelParameters from a scenario config."""
-    from src.model.parameters import ModelParameters, PolicyConfig
+    from src.model.parameters import ModelParameters, PolicyConfig, load_jurisdiction_parameters
 
     params_dict = dict(scenario_config.get("parameters", {}))
+    
+    # 1. Determine jurisdiction
+    j_code = scenario_config.get("jurisdiction", "AU").strip().upper()
+    j_map = {
+        "AU": "australia",
+        "NZ": "new_zealand",
+        "UK": "uk",
+        "CA": "canada",
+        "US": "us"
+    }
+    j_id = j_map.get(j_code, "australia")
+    
+    # 2. Load base parameters for that jurisdiction
+    base_params = load_jurisdiction_parameters(j_id)
+    
+    # 3. Apply updates
     model_fields = set(ModelParameters.model_fields)
     policy_fields = set(PolicyConfig.model_fields)
 
@@ -60,13 +76,7 @@ def _build_model_parameters(scenario_config: dict[str, Any]) -> Any:
         raise ValueError(message)
 
     model_updates = {key: value for key, value in params_dict.items() if key in model_fields}
-    jurisdiction = scenario_config.get("jurisdiction", "").strip().upper()
-    if jurisdiction == "AU":
-        model_updates.setdefault("jurisdiction", "australia")
-    elif jurisdiction == "NZ":
-        model_updates.setdefault("jurisdiction", "new_zealand")
-
-    return ModelParameters(**model_updates)
+    return base_params.model_copy(update=model_updates)
 
 
 def _infer_policy_id(scenario_name: str, scenario_config: dict[str, Any]) -> str:

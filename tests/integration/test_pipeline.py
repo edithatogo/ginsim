@@ -2,7 +2,7 @@
 Integration tests for the full policy evaluation pipeline.
 """
 
-from src.model.parameters import ModelParameters, PolicyConfig
+from src.model.parameters import ModelParameters, get_default_parameters, PolicyConfig
 from src.model.pipeline import (
     compare_policies,
     evaluate_policy_sweep,
@@ -18,7 +18,7 @@ class TestEvaluateSinglePolicy:
 
     def test_evaluation_returns_result(self):
         """Test that evaluation returns a result object."""
-        params = ModelParameters()
+        params = get_default_parameters()
         policy = PolicyConfig(
             name="test",
             description="Test policy",
@@ -35,7 +35,7 @@ class TestEvaluateSinglePolicy:
 
     def test_testing_uptake_bounded(self):
         """Test that testing uptake is bounded [0, 1]."""
-        params = ModelParameters()
+        params = get_default_parameters()
         policy = PolicyConfig(
             name="test",
             description="Test",
@@ -48,7 +48,7 @@ class TestEvaluateSinglePolicy:
 
     def test_premiums_positive(self):
         """Test that insurance premiums are positive."""
-        params = ModelParameters()
+        params = get_default_parameters()
         policy = PolicyConfig(
             name="test",
             description="Test",
@@ -62,7 +62,7 @@ class TestEvaluateSinglePolicy:
 
     def test_compliance_rate_bounded(self):
         """Test that compliance rate is bounded [0, 1]."""
-        params = ModelParameters()
+        params = get_default_parameters()
         policy = PolicyConfig(
             name="test",
             description="Test",
@@ -75,7 +75,7 @@ class TestEvaluateSinglePolicy:
 
     def test_evaluation_includes_real_ledger_and_proxy_metrics(self):
         """Test that evaluation exposes derived welfare and proxy outputs."""
-        params = ModelParameters()
+        params = get_default_parameters()
         policy = PolicyConfig(
             name="test_ban",
             description="Test ban",
@@ -100,7 +100,7 @@ class TestEvaluatePolicySweep:
 
     def test_sweep_returns_all_policies(self):
         """Test that sweep returns results for all standard policies."""
-        params = ModelParameters()
+        params = get_default_parameters()
 
         results = evaluate_policy_sweep(params)
 
@@ -110,7 +110,7 @@ class TestEvaluatePolicySweep:
 
     def test_sweep_results_are_valid(self):
         """Test that all sweep results are valid."""
-        params = ModelParameters()
+        params = get_default_parameters()
 
         results = evaluate_policy_sweep(params)
 
@@ -125,7 +125,7 @@ class TestComparePolicies:
 
     def test_comparison_structure(self):
         """Test that comparison output has correct structure."""
-        params = ModelParameters()
+        params = get_default_parameters()
         results = evaluate_policy_sweep(params)
 
         comparisons = compare_policies(results, baseline_name="status_quo")
@@ -141,7 +141,7 @@ class TestComparePolicies:
 
     def test_comparison_computes_changes(self):
         """Test that comparison computes changes correctly."""
-        params = ModelParameters()
+        params = get_default_parameters()
         results = evaluate_policy_sweep(params)
 
         comparisons = compare_policies(results, baseline_name="status_quo")
@@ -157,7 +157,7 @@ class TestGeneratePolicySummary:
 
     def test_summary_is_string(self):
         """Test that summary is a string."""
-        params = ModelParameters()
+        params = get_default_parameters()
         results = evaluate_policy_sweep(params)
 
         summary = generate_policy_summary(results)
@@ -166,7 +166,7 @@ class TestGeneratePolicySummary:
 
     def test_summary_contains_policy_names(self):
         """Test that summary contains policy names."""
-        params = ModelParameters()
+        params = get_default_parameters()
         results = evaluate_policy_sweep(params)
 
         summary = generate_policy_summary(results)
@@ -177,7 +177,7 @@ class TestGeneratePolicySummary:
 
     def test_summary_contains_metrics(self):
         """Test that summary contains key metrics."""
-        params = ModelParameters()
+        params = get_default_parameters()
         results = evaluate_policy_sweep(params)
 
         summary = generate_policy_summary(results)

@@ -1,0 +1,33 @@
+# Global Parameters for Australia
+jurisdiction: "australia"
+calibration_date: "2026-03-03"
+ppp_conversion_factor: 1.0  # Base currency is AUD for this region
+
+# Behavior
+baseline_testing_uptake: 0.52
+deterrence_elasticity: 0.18
+moratorium_effect: 0.15
+
+# Insurance
+adverse_selection_elasticity: 0.08
+demand_elasticity_high_risk: -0.22
+baseline_loading: 0.15
+
+# Proxy
+family_history_sensitivity: 0.68
+proxy_substitution_rate: 0.40
+
+# Economics
+pass_through_rate: 0.75
+research_participation_elasticity: -0.1
+research_participation_value: 50000.0
+
+# Enforcement
+enforcement_effectiveness: 0.50
+complaint_rate: 0.02
+enforcement_budget: 1000000.0
+marginal_cost_enforcement: 0.1
+compliance_cost_fixed: 5000.0
+detection_prob_baseline: 0.05
+
+high_sum_insured_share: 0.25

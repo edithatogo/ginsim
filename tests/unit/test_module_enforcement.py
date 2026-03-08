@@ -14,7 +14,7 @@ from src.model.module_enforcement import (
     compute_violation_benefit,
     get_standard_enforcement_parameters,
 )
-from src.model.parameters import ModelParameters, PolicyConfig
+from src.model.parameters import ModelParameters, get_default_parameters, PolicyConfig
 
 
 class TestDetectionProbability:
@@ -74,7 +74,7 @@ class TestViolationBenefit:
 
     def test_benefit_positive(self):
         """Test that violation benefit is positive."""
-        params = ModelParameters()
+        params = get_default_parameters()
         policy = PolicyConfig(
             name="test",
             description="Test",
@@ -87,7 +87,7 @@ class TestViolationBenefit:
 
     def test_benefit_higher_when_banned(self):
         """Test that benefit is higher when completely banned."""
-        params = ModelParameters()
+        params = get_default_parameters()
 
         # Allowed
         policy_allowed = PolicyConfig(
@@ -146,7 +146,7 @@ class TestComplianceEquilibrium:
 
     def test_equilibrium_structure(self):
         """Test that equilibrium output has correct structure."""
-        params = ModelParameters()
+        params = get_default_parameters()
         policy = PolicyConfig(
             name="test",
             description="Test policy",
@@ -164,7 +164,7 @@ class TestComplianceEquilibrium:
 
     def test_rates_sum_to_one(self):
         """Test that compliance and violation rates sum to 1."""
-        params = ModelParameters()
+        params = get_default_parameters()
         policy = PolicyConfig(
             name="test",
             description="Test",
@@ -182,7 +182,7 @@ class TestEnforcementEffect:
 
     def test_effect_structure(self):
         """Test that effect output has correct structure."""
-        params = ModelParameters()
+        params = get_default_parameters()
 
         baseline = PolicyConfig(
             name="baseline",
@@ -211,7 +211,7 @@ class TestOptimalEnforcement:
 
     def test_optimal_structure(self):
         """Test that optimal enforcement output has correct structure."""
-        params = ModelParameters()
+        params = get_default_parameters()
         policy = PolicyConfig(
             name="test",
             description="Test",
@@ -228,7 +228,7 @@ class TestOptimalEnforcement:
 
     def test_optimal_enforcement_bounded(self):
         """Test that optimal enforcement is bounded [0, 1]."""
-        params = ModelParameters()
+        params = get_default_parameters()
         policy = PolicyConfig(
             name="test",
             description="Test",

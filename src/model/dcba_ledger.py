@@ -154,8 +154,11 @@ def compute_dcba(
     distributional_weight: float = 1.0,
     time_horizon: int = 20,
     discount_rate: float = 0.03,
+    ppp_conversion_factor: float = 1.0,
 ) -> DCBAResult:
-    """Compute full DCBA ledger."""
+    """
+    Compute full DCBA ledger with PPP normalization.
+    """
     cs = compute_consumer_surplus(
         testing_uptake,
         insurance_premium,
@@ -173,10 +176,23 @@ def compute_dcba(
         testing_uptake, baseline_uptake, time_horizon=time_horizon, discount_rate=discount_rate
     )
     re = _to_float_scalar(research_value_loss)
-    net_welfare = cs + ps + hb + fi - re
-    weighted_welfare = net_welfare * distributional_weight
+    
+    # 1. Compute net local welfare
+    net_welfare_local = cs + ps + hb + fi - re
+    weighted_welfare_local = net_welfare_local * distributional_weight
+    
+    # 2. Apply PPP normalization to all components
+    ppp = jnp.asarray(float(ppp_conversion_factor))
+    
     return DCBAResult(
-        weighted_welfare, cs, ps, hb, fi, re, _to_float_scalar(distributional_weight), time_horizon
+        net_welfare=weighted_welfare_local * ppp,
+        consumer_surplus=cs * ppp,
+        producer_surplus=ps * ppp,
+        health_benefits=hb * ppp,
+        fiscal_impact=fi * ppp,
+        research_externalities=re * ppp,
+        distributional_weight=_to_float_scalar(distributional_weight),
+        time_horizon=time_horizon
     )
 
 

@@ -11,7 +11,7 @@ from src.model.module_d_proxy import (
     compute_underwriting_accuracy,
     get_standard_features,
 )
-from src.model.parameters import ModelParameters
+from src.model.parameters import ModelParameters, get_default_parameters
 
 
 class TestRiskScore:
@@ -109,7 +109,7 @@ class TestFamilyHistoryAccuracy:
 
     def test_sensitivity_from_params(self):
         """Test that sensitivity matches parameter value."""
-        params = ModelParameters()
+        params = get_default_parameters()
 
         # Create test data
         n = 100
@@ -123,7 +123,7 @@ class TestFamilyHistoryAccuracy:
 
     def test_accuracy_computed_correctly(self):
         """Test that empirical accuracy is computed correctly."""
-        params = ModelParameters()
+        params = get_default_parameters()
 
         # Perfect prediction case
         n = 100

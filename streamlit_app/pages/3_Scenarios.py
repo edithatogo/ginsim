@@ -32,9 +32,9 @@ selected_scenario_key = st.sidebar.selectbox("Predefined Scenario", list(scenari
 # 2. Run Analysis
 if st.sidebar.button("🔍 Run Comparative Analysis", type="primary"):
     with st.spinner("Executing full pipeline for all scenarios..."):
-        from src.model.parameters import ModelParameters
+        from src.model.parameters import ModelParameters, get_default_parameters
 
-        params = ModelParameters()
+        params = get_default_parameters()
 
         results = []
         for name, config in scenarios.items():

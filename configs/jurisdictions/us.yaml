@@ -1,0 +1,33 @@
+# Global Parameters for United States
+jurisdiction: "us"
+calibration_date: "2026-03-08"
+ppp_conversion_factor: 1.5  # USD health costs relative to AUD
+
+# Behavior
+baseline_testing_uptake: 0.45  # Gaps in GINA for life insurance
+deterrence_elasticity: 0.35  # High fear of insurance consequences
+moratorium_effect: 0.05  # Fragmented regulation
+
+# Insurance
+adverse_selection_elasticity: 0.05  # Underwriting is aggressive
+demand_elasticity_high_risk: -0.15
+baseline_loading: 0.10
+
+# Proxy
+family_history_sensitivity: 0.75
+proxy_substitution_rate: 0.50  # High use of alternative data
+
+# Economics
+pass_through_rate: 0.90
+research_participation_elasticity: -0.15
+research_participation_value: 80000.0  # Significant commercial value
+
+# Enforcement
+enforcement_effectiveness: 0.30  # Fragmented oversight
+complaint_rate: 0.01
+enforcement_budget: 5000000.0
+marginal_cost_enforcement: 0.05
+compliance_cost_fixed: 15000.0
+detection_prob_baseline: 0.03
+
+high_sum_insured_share: 0.25

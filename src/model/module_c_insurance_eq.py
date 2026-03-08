@@ -184,12 +184,37 @@ def compute_equilibrium(
 ) -> InsuranceEquilibrium:
     """
     Determine which equilibrium type exists under current parameters.
+    Supports blended threshold equilibria for moratoriums.
     """
-    # Note: cannot use logger inside @jit unless wrapped in lax.debug.callback
+    # 1. Pure separating (Status Quo)
+    sep_eq = separating_equilibrium(params, risk_high, risk_low, proportion_high)
+    
+    # 2. Pure pooling (Complete Ban)
+    pool_eq = pooling_equilibrium(params, risk_high, risk_low, proportion_high)
+    
+    # 3. Blended (Threshold Moratorium)
+    share_high = getattr(params, "high_sum_insured_share", 0.25)
+    
+    blended_eq = InsuranceEquilibrium(
+        premium_high=share_high * sep_eq.premium_high + (1.0 - share_high) * pool_eq.premium_high,
+        premium_low=share_high * sep_eq.premium_low + (1.0 - share_high) * pool_eq.premium_low,
+        uptake_high=share_high * sep_eq.uptake_high + (1.0 - share_high) * pool_eq.uptake_high,
+        uptake_low=share_high * sep_eq.uptake_low + (1.0 - share_high) * pool_eq.uptake_low,
+        insurer_profits=share_high * sep_eq.insurer_profits + (1.0 - share_high) * pool_eq.insurer_profits,
+        equilibrium_id=2, # 2 for blended
+        iterations=1
+    )
+
+    # Decision logic
     return lax.cond(
         policy.allow_genetic_test_results,
-        lambda _: separating_equilibrium(params, risk_high, risk_low, proportion_high),
-        lambda _: pooling_equilibrium(params, risk_high, risk_low, proportion_high),
+        lambda _: sep_eq,
+        lambda _: lax.cond(
+            policy.sum_insured_caps is None,
+            lambda _: pool_eq,
+            lambda _: blended_eq,
+            operand=None
+        ),
         operand=None,
     )
 

@@ -10,7 +10,7 @@ from src.model.module_a_behavior_wrappers import (
     compute_testing_uptake,
     get_standard_policies,
 )
-from src.model.parameters import ModelParameters, PolicyConfig
+from src.model.parameters import ModelParameters, get_default_parameters, PolicyConfig
 
 
 class TestPerceivedPenalty:
@@ -18,7 +18,7 @@ class TestPerceivedPenalty:
 
     def test_penalty_positive(self):
         """Test that penalty is always positive."""
-        params = ModelParameters()
+        params = get_default_parameters()
         policy = PolicyConfig(
             name="test",
             description="Test policy",
@@ -31,7 +31,7 @@ class TestPerceivedPenalty:
 
     def test_penalty_reduced_by_restrictions(self):
         """Test that information restrictions reduce penalty."""
-        params = ModelParameters()
+        params = get_default_parameters()
 
         # Permissive policy
         permissive = PolicyConfig(
@@ -57,7 +57,7 @@ class TestPerceivedPenalty:
 
     def test_penalty_reduced_by_enforcement(self):
         """Test that stronger enforcement reduces penalty."""
-        params = ModelParameters()
+        params = get_default_parameters()
 
         weak_enforcement = PolicyConfig(
             name="weak",
@@ -97,7 +97,7 @@ class TestTestingUptake:
 
     def test_uptake_bounded(self):
         """Test that uptake is bounded [0, 1]."""
-        params = ModelParameters()
+        params = get_default_parameters()
         policy = PolicyConfig(
             name="test",
             description="Test policy",
@@ -110,7 +110,7 @@ class TestTestingUptake:
 
     def test_uptake_increases_with_benefits(self):
         """Test that uptake increases with perceived benefits."""
-        params = ModelParameters()
+        params = get_default_parameters()
         policy = PolicyConfig(
             name="test",
             description="Test policy",
@@ -132,7 +132,7 @@ class TestTestingUptake:
 
     def test_uptake_decreases_with_penalty(self):
         """Test that uptake decreases under restrictive policies."""
-        params = ModelParameters()
+        params = get_default_parameters()
 
         permissive = PolicyConfig(
             name="permissive",
@@ -158,7 +158,7 @@ class TestPolicyEffect:
 
     def test_effect_structure(self):
         """Test that effect dictionary has correct structure."""
-        params = ModelParameters()
+        params = get_default_parameters()
 
         policies = get_standard_policies()
         baseline = policies["status_quo"]
@@ -173,7 +173,7 @@ class TestPolicyEffect:
 
     def test_moratorium_increases_uptake(self):
         """Test that moratorium increases testing uptake vs status quo."""
-        params = ModelParameters()
+        params = get_default_parameters()
 
         policies = get_standard_policies()
         baseline = policies["status_quo"]
@@ -187,7 +187,7 @@ class TestPolicyEffect:
 
     def test_ban_increases_uptake_more_than_moratorium(self):
         """Test that ban increases uptake more than moratorium."""
-        params = ModelParameters()
+        params = get_default_parameters()
 
         policies = get_standard_policies()
         baseline = policies["status_quo"]

@@ -7,7 +7,7 @@ from hypothesis import given, settings
 from hypothesis import strategies as st
 
 from src.model.module_d_proxy import compute_proxy_substitution_effect
-from src.model.parameters import ModelParameters, PolicyConfig
+from src.model.parameters import ModelParameters, get_default_parameters, PolicyConfig
 
 
 @settings(deadline=None)
@@ -49,7 +49,7 @@ def test_criminal_penalty_impact(enforcement):
     """
     Property: Criminal penalties should create a LARGER information gap than civil.
     """
-    params = ModelParameters()
+    params = get_default_parameters()
     baseline = PolicyConfig(name="base", description="d", allow_genetic_test_results=True)
 
     reform_civil = PolicyConfig(

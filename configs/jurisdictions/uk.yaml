@@ -1,0 +1,33 @@
+# Global Parameters for United Kingdom
+jurisdiction: "uk"
+calibration_date: "2026-03-08"
+ppp_conversion_factor: 1.8  # GBP base relative to AUD
+
+# Behavior
+baseline_testing_uptake: 0.60
+deterrence_elasticity: 0.15
+moratorium_effect: 0.25  # High trust in ABI Code historically
+
+# Insurance
+adverse_selection_elasticity: 0.07
+demand_elasticity_high_risk: -0.20
+baseline_loading: 0.12
+
+# Proxy
+family_history_sensitivity: 0.70
+proxy_substitution_rate: 0.45
+
+# Economics
+pass_through_rate: 0.80
+research_participation_elasticity: -0.08
+research_participation_value: 60000.0
+
+# Enforcement
+enforcement_effectiveness: 0.60
+complaint_rate: 0.03
+enforcement_budget: 2000000.0
+marginal_cost_enforcement: 0.08
+compliance_cost_fixed: 8000.0
+detection_prob_baseline: 0.06
+
+high_sum_insured_share: 0.25

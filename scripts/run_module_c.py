@@ -14,7 +14,7 @@ from src.model.module_c_insurance_eq import (
     pooling_equilibrium,
     separating_equilibrium,
 )
-from src.model.parameters import ModelParameters, PolicyConfig
+from src.model.parameters import ModelParameters, get_default_parameters, PolicyConfig
 
 
 def main():
@@ -37,7 +37,7 @@ def main():
     print("=" * 60)
 
     # Load parameters
-    params = ModelParameters()
+    params = get_default_parameters()
     print(f"Loaded parameters for {params.jurisdiction}")
 
     # Get policy

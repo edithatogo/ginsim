@@ -19,7 +19,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from src.model.module_a_behavior import get_standard_policies
-from src.model.parameters import ModelParameters
+from src.model.parameters import ModelParameters, get_default_parameters
 from src.model.pipeline import evaluate_single_policy
 from src.model.sensitivity import tornado_analysis
 
@@ -35,7 +35,7 @@ st.markdown("Explore how model outcomes shift under different parameter uncertai
 
 # Sidebar Settings
 st.sidebar.header("⚙️ Analysis Controls")
-params_model = ModelParameters()
+params_model = get_default_parameters()
 param_options = {
     "Deterrence Elasticity": "deterrence_elasticity",
     "Moratorium Effect": "moratorium_effect",

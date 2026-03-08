@@ -21,7 +21,7 @@ from . import module_d_proxy as mod_d
 from . import module_enforcement as mod_e
 from . import module_f_data_quality as mod_f
 from . import dcba_ledger as dcba
-from .parameters import ModelParameters, PolicyConfig
+from .parameters import ModelParameters, PolicyConfig, get_default_parameters
 
 
 @dataclass(frozen=True)
@@ -199,5 +199,5 @@ def run_full_evaluation(
     policies: list[PolicyConfig] | None = None,
 ) -> dict[str, PolicyEvaluationResult]:
     if params is None:
-        params = ModelParameters()
+        params = get_default_parameters()
     return evaluate_policy_sweep(params, policies)

@@ -14,7 +14,7 @@ from src.model.module_f_data_quality import (
     compute_selection_bias,
     get_standard_participation_parameters,
 )
-from src.model.parameters import ModelParameters, PolicyConfig
+from src.model.parameters import ModelParameters, get_default_parameters, PolicyConfig
 
 
 class TestParticipationProbability:
@@ -66,7 +66,7 @@ class TestParticipationRate:
 
     def test_rate_bounded(self):
         """Test that participation rate is bounded [0, 1]."""
-        params = ModelParameters()
+        params = get_default_parameters()
         policy = PolicyConfig(
             name="test",
             description="Test policy",
@@ -80,7 +80,7 @@ class TestParticipationRate:
 
     def test_rate_higher_with_protections(self):
         """Test that rate is higher with privacy protections."""
-        params = ModelParameters()
+        params = get_default_parameters()
 
         # Policy with protections
         policy_with = PolicyConfig(
@@ -160,7 +160,7 @@ class TestDataQualityExternality:
 
     def test_externality_structure(self):
         """Test that externality output has correct structure."""
-        params = ModelParameters()
+        params = get_default_parameters()
 
         baseline = PolicyConfig(
             name="baseline",
@@ -186,7 +186,7 @@ class TestDataQualityExternality:
 
     def test_protections_increase_participation(self):
         """Test that privacy protections increase participation."""
-        params = ModelParameters()
+        params = get_default_parameters()
 
         baseline = PolicyConfig(
             name="baseline",

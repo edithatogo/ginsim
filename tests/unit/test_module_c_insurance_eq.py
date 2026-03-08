@@ -15,7 +15,7 @@ from src.model.module_c_insurance_eq import (
     separating_equilibrium,
     zero_profit_premium,
 )
-from src.model.parameters import ModelParameters, PolicyConfig
+from src.model.parameters import ModelParameters, get_default_parameters, PolicyConfig
 
 
 class TestRiskPremium:
@@ -56,7 +56,7 @@ class TestDemand:
 
     def test_demand_more_elastic_for_high_risk(self):
         """Test that high-risk individuals have more elastic demand."""
-        params = ModelParameters()
+        params = get_default_parameters()
 
         # High-risk should be more sensitive to price
         demand_high_risk = compute_demand(
@@ -104,7 +104,7 @@ class TestSeparatingEquilibrium:
 
     def test_premiums_differ_by_risk(self):
         """Test that premiums differ by risk type."""
-        params = ModelParameters()
+        params = get_default_parameters()
 
         eq = separating_equilibrium(params, risk_high=0.3, risk_low=0.1)
 
@@ -112,7 +112,7 @@ class TestSeparatingEquilibrium:
 
     def test_profits_near_zero(self):
         """Test that insurer profits are near zero."""
-        params = ModelParameters()
+        params = get_default_parameters()
 
         eq = separating_equilibrium(params, risk_high=0.3, risk_low=0.1)
 
@@ -120,7 +120,7 @@ class TestSeparatingEquilibrium:
 
     def test_convergence(self):
         """Test that separating equilibrium always converges."""
-        params = ModelParameters()
+        params = get_default_parameters()
 
         eq = separating_equilibrium(params, risk_high=0.3, risk_low=0.1)
 
@@ -133,7 +133,7 @@ class TestPoolingEquilibrium:
 
     def test_same_premium_for_all(self):
         """Test that pooling has same premium for all risk types."""
-        params = ModelParameters()
+        params = get_default_parameters()
 
         eq = pooling_equilibrium(params, risk_high=0.3, risk_low=0.1)
 
@@ -141,7 +141,7 @@ class TestPoolingEquilibrium:
 
     def test_premium_between_risk_types(self):
         """Test that pooling premium is between high and low risk premiums."""
-        params = ModelParameters()
+        params = get_default_parameters()
 
         eq_sep = separating_equilibrium(params, risk_high=0.3, risk_low=0.1)
         eq_pool = pooling_equilibrium(params, risk_high=0.3, risk_low=0.1)
@@ -152,7 +152,7 @@ class TestPoolingEquilibrium:
 
     def test_convergence(self):
         """Test that pooling equilibrium converges."""
-        params = ModelParameters()
+        params = get_default_parameters()
 
         eq = pooling_equilibrium(params, risk_high=0.3, risk_low=0.1)
 
@@ -164,7 +164,7 @@ class TestComputeEquilibrium:
 
     def test_separating_with_information(self):
         """Test that full information leads to separating equilibrium."""
-        params = ModelParameters()
+        params = get_default_parameters()
 
         policy = PolicyConfig(
             name="full_info",
@@ -179,7 +179,7 @@ class TestComputeEquilibrium:
 
     def test_pooling_without_information(self):
         """Test that no information leads to pooling equilibrium."""
-        params = ModelParameters()
+        params = get_default_parameters()
 
         policy = PolicyConfig(
             name="no_info",
@@ -198,7 +198,7 @@ class TestPremiumDivergence:
 
     def test_divergence_structure(self):
         """Test that divergence output has correct structure."""
-        params = ModelParameters()
+        params = get_default_parameters()
 
         policies = {
             "status_quo": PolicyConfig(
@@ -228,7 +228,7 @@ class TestPremiumDivergence:
 
     def test_ban_reduces_risk_rating(self):
         """Test that ban reduces risk rating (premium differentiation)."""
-        params = ModelParameters()
+        params = get_default_parameters()
 
         status_quo = PolicyConfig(
             name="status_quo",

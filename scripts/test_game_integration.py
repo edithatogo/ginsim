@@ -1,13 +1,13 @@
 from src.model.module_a_behavior import compute_testing_uptake
 from src.model.module_d_proxy import compute_proxy_substitution_effect
-from src.model.parameters import ModelParameters, PolicyConfig
+from src.model.parameters import ModelParameters, get_default_parameters, PolicyConfig
 
 
 def test_game_engine_integration():
     """
     Ensure Modules A and D integrate without numerical collapse.
     """
-    params = ModelParameters()
+    params = get_default_parameters()
     baseline = PolicyConfig(name="base", description="d", allow_genetic_test_results=True)
     ban = PolicyConfig(name="ban", description="d", allow_genetic_test_results=False)
 

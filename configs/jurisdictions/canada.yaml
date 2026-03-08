@@ -1,0 +1,33 @@
+# Global Parameters for Canada
+jurisdiction: "canada"
+calibration_date: "2026-03-08"
+ppp_conversion_factor: 1.1  # CAD relative to AUD
+
+# Behavior
+baseline_testing_uptake: 0.65  # Boosted by GNDA
+deterrence_elasticity: 0.10  # Low fear of discrimination
+moratorium_effect: 0.05  # Irrelevant due to Statutory Ban
+
+# Insurance
+adverse_selection_elasticity: 0.12  # Higher risk due to strict ban
+demand_elasticity_high_risk: -0.28
+baseline_loading: 0.20  # Loadings increased post-ban
+
+# Proxy
+family_history_sensitivity: 0.65
+proxy_substitution_rate: 0.35
+
+# Economics
+pass_through_rate: 0.70
+research_participation_elasticity: -0.05
+research_participation_value: 55000.0
+
+# Enforcement
+enforcement_effectiveness: 0.80  # Strict criminal penalties
+complaint_rate: 0.04
+enforcement_budget: 1500000.0
+marginal_cost_enforcement: 0.15
+compliance_cost_fixed: 10000.0
+detection_prob_baseline: 0.08
+
+high_sum_insured_share: 0.25

@@ -14,7 +14,7 @@ from src.model.module_a_behavior_wrappers import (
     compute_testing_uptake,
     get_standard_policies,
 )
-from src.model.parameters import ModelParameters
+from src.model.parameters import ModelParameters, get_default_parameters
 
 
 def main():
@@ -37,7 +37,7 @@ def main():
     print("=" * 60)
 
     # Load parameters
-    params = ModelParameters()
+    params = get_default_parameters()
     print(f"Loaded parameters for {params.jurisdiction}")
 
     # Get policy

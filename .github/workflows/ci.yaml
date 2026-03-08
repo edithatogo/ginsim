@@ -28,5 +28,5 @@ jobs:
     - name: Run Pytest (Generate Coverage)
       run: uv run pytest -v --cov=src --cov-report=xml
 
-    - name: Run Conductor Gate
-      run: uv run python scripts/conductor_gate.py
+    - name: Run Quality Gate
+      run: uv run python scripts/quality_gate.py

@@ -1,0 +1,33 @@
+# Global Parameters for New Zealand
+jurisdiction: "new_zealand"
+calibration_date: "2026-03-03"
+ppp_conversion_factor: 1.1  # Relative to AUD base
+
+# Behavior
+baseline_testing_uptake: 0.48
+deterrence_elasticity: 0.20
+moratorium_effect: 0.10  # Lower trust in self-regulation in NZ historically
+
+# Insurance
+adverse_selection_elasticity: 0.10
+demand_elasticity_high_risk: -0.25
+baseline_loading: 0.18
+
+# Proxy
+family_history_sensitivity: 0.65
+proxy_substitution_rate: 0.35
+
+# Economics
+pass_through_rate: 0.70
+research_participation_elasticity: -0.12
+research_participation_value: 45000.0
+
+# Enforcement
+enforcement_effectiveness: 0.40
+complaint_rate: 0.015
+enforcement_budget: 500000.0
+marginal_cost_enforcement: 0.12
+compliance_cost_fixed: 4000.0
+detection_prob_baseline: 0.04
+
+high_sum_insured_share: 0.25

@@ -1,7 +1,7 @@
 """
 Unified Sensitivity Engine (Diamond Standard).
 
-Consolidates JAX-vectorized DSA, PSA, and Sobol analysis for 
+Consolidates JAX-vectorized DSA, PSA, and Sobol analysis for
 high-performance uncertainty quantification.
 Now integrated with Bayesian Prior Grounding (Track 0039).
 """
@@ -17,6 +17,7 @@ from jax import jit, vmap
 from jaxtyping import Array
 
 from src.inference.priors import sample_parameter_matrix
+
 from .parameters import ModelParameters, PolicyConfig
 from .pipeline import evaluate_single_policy, get_standard_policies
 from .voi import compute_evpi, compute_evppi

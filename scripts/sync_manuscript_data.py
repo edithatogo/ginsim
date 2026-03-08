@@ -14,15 +14,16 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from src.model.pipeline import run_full_pipeline
-from src.model.parameters import load_jurisdiction_parameters
 from loguru import logger
+
+from src.model.parameters import load_jurisdiction_parameters
+from src.model.pipeline import run_full_pipeline
 
 OUTPUT_FILE = project_root / "outputs" / "results_manifest.json"
 
 def main():
     logger.info("Starting Manuscript Data Sync...")
-    
+
     jurisdictions = ["australia", "new_zealand", "uk", "canada", "us"]
     manifest = {}
 
@@ -30,7 +31,7 @@ def main():
         logger.info(f"Processing {j}...")
         params = load_jurisdiction_parameters(j)
         results = run_full_pipeline(params=params)
-        
+
         for p_name, res in results.items():
             prefix = f"{j.upper()}_{p_name.upper()}"
             manifest[f"{prefix}_UPTAKE"] = f"{float(res.testing_uptake):.4f}"
@@ -40,7 +41,7 @@ def main():
     # Save manifest
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2)
-    
+
     logger.success(f"Manifest updated: {OUTPUT_FILE}")
 
 if __name__ == "__main__":

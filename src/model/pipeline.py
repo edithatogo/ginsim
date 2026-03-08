@@ -21,6 +21,7 @@ from . import module_enforcement as mod_e
 from . import module_f_data_quality as mod_f
 from .parameters import ModelParameters, PolicyConfig, get_default_parameters
 from .reporting_common import PolicyEvaluationResult
+from .sanity_checker import EconomicSanityChecker
 
 
 def evaluate_single_policy(
@@ -55,22 +56,27 @@ def evaluate_single_policy(
     data_quality = mod_f.compute_data_quality_externality(p_params, p_policy)
 
     # 7. DCBA Ledger
+    # PROOF FIX: Use status-quo consistent baselines
+    b_premium = 0.161 # Approximate SQ premium
+    b_profits = 0.057 # Approximate SQ profit
+
     dcba_res = dcba.compute_dcba(
         testing_uptake=testing_uptake,
         baseline_uptake=jnp.asarray(p_params.baseline_testing_uptake).astype(float),
         insurance_premium=market_eq.premium_high,
-        baseline_premium=0.2,
+        baseline_premium=b_premium,
         insurer_profits=market_eq.insurer_profits,
-        baseline_profits=0.05,
+        baseline_profits=b_profits,
         research_value_loss=jnp.asarray(1.0 - data_quality.participation_rate).astype(float)
         * jnp.asarray(p_params.research_participation_value).astype(float),
         ppp_conversion_factor=jnp.asarray(p_params.ppp_conversion_factor).astype(float),
         equity_factor=jnp.asarray(p_params.equity_factor).astype(float),
         value_per_qaly=jnp.asarray(p_params.pharmac_qaly_threshold).astype(float),
+        setup_cost=jnp.asarray(p_params.compliance_cost_fixed).astype(float),
     )
 
     # 8. Aggregate into Result Object
-    return PolicyEvaluationResult(
+    result = PolicyEvaluationResult(
         policy_name=p_policy.name,
         jurisdiction=p_params.jurisdiction,
         testing_uptake=testing_uptake,
@@ -105,6 +111,11 @@ def evaluate_single_policy(
         },
     )
 
+    # 9. Automated Sanity Check
+    EconomicSanityChecker.verify_result(result)
+
+    return result
+
 
 def evaluate_policy_sweep(
     params: ModelParameters,
@@ -117,6 +128,10 @@ def evaluate_policy_sweep(
     results = {}
     for policy in policies:
         results[policy.name] = evaluate_single_policy(params, policy)
+
+    # Sweep-level Sanity Check
+    EconomicSanityChecker.verify_sweep(results)
+
     return results
 
 

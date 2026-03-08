@@ -32,24 +32,24 @@ if st.button("⚖️ Audit Policies", type="primary"):
     with st.spinner("Executing fairness audit matrix..."):
         def model_func(params, policy):
             return evaluate_single_policy(params, policy)
-        
+
         # Base result
         b_res = evaluate_scenario(baseline_key, scenarios[baseline_key], model_func)
-        
+
         results = []
         selected_policies = ["au_moratorium", "au_ban"]
-        
+
         for pk in selected_policies:
             if pk not in scenarios:
                 continue
             r = evaluate_scenario(pk, scenarios[pk], model_func)
-            
+
             u_delta = float(r.testing_uptake) - float(b_res.testing_uptake)
             w_delta = float(r.welfare_impact) - float(b_res.welfare_impact)
             p_delta = float(r.insurance_premiums["premium_high"]) - float(b_res.insurance_premiums["premium_high"])
-            
+
             fairness = audit_policy_fairness(u_delta, w_delta, p_delta)
-            
+
             results.append(
                 {
                     "Policy": scenarios[pk].get("name", pk),
@@ -59,10 +59,10 @@ if st.button("⚖️ Audit Policies", type="primary"):
                     "Fairness Rationale": "; ".join(fairness.reasons) if fairness.reasons else "Maintains equity.",
                 }
             )
-            
+
         df = pd.DataFrame(results)
         st.subheader("Fairness Verdict Matrix")
         st.table(df)
-        
+
 st.divider()
 st.caption("Developed by Dylan A Mordaunt • 2026.03 • Fairness Engine Active")

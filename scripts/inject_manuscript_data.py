@@ -7,7 +7,9 @@ Injects authoritative results from manifest.json into the manuscript template.
 
 import json
 from pathlib import Path
+
 from loguru import logger
+
 
 def main():
     project_root = Path(__file__).parent.parent
@@ -20,11 +22,11 @@ def main():
         return
 
     # Load data
-    with open(manifest_path, "r", encoding="utf-8") as f:
+    with open(manifest_path, encoding="utf-8") as f:
         data = json.load(f)
 
     # Load template
-    with open(template_path, "r", encoding="utf-8") as f:
+    with open(template_path, encoding="utf-8") as f:
         template = f.read()
 
     # Inject

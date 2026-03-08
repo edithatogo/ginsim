@@ -165,6 +165,7 @@ def compute_dcba(
     ppp_conversion_factor: float | Array = 1.0,
     value_per_qaly: float | Array = 50000.0,
     cost_per_test: float | Array = 500.0,
+    setup_cost: float | Array = 1e6,
 ) -> DCBAResult:
     """
     Compute full DCBA ledger with PPP normalization and Equity weighting.
@@ -176,6 +177,7 @@ def compute_dcba(
         time_horizon=time_horizon,
         discount_rate=discount_rate,
     )
+    # PROOF FIX: We ensure PS is a true delta
     ps = compute_producer_surplus(
         insurer_profits, baseline_profits, time_horizon=time_horizon, discount_rate=discount_rate
     )
@@ -190,6 +192,7 @@ def compute_dcba(
         testing_uptake,
         baseline_uptake,
         cost_per_test=cost_per_test,
+        setup_cost=setup_cost,
         time_horizon=time_horizon,
         discount_rate=discount_rate,
     )

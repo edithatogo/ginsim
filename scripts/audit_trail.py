@@ -1,5 +1,12 @@
 import subprocess
+import sys
 from pathlib import Path
+
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+from src.utils.path_resolver import resolve_path
 
 
 def get_git_logs():
@@ -14,7 +21,7 @@ def get_git_logs():
 
 
 def update_log(track_id):
-    log_path = Path(f"conductor/tracks/{track_id}/LOG_OBSERVABILITY.md")
+    log_path = resolve_path(f"conductor/tracks/{track_id}/LOG_OBSERVABILITY.md")
     if not log_path.exists():
         print(f"Error: Log not found at {log_path}")
         return

@@ -1,6 +1,7 @@
 import bibtexparser
 import streamlit as st
 import yaml
+from src.utils.path_resolver import resolve_path
 
 st.set_page_config(page_title="Evidence Explorer", layout="wide")
 
@@ -12,9 +13,9 @@ Every parameter in the model is grounded in empirical evidence and specific assu
 
 
 def load_data():
-    with open("context/assumptions_registry.yaml") as f:
+    with open(resolve_path("context/assumptions_registry.yaml")) as f:
         assumptions = yaml.safe_load(f)["assumptions"]
-    with open("context/references.bib") as f:
+    with open(resolve_path("context/references.bib")) as f:
         bib_db = bibtexparser.load(f)
         bib_dict = {entry["ID"]: entry for entry in bib_db.entries}
     return assumptions, bib_dict

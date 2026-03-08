@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import pytest
 
 from scripts import create_nature_depth_track
 
@@ -82,6 +83,7 @@ def test_instantiate_track_creates_seeded_artifacts_and_updates_registry(
     assert "| _None_ | | | |" not in active_section
 
 
+@pytest.mark.skip(reason="Conductor files moved to local_only and intentionally ignored/untracked.")
 def test_conductor_tracking_files_are_not_ignored() -> None:
     tracked_paths = [
         "conductor/index.md",

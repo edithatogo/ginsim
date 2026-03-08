@@ -62,23 +62,20 @@ data/raw/
 data/processed/*.csv
 data/processed/*.parquet
 
-# Research meta-data and working folders (not for remote)
-conductor/*
-!conductor/index.md
-!conductor/workflow.md
-!conductor/tracks.md
-!conductor/templates/
-!conductor/templates/**
-archive/
+# Local-only development artifacts (SOTA CLEANUP)
+local_only/
+.gemini/
+.qwen/
+.pytest_cache/
+.ruff_cache/
+.hypothesis/
+.streamlit/config.toml
+
+# Legacy exclusions (for safety)
+conductor/
 context/reflexive_journal/
 docs/expert_reviews/
 docs/EXTERNAL_VALIDATION_ACTION_LOG.md
-
-# Tool caches
-.ruff_cache/
-.pytest_cache/
-.qwen/
-.streamlit/config.toml
 
 # Posterior samples (large files)
 outputs/posterior_samples/*.npy
@@ -86,6 +83,3 @@ outputs/posterior_samples/*.csv
 
 # Run manifests (keep structure, not content)
 outputs/runs/
-
-# Jupyter notebooks (optional - uncomment if used)
-# *.ipynb_checkpoints/

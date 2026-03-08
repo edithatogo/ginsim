@@ -46,14 +46,35 @@ The model is calibrated against structured evidence registers, with active assum
 
 ---
 
+## 🔬 Scientific Core
+
+The model is structured to mirror the policy causal pathway:
+
+1. **Behavioral Response (Module A):** Located in `src/model/module_a_behavior.py`. Models individual testing decisions under different legal protections.
+2. **Insurance Equilibrium (Module C):** Located in `src/model/module_c_insurance_eq.py`. Computes Rothschild-Stiglitz screening equilibria and adverse selection magnitude.
+3. **Proxy Reconstruction (Module D):** Located in `src/model/module_d_proxy.py`. Simulates insurer use of non-genetic data to bypass information restrictions.
+4. **Enforcement Game (Module E):** Located in `src/model/module_enforcement.py`. Models strategic compliance between insurers and regulators.
+5. **Welfare Ledger (DCBA):** Located in `src/model/dcba_ledger.py`. Aggregates stakeholder impacts into a unified distributional cost-benefit analysis.
+
+## 📊 Reproducibility & Peer Review
+
+This repository is designed for bit-for-bit reproducibility using JAX and deterministic seeds.
+
+| Objective | Command / Path |
+|:---|:---|
+| **Full Policy Run** | `python -m scripts.run_meta_pipeline --n_draws 2000` |
+| **Figure Generation** | `python -m scripts.generate_figures` |
+| **Reference Audit** | `python -m scripts.validate_references --report` |
+| **Logic Verification** | `pytest tests/test_economic_logic.py` |
+
 ## 📁 Repository Structure
 
-- `src/` — Core modelling engine (JAX/NumPyro).
-- `streamlit_app/` — Interactive dashboard source code.
-- `configs/` — YAML definitions for policy regimes and priors.
-- `context/` — Evidence registers and jurisdictional profiles.
-- `protocols/` — Research protocols and validation frameworks.
-- `docs/` — Technical documentation and Model Card.
+- `src/` — Core JAX/NumPyro modelling engine and logic proof scripts.
+- `streamlit_app/` — Live policy sandbox and evidence explorer.
+- `configs/` — Calibrated priors and policy benchmark definitions.
+- `protocols/` — Versioned research protocols (v2.0 Diamond Standard).
+- `docs/` — Model cards, reproduction reports, and technical appendices.
+- `local_only/` — (Developer only) Internal decision logs and development journal.
 
 ---
 

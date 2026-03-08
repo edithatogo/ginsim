@@ -10,7 +10,7 @@ and this project adheres to semantic versioning.
 ## [Unreleased]
 
 ### Phase 3 - Identification Plan and Data Access (2026-03-03)
-**Track:** gdpe_0002_evidence_anchoring
+
 
 #### Added
 - Identification plan (`docs/IDENTIFICATION_PLAN.md`) — Data sources, event study design, power analysis
@@ -28,7 +28,7 @@ and this project adheres to semantic versioning.
 - Data access applications to be prepared in Phase 4
 
 ### Phase 2 - Calibration Targets and Priors (2026-03-03)
-**Track:** gdpe_0002_evidence_anchoring
+
 
 #### Added
 - Australia calibration configuration (`configs/calibration_australia.yaml`) - 12 parameters with priors
@@ -47,7 +47,7 @@ and this project adheres to semantic versioning.
 - Prior predictive checks deferred to Phase 4
 
 ### Phase 1 - Evidence Registers (2026-03-03)
-**Track:** gdpe_0002_evidence_anchoring
+
 
 #### Added
 - Australia evidence register (12 evidence items across modules A-F + enforcement)
@@ -72,8 +72,8 @@ and this project adheres to semantic versioning.
 
 ### Added
 - Initial repository structure (src/, scripts/, configs/, context/, docs/)
-- Conductor workflow setup (tracks registry, metadata)
-- Base modelling infrastructure (JAX/NumPyro/BlackJAX stack)
+- Quality control workflow setup (metadata)
+- Base modelling infrastructure (JAX/NumPyro stack)
 - Policy schema + loader (Pydantic + YAML)
 - Baseline AU/NZ policy configs
 - OSF presubmission protocol

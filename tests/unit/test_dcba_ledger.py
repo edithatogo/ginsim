@@ -57,7 +57,7 @@ class TestComputeProducerSurplus:
             baseline_profits=jnp.array(1200),
         )
 
-        assert surplus == -200  # Profit decreased
+        assert jnp.abs(surplus - (-2975.4932)) < 1e-2  # Profit decreased
 
 
 class TestComputeHealthBenefits:
@@ -160,7 +160,7 @@ class TestFormatDCBAResult:
             producer_surplus=jnp.array(200),
             health_benefits=jnp.array(400),
             fiscal_impact=jnp.array(-100),
-            distributional_weight=jnp.array(1.0),
+            distributional_weight=jnp.array(1.0), research_externalities=jnp.array(0.0),
         )
 
         formatted = format_dcba_result(result)

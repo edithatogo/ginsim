@@ -2,7 +2,6 @@
 Module A: Behavior / Deterrence model - CORE JIT-compiled functions.
 
 This module contains the core functions that work with JAX arrays.
-Use module_a_behavior_wrappers.py for user-facing functions that accept pydantic models.
 """
 
 from __future__ import annotations
@@ -22,90 +21,65 @@ from .parameters import PolicyConfig
 @dataclass(frozen=True)
 class BehaviorParams:
     """Compact behavior parameters used by glue scripts."""
-
     baseline_logit: float
     policy_shock: float
     trend: float
 
 
 @jax.jit
-def taper_function(x: Array, cap: Array, taper_range: Array) -> Array:
+def taper_function(x: Any, cap: Any, taper_range: Any) -> Array:
     """
     Compute a smooth tapering protection factor.
-    Returns 1.0 if x <= cap, 0.0 if x >= cap + taper_range.
-    Interpolates smoothly in between.
     """
-    # Normalized position in taper: 0 at cap, 1 at cap + range
-    # Avoid division by zero for hard caps
-    safe_range = jnp.maximum(taper_range, 1e-10)
-    z = (x - cap) / safe_range
+    safe_range = jnp.maximum(jnp.asarray(taper_range), 1e-10)
+    z = (jnp.asarray(x) - jnp.asarray(cap)) / safe_range
     z = jnp.clip(z, 0.0, 1.0)
-
-    # Cosine smoothing (SmoothStep)
-    # 0.5 * (1 + cos(pi * z)) gives 1 at z=0, 0 at z=1
     return 0.5 * (1.0 + jnp.cos(jnp.pi * z))
 
 
-# Don't use @jit here - boolean arguments don't work with JIT
 def compute_perceived_penalty(
-    adverse_selection_elasticity: float,
-    baseline_loading: float,
+    adverse_selection_elasticity: Any,
+    baseline_loading: Any,
     allow_genetic_test_results: bool,
-    enforcement_strength: float,
-    enforcement_effectiveness: float,
-    moratorium_effect: float,
+    enforcement_strength: Any,
+    enforcement_effectiveness: Any,
+    moratorium_effect: Any,
     sum_insured_caps: dict[str, float] | None = None,
-    high_sum_insured_share: float = 0.25,
-    taper_range: float = 0.0,
-    acc_deterrence_offset: float = 0.0,
-    audit_intensity: float = 0.50,
+    high_sum_insured_share: Any = 0.25,
+    taper_range: Any = 0.0,
+    acc_deterrence_offset: Any = 0.0,
+    audit_intensity: Any = 0.50,
 ) -> Float[Array, ""]:
     """
     Compute perceived discrimination penalty under policy regime.
-    Now supports smooth regulatory tapering, NZ ACC offsets, and AU Audit Intensity.
     """
-    # Base penalty from adverse selection
-    base_penalty = adverse_selection_elasticity * baseline_loading
-
-    # Policy reduces penalty
-    # Use audit_intensity instead of generic effectiveness if specified
+    base_penalty = jnp.asarray(adverse_selection_elasticity) * jnp.asarray(baseline_loading)
     eff = jnp.maximum(jnp.asarray(enforcement_effectiveness), jnp.asarray(audit_intensity))
-    enforcement_factor = enforcement_strength * eff
+    enforcement_factor = jnp.asarray(enforcement_strength) * eff
 
     if allow_genetic_test_results:
         restriction_strength = 0.0
     elif sum_insured_caps is not None:
-        # Tapering logic
         avg_protection_high = taper_function(
-            jnp.asarray(1.0),  # Normalized proxy for high buyers
+            jnp.asarray(1.0),
             jnp.asarray(0.0),
-            jnp.asarray(taper_range / 1000000.0),  # Scaled range
+            jnp.asarray(taper_range) / 1000000.0,
         )
-
-        base_restriction = 1.0 - high_sum_insured_share
-        taper_bonus = high_sum_insured_share * avg_protection_high
-
-        restriction_strength = (base_restriction + taper_bonus) * (0.7 + 0.3 * moratorium_effect)
+        base_restriction = 1.0 - jnp.asarray(high_sum_insured_share)
+        taper_bonus = jnp.asarray(high_sum_insured_share) * avg_protection_high
+        restriction_strength = (base_restriction + taper_bonus) * (0.7 + 0.3 * jnp.asarray(moratorium_effect))
     else:
         restriction_strength = 1.0
 
     penalty_reduction = restriction_strength * (0.5 + 0.5 * enforcement_factor)
     penalty_reduction = jnp.clip(penalty_reduction, 0.0, 0.95)
-
-    # ACC Offset (NZ Specific)
-    effective_penalty_base = base_penalty * (1.0 - acc_deterrence_offset)
-
-    # Final perceived penalty
+    effective_penalty_base = base_penalty * (1.0 - jnp.asarray(acc_deterrence_offset))
     perceived_penalty = effective_penalty_base * (1.0 - penalty_reduction)
 
     return jnp.asarray(perceived_penalty, dtype=jnp.float32)
 
 
-# Convenience wrapper
-def compute_perceived_penalty_wrapper(
-    params: Any,
-    policy: PolicyConfig,
-) -> float:
+def compute_perceived_penalty_wrapper(params: Any, policy: PolicyConfig) -> float:
     """Wrapper that accepts pydantic models."""
     penalty = compute_perceived_penalty(
         params.adverse_selection_elasticity,
@@ -124,27 +98,20 @@ def compute_perceived_penalty_wrapper(
 
 
 def compute_testing_utility(
-    benefits: Float[Array, "*"],
-    perceived_penalty: Float[Array, ""],
-    individual_characteristics: dict[str, Float[Array, "*"]] | None = None,
-    medicare_cost_share: float = 0.0,
-    remoteness_index: float | Array = 0.0,
-    remoteness_weight: float | Array = 0.20,
+    benefits: Any,
+    perceived_penalty: Any,
+    individual_characteristics: dict[str, Any] | None = None,
+    medicare_cost_share: Any = 0.0,
+    remoteness_index: Any = 0.0,
+    remoteness_weight: Any = 0.20,
 ) -> Float[Array, "*"]:
     """
     Compute utility of genetic testing.
-    Now accounts for spatial 'Diagnostic Desert' effects.
     """
-    # Base utility: benefits reduced by insurance penalty and test cost (net of Medicare)
-    # Assume base cost of testing is 0.1 in utility units
-    base_test_cost = 0.1 * (1.0 - medicare_cost_share)
+    base_test_cost = 0.1 * (1.0 - jnp.asarray(medicare_cost_share))
+    spatial_test_cost = base_test_cost * (1.0 + jnp.asarray(remoteness_weight) * jnp.asarray(remoteness_index))
+    utility = jnp.asarray(benefits) - jnp.asarray(perceived_penalty) - spatial_test_cost
 
-    # Spatial penalty: Cost increases with remoteness
-    spatial_test_cost = base_test_cost * (1.0 + _to_float_scalar(remoteness_weight) * _to_float_scalar(remoteness_index))
-
-    utility = benefits - perceived_penalty - spatial_test_cost
-
-    # Add individual characteristics
     if individual_characteristics is not None:
         for factor, weight in individual_characteristics.items():
             utility = utility + weight * individual_characteristics.get(factor, 0.0)
@@ -152,19 +119,11 @@ def compute_testing_utility(
     return utility
 
 
-def _to_float_scalar(val: Any) -> Array:
-    return jnp.asarray(float(val), dtype=jnp.float32)
-
-
-def compute_testing_probability(
-    utility: Float[Array, "*"],
-    scale: float = 1.0,
-) -> Float[Array, "*"]:
+def compute_testing_probability(utility: Any, scale: float = 1.0) -> Float[Array, "*"]:
     """
     Compute probability of testing using numerically stable sigmoid.
     """
-    scaled_utility = utility * scale
-    # jax.nn.sigmoid is numerically stabilized for large values
+    scaled_utility = jnp.asarray(utility) * scale
     return jax.nn.sigmoid(scaled_utility)
 
 
@@ -179,10 +138,7 @@ def compute_testing_uptake(
 ) -> Float[Array, ""]:
     """
     Compute aggregate testing uptake.
-    Supports spatial analysis via remoteness_index.
     """
-    logger.debug(f"Computing testing uptake for policy: {policy.name} (Remoteness: {remoteness_index:.2f})")
-    # Compute perceived penalty
     perceived_penalty = compute_perceived_penalty(
         params.adverse_selection_elasticity,
         params.baseline_loading,
@@ -197,30 +153,24 @@ def compute_testing_uptake(
         getattr(params, "audit_intensity", 0.50),
     )
 
-    # Simulate heterogeneous benefits
     if rng_key is not None:
         benefits = jr.normal(rng_key, (n_individuals,)) * benefits_sd + benefits_mean
     else:
-        # Deterministic grid
         benefits = jnp.linspace(
             benefits_mean - 3 * benefits_sd,
             benefits_mean + 3 * benefits_sd,
             n_individuals,
         )
 
-    # Compute utility (with Medicare cost sharing and Spatial effects)
     utilities = compute_testing_utility(
-        benefits,
-        perceived_penalty,
+        benefits, 
+        perceived_penalty, 
         medicare_cost_share=getattr(params, "medicare_cost_share", 0.0),
         remoteness_index=remoteness_index,
         remoteness_weight=getattr(params, "remoteness_weight", 0.20)
     )
 
-    # Compute testing probabilities
     probabilities = compute_testing_probability(utilities)
-
-    # Aggregate uptake
     return jnp.mean(probabilities)
 
 
@@ -228,7 +178,7 @@ def compute_policy_effect(
     params: Any,
     baseline_policy: PolicyConfig,
     reform_policy: PolicyConfig,
-) -> dict[str, Float[Array, ""]]:
+) -> dict[str, Any]:
     """
     Compute effect of policy reform.
     """
@@ -250,7 +200,7 @@ def evaluate_multiple_policies(
     params: Any,
     policies: list[PolicyConfig],
     **kwargs: Any,
-) -> dict[str, Float[Array, ""]]:
+) -> dict[str, Any]:
     """
     Evaluate testing uptake for multiple policies.
     """
@@ -277,14 +227,13 @@ def get_standard_policies() -> dict[str, PolicyConfig]:
             description="Moratorium (Self-Regulation)",
             allow_genetic_test_results=False,
             allow_family_history=True,
-            # Exact FSC Moratorium thresholds (AUD)
             sum_insured_caps={
                 "life": 500000.0,
                 "tpd": 500000.0,
                 "trauma": 200000.0,
                 "income_protection": 4000.0,
             },
-            taper_range=100000.0,  # 100k AUD taper zone
+            taper_range=100000.0,
             enforcement_strength=0.5,
         ),
         "ban": PolicyConfig(

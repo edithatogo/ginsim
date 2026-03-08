@@ -62,7 +62,7 @@ class TestFunctionality:
         uptake_metric = next(m for m in app_test.metric if "Testing Uptake" in m.label)
         # Expected value from CLI baseline: 61.3% (formatted)
         assert "61.3%" in uptake_metric.value
-        
+
         welfare_metric = next(m for m in app_test.metric if "Net Social Benefit" in m.label)
         # Verify welfare is formatted
         assert "$" in welfare_metric.value

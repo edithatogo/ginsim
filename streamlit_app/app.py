@@ -11,11 +11,11 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
-import numpy as np
 
 from src.model.module_a_behavior import compute_testing_uptake, get_standard_policies
 from src.model.parameters import load_jurisdiction_parameters

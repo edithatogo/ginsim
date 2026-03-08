@@ -203,7 +203,6 @@ class TestEvaluateScenario:
             },
             "policy_overrides": {
                 "enforcement_strength": 0.95,
-                "penalty_type": "criminal",
             },
         }
 
@@ -216,7 +215,7 @@ class TestEvaluateScenario:
             "jurisdiction": "new_zealand",
             "policy_name": "ban",
             "enforcement_strength": 0.95,
-            "penalty_type": "criminal",
+            "penalty_type": "civil",
         }
 
     def test_evaluate_scenario_rejects_unsupported_active_looking_fields(self):

@@ -23,7 +23,7 @@ from src.model.game_diagrams import (
     create_module_a_diagram,
     create_module_c_diagram,
     create_module_d_diagram,
-    create_module_e_diagram,
+    create_enforcement_diagram,
     create_module_f_diagram,
 )
 
@@ -111,7 +111,7 @@ def create_diagram_cached(diagram_key: str, params: dict) -> BytesIO:
     elif diagram_key == "module_d":
         fig = create_module_d_diagram(params=params if show_parameters else None)
     elif diagram_key == "module_e":
-        fig = create_module_e_diagram(params=params if show_parameters else None)
+        fig = create_enforcement_diagram(params=params if show_parameters else None)
     elif diagram_key == "module_f":
         fig = create_module_f_diagram(params=params if show_parameters else None)
     elif diagram_key == "enforcement":
@@ -300,7 +300,7 @@ def create_svg_diagram(diagram_key: str, params: dict) -> BytesIO:
     elif diagram_key == "module_d":
         fig = create_module_d_diagram(params=params if show_parameters else None)
     elif diagram_key == "module_e":
-        fig = create_module_e_diagram(params=params if show_parameters else None)
+        fig = create_enforcement_diagram(params=params if show_parameters else None)
     elif diagram_key == "module_f":
         fig = create_module_f_diagram(params=params if show_parameters else None)
     elif diagram_key == "enforcement":

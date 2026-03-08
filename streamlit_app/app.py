@@ -191,7 +191,7 @@ with tab_sandbox:
     with c_pop:
         pop_country = st.selectbox("Select Population (Demographics & Costs):", ["Australia", "New Zealand", "UK", "Canada", "US"])
     with c_pol:
-        pol_country = st.selectbox("Select Policy (Rules & Thresholds):", ["Status Quo", "UK Moratorium", "Canadian Ban"])
+        pol_country = st.selectbox("Select Policy (Rules & Thresholds):", ["Status Quo", "Moratorium (UK ABI)", "Statutory Ban (Canada GNDA)"])
     
     if st.button("🧪 Run Counterfactual", type="primary"):
         # 1. Load population params
@@ -201,7 +201,7 @@ with tab_sandbox:
         p_policies = get_standard_policies()
         p_obj = p_policies["status_quo"]
         if "UK" in pol_country: p_obj = p_policies["moratorium"]
-        if "Canadian" in pol_country: p_obj = p_policies["ban"]
+        if "Canada" in pol_country: p_obj = p_policies["ban"]
         
         res_counter = evaluate_single_policy(params_counter, p_obj)
         

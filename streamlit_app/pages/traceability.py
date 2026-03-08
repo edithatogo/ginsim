@@ -1,6 +1,7 @@
 import bibtexparser
 import streamlit as st
 import yaml
+
 from src.utils.path_resolver import resolve_path
 
 st.set_page_config(page_title="Evidence Explorer", layout="wide")

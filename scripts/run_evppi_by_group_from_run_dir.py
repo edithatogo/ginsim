@@ -8,8 +8,8 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 import pandas as pd
-
 from src.model.evppi_rff import evppi_rff
+
 from src.model.voi import evpi
 from src.utils.manifest import write_manifest
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+
 import pytest
 
 from scripts import create_nature_depth_track

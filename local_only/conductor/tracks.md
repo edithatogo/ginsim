@@ -153,5 +153,5 @@ This registry is the index of Conductor tracks for this repository.
 
 ---
 
-- [ ] **Track: Agentic Delphi Protocol Vertical (Permanent Audit)**
+- [x] **Track: Agentic Delphi Protocol Vertical (Permanent Audit)**
 *Link: [./tracks/gdpe_0045_agentic_delphi_vertical/](./tracks/gdpe_0045_agentic_delphi_vertical/)*

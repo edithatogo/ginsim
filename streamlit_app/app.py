@@ -21,6 +21,7 @@ from src.model.module_a_behavior import compute_testing_uptake, get_standard_pol
 from src.model.parameters import load_jurisdiction_parameters
 from src.model.pipeline import evaluate_single_policy, simulate_evolution
 from src.model.adversarial_engine import AdversarialEngine
+from src.model.agentic_auditor import AgenticAuditor
 from src.utils.hta_export import HTAExporter
 
 # =============================================================================
@@ -84,6 +85,13 @@ use_equity_weights = st.sidebar.toggle(
     help="Applies weights based on Māori Health Sovereignty (NZ) or Vertical Equity (AU).",
 )
 
+st.sidebar.subheader("🤖 Governance & Audit")
+enable_auditor = st.sidebar.toggle(
+    "Enable Agentic Audit Layer",
+    value=True,
+    help="Activates the multi-persona Delphi Protocol for scenario auditing.",
+)
+
 with st.sidebar.expander("⚙️ Advanced Controls"):
     jurisdiction = st.selectbox(
         "Base Jurisdiction", ["Australia", "New Zealand", "UK", "Canada", "US"]
@@ -104,13 +112,14 @@ st.markdown("### Benchmarking and Temporal Evolution Analysis (Track gdpe_0042)"
 STANDARD_POLICIES = get_standard_policies()
 
 # 2. Main Narrative Tabs
-tab_main, tab_bench, tab_sandbox, tab_spatial, tab_redteam, tab_interop, tab_narrative, tab_evidence = st.tabs(
+tab_main, tab_bench, tab_sandbox, tab_spatial, tab_redteam, tab_delphi, tab_interop, tab_narrative, tab_evidence = st.tabs(
     [
         "🏠 Primary Evaluation",
         "🌍 Global Benchmarking",
         "🧪 Cross-Pollination Sandbox",
         "🗺️ Spatial Equity",
         "🔴 Adversarial Red-Teaming",
+        "🧑‍⚖️ Stakeholder Consensus",
         "🔄 Interoperability",
         "📖 Publication Narrative",
         "🔬 Evidence & Traceability",
@@ -448,6 +457,81 @@ with tab_redteam:
 
         else:
             st.error("Optimization failed to converge or returned NaNs.")
+
+# TAB 5: STAKEHOLDER CONSENSUS
+with tab_delphi:
+    st.subheader("🧑‍⚖️ Agentic Delphi Protocol")
+    st.write(
+        "Simulate a consensus-building process among diverse stakeholder personas (Treasury, Lancet, etc.)."
+    )
+
+    if not enable_auditor:
+        st.warning("Agentic Audit Layer is disabled in the sidebar. Please enable it to use this feature.")
+    elif "main_result" not in st.session_state:
+        st.warning("Please run a primary evaluation first to provide data for the audit.")
+    else:
+        res = st.session_state["main_result"]
+        auditor = AgenticAuditor()
+
+        c_del1, c_del2 = st.columns([1, 2])
+        with c_del1:
+            delphi_rounds = st.slider("Delphi Rounds", 1, 5, 3)
+            if st.button("⚖️ Initiate Audit & Consensus", type="primary"):
+                with st.spinner("Simulating stakeholder meeting..."):
+                    history = auditor.run_delphi_session(res.dcba_result, max_rounds=delphi_rounds)
+                    st.session_state["delphi_history"] = history
+
+        if "delphi_history" in st.session_state:
+            history = st.session_state["delphi_history"]
+            last_round = history[-1]
+            
+            with c_del2:
+                # 1. Divergence Plot
+                div_data = [auditor.compute_divergence(r)["coefficient_of_variation"] for r in history]
+                df_div = pd.DataFrame({"Round": range(1, len(div_data) + 1), "Epistemic Divergence (CV)": div_data})
+                fig_div = px.line(df_div, x="Round", y="Epistemic Divergence (CV)", title="Consensus Trend (Delphi Protocol)")
+                fig_div.update_layout(template="plotly_white")
+                st.plotly_chart(fig_div, use_container_width=True)
+
+            st.divider()
+            col_v1, col_v2 = st.columns([1, 1])
+            
+            with col_v1:
+                st.write("### Persona Welfare Polar Plot")
+                # Prepare data for Radar Chart
+                categories = [v.name for v in last_round.values()]
+                values = [v.subjective_welfare for v in last_round.values()]
+                
+                fig_radar = go.Figure()
+                fig_radar.add_trace(go.Scatterpolar(
+                    r=values,
+                    theta=categories,
+                    fill='toself',
+                    name='Subjective Welfare ($M)'
+                ))
+                fig_radar.update_layout(
+                    polar=dict(radialaxis=dict(visible=True)),
+                    showlegend=False,
+                    template="plotly_white"
+                )
+                st.plotly_chart(fig_radar, use_container_width=True)
+
+            with col_v2:
+                st.write("### Auditor Trail (Final Round)")
+                for pid, v in last_round.items():
+                    with st.expander(f"**{v.name}**"):
+                        st.write(f"**Sentiment:** {v.qualitative_feedback}")
+                        if v.key_concerns:
+                            st.write("**Key Concerns:**")
+                            for c in v.key_concerns:
+                                st.write(f"- {c}")
+                        else:
+                            st.write("✅ No critical concerns identified.")
+
+            st.info(
+                "The Delphi Protocol forces personas to adjust their subjective weightings towards the collective mean. "
+                "The 'Radar Plot' shows the final perceived value of the policy across different ideological axes."
+            )
 
 # TAB 6: INTEROPERABILITY
 with tab_interop:

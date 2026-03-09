@@ -21,6 +21,7 @@ from src.model.module_a_behavior import compute_testing_uptake, get_standard_pol
 from src.model.parameters import load_jurisdiction_parameters
 from src.model.pipeline import evaluate_single_policy
 from src.model.temporal_engine import simulate_evolution
+from src.utils.hta_export import HTAExporter
 
 # =============================================================================
 # Visual Design System
@@ -96,13 +97,14 @@ st.markdown("### Benchmarking and Temporal Evolution Analysis (Track gdpe_0042)"
 STANDARD_POLICIES = get_standard_policies()
 
 # 2. Main Narrative Tabs
-tab_main, tab_bench, tab_sandbox, tab_spatial, tab_evidence = st.tabs(
+tab_main, tab_bench, tab_sandbox, tab_spatial, tab_interop, tab_evidence = st.tabs(
     [
-        "🏠 Primary Evaluation",
-        "🌐 Global Benchmarking",
-        "🧪 Cross-Pollination Sandbox",
-        "🗺️ Spatial Equity",
-        "🔬 Evidence & Traceability",
+        "ðŸ  Primary Evaluation",
+        "ðŸŒ Global Benchmarking",
+        "ðŸ§ª Cross-Pollination Sandbox",
+        "ðŸ—ºï¸ Spatial Equity",
+        "ðŸ”„ Interoperability",
+        "ðŸ”¬ Evidence & Traceability",
     ]
 )
 
@@ -183,7 +185,13 @@ with tab_main:
                 w["fiscal_impact"],
                 -w["research_externalities"],
             ]
-            fig = go.Figure(go.Bar(x=names, y=vals, marker_color=["#56B4E9", "#E69F00", "#CC79A7", "#999999", "#D55E00"]))
+            fig = go.Figure(
+                go.Bar(
+                    x=names,
+                    y=vals,
+                    marker_color=["#56B4E9", "#E69F00", "#CC79A7", "#999999", "#D55E00"],
+                )
+            )
             fig.update_layout(template="plotly_white")
             st.plotly_chart(fig, use_container_width=True)
 
@@ -201,13 +209,18 @@ with tab_main:
         st.divider()
         st.subheader("📅 10-Year Market Trajectory")
         hist = st.session_state["temporal_history"]
-        df_hist = pd.DataFrame([{
-            "Year": s.year,
-            "Uptake": float(s.uptake),
-            "Premium (High)": float(s.premium_high),
-            "Premium (Low)": float(s.premium_low),
-            "Welfare": float(s.net_welfare)
-        } for s in hist])
+        df_hist = pd.DataFrame(
+            [
+                {
+                    "Year": s.year,
+                    "Uptake": float(s.uptake),
+                    "Premium (High)": float(s.premium_high),
+                    "Premium (Low)": float(s.premium_low),
+                    "Welfare": float(s.net_welfare),
+                }
+                for s in hist
+            ]
+        )
 
         c_h1, c_h2 = st.columns(2)
         with c_h1:
@@ -215,11 +228,15 @@ with tab_main:
             fig_u.update_layout(template="plotly_white", yaxis_tickformat=".0%")
             st.plotly_chart(fig_u, use_container_width=True)
         with c_h2:
-            fig_p = px.line(df_hist, x="Year", y=["Premium (High)", "Premium (Low)"], title="Premium Evolution")
+            fig_p = px.line(
+                df_hist, x="Year", y=["Premium (High)", "Premium (Low)"], title="Premium Evolution"
+            )
             fig_p.update_layout(template="plotly_white")
             st.plotly_chart(fig_p, use_container_width=True)
 
-        st.info("The projection accounts for annual technological drift (increasing proxy accuracy) and inflationary pressure on regulatory thresholds.")
+        st.info(
+            "The projection accounts for annual technological drift (increasing proxy accuracy) and inflationary pressure on regulatory thresholds."
+        )
 
 # TAB 2: GLOBAL BENCHMARKING
 with tab_bench:
@@ -236,11 +253,29 @@ with tab_bench:
                 if c == "Canada":
                     pid = "ban"
                 r = evaluate_cached(p, pid)
-                val = float(r.equity_weighted_welfare) if use_equity_weights else float(r.welfare_impact)
-                bench_data.append({"Jurisdiction": c, "Policy": pid.replace("_", " ").title(), "Uptake": float(r.testing_uptake), "Welfare": val})
+                val = (
+                    float(r.equity_weighted_welfare)
+                    if use_equity_weights
+                    else float(r.welfare_impact)
+                )
+                bench_data.append(
+                    {
+                        "Jurisdiction": c,
+                        "Policy": pid.replace("_", " ").title(),
+                        "Uptake": float(r.testing_uptake),
+                        "Welfare": val,
+                    }
+                )
         df_bench = pd.DataFrame(bench_data)
         title_suffix = "Equity-Weighted" if use_equity_weights else "Utilitarian"
-        fig_bench = px.scatter(df_bench, x="Uptake", y="Welfare", text="Jurisdiction", color="Policy", title=f"Global Efficiency Frontier ({title_suffix})")
+        fig_bench = px.scatter(
+            df_bench,
+            x="Uptake",
+            y="Welfare",
+            text="Jurisdiction",
+            color="Policy",
+            title=f"Global Efficiency Frontier ({title_suffix})",
+        )
         fig_bench.update_traces(textposition="top center", marker={"size": 12})
         fig_bench.update_layout(template="plotly_white", xaxis_tickformat=".0%")
         st.plotly_chart(fig_bench, use_container_width=True)
@@ -250,11 +285,17 @@ with tab_sandbox:
     st.subheader("🧪 Policy Cross-Pollination")
     c_pop, c_pol = st.columns(2)
     with c_pop:
-        pop_country = st.selectbox("Select Population:", ["Australia", "New Zealand", "UK", "Canada", "US"])
+        pop_country = st.selectbox(
+            "Select Population:", ["Australia", "New Zealand", "UK", "Canada", "US"]
+        )
     with c_pol:
-        pol_country = st.selectbox("Select Policy:", ["Status Quo", "Moratorium (UK ABI)", "Statutory Ban (Canada GNDA)"])
+        pol_country = st.selectbox(
+            "Select Policy:", ["Status Quo", "Moratorium (UK ABI)", "Statutory Ban (Canada GNDA)"]
+        )
     if st.button("🧪 Run Counterfactual", type="primary"):
-        params_counter = get_params(pop_country, deterrence_level, moratorium_belief, baseline_uptake)
+        params_counter = get_params(
+            pop_country, deterrence_level, moratorium_belief, baseline_uptake
+        )
         p_policies = get_standard_policies()
         p_obj = p_policies["status_quo"]
         if "UK" in pol_country:
@@ -265,7 +306,11 @@ with tab_sandbox:
         st.success(f"Results for {pop_country} under {pol_country} rules:")
         sc1, sc2 = st.columns(2)
         sc1.metric("Counterfactual Uptake", f"{float(res_counter.testing_uptake):.1%}")
-        val_c = float(res_counter.equity_weighted_welfare) if use_equity_weights else float(res_counter.welfare_impact)
+        val_c = (
+            float(res_counter.equity_weighted_welfare)
+            if use_equity_weights
+            else float(res_counter.welfare_impact)
+        )
         sc2.metric("Counterfactual Welfare", f"${val_c:,.0f}")
 
 # TAB 4: SPATIAL EQUITY
@@ -278,12 +323,85 @@ with tab_spatial:
         with st.spinner("Simulating geographic sweep..."):
             for policy_name, policy_obj in STANDARD_POLICIES.items():
                 for r_idx in remoteness_levels:
-                    uptake = compute_testing_uptake(current_params, policy_obj, remoteness_index=float(r_idx))
-                    spatial_results.append({"Policy": policy_name.replace("_", " ").title(), "Remoteness": r_idx, "Uptake": float(uptake)})
+                    uptake = compute_testing_uptake(
+                        current_params, policy_obj, remoteness_index=float(r_idx)
+                    )
+                    spatial_results.append(
+                        {
+                            "Policy": policy_name.replace("_", " ").title(),
+                            "Remoteness": r_idx,
+                            "Uptake": float(uptake),
+                        }
+                    )
         df_spatial = pd.DataFrame(spatial_results)
-        fig_spatial = px.line(df_spatial, x="Remoteness", y="Uptake", color="Policy", title=f"Testing Uptake Decay by Geographic Remoteness ({jurisdiction.title()})")
+        fig_spatial = px.line(
+            df_spatial,
+            x="Remoteness",
+            y="Uptake",
+            color="Policy",
+            title=f"Testing Uptake Decay by Geographic Remoteness ({jurisdiction.title()})",
+        )
         fig_spatial.update_layout(template="plotly_white", yaxis_tickformat=".0%")
         st.plotly_chart(fig_spatial, use_container_width=True)
+
+# TAB 5: INTEROPERABILITY
+with tab_interop:
+    st.subheader("🔄 HTA Interoperability & Data Export")
+    st.write(
+        "Export model results in standardized formats for Health Technology Assessment (HTA) dossiers or cross-platform integration."
+    )
+
+    if "main_result" not in st.session_state:
+        st.warning("Please run an evaluation in the 'Primary Evaluation' tab first to export data.")
+    else:
+        res = st.session_state["main_result"]
+        params = st.session_state["main_params"]
+
+        c_exp1, c_exp2 = st.columns(2)
+
+        with c_exp1:
+            st.write("### Standardized JSON Dossier")
+            st.caption("Machine-readable format for auditable replication.")
+
+            dossier_path = "hta_dossier.json"
+            HTAExporter.to_json_dossier(res, params, dossier_path)
+
+            with open(dossier_path, "rb") as f:
+                st.download_button(
+                    label="📥 Download JSON Dossier",
+                    data=f,
+                    file_name=f"GINSIM_HTA_{res.policy_name}_{res.jurisdiction}.json",
+                    mime="application/json",
+                )
+
+        with c_exp2:
+            st.write("### Excel Submission Template")
+            st.caption("Multi-sheet workbook for jurisdictional HTA committees.")
+
+            excel_path = "hta_submission.xlsx"
+            HTAExporter.to_excel_template([res], excel_path)
+
+            with open(excel_path, "rb") as f:
+                st.download_button(
+                    label="📥 Download Excel Template",
+                    data=f,
+                    file_name=f"GINSIM_HTA_Submission_{res.jurisdiction}.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                )
+
+        st.divider()
+        st.write("#### Schema Preview")
+        with st.expander("View Outcome Schema (v1.0.0)"):
+            preview = {
+                "metadata": ["timestamp", "jurisdiction", "engine"],
+                "inputs": ["adverse_selection_elasticity", "deterrence_elasticity", "..."],
+                "outcomes": {
+                    "utilitarian_welfare": "float",
+                    "components": ["consumer_surplus", "producer_surplus", "..."],
+                    "behavioral": ["testing_uptake", "compliance_rate"],
+                },
+            }
+            st.json(preview)
 
 with tab_evidence:
     st.subheader("🧬 Diamond-Standard Traceability")

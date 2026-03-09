@@ -26,6 +26,7 @@ from .voi import compute_evpi, compute_evppi
 @dataclass(frozen=True)
 class UncertaintyResult:
     """Consolidated summary of a Monte Carlo run."""
+
     mean: Any
     median: Any
     lower_95: Any
@@ -43,7 +44,7 @@ def calculate_summary_stats(results: Array, n_subsamples: int = 100) -> dict[str
         "lower_95": jnp.percentile(results, 2.5),
         "upper_95": jnp.percentile(results, 97.5),
         "std": jnp.std(results),
-        "samples": results[:n_subsamples]
+        "samples": results[:n_subsamples],
     }
 
 
@@ -72,7 +73,7 @@ def evaluate_batch(
     return {
         "uptake": calculate_summary_stats(results["uptake"]),
         "welfare": calculate_summary_stats(results["welfare"]),
-        "raw_welfare": results["welfare"]
+        "raw_welfare": results["welfare"],
     }
 
 
@@ -98,12 +99,12 @@ def run_psa(
         jurisdiction=base_params.jurisdiction,
         calibration_date=base_params.calibration_date,
         baseline_testing_uptake=_to_batch(base_params.baseline_testing_uptake),
-
         # Bayesian Varied Fields
         deterrence_elasticity=prior_draws["deterrence_elasticity"],
-        adverse_selection_elasticity=-prior_draws["adverse_selection_elasticity"], # Negative by convention
+        adverse_selection_elasticity=-prior_draws[
+            "adverse_selection_elasticity"
+        ],  # Negative by convention
         equity_factor=prior_draws["equity_factor"],
-
         # Constants
         moratorium_effect=_to_batch(base_params.moratorium_effect),
         demand_elasticity_high_risk=_to_batch(base_params.demand_elasticity_high_risk),
@@ -126,6 +127,8 @@ def run_psa(
         pharmac_qaly_threshold=_to_batch(base_params.pharmac_qaly_threshold),
         medicare_cost_share=_to_batch(base_params.medicare_cost_share),
         audit_intensity=_to_batch(base_params.audit_intensity),
+        audit_intensity_apra=_to_batch(getattr(base_params, "audit_intensity_apra", 0.50)),
+        audit_intensity_asic=_to_batch(getattr(base_params, "audit_intensity_asic", 0.50)),
         remoteness_weight=_to_batch(base_params.remoteness_weight),
     )
 
@@ -133,7 +136,7 @@ def run_psa(
 
     return {
         "uptake": UncertaintyResult(**raw_results["uptake"]),
-        "welfare": UncertaintyResult(**raw_results["welfare"])
+        "welfare": UncertaintyResult(**raw_results["welfare"]),
     }
 
 
@@ -182,6 +185,8 @@ def run_full_voi_analysis(
         pharmac_qaly_threshold=_to_batch(base_params.pharmac_qaly_threshold),
         medicare_cost_share=_to_batch(base_params.medicare_cost_share),
         audit_intensity=_to_batch(base_params.audit_intensity),
+        audit_intensity_apra=_to_batch(getattr(base_params, "audit_intensity_apra", 0.50)),
+        audit_intensity_asic=_to_batch(getattr(base_params, "audit_intensity_asic", 0.50)),
         remoteness_weight=_to_batch(base_params.remoteness_weight),
     )
 
@@ -200,7 +205,7 @@ def run_full_voi_analysis(
         "evpi": float(evpi),
         "evppi": {
             "Deterrence Elasticity": float(evppi_deterrence),
-            "Adverse Selection": float(evppi_as)
+            "Adverse Selection": float(evppi_as),
         },
-        "w_matrix": w_matrix
+        "w_matrix": w_matrix,
     }

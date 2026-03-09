@@ -115,11 +115,16 @@ def compute_testing_utility(
     medicare_cost_share: Any = 0.0,
     remoteness_index: Any = 0.0,
     remoteness_weight: Any = 0.20,
+    year: int = 0,
+    tech_improvement_rate: float = 0.15,
 ) -> Float[Array, "*"]:
     """
     Compute utility of genetic testing.
+    Incorporates temporal cost curve (costs drop over time).
     """
-    base_test_cost = 0.1 * (1.0 - jnp.asarray(medicare_cost_share))
+    # Temporal cost curve: 15% annual drop
+    cost_multiplier = (1.0 - tech_improvement_rate) ** float(year)
+    base_test_cost = 0.1 * cost_multiplier * (1.0 - jnp.asarray(medicare_cost_share))
     spatial_test_cost = base_test_cost * (
         1.0 + jnp.asarray(remoteness_weight) * jnp.asarray(remoteness_index)
     )
@@ -148,6 +153,7 @@ def compute_testing_uptake(
     n_individuals: int = 1000,
     rng_key: Array | None = None,
     remoteness_index: float = 0.0,
+    year: int = 0,
 ) -> Float[Array, ""]:
     """
     Compute aggregate testing uptake.
@@ -183,6 +189,8 @@ def compute_testing_uptake(
         medicare_cost_share=getattr(params, "medicare_cost_share", 0.0),
         remoteness_index=remoteness_index,
         remoteness_weight=getattr(params, "remoteness_weight", 0.20),
+        year=year,
+        tech_improvement_rate=getattr(params, "tech_improvement_rate", 0.15),
     )
 
     probabilities = compute_testing_probability(utilities)

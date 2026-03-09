@@ -139,10 +139,12 @@ def compute_proxy_substitution_effect(
     params: ModelParameters,
     baseline_policy: PolicyConfig,
     reform_policy: PolicyConfig,
+    year: int = 0,
 ) -> dict[str, Any]:
     """
     Compute effect of proxy substitution and the resulting 'Information Gap'.
     Now anchored in empirical literature (Taylor 2021, Hersch 2019).
+    Incorporates temporal evolution of technology (AI/ML proxy capability).
     """
     # Baseline accuracy of full-info underwriting
     baseline_accuracy = 0.85
@@ -155,10 +157,14 @@ def compute_proxy_substitution_effect(
         # SOTA: Informational redundancy is the 'capture' from allowed proxies
 
         # 1. Family History Component (Taylor 2021: ~45-75% capture)
-        fh_capture = params.family_history_sensitivity if reform_policy.allow_family_history else 0.0
+        fh_capture = (
+            params.family_history_sensitivity if reform_policy.allow_family_history else 0.0
+        )
 
         # 2. Medical Marker Component (Hersch 2019: ~30-50% capture)
-        mm_capture = params.proxy_substitution_rate
+        # TEMPORAL DYNAMICS: AI capabilities improve proxy extraction over time
+        tech_multiplier = 1.0 + (getattr(params, "tech_improvement_rate", 0.15) * float(year))
+        mm_capture = jnp.minimum(1.0, params.proxy_substitution_rate * tech_multiplier)
 
         # Aggregate redundancy: Insurers use the best available proxy suite
         informational_redundancy = jnp.maximum(fh_capture, mm_capture)
@@ -168,12 +174,14 @@ def compute_proxy_substitution_effect(
 
         # Resulting accuracy
         reform_accuracy = float(baseline_accuracy * informational_redundancy * enforcement_drag)
-        evidence_key = "taylor_2021_hersch_2019_combined"
+        evidence_key = "taylor_2021_hersch_2019_combined_temporal"
 
     accuracy_loss = float(baseline_accuracy - reform_accuracy)
 
     # Information Gap: How much genetic info remains effectively hidden (1 - redundancy)
-    residual_information_gap = float(max(0.0, 1.0 - (reform_accuracy / (baseline_accuracy + 1e-10))))
+    residual_information_gap = float(
+        max(0.0, 1.0 - (reform_accuracy / (baseline_accuracy + 1e-10)))
+    )
 
     return {
         "accuracy_baseline": baseline_accuracy,
@@ -181,7 +189,7 @@ def compute_proxy_substitution_effect(
         "accuracy_loss": accuracy_loss,
         "residual_information_gap": residual_information_gap,
         "informational_redundancy": float(informational_redundancy),
-        "source_evidence_key": evidence_key
+        "source_evidence_key": evidence_key,
     }
 
 

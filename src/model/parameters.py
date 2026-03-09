@@ -112,6 +112,10 @@ class ModelParameters:
     audit_intensity_asic: Any = 0.50
     remoteness_weight: Any = 0.20
 
+    # Temporal Evolution
+    time_horizon: int = 10
+    tech_improvement_rate: Any = 0.15
+
     def __hash__(self):
         # We only hash static strings to ensure cache stability
         return hash((self.jurisdiction, self.calibration_date))
@@ -165,6 +169,8 @@ def _model_params_flatten(params: ModelParameters):
         params.audit_intensity_apra,
         params.audit_intensity_asic,
         params.remoteness_weight,
+        params.time_horizon,
+        params.tech_improvement_rate,
     )
     aux_data = {
         "jurisdiction": params.jurisdiction,
@@ -203,6 +209,8 @@ def _model_params_unflatten(aux_data: dict[str, Any], children: tuple[Any, ...])
         audit_intensity_apra=children[25],
         audit_intensity_asic=children[26],
         remoteness_weight=children[27],
+        time_horizon=children[28],
+        tech_improvement_rate=children[29],
         **aux_data,
     )
 

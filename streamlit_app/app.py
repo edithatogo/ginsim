@@ -22,6 +22,7 @@ from src.model.parameters import load_jurisdiction_parameters
 from src.model.pipeline import evaluate_single_policy, simulate_evolution
 from src.model.adversarial_engine import AdversarialEngine
 from src.model.agentic_auditor import AgenticAuditor
+from src.utils.persona_distiller import PersonaDistiller
 from src.utils.hta_export import HTAExporter
 
 # =============================================================================
@@ -471,7 +472,31 @@ with tab_delphi:
         st.warning("Please run a primary evaluation first to provide data for the audit.")
     else:
         res = st.session_state["main_result"]
-        auditor = AgenticAuditor()
+        
+        # Initialize Auditor and Distiller
+        if "auditor" not in st.session_state:
+            st.session_state["auditor"] = AgenticAuditor()
+        auditor = st.session_state["auditor"]
+        distiller = PersonaDistiller()
+
+        # --- TEACHING INTERFACE ---
+        with st.expander("🎓 Teach New Persona from Policy Document"):
+            st.write("Provide a text-based policy statement to 'distill' a new stakeholder persona.")
+            custom_name = st.text_input("Persona Name:", placeholder="e.g., Māori Health Board")
+            policy_text = st.text_area("Policy Statement / Text:", height=150, placeholder="Paste policy document text here...")
+            
+            if st.button("🧠 Distill & Add Persona"):
+                if custom_name and policy_text:
+                    with st.spinner("Distilling priorities..."):
+                        new_config = distiller.distill_persona(policy_text, name=custom_name)
+                        auditor.add_persona(new_config)
+                        st.success(f"Persona '{custom_name}' taught successfully and added to registry.")
+                        # Clear history to force re-audit with new persona
+                        if "delphi_history" in st.session_state:
+                            del st.session_state["delphi_history"]
+                else:
+                    st.error("Please provide both a name and policy text.")
+        st.divider()
 
         c_del1, c_del2 = st.columns([1, 2])
         with c_del1:

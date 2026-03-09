@@ -17,6 +17,7 @@ The repo implements an integrated clinical-economic pipeline:
 - Explicit uncertainty quantification with clear "what matters most" diagnostics (EVPI/EVPPI; S1/ST).
 - **Adversarial Robustness:** Automated "Red-Teaming" engine using gradient-based optimization to identify parameter combinations that collapse policy welfare.
 - **Permanent Governance Layer:** Integrated Agentic Delphi Protocol providing live stakeholder sentiment (Nature, Lancet, Treasury) for every scenario.
+- **Dynamic Stakeholder Learning:** Ability to "teach" the auditor new organizational personas by distilling priorities from raw policy documents.
 - A structured evidence register per jurisdiction that anchors priors/assumptions.
 - Outputs that are reproducible, reviewer-auditable (Lancet/Nature grade), and suitable for high-impact manuscript/package assembly.
 - Integrated clinical utility that grounds economic QALY gains in real-world genetic condition cohorts.

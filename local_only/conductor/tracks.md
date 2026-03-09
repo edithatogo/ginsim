@@ -6,6 +6,7 @@ This registry is the index of Conductor tracks for this repository.
 
 | Track ID | Title | Status | Link |
 |---|---|---|---|
+| gdpe_0046_teaching_personas | Teaching Personas from Internal Documents | ✅ Complete | [track](./tracks/gdpe_0046_teaching_personas/index.md) |
 | gdpe_0022_empirical_traceability_and_legacy_closure | Empirical traceability and legacy analysis closure | Completed | [track](./tracks/gdpe_0022_empirical_traceability_and_legacy_closure/index.md) |
 
 ## Planned Tracks
@@ -134,10 +135,6 @@ This registry is the index of Conductor tracks for this repository.
 
 - [x] **Track: Bayesian Calibration Vertical (NumPyro/BlackJAX)**
 *Link: [./tracks/gdpe_0039_calibration_vertical/](./tracks/gdpe_0039_calibration_vertical/)*
-
----
-
-
 
 ---
 

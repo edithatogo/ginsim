@@ -3,11 +3,14 @@ Agentic Auditor: Multi-Persona Governance Layer.
 
 Loads stakeholder personas and computes persona-specific welfare verdicts
 to measure epistemic divergence and build consensus via Delphi Protocol.
+Supports dynamic 'Teaching' of new personas from external documents.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional
+from pathlib import Path
 
 import jax.numpy as jnp
 import yaml
@@ -33,15 +36,76 @@ class AgenticAuditor:
     Orchestrates multi-persona audits and Delphi consensus rounds.
     """
 
-    def __init__(self, config_path: str = "configs/stakeholder_personas.yaml"):
+    def __init__(
+        self, 
+        config_path: str = "configs/stakeholder_personas.yaml",
+        taught_path: str = "configs/taught_stakeholders.yaml"
+    ):
+        self.config_path = config_path
+        self.taught_path = taught_path
+        self.personas = {}
+        
+        # 1. Load standard personas
+        self._load_standard_personas()
+        
+        # 2. Load taught (cached) personas
+        self._load_taught_personas()
+        
+        logger.info(f"AgenticAuditor initialized with {len(self.personas)} personas.")
+
+    def _load_standard_personas(self):
         try:
-            with open(config_path) as f:
-                self.config = yaml.safe_load(f)
-            self.personas = self.config["personas"]
-            logger.info(f"AgenticAuditor initialized with {len(self.personas)} personas.")
+            if Path(self.config_path).exists():
+                with open(self.config_path) as f:
+                    config = yaml.safe_load(f)
+                self.personas.update(config.get("personas", {}))
         except Exception as e:
-            logger.error(f"Failed to load stakeholder personas from {config_path}: {e}")
-            self.personas = {}
+            logger.error(f"Failed to load standard personas from {self.config_path}: {e}")
+
+    def _load_taught_personas(self):
+        try:
+            if Path(self.taught_path).exists():
+                with open(self.taught_path) as f:
+                    taught = yaml.safe_load(f)
+                if taught and "personas" in taught:
+                    self.personas.update(taught["personas"])
+                    logger.info(f"Loaded {len(taught['personas'])} taught personas from cache.")
+        except Exception as e:
+            logger.error(f"Failed to load taught personas from {self.taught_path}: {e}")
+
+    def add_persona(self, persona_config: dict[str, Any], persist: bool = True):
+        """
+        Dynamically add a new persona to the auditor.
+        """
+        pid = persona_config.get("id")
+        if pid:
+            self.personas[pid] = persona_config
+            logger.info(f"Dynamically added persona: {pid}")
+            if persist:
+                self.save_taught_personas()
+
+    def save_taught_personas(self):
+        """
+        Save all non-standard personas to the taught_path for persistence.
+        """
+        # We assume standard personas are those in the main config
+        # This is a bit brittle, but works for the current architecture.
+        try:
+            with open(self.config_path) as f:
+                standard_config = yaml.safe_load(f)
+            standard_ids = set(standard_config.get("personas", {}).keys())
+            
+            taught_personas = {
+                pid: pdata for pid, pdata in self.personas.items() 
+                if pid not in standard_ids
+            }
+            
+            if taught_personas:
+                with open(self.taught_path, "w") as f:
+                    yaml.dump({"personas": taught_personas}, f)
+                logger.info(f"Saved {len(taught_personas)} taught personas to {self.taught_path}")
+        except Exception as e:
+            logger.error(f"Failed to save taught personas: {e}")
 
     def audit_policy(
         self, result: DCBAResult, previous_verdicts: dict[str, PersonaVerdict] | None = None
@@ -52,7 +116,6 @@ class AgenticAuditor:
         """
         verdicts = {}
 
-        # Calculate consensus welfare mean if in Delphi mode
         consensus_mean = 0.0
         if previous_verdicts:
             consensus_mean = float(
@@ -60,21 +123,14 @@ class AgenticAuditor:
             )
 
         for pid, pdata in self.personas.items():
-            # 1. Base weights from config
             w = pdata.get("weighting", {}).copy()
 
-            # 2. Consensus Adjustment (Mathematical Proxy for 'Listening' to others)
-            # In a real Delphi round, personas might shift their priorities if they see
-            # a massive divergence from the group mean.
             if previous_verdicts:
                 my_prev = previous_verdicts[pid].subjective_welfare
-                # Shift factor: 10% move towards the mean
                 shift = (consensus_mean - my_prev) * 0.1
-                # We apply this as a direct scalar shift to the score for this proxy
             else:
                 shift = 0.0
 
-            # 3. Compute Score
             score = (
                 float(result.consumer_surplus) * w.get("consumer_surplus", 0.0)
                 + float(result.producer_surplus) * w.get("producer_surplus", 0.0)
@@ -83,8 +139,6 @@ class AgenticAuditor:
                 + float(result.research_externalities) * w.get("research_externalities", 0.0)
             ) + shift
 
-            # 4. Construct Verdict
-            # For now, qualitative feedback is generated as a structured summary.
             feedback = self._generate_simulated_feedback(pid, score, result)
 
             verdicts[pid] = PersonaVerdict(

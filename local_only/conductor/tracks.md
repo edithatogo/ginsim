@@ -152,7 +152,7 @@ This registry is the index of Conductor tracks for this repository.
 
 ---
 
-- [ ] **Track: Adversarial Economic Red-Teaming Vertical**
+- [x] **Track: Adversarial Economic Red-Teaming Vertical**
 *Link: [./tracks/gdpe_0044_adversarial_vertical/](./tracks/gdpe_0044_adversarial_vertical/)*
 
 ---

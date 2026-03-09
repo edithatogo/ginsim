@@ -74,10 +74,10 @@ jax.tree_util.register_pytree_node(
 
 @jit
 def compute_demand(
-    premium: Array | float,
-    income: float = 1.0,
-    risk_aversion: float = 2.0,
-    price_elasticity: float = -0.22,
+    premium: Any,
+    income: Any = 1.0,
+    risk_aversion: Any = 2.0,
+    price_elasticity: Any = -0.22,
 ) -> Float[Array, ""]:
     """
     Compute insurance demand using constant elasticity form.
@@ -91,18 +91,18 @@ def compute_insurer_profit(
     premium: Any,
     risk: Any,
     takeup: Any = 1.0,  # Added for compatibility
-    loading: float = 0.0,
+    loading: Any = 0.0,
 ) -> Float[Array, ""]:
     """Compute insurer profit for a single group."""
     return jnp.asarray(takeup) * (jnp.asarray(premium) - jnp.asarray(risk) * (1.0 + loading))
 
 
-@jit(static_argnames=["params"])
+@jit
 def separating_equilibrium(
     params: ModelParameters,
-    risk_high: Float[Array, ""] | float = 0.3,
-    risk_low: Float[Array, ""] | float = 0.1,
-    proportion_high: Float[Array, ""] | float = 0.2,
+    risk_high: Any = 0.3,
+    risk_low: Any = 0.1,
+    proportion_high: Any = 0.2,
 ) -> InsuranceEquilibrium:
     """
     Compute Rothschild-Stiglitz separating equilibrium.
@@ -127,12 +127,12 @@ def separating_equilibrium(
     )
 
 
-@jit(static_argnames=["params"])
+@jit
 def pooling_equilibrium(
     params: ModelParameters,
-    risk_high: Float[Array, ""] | float = 0.3,
-    risk_low: Float[Array, ""] | float = 0.1,
-    proportion_high: Float[Array, ""] | float = 0.2,
+    risk_high: Any = 0.3,
+    risk_low: Any = 0.1,
+    proportion_high: Any = 0.2,
 ) -> InsuranceEquilibrium:
     """
     Compute pooling equilibrium.
@@ -174,13 +174,13 @@ def pooling_equilibrium(
     )
 
 
-@jit(static_argnames=["params", "policy"])
+@jit
 def compute_equilibrium(
     params: ModelParameters,
     policy: PolicyConfig,
-    risk_high: Float[Array, ""] | float = 0.3,
-    risk_low: Float[Array, ""] | float = 0.1,
-    proportion_high: Float[Array, ""] | float = 0.2,
+    risk_high: Any = 0.3,
+    risk_low: Any = 0.1,
+    proportion_high: Any = 0.2,
 ) -> InsuranceEquilibrium:
     """
     Determine which equilibrium type exists under current parameters.
@@ -200,9 +200,10 @@ def compute_equilibrium(
         premium_low=share_high * sep_eq.premium_low + (1.0 - share_high) * pool_eq.premium_low,
         uptake_high=share_high * sep_eq.uptake_high + (1.0 - share_high) * pool_eq.uptake_high,
         uptake_low=share_high * sep_eq.uptake_low + (1.0 - share_high) * pool_eq.uptake_low,
-        insurer_profits=share_high * sep_eq.insurer_profits + (1.0 - share_high) * pool_eq.insurer_profits,
-        equilibrium_id=2, # 2 for blended
-        iterations=1
+        insurer_profits=share_high * sep_eq.insurer_profits
+        + (1.0 - share_high) * pool_eq.insurer_profits,
+        equilibrium_id=2,  # 2 for blended
+        iterations=1,
     )
 
     # Decision logic
@@ -210,10 +211,7 @@ def compute_equilibrium(
         policy.allow_genetic_test_results,
         lambda _: sep_eq,
         lambda _: lax.cond(
-            policy.sum_insured_caps is None,
-            lambda _: pool_eq,
-            lambda _: blended_eq,
-            operand=None
+            policy.sum_insured_caps is None, lambda _: pool_eq, lambda _: blended_eq, operand=None
         ),
         operand=None,
     )
@@ -272,13 +270,13 @@ def get_standard_risk_parameters() -> dict[str, float]:
     }
 
 
-@jit(static_argnames=["params"])
+@jit
 def verify_equilibrium_stability(
     premium: Float[Array, ""],
     params: ModelParameters,
-    risk_high: float = 0.3,
-    risk_low: float = 0.1,
-    proportion_high: float = 0.2,
+    risk_high: Any = 0.3,
+    risk_low: Any = 0.1,
+    proportion_high: Any = 0.2,
 ) -> Float[Array, ""]:
     """
     Compute the derivative of the insurer's profit function.

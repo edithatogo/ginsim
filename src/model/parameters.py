@@ -54,6 +54,40 @@ class PolicyConfig:
         return replace(self, **update)
 
 
+# Register PolicyConfig as a PyTree
+def _policy_config_flatten(config: PolicyConfig):
+    children = (
+        config.enforcement_strength,
+        config.penalty_max,
+        config.taper_range,
+    )
+    aux_data = {
+        "name": config.name,
+        "description": config.description,
+        "allow_genetic_test_results": config.allow_genetic_test_results,
+        "allow_family_history": config.allow_family_history,
+        "sum_insured_caps": config.sum_insured_caps,
+        "penalty_type": config.penalty_type,
+    }
+    return (children, aux_data)
+
+
+def _policy_config_unflatten(aux_data: dict[str, Any], children: tuple[Any, ...]):
+    return PolicyConfig(
+        enforcement_strength=children[0],
+        penalty_max=children[1],
+        taper_range=children[2],
+        **aux_data,
+    )
+
+
+jax.tree_util.register_pytree_node(
+    PolicyConfig,
+    _policy_config_flatten,
+    _policy_config_unflatten,
+)
+
+
 @dataclass(frozen=True, eq=False)
 class ModelParameters:
     """

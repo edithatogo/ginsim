@@ -20,6 +20,7 @@ import streamlit as st
 from src.model.module_a_behavior import compute_testing_uptake, get_standard_policies
 from src.model.parameters import load_jurisdiction_parameters
 from src.model.pipeline import evaluate_single_policy, simulate_evolution
+from src.model.adversarial_engine import AdversarialEngine
 from src.utils.hta_export import HTAExporter
 
 # =============================================================================
@@ -103,12 +104,13 @@ st.markdown("### Benchmarking and Temporal Evolution Analysis (Track gdpe_0042)"
 STANDARD_POLICIES = get_standard_policies()
 
 # 2. Main Narrative Tabs
-tab_main, tab_bench, tab_sandbox, tab_spatial, tab_interop, tab_narrative, tab_evidence = st.tabs(
+tab_main, tab_bench, tab_sandbox, tab_spatial, tab_redteam, tab_interop, tab_narrative, tab_evidence = st.tabs(
     [
         "🏠 Primary Evaluation",
         "🌍 Global Benchmarking",
         "🧪 Cross-Pollination Sandbox",
         "🗺️ Spatial Equity",
+        "🔴 Adversarial Red-Teaming",
         "🔄 Interoperability",
         "📖 Publication Narrative",
         "🔬 Evidence & Traceability",
@@ -357,8 +359,97 @@ with tab_spatial:
         )
         fig_spatial.update_layout(template="plotly_white", yaxis_tickformat=".0%")
         st.plotly_chart(fig_spatial, use_container_width=True)
+with tab_redteam:
+    st.subheader("🔴 Economic Red-Teaming (Stress Testing)")
+    st.write(
+        "Find the 'Worst-Case' parameters that collapse a policy's welfare gain using gradient-based optimization (JAX/Optax)."
+    )
 
-# TAB 5: INTEROPERABILITY
+    c_rt1, c_rt2 = st.columns(2)
+    with c_rt1:
+        rt_policy = st.selectbox("Policy to Stress Test:", ["Moratorium", "Ban"])
+        rt_steps = st.slider("Optimization Steps", 50, 300, 100)
+    with c_rt2:
+        rt_lr = st.slider("Learning Rate", 0.01, 0.20, 0.05)
+        rt_individuals = st.number_input("Individuals for Uptake Simulation", 100, 2000, 500)
+
+    if st.button("🚀 Run Adversarial Search", type="primary"):
+        engine = AdversarialEngine(learning_rate=rt_lr, steps=rt_steps, n_individuals=int(rt_individuals))
+
+        current_params = get_params(jurisdiction, deterrence_level, moratorium_belief, baseline_uptake)
+        p_target = STANDARD_POLICIES[rt_policy.lower()]
+        p_base = STANDARD_POLICIES["status_quo"]
+
+        with st.spinner(f"Searching for failure modes of '{rt_policy}'..."):
+            rt_result = engine.find_worst_case(p_target, p_base, current_params)
+
+        if rt_result.success:
+            st.success(f"Worst-Case Scenario Found (Welfare Delta: ${rt_result.min_welfare_delta:,.2f}M)")
+
+            # Display optimized parameters
+            st.write("### Adversarial Parameter Combination")
+
+            theta = rt_result.worst_case_theta
+            col_p1, col_p2, col_p3 = st.columns(3)
+            col_p1.metric("Optimized Prevalence", f"{theta['final_proportion_high']:.1%}")
+            col_p2.metric("Optimized Loading", f"{theta['final_loading']:.1%}")
+            col_p3.metric("Fear Elasticity", f"{theta['final_as_elasticity']:.2f}")
+
+            col_p4, col_p5, col_p6 = st.columns(3)
+            col_p4.metric("High-Risk Cost", f"{theta['final_risk_high']:.2f}")
+            col_p5.metric("Low-Risk Cost", f"{theta['final_risk_low']:.2f}")
+            col_p6.metric("High-Risk Elasticity", f"{theta['final_demand_elasticity_high']:.2f}")
+
+            # Interpretation
+            st.warning(
+                f"**Interpretation:** In this scenario, the {rt_policy} policy delivers its minimum value. "
+                "The model 'broke' the policy by maximizing the prevalence of high-risk individuals and the markup (loading), "
+                "while making people extremely sensitive to the 'fear of discrimination' (as_elasticity)."
+            )
+
+            # Optimization Path
+            st.write("### Comparison under Stress-Test Parameters")
+
+            # Extract components from the stored DCBAResult objects
+            res_r = rt_result.reform_welfare_result
+            res_b = rt_result.baseline_welfare_result
+
+            if res_r and res_b:
+                comp_data = []
+                # Helper to add components
+                def add_comp(name, r_val, b_val):
+                    comp_data.append({"Component": name, "Policy": rt_policy, "Value ($M)": float(r_val)})
+                    comp_data.append({"Component": name, "Policy": "Status Quo", "Value ($M)": float(b_val)})
+
+                add_comp("Consumer Surplus", res_r.consumer_surplus, res_b.consumer_surplus)
+                add_comp("Insurer Profits", res_r.producer_surplus, res_b.producer_surplus)
+                add_comp("Health Benefits", res_r.health_benefits, res_b.health_benefits)
+                add_comp("Fiscal Impact", res_r.fiscal_impact, res_b.fiscal_impact)
+
+                df_comp = pd.DataFrame(comp_data)
+                fig_comp = px.bar(df_comp, x="Component", y="Value ($M)", color="Policy", barmode="group", title=f"Welfare Components: {rt_policy} vs Status Quo (Worst-Case)")
+                fig_comp.update_layout(template="plotly_white")
+                st.plotly_chart(fig_comp, use_container_width=True)
+
+            st.write("### Optimization Path (Robustness Search)")
+            if rt_result.loss_history:
+                df_loss = pd.DataFrame({
+                    "Step": range(len(rt_result.loss_history)),
+                    "Welfare Delta ($M)": rt_result.loss_history
+                })
+                fig_loss = px.line(df_loss, x="Step", y="Welfare Delta ($M)", title="Gradient Descent towards Failure")
+                fig_loss.update_layout(template="plotly_white")
+                st.plotly_chart(fig_loss, use_container_width=True)
+
+                st.info(
+                    "The optimization seeks the parameter set that minimizes the welfare difference between the Reform and Status Quo. "
+                    "A negative value indicates the reform is actively worse than doing nothing under these adversarial assumptions."
+                )
+
+        else:
+            st.error("Optimization failed to converge or returned NaNs.")
+
+# TAB 6: INTEROPERABILITY
 with tab_interop:
     st.subheader("🔄 HTA Interoperability & Data Export")
     st.write(

@@ -22,7 +22,18 @@ from .parameters import ModelParameters, PolicyConfig
 
 
 class AdversarialResult(NamedTuple):
-    """Result of an adversarial optimization run."""
+    """Result of an adversarial optimization run.
+
+    Attributes:
+        worst_case_theta: dict of raw optimizer variables and mapped outcomes.
+        worst_case_params: ModelParameters object with optimized values.
+        min_welfare_delta: The minimum welfare difference found ($M).
+        optimization_steps: Number of steps performed.
+        success: Whether the optimization converged without NaNs.
+        loss_history: List of welfare deltas across steps.
+        reform_welfare_result: DCBAResult for the reform policy.
+        baseline_welfare_result: DCBAResult for the baseline policy.
+    """
 
     worst_case_theta: dict[str, float]
     worst_case_params: ModelParameters
@@ -34,9 +45,16 @@ class AdversarialResult(NamedTuple):
     baseline_welfare_result: Any = None
 
 
-def parameter_mapping(theta, base_params):
+def parameter_mapping(theta: dict[str, Any], base_params: ModelParameters) -> tuple[ModelParameters, dict[str, Any]]:
     """
     Map unbounded optimizer variables (theta) to bounded model parameters.
+
+    Args:
+        theta: Dictionary of optimizer tracers/variables.
+        base_params: Base ModelParameters to copy from.
+
+    Returns:
+        tuple of (Updated ModelParameters, Dictionary of risk-specific parameters).
     """
     prop_high = jax.nn.sigmoid(theta.get("proportion_high", 0.0)) * 0.5
     risk_low = jax.nn.sigmoid(theta.get("risk_low", -1.0)) * 0.4
@@ -63,8 +81,26 @@ def parameter_mapping(theta, base_params):
     return new_params, risk_params
 
 
-def evaluate_welfare_pure(params, policy, risk_params, n_individuals=500, baseline_policy=None):
-    """Differentiable welfare calculation."""
+def evaluate_welfare_pure(
+    params: ModelParameters,
+    policy: PolicyConfig,
+    risk_params: dict[str, Any],
+    n_individuals: int = 500,
+    baseline_policy: PolicyConfig | None = None,
+) -> Any:
+    """
+    Differentiable welfare calculation (Pure JAX).
+
+    Args:
+        params: ModelParameters to use.
+        policy: PolicyConfig to evaluate.
+        risk_params: Risk profile (prevalence, costs).
+        n_individuals: Population size for Monte Carlo.
+        baseline_policy: Optional baseline for relative calculation.
+
+    Returns:
+        DCBAResult or scalar welfare.
+    """
     uptake = mod_a.compute_testing_uptake(params, policy, n_individuals=n_individuals)
     market_eq = mod_c.compute_equilibrium(
         params,

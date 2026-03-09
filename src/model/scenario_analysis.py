@@ -26,6 +26,7 @@ class ScenarioResult:
     jurisdiction: str
     testing_uptake: Any
     welfare_impact: Any
+    equity_weighted_welfare: Any
     qalys_gained: Any
     compliance_rate: Any
     insurance_premiums: dict[str, Any]
@@ -107,7 +108,7 @@ def _build_policy_config(scenario_name: str, scenario_config: dict[str, Any]) ->
 
     parameter_values = scenario_config.get("parameters", {})
     valid_policy_fields = {f.name for f in fields(PolicyConfig)}
-
+    
     for key, value in parameter_values.items():
         if key in valid_policy_fields and key not in policy_updates:
             policy_updates[key] = value
@@ -154,6 +155,7 @@ def evaluate_scenario(
     # Extract metrics
     testing_uptake = result.testing_uptake if hasattr(result, "testing_uptake") else 0.0
     welfare_impact = result.welfare_impact if hasattr(result, "welfare_impact") else 0.0
+    equity_weighted_welfare = result.equity_weighted_welfare if hasattr(result, "equity_weighted_welfare") else 0.0
     qalys_gained = 0.0 # Placeholder
     compliance_rate = result.compliance_rate if hasattr(result, "compliance_rate") else 0.0
     insurance_premiums = (
@@ -167,12 +169,14 @@ def evaluate_scenario(
         jurisdiction=scenario_config.get("jurisdiction", "Unknown"),
         testing_uptake=testing_uptake,
         welfare_impact=welfare_impact,
+        equity_weighted_welfare=equity_weighted_welfare,
         qalys_gained=qalys_gained,
         compliance_rate=compliance_rate,
         insurance_premiums=insurance_premiums,
         all_metrics={
             "testing_uptake": testing_uptake,
             "welfare_impact": welfare_impact,
+            "equity_weighted_welfare": equity_weighted_welfare,
             "compliance_rate": compliance_rate,
             "insurance_premiums": insurance_premiums,
             "policy_name": policy.name,

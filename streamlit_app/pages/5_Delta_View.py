@@ -46,15 +46,19 @@ if st.button("⚖️ Audit Policies", type="primary"):
 
             u_delta = float(r.testing_uptake) - float(b_res.testing_uptake)
             w_delta = float(r.welfare_impact) - float(b_res.welfare_impact)
+            ew_delta = float(r.equity_weighted_welfare) - float(b_res.equity_weighted_welfare)
             p_delta = float(r.insurance_premiums["premium_high"]) - float(b_res.insurance_premiums["premium_high"])
 
+            # Fairness audit uses utilitarian welfare delta for the core check
+            # but we surface both in the table.
             fairness = audit_policy_fairness(u_delta, w_delta, p_delta)
 
             results.append(
                 {
                     "Policy": scenarios[pk].get("name", pk),
                     "Uptake Delta": f"{u_delta:+.1%}",
-                    "Benefit Delta": f"${w_delta:+,.0f}",
+                    "Utilitarian Delta": f"${w_delta:+,.0f}",
+                    "Equity-Weighted Delta": f"${ew_delta:+,.0f}",
                     "Ethical Category": "FAIR" if fairness.is_fair else "UNFAIR",
                     "Fairness Rationale": "; ".join(fairness.reasons) if fairness.reasons else "Maintains equity.",
                 }

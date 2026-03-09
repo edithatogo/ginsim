@@ -14,7 +14,7 @@
 
 ## Data + config
 - pandas, numpy, polars
-- PyYAML for configs
+- PyYAML (Stakeholder Personas / Configuration)
 - pydantic for schema validation (external API)
 - attrs for JAX-compatible data classes (internal state)
 - msgspec for fast serialization (config I/O)

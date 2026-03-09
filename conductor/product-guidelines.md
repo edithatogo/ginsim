@@ -62,7 +62,8 @@
 2. **Parameter Sliders:** Use for sensitivity analysis; show baseline marker
 3. **Comparison Mode:** Side-by-side policy comparison with delta highlighting
 4. **Red-Teaming:** Active search for failure modes using adversarial optimization (JAX/Optax)
-5. **Downloadable Outputs:** All charts exportable as PNG/SVG; tables as CSV
+5. **Stakeholder Consensus:** Multi-persona Delphi Protocol for live qualitative auditing
+6. **Downloadable Outputs:** All charts exportable as PNG/SVG; tables as CSV
 5. **Shareable Links:** Encode parameter state in URL for collaboration
 
 ### Accessibility Requirements
@@ -95,6 +96,7 @@
 - **Unit Tests:** All core functions have tests covering edge cases (minimum 80% coverage)
 - **Benchmark Comparisons:** Validate against published results (e.g., prior literature values)
 - **Peer Review Readiness:** All reviewer-facing documentation in `docs/` kept current
+- **Delphi Protocol:** Live agentic auditing by Nature/Lancet/Treasury personas for scenario robustness
 - **External Audit Trail:** `context/reflexive_journal/` documents design decisions
 
 ---

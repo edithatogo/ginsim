@@ -27,11 +27,13 @@ from .sanity_checker import EconomicSanityChecker
 def evaluate_single_policy(
     params: ModelParameters,
     policy: PolicyConfig,
+    year: int = 0,
+    is_annual: bool = False,
 ) -> PolicyEvaluationResult:
     """
     Execute full clinical-economic pipeline for a single policy configuration.
     """
-    logger.info(f"FULL EVALUATION: {policy.name} ({params.jurisdiction})")
+    logger.info(f"FULL EVALUATION: {policy.name} ({params.jurisdiction}) - Year {year}")
 
     p_params = params
     p_policy = policy
@@ -40,14 +42,14 @@ def evaluate_single_policy(
     enforcement = mod_e.compute_compliance_equilibrium(p_params, p_policy)
 
     # 2. Testing Uptake (Module A)
-    testing_uptake = mod_a.compute_testing_uptake(p_params, p_policy)
+    testing_uptake = mod_a.compute_testing_uptake(p_params, p_policy, year=year)
 
     # 3. Insurance Equilibrium (Module C)
     market_eq = mod_c.compute_equilibrium(p_params, p_policy)
 
     # 4. Proxy Substitution (Module D)
     sq_policy = mod_a.get_standard_policies()["status_quo"]
-    proxy = mod_d.compute_proxy_substitution_effect(p_params, sq_policy, p_policy)
+    proxy = mod_d.compute_proxy_substitution_effect(p_params, sq_policy, p_policy, year=year)
 
     # 5. Clinical Impact (Module B)
     clinical = mod_b.compute_clinical_outcomes(testing_uptake)
@@ -57,8 +59,8 @@ def evaluate_single_policy(
 
     # 7. DCBA Ledger
     # PROOF FIX: Use status-quo consistent baselines
-    b_premium = 0.161 # Approximate SQ premium
-    b_profits = 0.057 # Approximate SQ profit
+    b_premium = 0.161  # Approximate SQ premium
+    b_profits = 0.057  # Approximate SQ profit
 
     dcba_res = dcba.compute_dcba(
         testing_uptake=testing_uptake,
@@ -73,6 +75,8 @@ def evaluate_single_policy(
         equity_factor=jnp.asarray(p_params.equity_factor).astype(float),
         value_per_qaly=jnp.asarray(p_params.pharmac_qaly_threshold).astype(float),
         setup_cost=jnp.asarray(p_params.compliance_cost_fixed).astype(float),
+        time_horizon=year if is_annual else 20,
+        is_annual=is_annual,
     )
 
     # 8. Aggregate into Result Object
@@ -115,6 +119,45 @@ def evaluate_single_policy(
     EconomicSanityChecker.verify_result(result)
 
     return result
+
+
+def simulate_evolution(
+    params: ModelParameters,
+    policy: PolicyConfig,
+) -> dict[str, Any]:
+    """
+    Simulate policy impact over a multi-year horizon and return aggregate.
+    """
+    horizon = int(getattr(params, "time_horizon", 10))
+    annual_results = {}
+
+    for year in range(horizon + 1):
+        annual_results[year] = evaluate_single_policy(params, policy, year=year, is_annual=True)
+
+    # Aggregate ledger
+    ledger_list = [res.dcba_result for res in annual_results.values()]
+    aggregate_ledger = dcba.aggregate_temporal_results(ledger_list)
+
+    # Primary result is the aggregate
+    main_res = annual_results[0]  # Base for metadata
+    # Update with aggregate welfare
+    result = PolicyEvaluationResult(
+        policy_name=main_res.policy_name,
+        jurisdiction=main_res.jurisdiction,
+        testing_uptake=main_res.testing_uptake,
+        welfare_impact=aggregate_ledger.net_welfare,
+        equity_weighted_welfare=aggregate_ledger.equity_weighted_welfare,
+        clinical_outcomes=main_res.clinical_outcomes,
+        insurance_premiums=main_res.insurance_premiums,
+        compliance_rate=main_res.compliance_rate,
+        dcba_result=aggregate_ledger,
+        all_metrics={
+            "temporal_results": annual_results,
+            "aggregate_ledger": aggregate_ledger,
+        },
+    )
+
+    return {"aggregate": result, "annual": annual_results}
 
 
 def evaluate_policy_sweep(

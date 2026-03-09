@@ -60,18 +60,21 @@ jax.tree_util.register_pytree_node(
 )
 
 
-@jit(static_argnames=["time_horizon", "discount_rate"])
+@jit(static_argnames=["time_horizon", "discount_rate", "is_annual"])
 def compute_discount_factor(
     time_horizon: float | int | Array,
     discount_rate: float | int | Array = 0.03,
+    is_annual: bool = False,
 ) -> Float[Array, ""]:
-    """Compute cumulative discount factor."""
+    """Compute discount factor (cumulative or single year)."""
     th = jnp.asarray(float(time_horizon))
     dr = jnp.asarray(float(discount_rate))
+    if is_annual:
+        return (1.0 + dr) ** (-th)
     return (1.0 - (1.0 + dr) ** (-th)) / (dr + 1e-10)
 
 
-@jit(static_argnames=["time_horizon", "discount_rate"])
+@jit(static_argnames=["time_horizon", "discount_rate", "is_annual"])
 def compute_consumer_surplus(
     testing_uptake: Array | float,
     insurance_premium: Array | float,
@@ -79,34 +82,36 @@ def compute_consumer_surplus(
     value_of_testing: float | Array = 100.0,
     time_horizon: float | int | Array = 20.0,
     discount_rate: float | int | Array = 0.03,
+    is_annual: bool = False,
 ) -> Float[Array, ""]:
     """Compute discounted consumer surplus change."""
     testing_uptake = _to_float_scalar(testing_uptake)
     insurance_premium = _to_float_scalar(insurance_premium)
     baseline_premium = _to_float_scalar(baseline_premium)
 
-    annual_surplus = (
-        testing_uptake * _to_float_scalar(value_of_testing) - (insurance_premium - baseline_premium)
+    annual_surplus = testing_uptake * _to_float_scalar(value_of_testing) - (
+        insurance_premium - baseline_premium
     )
-    cum_discount = compute_discount_factor(time_horizon, discount_rate)
+    cum_discount = compute_discount_factor(time_horizon, discount_rate, is_annual=is_annual)
 
     return annual_surplus * cum_discount
 
 
-@jit(static_argnames=["time_horizon", "discount_rate"])
+@jit(static_argnames=["time_horizon", "discount_rate", "is_annual"])
 def compute_producer_surplus(
     insurer_profits: Array | float,
     baseline_profits: Array | float,
     time_horizon: float | int | Array = 20.0,
     discount_rate: float | int | Array = 0.03,
+    is_annual: bool = False,
 ) -> Float[Array, ""]:
     """Compute discounted producer surplus."""
     annual_surplus = _to_float_scalar(insurer_profits) - _to_float_scalar(baseline_profits)
-    cum_discount = compute_discount_factor(time_horizon, discount_rate)
+    cum_discount = compute_discount_factor(time_horizon, discount_rate, is_annual=is_annual)
     return annual_surplus * cum_discount
 
 
-@jit(static_argnames=["time_horizon", "discount_rate"])
+@jit(static_argnames=["time_horizon", "discount_rate", "is_annual"])
 def compute_health_benefits(
     testing_uptake: Array | float,
     baseline_uptake: Array | float,
@@ -114,17 +119,18 @@ def compute_health_benefits(
     value_per_qaly: float | Array = 50000.0,
     time_horizon: float | int | Array = 20.0,
     discount_rate: float | int | Array = 0.03,
+    is_annual: bool = False,
 ) -> Float[Array, ""]:
     """Compute discounted health benefits."""
     uptake_change = _to_float_scalar(testing_uptake) - _to_float_scalar(baseline_uptake)
     annual_qaly_gain = uptake_change * _to_float_scalar(qaly_per_test)
     avg_manifestation = jnp.minimum(jnp.asarray(float(time_horizon)) / 40.0, 0.5)
     annual_benefit = annual_qaly_gain * _to_float_scalar(value_per_qaly) * avg_manifestation
-    cum_discount = compute_discount_factor(time_horizon, discount_rate)
+    cum_discount = compute_discount_factor(time_horizon, discount_rate, is_annual=is_annual)
     return annual_benefit * cum_discount
 
 
-@jit(static_argnames=["time_horizon", "discount_rate"])
+@jit(static_argnames=["time_horizon", "discount_rate", "is_annual"])
 def compute_fiscal_impact(
     testing_uptake: Array | float,
     baseline_uptake: Array | float,
@@ -133,6 +139,7 @@ def compute_fiscal_impact(
     setup_cost: float | Array = 1e6,
     time_horizon: float | int | Array = 20.0,
     discount_rate: float | int | Array = 0.03,
+    is_annual: bool = False,
 ) -> Float[Array, ""]:
     """Compute discounted fiscal impact."""
     uptake_change = _to_float_scalar(testing_uptake) - _to_float_scalar(baseline_uptake)
@@ -145,11 +152,13 @@ def compute_fiscal_impact(
     )
 
     net_annual_impact = annual_health_savings - annual_testing_cost
-    cum_discount = compute_discount_factor(time_horizon, discount_rate)
-    return net_annual_impact * cum_discount - _to_float_scalar(setup_cost)
+    cum_discount = compute_discount_factor(time_horizon, discount_rate, is_annual=is_annual)
+    return net_annual_impact * cum_discount - (
+        _to_float_scalar(setup_cost) if not is_annual else 0.0
+    )
 
 
-@jit(static_argnames=["time_horizon", "discount_rate"])
+@jit(static_argnames=["time_horizon", "discount_rate", "is_annual"])
 def compute_dcba(
     testing_uptake: Array | float,
     baseline_uptake: Array | float,
@@ -166,6 +175,7 @@ def compute_dcba(
     value_per_qaly: float | Array = 50000.0,
     cost_per_test: float | Array = 500.0,
     setup_cost: float | Array = 1e6,
+    is_annual: bool = False,
 ) -> DCBAResult:
     """
     Compute full DCBA ledger with PPP normalization and Equity weighting.
@@ -176,10 +186,15 @@ def compute_dcba(
         baseline_premium,
         time_horizon=time_horizon,
         discount_rate=discount_rate,
+        is_annual=is_annual,
     )
     # PROOF FIX: We ensure PS is a true delta
     ps = compute_producer_surplus(
-        insurer_profits, baseline_profits, time_horizon=time_horizon, discount_rate=discount_rate
+        insurer_profits,
+        baseline_profits,
+        time_horizon=time_horizon,
+        discount_rate=discount_rate,
+        is_annual=is_annual,
     )
     hb = compute_health_benefits(
         testing_uptake,
@@ -187,6 +202,7 @@ def compute_dcba(
         value_per_qaly=value_per_qaly,
         time_horizon=time_horizon,
         discount_rate=discount_rate,
+        is_annual=is_annual,
     )
     fi = compute_fiscal_impact(
         testing_uptake,
@@ -195,8 +211,12 @@ def compute_dcba(
         setup_cost=setup_cost,
         time_horizon=time_horizon,
         discount_rate=discount_rate,
+        is_annual=is_annual,
     )
     re = _to_float_scalar(research_value_loss)
+    if is_annual:
+        # Research loss is also discounted
+        re = re * compute_discount_factor(time_horizon, discount_rate, is_annual=True)
 
     # 1. Compute net local welfare (Utilitarian)
     net_welfare_local = cs + ps + hb + fi - re
@@ -220,6 +240,25 @@ def compute_dcba(
         distributional_weight=dist_weight,
         equity_factor=_to_float_scalar(equity_factor),
         time_horizon=time_horizon,
+    )
+
+
+def aggregate_temporal_results(results: list[DCBAResult]) -> DCBAResult:
+    """Sum a sequence of annual results into a single aggregate result."""
+    if not results:
+        raise ValueError("Empty results list")
+
+    return DCBAResult(
+        net_welfare=sum(r.net_welfare for r in results),
+        equity_weighted_welfare=sum(r.equity_weighted_welfare for r in results),
+        consumer_surplus=sum(r.consumer_surplus for r in results),
+        producer_surplus=sum(r.producer_surplus for r in results),
+        health_benefits=sum(r.health_benefits for r in results),
+        fiscal_impact=sum(r.fiscal_impact for r in results),
+        research_externalities=sum(r.research_externalities for r in results),
+        distributional_weight=results[0].distributional_weight,
+        equity_factor=results[0].equity_factor,
+        time_horizon=len(results),
     )
 
 

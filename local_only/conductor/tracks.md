@@ -24,6 +24,7 @@ This registry is the index of Conductor tracks for this repository.
 | gdpe_0034_au_system_localization | AU System Localization (Medicare & Oversight) | ✅ Complete | [archived](./archive/gdpe_0034_au_system_localization/index.md) |
 | gdpe_0043_interop_vertical | Interoperability & Standardized HTA Export | ✅ Complete | [archived](./archive/gdpe_0043_interop_vertical/index.md) |
 | gdpe_0036_spatial_equity | Spatial Equity & 'Diagnostic Deserts' | ✅ Complete | [archived](./archive/gdpe_0036_spatial_equity/index.md) |
+| gdpe_0042_temporal_evolution | Temporal Evolution & Market Dynamics (10-Year Horizon) | ✅ Complete | [archived](./archive/gdpe_0042_temporal_evolution/index.md) |
 | gdpe_0020_dashboard_policy_alignment_and_publication_sync | Publication-grade model closure, traceability, dashboard alignment, and submission-surface sync | ✅ Complete | [track](./tracks/gdpe_0020_dashboard_policy_alignment_and_publication_sync/index.md) |
 | gdpe_0019_review_and_author_metadata | Comprehensive codebase review and author-metadata alignment | ✅ Complete | [track](./tracks/gdpe_0019_review_and_author_metadata/index.md) |
 | gdpe_0018_dashboard_alignment | Dashboard, validation, and gin-sim alignment | ✅ Complete | [track](./tracks/gdpe_0018_dashboard_alignment/index.md) |
@@ -143,8 +144,7 @@ This registry is the index of Conductor tracks for this repository.
 
 ---
 
-- [x] **Track: Temporal Evolution & Market Dynamics (10-Year Horizon)**
-*Link: [./tracks/gdpe_0042_temporal_evolution/](./tracks/gdpe_0042_temporal_evolution/)*
+
 
 ---
 

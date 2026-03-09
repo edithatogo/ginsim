@@ -41,5 +41,7 @@ pharmac_qaly_threshold: 50000.0
 
 medicare_cost_share: 0.75
 audit_intensity: 0.60
+audit_intensity_apra: 0.70
+audit_intensity_asic: 0.65
 
 remoteness_weight: 0.40

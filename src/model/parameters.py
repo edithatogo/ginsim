@@ -28,19 +28,29 @@ class PolicyConfig:
 
     def __hash__(self):
         # Static metadata for JAX hashing
-        return hash((self.name, self.allow_genetic_test_results, self.allow_family_history, self.penalty_type))
+        return hash(
+            (
+                self.name,
+                self.allow_genetic_test_results,
+                self.allow_family_history,
+                self.penalty_type,
+            )
+        )
 
     def __eq__(self, other):
         if not isinstance(other, PolicyConfig):
             return False
-        return (self.name == other.name and
-                self.allow_genetic_test_results == other.allow_genetic_test_results and
-                self.allow_family_history == other.allow_family_history and
-                self.penalty_type == other.penalty_type)
+        return (
+            self.name == other.name
+            and self.allow_genetic_test_results == other.allow_genetic_test_results
+            and self.allow_family_history == other.allow_family_history
+            and self.penalty_type == other.penalty_type
+        )
 
     def model_copy(self, update: dict[str, Any]) -> PolicyConfig:
         """Compatibility method."""
         from dataclasses import replace
+
         return replace(self, **update)
 
 
@@ -98,6 +108,8 @@ class ModelParameters:
     # AU System Specifics
     medicare_cost_share: Any = 0.0
     audit_intensity: Any = 0.50
+    audit_intensity_apra: Any = 0.50
+    audit_intensity_asic: Any = 0.50
     remoteness_weight: Any = 0.20
 
     def __hash__(self):
@@ -108,12 +120,15 @@ class ModelParameters:
         if not isinstance(other, ModelParameters):
             return False
         # Only compare static fields to avoid TracerBoolConversionError
-        return (self.jurisdiction == other.jurisdiction and
-                self.calibration_date == other.calibration_date)
+        return (
+            self.jurisdiction == other.jurisdiction
+            and self.calibration_date == other.calibration_date
+        )
 
     def model_copy(self, update: dict[str, Any]) -> ModelParameters:
         """Compatibility method."""
         from dataclasses import replace
+
         return replace(self, **update)
 
 
@@ -147,6 +162,8 @@ def _model_params_flatten(params: ModelParameters):
         params.pharmac_qaly_threshold,
         params.medicare_cost_share,
         params.audit_intensity,
+        params.audit_intensity_apra,
+        params.audit_intensity_asic,
         params.remoteness_weight,
     )
     aux_data = {
@@ -183,7 +200,9 @@ def _model_params_unflatten(aux_data: dict[str, Any], children: tuple[Any, ...])
         pharmac_qaly_threshold=children[22],
         medicare_cost_share=children[23],
         audit_intensity=children[24],
-        remoteness_weight=children[25],
+        audit_intensity_apra=children[25],
+        audit_intensity_asic=children[26],
+        remoteness_weight=children[27],
         **aux_data,
     )
 
@@ -217,6 +236,7 @@ Params = ModelParameters
 @dataclass(frozen=True)
 class HyperParameters:
     """Global simulation hyperparameters."""
+
     n_samples: int = 1000
     seed: int = 20260303
     use_priors: bool = True

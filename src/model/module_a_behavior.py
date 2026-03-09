@@ -20,6 +20,7 @@ from .parameters import PolicyConfig
 @dataclass(frozen=True)
 class BehaviorParams:
     """Compact behavior parameters used by glue scripts."""
+
     baseline_logit: float
     policy_shock: float
     trend: float
@@ -48,12 +49,19 @@ def compute_perceived_penalty(
     taper_range: Any = 0.0,
     acc_deterrence_offset: Any = 0.0,
     audit_intensity: Any = 0.50,
+    audit_intensity_apra: Any = 0.50,
+    audit_intensity_asic: Any = 0.50,
 ) -> Float[Array, ""]:
     """
     Compute perceived discrimination penalty under policy regime.
     """
     base_penalty = jnp.asarray(adverse_selection_elasticity) * jnp.asarray(baseline_loading)
-    eff = jnp.maximum(jnp.asarray(enforcement_effectiveness), jnp.asarray(audit_intensity))
+
+    # AU-specific oversight modelling: combined APRA/ASIC intensity
+    combined_audit = jnp.sqrt(jnp.asarray(audit_intensity_apra) * jnp.asarray(audit_intensity_asic))
+    eff = jnp.maximum(jnp.asarray(enforcement_effectiveness), combined_audit)
+    eff = jnp.maximum(eff, jnp.asarray(audit_intensity))
+
     enforcement_factor = jnp.asarray(enforcement_strength) * eff
 
     if allow_genetic_test_results:
@@ -66,7 +74,9 @@ def compute_perceived_penalty(
         )
         base_restriction = 1.0 - jnp.asarray(high_sum_insured_share)
         taper_bonus = jnp.asarray(high_sum_insured_share) * avg_protection_high
-        restriction_strength = (base_restriction + taper_bonus) * (0.7 + 0.3 * jnp.asarray(moratorium_effect))
+        restriction_strength = (base_restriction + taper_bonus) * (
+            0.7 + 0.3 * jnp.asarray(moratorium_effect)
+        )
     else:
         restriction_strength = 1.0
 
@@ -92,6 +102,8 @@ def compute_perceived_penalty_wrapper(params: Any, policy: PolicyConfig) -> floa
         policy.taper_range,
         getattr(params, "acc_deterrence_offset", 0.0),
         getattr(params, "audit_intensity", 0.50),
+        getattr(params, "audit_intensity_apra", 0.50),
+        getattr(params, "audit_intensity_asic", 0.50),
     )
     return float(penalty)
 
@@ -108,7 +120,9 @@ def compute_testing_utility(
     Compute utility of genetic testing.
     """
     base_test_cost = 0.1 * (1.0 - jnp.asarray(medicare_cost_share))
-    spatial_test_cost = base_test_cost * (1.0 + jnp.asarray(remoteness_weight) * jnp.asarray(remoteness_index))
+    spatial_test_cost = base_test_cost * (
+        1.0 + jnp.asarray(remoteness_weight) * jnp.asarray(remoteness_index)
+    )
     utility = jnp.asarray(benefits) - jnp.asarray(perceived_penalty) - spatial_test_cost
 
     if individual_characteristics is not None:
@@ -150,6 +164,8 @@ def compute_testing_uptake(
         policy.taper_range,
         getattr(params, "acc_deterrence_offset", 0.0),
         getattr(params, "audit_intensity", 0.50),
+        getattr(params, "audit_intensity_apra", 0.50),
+        getattr(params, "audit_intensity_asic", 0.50),
     )
 
     if rng_key is not None:
@@ -166,7 +182,7 @@ def compute_testing_uptake(
         perceived_penalty,
         medicare_cost_share=getattr(params, "medicare_cost_share", 0.0),
         remoteness_index=remoteness_index,
-        remoteness_weight=getattr(params, "remoteness_weight", 0.20)
+        remoteness_weight=getattr(params, "remoteness_weight", 0.20),
     )
 
     probabilities = compute_testing_probability(utilities)

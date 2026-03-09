@@ -130,6 +130,8 @@ def run_psa(
         audit_intensity_apra=_to_batch(getattr(base_params, "audit_intensity_apra", 0.50)),
         audit_intensity_asic=_to_batch(getattr(base_params, "audit_intensity_asic", 0.50)),
         remoteness_weight=_to_batch(base_params.remoteness_weight),
+        time_horizon=_to_batch(getattr(base_params, "time_horizon", 10)),
+        tech_improvement_rate=_to_batch(getattr(base_params, "tech_improvement_rate", 0.15)),
     )
 
     raw_results = evaluate_batch(batch_params, policy)
@@ -188,6 +190,8 @@ def run_full_voi_analysis(
         audit_intensity_apra=_to_batch(getattr(base_params, "audit_intensity_apra", 0.50)),
         audit_intensity_asic=_to_batch(getattr(base_params, "audit_intensity_asic", 0.50)),
         remoteness_weight=_to_batch(base_params.remoteness_weight),
+        time_horizon=_to_batch(getattr(base_params, "time_horizon", 10)),
+        tech_improvement_rate=_to_batch(getattr(base_params, "tech_improvement_rate", 0.15)),
     )
 
     welfare_matrix = []

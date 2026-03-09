@@ -115,8 +115,8 @@ def compute_testing_utility(
     medicare_cost_share: Any = 0.0,
     remoteness_index: Any = 0.0,
     remoteness_weight: Any = 0.20,
-    year: int = 0,
-    tech_improvement_rate: float = 0.15,
+    year: Any = 0,
+    tech_improvement_rate: Any = 0.15,
 ) -> Float[Array, "*"]:
     """
     Compute utility of genetic testing.

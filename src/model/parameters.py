@@ -113,7 +113,7 @@ class ModelParameters:
     remoteness_weight: Any = 0.20
 
     # Temporal Evolution
-    time_horizon: int = 10
+    time_horizon: Any = 10
     tech_improvement_rate: Any = 0.15
 
     def __hash__(self):

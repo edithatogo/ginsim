@@ -103,14 +103,15 @@ st.markdown("### Benchmarking and Temporal Evolution Analysis (Track gdpe_0042)"
 STANDARD_POLICIES = get_standard_policies()
 
 # 2. Main Narrative Tabs
-tab_main, tab_bench, tab_sandbox, tab_spatial, tab_interop, tab_evidence = st.tabs(
+tab_main, tab_bench, tab_sandbox, tab_spatial, tab_interop, tab_narrative, tab_evidence = st.tabs(
     [
-        "ðŸ  Primary Evaluation",
-        "ðŸŒ Global Benchmarking",
-        "ðŸ§ª Cross-Pollination Sandbox",
-        "ðŸ—ºï¸ Spatial Equity",
-        "ðŸ”„ Interoperability",
-        "ðŸ”¬ Evidence & Traceability",
+        "🏠 Primary Evaluation",
+        "🌍 Global Benchmarking",
+        "🧪 Cross-Pollination Sandbox",
+        "🗺️ Spatial Equity",
+        "🔄 Interoperability",
+        "📖 Publication Narrative",
+        "🔬 Evidence & Traceability",
     ]
 )
 
@@ -415,6 +416,31 @@ with tab_interop:
                 },
             }
             st.json(preview)
+
+# TAB 6: PUBLICATION NARRATIVE
+with tab_narrative:
+    st.subheader("📖 Automated Manuscript Narrative")
+    st.write("Authoritative narrative generation with live data binding from simulation results.")
+
+    draft_path = Path("local_only/docs/manuscript_draft.md")
+
+    if st.button("🔄 Update Narrative", type="primary"):
+        with st.spinner("Injecting live data into manuscript template..."):
+            import subprocess
+
+            try:
+                subprocess.run([sys.executable, "scripts/inject_manuscript_data.py"], check=True)
+                st.success("Narrative updated successfully!")
+            except Exception as e:
+                st.error(f"Failed to update narrative: {e}")
+
+    if draft_path.exists():
+        with open(draft_path, encoding="utf-8") as f:
+            content = f.read()
+        st.markdown("---")
+        st.markdown(content)
+    else:
+        st.warning("Manuscript draft not found. Click 'Update Narrative' to generate it.")
 
 with tab_evidence:
     st.subheader("🧬 Diamond-Standard Traceability")

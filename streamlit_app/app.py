@@ -19,8 +19,7 @@ import streamlit as st
 
 from src.model.module_a_behavior import compute_testing_uptake, get_standard_policies
 from src.model.parameters import load_jurisdiction_parameters
-from src.model.pipeline import evaluate_single_policy
-from src.model.temporal_engine import simulate_evolution
+from src.model.pipeline import evaluate_single_policy, simulate_evolution
 from src.utils.hta_export import HTAExporter
 
 # =============================================================================
@@ -90,6 +89,13 @@ with st.sidebar.expander("⚙️ Advanced Controls"):
     )
     baseline_uptake = st.slider("Baseline Testing Share", 0.1, 0.9, 0.52)
     taper_range_val = st.slider("Taper Range (Glide Path $)", 0, 500000, 100000, step=10000)
+    simulation_year = st.slider(
+        "Simulation Year (Horizon)",
+        0,
+        10,
+        0,
+        help="0 = Current Year (2026), 10 = 10 Years Future (2036).",
+    )
 
 st.title("🧬 Genetic Discrimination: Global Policy Explorer")
 st.markdown("### Benchmarking and Temporal Evolution Analysis (Track gdpe_0042)")
@@ -110,11 +116,11 @@ tab_main, tab_bench, tab_sandbox, tab_spatial, tab_interop, tab_evidence = st.ta
 
 
 @st.cache_data
-def evaluate_cached(_params, policy_id):
+def evaluate_cached(_params, policy_id, year=0):
     policy = STANDARD_POLICIES[policy_id]
     if policy_id == "moratorium":
         policy = policy.model_copy(update={"taper_range": float(taper_range_val)})
-    return evaluate_single_policy(_params, policy)
+    return evaluate_single_policy(_params, policy, year=year)
 
 
 def get_params(j_name, d_lvl, m_bel, b_uptake):
@@ -138,8 +144,8 @@ with tab_main:
     c_run, c_temp = st.columns(2)
     with c_run:
         if st.button("🔬 Run Evaluation", type="primary", key="main_run"):
-            with st.spinner("Executing full pipeline..."):
-                result = evaluate_cached(params_obj, selected_policy_id)
+            with st.spinner(f"Executing pipeline for Year {simulation_year}..."):
+                result = evaluate_cached(params_obj, selected_policy_id, year=simulation_year)
                 st.session_state["main_result"] = result
                 st.session_state["main_params"] = params_obj
 
@@ -147,11 +153,13 @@ with tab_main:
         if st.button("📈 Project 10-Year Trajectory", type="secondary"):
             with st.spinner("Simulating temporal evolution..."):
                 target_policy = STANDARD_POLICIES[selected_policy_id]
-                history = simulate_evolution(params_obj, target_policy, n_years=10)
-                st.session_state["temporal_history"] = history
+                history_bundle = simulate_evolution(params_obj, target_policy)
+                st.session_state["temporal_history"] = history_bundle["annual"]
+                st.session_state["aggregate_result"] = history_bundle["aggregate"]
 
     if "main_result" in st.session_state:
         res = st.session_state["main_result"]
+        st.info(f"Viewing results for **Year {simulation_year}**.")
 
         if use_equity_weights:
             w_impact = float(res.equity_weighted_welfare)
@@ -209,16 +217,21 @@ with tab_main:
         st.divider()
         st.subheader("📅 10-Year Market Trajectory")
         hist = st.session_state["temporal_history"]
+
+        # Display aggregate welfare
+        agg_res = st.session_state["aggregate_result"]
+        st.success(f"Aggregate 10-Year Net Welfare: **${float(agg_res.welfare_impact):,.0f}**")
+
         df_hist = pd.DataFrame(
             [
                 {
-                    "Year": s.year,
-                    "Uptake": float(s.uptake),
-                    "Premium (High)": float(s.premium_high),
-                    "Premium (Low)": float(s.premium_low),
-                    "Welfare": float(s.net_welfare),
+                    "Year": year,
+                    "Uptake": float(res.testing_uptake),
+                    "Premium (High)": float(res.insurance_premiums["premium_high"]),
+                    "Premium (Low)": float(res.insurance_premiums["premium_low"]),
+                    "Welfare": float(res.welfare_impact),
                 }
-                for s in hist
+                for year, res in hist.items()
             ]
         )
 

@@ -28,7 +28,18 @@ from src.utils.logging_config import setup_logging
 setup_logging(level="INFO")
 
 SCAN_PATTERNS = ("*.md", "*.tex", "*.py", "*.yaml", "*.yml", "*.json")
-SKIP_PARTS = {".git", ".venv", "outputs", "__pycache__", ".pytest_cache", ".mypy_cache", "external", ".tmp_streamlit_deploy_check", "study", "tests"}
+SKIP_PARTS = {
+    ".git",
+    ".venv",
+    "outputs",
+    "__pycache__",
+    ".pytest_cache",
+    ".mypy_cache",
+    "external",
+    ".tmp_streamlit_deploy_check",
+    "study",
+    "tests",
+}
 
 LATEX_PATTERNS = (
     r"\\cite\{([^}]+)\}",

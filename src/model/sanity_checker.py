@@ -30,7 +30,6 @@ class EconomicSanityChecker:
         # We use jnp.any to check if any element violates the invariant
         uptake = jnp.asarray(result.testing_uptake)
 
-
         # 2. Premium Ordering
         ph = jnp.asarray(result.insurance_premiums.get("premium_high", 0.0))
         pl = jnp.asarray(result.insurance_premiums.get("premium_low", 0.0))
@@ -43,16 +42,22 @@ class EconomicSanityChecker:
         # For non-traced runs (concrete), we can log.
         if not isinstance(uptake, jax.core.Tracer):
             if float(jnp.mean(uptake)) < -1e-6:
-                logger.error(f"INVARIANT VIOLATION: Negative testing uptake ({float(jnp.mean(uptake)):.4f})")
+                logger.error(
+                    f"INVARIANT VIOLATION: Negative testing uptake ({float(jnp.mean(uptake)):.4f})"
+                )
             if float(jnp.mean(ph)) < float(jnp.mean(pl)) - 1e-6:
                 logger.error("INVARIANT VIOLATION: Premium High < Premium Low")
-            
+
             # Additional invariants
             if float(jnp.mean(uptake)) > 0.01 and float(jnp.mean(hb)) <= 0:
-                logger.warning(f"SENSITIVITY ALERT: Positive uptake ({float(jnp.mean(uptake)):.2f}) with zero health benefits.")
-            
+                logger.warning(
+                    f"SENSITIVITY ALERT: Positive uptake ({float(jnp.mean(uptake)):.2f}) with zero health benefits."
+                )
+
             if float(jnp.mean(ph)) > 2.0:
-                logger.warning(f"SENSITIVITY ALERT: Extreme High-Risk Premium detected ({float(jnp.mean(ph)):.2f})")
+                logger.warning(
+                    f"SENSITIVITY ALERT: Extreme High-Risk Premium detected ({float(jnp.mean(ph)):.2f})"
+                )
 
     @staticmethod
     def verify_sweep(results: dict[str, Any]) -> None:
@@ -63,6 +68,8 @@ class EconomicSanityChecker:
             u_sq = jnp.asarray(results["status_quo"].testing_uptake)
             u_ban = jnp.asarray(results["ban"].testing_uptake)
 
-            if not isinstance(u_sq, jax.core.Tracer) and float(jnp.mean(u_ban)) < float(jnp.mean(u_sq)) - 1e-6:
-
-                    logger.error("INVARIANT VIOLATION: Ban uptake < Status Quo uptake")
+            if (
+                not isinstance(u_sq, jax.core.Tracer)
+                and float(jnp.mean(u_ban)) < float(jnp.mean(u_sq)) - 1e-6
+            ):
+                logger.error("INVARIANT VIOLATION: Ban uptake < Status Quo uptake")

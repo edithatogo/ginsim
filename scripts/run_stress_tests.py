@@ -180,7 +180,9 @@ def run_stress_test(
         "welfare_impact": float(result.welfare_impact),
         "policy_effect": float(result.all_metrics["welfare"].get("net_welfare", 0.0)),
         "enforcement_compliance": float(result.compliance_rate),
-        "proxy_substitution_rate": float(result.all_metrics["proxy"].get("proxy_substitution_rate", 0.0)),
+        "proxy_substitution_rate": float(
+            result.all_metrics["proxy"].get("proxy_substitution_rate", 0.0)
+        ),
         "research_participation": float(result.research_participation),
     }
 

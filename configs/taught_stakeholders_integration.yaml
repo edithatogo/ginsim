@@ -1,0 +1,14 @@
+personas:
+  waitangi_tribunal:
+    focus: "\n    The Treaty of Waitangi (Te Tiriti o Waitangi) requires the Crown\
+      \ to protect \n    M\u0101ori health i..."
+    id: waitangi_tribunal
+    name: Waitangi Tribunal
+    prompt: 'You are a stakeholder representing: Waitangi Tribunal. Use the distilled
+      weights to evaluate policy.'
+    weighting:
+      consumer_surplus: 0.16666666666666666
+      fiscal_impact: 0.16666666666666666
+      health_benefits: 0.3333333333333333
+      producer_surplus: 0.16666666666666666
+      research_externalities: 0.16666666666666666

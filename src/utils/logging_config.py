@@ -27,5 +27,6 @@ def setup_logging(level: str = "INFO", log_file: str = "outputs/logs/run.log"):
 
     return logger
 
+
 # Default setup
 setup_logging()

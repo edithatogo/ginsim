@@ -1,0 +1,56 @@
+{
+  "metadata": {
+    "timestamp": "2026-03-11T15:08:00.112082Z",
+    "jurisdiction": "australia",
+    "policy_name": "status_quo",
+    "engine": "GINSIM-JAX",
+    "schema_version": "1.0.0"
+  },
+  "inputs": {
+    "baseline_testing_uptake": 0.52,
+    "deterrence_elasticity": 0.18,
+    "moratorium_effect": 0.15,
+    "adverse_selection_elasticity": 0.08,
+    "demand_elasticity_high_risk": -0.22,
+    "baseline_loading": 0.15,
+    "family_history_sensitivity": 0.68,
+    "proxy_substitution_rate": 0.4,
+    "pass_through_rate": 0.75,
+    "research_participation_elasticity": -0.1,
+    "research_participation_value": 50000.0,
+    "ppp_conversion_factor": 1.0,
+    "equity_factor": 1.15,
+    "high_sum_insured_share": 0.25,
+    "taper_range": 100000.0,
+    "enforcement_effectiveness": 0.5,
+    "complaint_rate": 0.02,
+    "enforcement_budget": 1000000.0,
+    "marginal_cost_enforcement": 0.1,
+    "compliance_cost_fixed": 5000.0,
+    "detection_prob_baseline": 0.05,
+    "acc_deterrence_offset": 0.0,
+    "pharmac_qaly_threshold": 50000.0,
+    "medicare_cost_share": 0.75,
+    "audit_intensity": 0.6,
+    "audit_intensity_apra": 0.7,
+    "audit_intensity_asic": 0.65,
+    "remoteness_weight": 0.4,
+    "time_horizon": 10,
+    "tech_improvement_rate": 0.15
+  },
+  "outcomes": {
+    "utilitarian_welfare": -34160.83203125,
+    "equity_weighted_welfare": -33972.62109375,
+    "components": {
+      "consumer_surplus": 909.1350708007812,
+      "producer_surplus": -0.848015546798706,
+      "health_benefits": 345.6108703613281,
+      "fiscal_impact": -5414.73291015625,
+      "research_externalities": 29999.998046875
+    },
+    "behavioral": {
+      "testing_uptake": 0.612921953201294,
+      "compliance_rate": 0.0
+    },
+    "clinical": {
+      "total_qaly_gains": 

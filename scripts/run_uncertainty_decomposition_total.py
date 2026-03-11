@@ -78,7 +78,9 @@ def main():
 
     rows = []
     if sobol_first_order_rff is None or total_order_sobol_rff is None:
-        logger.error("sobol_first_order_rff or total_order_sobol_rff is missing. Skipping calculation.")
+        logger.error(
+            "sobol_first_order_rff or total_order_sobol_rff is missing. Skipping calculation."
+        )
     else:
         for g in GROUPS:
             theta_g = load_theta(run_dir, g)

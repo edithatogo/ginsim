@@ -57,5 +57,6 @@ def main():
     if unused:
         logger.info(f"Unused BibTeX entries: {len(unused)}")
 
+
 if __name__ == "__main__":
     main()

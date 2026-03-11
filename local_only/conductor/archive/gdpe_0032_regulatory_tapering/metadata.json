@@ -1,0 +1,8 @@
+{
+  "track_id": "gdpe_0032_regulatory_tapering",
+  "type": "feature",
+  "status": "completed",
+  "created_at": "2026-03-08T23:30:00Z",
+  "updated_at": "2026-03-09T01:00:00Z",
+  "description": "Implemented smooth 'Sum-Insured Tapering' (Glide Paths) for financial thresholds in JAX engine and dashboard."
+}

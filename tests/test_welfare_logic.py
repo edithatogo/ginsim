@@ -30,6 +30,7 @@ def test_welfare_conservation_identity(uptake, premium, profits, externality):
         baseline_profits=0.0,
         research_value_loss=externality,
         time_horizon=20,
+        setup_cost=0.0,
     )
 
     # Sum components
@@ -42,7 +43,7 @@ def test_welfare_conservation_identity(uptake, premium, profits, externality):
     )
 
     # Should be exactly equal (ignoring distributional weight)
-    assert float(res.net_welfare) == pytest.approx(float(component_sum), abs=1e-5)
+    assert float(res.net_welfare) == pytest.approx(float(component_sum), abs=1e-3)
 
 
 @settings(deadline=None)

@@ -54,7 +54,9 @@ def main():
         logger.error(f"LAST ERROR: {state['last_error']}")
         sys.exit(1)
 
-    logger.warning(f"REMEDIATION REQUIRED: Attempt {state['attempts']}/3. Error captured in state file.")
+    logger.warning(
+        f"REMEDIATION REQUIRED: Attempt {state['attempts']}/3. Error captured in state file."
+    )
     sys.exit(2)  # Code 2 means "Retry allowed"
 
 

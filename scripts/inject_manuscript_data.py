@@ -50,5 +50,6 @@ def main():
 
     logger.success(f"Manuscript draft generated: {output_path}")
 
+
 if __name__ == "__main__":
     main()

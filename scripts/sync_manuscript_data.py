@@ -24,6 +24,7 @@ setup_logging(level="INFO")
 
 OUTPUT_FILE = project_root / "outputs" / "results_manifest.json"
 
+
 def main():
     logger.info("Starting Manuscript Data Sync...")
 
@@ -46,6 +47,7 @@ def main():
         json.dump(manifest, f, indent=2)
 
     logger.success(f"Manifest updated: {OUTPUT_FILE}")
+
 
 if __name__ == "__main__":
     main()

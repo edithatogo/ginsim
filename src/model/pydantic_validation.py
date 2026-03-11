@@ -1,6 +1,7 @@
 from beartype import beartype
-from src.utils.logging_config import logger
 from pydantic import BaseModel, Field, field_validator
+
+from src.utils.logging_config import logger
 
 
 class AssumptionRef(BaseModel):

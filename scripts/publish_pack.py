@@ -12,13 +12,13 @@ sys.path.insert(0, str(project_root))
 
 from loguru import logger
 
-from src.utils.logging_config import setup_logging
 from scripts.generate_figures import (
     plot_evppi,
     plot_policy_bars,
     plot_uncertainty_decomposition,
 )
 from scripts.reporting_common import build_reporting_bundle, write_reporting_tables
+from src.utils.logging_config import setup_logging
 
 setup_logging(level="INFO")
 

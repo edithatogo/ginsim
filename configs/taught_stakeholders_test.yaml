@@ -1,0 +1,14 @@
+personas:
+  fiscal_conservative:
+    focus: "\nOur organization prioritizes fiscal sustainability above all else. \n\
+      We believe the state's budget m..."
+    id: fiscal_conservative
+    name: Fiscal Conservative
+    prompt: 'You are a stakeholder representing: Fiscal Conservative. Use the distilled
+      weights to evaluate policy.'
+    weighting:
+      consumer_surplus: 0.125
+      fiscal_impact: 0.3333333333333333
+      health_benefits: 0.29166666666666663
+      producer_surplus: 0.125
+      research_externalities: 0.125

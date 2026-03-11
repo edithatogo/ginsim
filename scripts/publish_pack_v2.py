@@ -60,5 +60,6 @@ def main():
 
     logger.success(f"Archival package generated: {zip_path}")
 
+
 if __name__ == "__main__":
     main()

@@ -129,12 +129,14 @@ def simulate_evolution(
     Simulate policy impact over a multi-year horizon and return aggregate.
     """
     horizon = int(getattr(params, "time_horizon", 10))
+    logger.info(f"SIMULATING EVOLUTION: {policy.name} over {horizon} years")
     annual_results = {}
 
     for year in range(horizon + 1):
         annual_results[year] = evaluate_single_policy(params, policy, year=year, is_annual=True)
 
     # Aggregate ledger
+    logger.info("Aggregating temporal results...")
     ledger_list = [res.dcba_result for res in annual_results.values()]
     aggregate_ledger = dcba.aggregate_temporal_results(ledger_list)
 

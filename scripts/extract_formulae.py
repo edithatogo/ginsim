@@ -8,7 +8,18 @@ Usage:
 
 import argparse
 import re
+import sys
 from pathlib import Path
+
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+from loguru import logger
+
+from src.utils.logging_config import setup_logging
+
+setup_logging(level="INFO")
 
 
 def extract_formulae_from_file(file_path: Path) -> list[dict]:
@@ -144,18 +155,18 @@ def main():
     src_dir = Path(args.src)
     output_path = Path(args.output)
 
-    print("=" * 60)
-    print("FORMULAE EXTRACTION")
-    print("=" * 60)
+    logger.info("=" * 60)
+    logger.info("FORMULAE EXTRACTION")
+    logger.info("=" * 60)
 
     # Extract formulae from all Python files
     all_formulae = []
     for py_file in src_dir.glob("**/*.py"):
-        print(f"Scanning {py_file}...")
+        logger.info(f"Scanning {py_file}...")
         formulae = extract_formulae_from_file(py_file)
         all_formulae.extend(formulae)
 
-    print(f"\nFound {len(all_formulae)} formulae")
+    logger.info(f"Found {len(all_formulae)} formulae")
 
     # Categorize formulae
     categorized = categorize_formulae(all_formulae)
@@ -164,8 +175,8 @@ def main():
     output_path.parent.mkdir(parents=True, exist_ok=True)
     generate_inventory(categorized, output_path)
 
-    print(f"\n✓ Formula inventory saved to {output_path}")
-    print("=" * 60)
+    logger.success(f"Formula inventory saved to {output_path}")
+    logger.info("=" * 60)
 
 
 if __name__ == "__main__":

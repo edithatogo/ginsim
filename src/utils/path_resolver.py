@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from loguru import logger
+from src.utils.logging_config import logger
 
 
 def resolve_path(relative_path: str | Path) -> Path:

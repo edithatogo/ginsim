@@ -22,7 +22,12 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+from loguru import logger
+
+from src.utils.logging_config import setup_logging
 from src.utils.path_resolver import resolve_path
+
+setup_logging(level="INFO")
 
 TEMPLATE_DIR = resolve_path("conductor/templates/nature_depth_cycle")
 TRACKS_DIR = resolve_path("conductor/tracks")
@@ -263,11 +268,11 @@ def main() -> None:
         status=args.status,
     )
 
-    print(f"Created development track at: {track_dir}")
-    print("Next steps:")
-    print("1. Run 3-5 refinement rounds before implementation")
-    print("2. Update spec.md and plan.md with aspect-specific findings")
-    print("3. Start the implementation cycle")
+    logger.info(f"Created development track at: {track_dir}")
+    logger.info("Next steps:")
+    logger.info("1. Run 3-5 refinement rounds before implementation")
+    logger.info("2. Update spec.md and plan.md with aspect-specific findings")
+    logger.info("3. Start the implementation cycle")
 
 
 if __name__ == "__main__":

@@ -3,11 +3,21 @@ from pathlib import Path
 
 import bibtexparser
 
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+from loguru import logger
+
+from src.utils.logging_config import setup_logging
+
+setup_logging(level="INFO")
+
 
 def validate_bibtex(file_path):
     path = Path(file_path)
     if not path.exists():
-        print(f"Error: {file_path} not found.")
+        logger.error(f"{file_path} not found.")
         return 1
 
     try:
@@ -15,18 +25,18 @@ def validate_bibtex(file_path):
             bib_db = bibtexparser.load(f)
 
         if not bib_db.entries:
-            print(f"Warning: No entries found in {file_path}")
+            logger.warning(f"No entries found in {file_path}")
             return 0
 
-        print(f"Successfully validated {len(bib_db.entries)} entries in {file_path}")
+        logger.success(f"Successfully validated {len(bib_db.entries)} entries in {file_path}")
         return 0
     except Exception as e:
-        print(f"BibTeX Validation Error in {file_path}: {e}")
+        logger.error(f"BibTeX Validation Error in {file_path}: {e}")
         return 1
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python validate_bibtex.py <path_to_bib>")
+        logger.error("Usage: python validate_bibtex.py <path_to_bib>")
         sys.exit(1)
     sys.exit(validate_bibtex(sys.argv[1]))

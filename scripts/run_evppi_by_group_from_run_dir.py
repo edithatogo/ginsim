@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from contextlib import suppress
 from pathlib import Path
 
@@ -8,10 +9,24 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 import pandas as pd
-from src.model.evppi_rff import evppi_rff
+
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+from loguru import logger
+
+try:
+    from src.model.evppi_rff import evppi_rff
+except ImportError:
+    logger.warning("src.model.evppi_rff.evppi_rff not found. Using None.")
+    evppi_rff = None
 
 from src.model.voi import evpi
+from src.utils.logging_config import setup_logging
 from src.utils.manifest import write_manifest
+
+setup_logging(level="INFO")
 
 GROUPS = ["mapping", "behavior", "clinical", "insurance", "passthrough", "data_quality"]
 
@@ -50,23 +65,26 @@ def main():
     evpi_val = float(evpi(nb_j))
 
     rows = []
-    for g in GROUPS:
-        theta = load_theta(run_dir, g)
-        if theta is None:
-            continue
-        theta_j = jnp.array(theta)
-        k = jax.random.fold_in(key, hash(g) & 0xFFFFFFFF)
-        val = float(
-            evppi_rff(
-                nb_j,
-                theta_j,
-                k,
-                n_features=args.n_features,
-                lengthscale=args.lengthscale,
-                l2=args.l2,
-            ),
-        )
-        rows.append({"group": g, "evppi": val})
+    if evppi_rff is None:
+        logger.error("evppi_rff is missing. Skipping EVPPI calculation.")
+    else:
+        for g in GROUPS:
+            theta = load_theta(run_dir, g)
+            if theta is None:
+                continue
+            theta_j = jnp.array(theta)
+            k = jax.random.fold_in(key, hash(g) & 0xFFFFFFFF)
+            val = float(
+                evppi_rff(
+                    nb_j,
+                    theta_j,
+                    k,
+                    n_features=args.n_features,
+                    lengthscale=args.lengthscale,
+                    l2=args.l2,
+                ),
+            )
+            rows.append({"group": g, "evppi": val})
 
     df = (
         pd.DataFrame(rows).sort_values("evppi", ascending=False)
@@ -96,8 +114,8 @@ def main():
         encoding="utf-8",
     )
 
-    print("Wrote:", out_dir)
-    print(df.to_string(index=False))
+    logger.info(f"Wrote evppi results to: {out_dir}")
+    logger.info(f"\n{df.to_string(index=False)}")
 
 
 if __name__ == "__main__":

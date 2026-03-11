@@ -29,7 +29,7 @@ class UnderwritingAccuracy:
     mispricing_error: float
 
 
-@jit(static_argnames=["params", "policy", "max_iterations"])
+@jit(static_argnames=["params", "policy", "max_iterations", "noise_level"])
 def optimize_underwriting(
     params: ModelParameters,
     policy: PolicyConfig,

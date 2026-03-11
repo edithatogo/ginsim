@@ -35,6 +35,8 @@ class EconomicSanityChecker:
         ph = jnp.asarray(result.insurance_premiums.get("premium_high", 0.0))
         pl = jnp.asarray(result.insurance_premiums.get("premium_low", 0.0))
 
+        # 3. Welfare vs Uptake (Health benefits must be non-zero if uptake > 0)
+        hb = jnp.asarray(result.all_metrics.get("welfare", {}).get("health_benefits", 0.0))
 
         # Note: We cannot branch on tracers during JIT/vmap.
         # We rely on the fact that JAX arrays will propagate these values.
@@ -44,6 +46,13 @@ class EconomicSanityChecker:
                 logger.error(f"INVARIANT VIOLATION: Negative testing uptake ({float(jnp.mean(uptake)):.4f})")
             if float(jnp.mean(ph)) < float(jnp.mean(pl)) - 1e-6:
                 logger.error("INVARIANT VIOLATION: Premium High < Premium Low")
+            
+            # Additional invariants
+            if float(jnp.mean(uptake)) > 0.01 and float(jnp.mean(hb)) <= 0:
+                logger.warning(f"SENSITIVITY ALERT: Positive uptake ({float(jnp.mean(uptake)):.2f}) with zero health benefits.")
+            
+            if float(jnp.mean(ph)) > 2.0:
+                logger.warning(f"SENSITIVITY ALERT: Extreme High-Risk Premium detected ({float(jnp.mean(ph)):.2f})")
 
     @staticmethod
     def verify_sweep(results: dict[str, Any]) -> None:

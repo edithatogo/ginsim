@@ -1,16 +1,26 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 
 import pandas as pd
 
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+from loguru import logger
+
+from src.utils.logging_config import setup_logging
 from scripts.generate_figures import (
     plot_evppi,
     plot_policy_bars,
     plot_uncertainty_decomposition,
 )
 from scripts.reporting_common import build_reporting_bundle, write_reporting_tables
+
+setup_logging(level="INFO")
 
 try:
     from docx import Document
@@ -413,9 +423,9 @@ def main() -> None:
         message = "Publish pack did not produce the expected DOCX/PDF artifacts."
         raise RuntimeError(message)
 
-    print("Wrote publish pack to:", out_dir)
-    print("Generated tables:", ", ".join(sorted(generated_tables)))
-    print("Generated documents:", generated_docx.name, generated_pdf.name)
+    logger.info(f"Wrote publish pack to: {out_dir}")
+    logger.info(f"Generated tables: {', '.join(sorted(generated_tables))}")
+    logger.success(f"Generated documents: {generated_docx.name}, {generated_pdf.name}")
 
 
 if __name__ == "__main__":

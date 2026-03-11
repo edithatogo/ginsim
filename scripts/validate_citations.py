@@ -6,9 +6,18 @@ Verifies that every citation in the manuscript draft exists in the BibTeX librar
 """
 
 import re
+import sys
 from pathlib import Path
 
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
 from loguru import logger
+
+from src.utils.logging_config import setup_logging
+
+setup_logging(level="INFO")
 
 
 def main():

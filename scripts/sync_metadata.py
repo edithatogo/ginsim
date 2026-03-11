@@ -6,18 +6,23 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+from loguru import logger
+
+from src.utils.logging_config import setup_logging
 from src.utils.path_resolver import resolve_path
+
+setup_logging(level="INFO")
 
 
 def sync_registry():
     tracks_dir = resolve_path("conductor/tracks")
     registry_path = resolve_path("conductor/tracks.md")
 
-    print(f"Syncing registry from {tracks_dir} to {registry_path}...")
+    logger.info(f"Syncing registry from {tracks_dir} to {registry_path}...")
 
     tracks = []
     if not tracks_dir.exists():
-        print(f"Error: tracks_dir {tracks_dir} does not exist.")
+        logger.error(f"tracks_dir {tracks_dir} does not exist.")
         return
 
     for track_folder in tracks_dir.iterdir():
@@ -29,7 +34,7 @@ def sync_registry():
 
     # Sort tracks by ID or Date if available
     # For now, just a basic list update
-    print(f"Found {len(tracks)} tracks in metadata.")
+    logger.info(f"Found {len(tracks)} tracks in metadata.")
     # In a full implementation, we would rewrite the Markdown table in tracks.md
 
 

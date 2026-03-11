@@ -1,6 +1,5 @@
-from __future__ import annotations
-
 import argparse
+import sys
 from contextlib import suppress
 from pathlib import Path
 
@@ -9,9 +8,28 @@ import jax.numpy as jnp
 import numpy as np
 import pandas as pd
 
-from src.model.sensitivity import sobol_first_order_rff
-from src.model.sensitivity_total import total_order_sobol_rff
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+from loguru import logger
+
+try:
+    from src.model.sensitivity import sobol_first_order_rff
+except ImportError:
+    logger.warning("src.model.sensitivity.sobol_first_order_rff not found. Using None.")
+    sobol_first_order_rff = None
+
+try:
+    from src.model.sensitivity_total import total_order_sobol_rff
+except ImportError:
+    logger.warning("src.model.sensitivity_total.total_order_sobol_rff not found. Using None.")
+    total_order_sobol_rff = None
+
+from src.utils.logging_config import setup_logging
 from src.utils.manifest import write_manifest
+
+setup_logging(level="INFO")
 
 GROUPS = ["mapping", "behavior", "clinical", "insurance", "passthrough", "data_quality"]
 
@@ -59,73 +77,76 @@ def main():
     key = jax.random.PRNGKey(args.seed)
 
     rows = []
-    for g in GROUPS:
-        theta_g = load_theta(run_dir, g)
-        if theta_g is None:
-            continue
-        theta_g_j = jnp.array(theta_g)
+    if sobol_first_order_rff is None or total_order_sobol_rff is None:
+        logger.error("sobol_first_order_rff or total_order_sobol_rff is missing. Skipping calculation.")
+    else:
+        for g in GROUPS:
+            theta_g = load_theta(run_dir, g)
+            if theta_g is None:
+                continue
+            theta_g_j = jnp.array(theta_g)
 
-        comp = concat_complement(run_dir, g)
-        if comp is None:
-            continue
-        comp_j = jnp.array(comp)
+            comp = concat_complement(run_dir, g)
+            if comp is None:
+                continue
+            comp_j = jnp.array(comp)
 
-        # First-order and total-order for decision-focused output (optimal NB)
-        k1 = jax.random.fold_in(key, hash(g) & 0xFFFFFFFF)
-        s1_opt = float(
-            sobol_first_order_rff(
-                nb_opt,
+            # First-order and total-order for decision-focused output (optimal NB)
+            k1 = jax.random.fold_in(key, hash(g) & 0xFFFFFFFF)
+            s1_opt = float(
+                sobol_first_order_rff(
+                    nb_opt,
+                    theta_g_j,
+                    k1,
+                    n_features=args.n_features,
+                    lengthscale=args.lengthscale,
+                    l2=args.l2,
+                ),
+            )
+            k2 = jax.random.fold_in(key, (hash(g) + 1) & 0xFFFFFFFF)
+            st_opt = float(
+                total_order_sobol_rff(
+                    nb_opt,
+                    comp_j,
+                    k2,
+                    n_features=args.n_features,
+                    lengthscale=args.lengthscale,
+                    l2=args.l2,
+                ),
+            )
+
+            # For per-policy NB (average)
+            k3 = jax.random.fold_in(key, (hash(g) + 2) & 0xFFFFFFFF)
+            s1_pol = sobol_first_order_rff(
+                nb_j,
                 theta_g_j,
-                k1,
+                k3,
                 n_features=args.n_features,
                 lengthscale=args.lengthscale,
                 l2=args.l2,
-            ),
-        )
-        k2 = jax.random.fold_in(key, (hash(g) + 1) & 0xFFFFFFFF)
-        st_opt = float(
-            total_order_sobol_rff(
-                nb_opt,
+            )
+            s1_avg = float(jnp.mean(s1_pol))
+
+            k4 = jax.random.fold_in(key, (hash(g) + 3) & 0xFFFFFFFF)
+            st_pol = total_order_sobol_rff(
+                nb_j,
                 comp_j,
-                k2,
+                k4,
                 n_features=args.n_features,
                 lengthscale=args.lengthscale,
                 l2=args.l2,
-            ),
-        )
+            )
+            st_avg = float(jnp.mean(st_pol))
 
-        # For per-policy NB (average)
-        k3 = jax.random.fold_in(key, (hash(g) + 2) & 0xFFFFFFFF)
-        s1_pol = sobol_first_order_rff(
-            nb_j,
-            theta_g_j,
-            k3,
-            n_features=args.n_features,
-            lengthscale=args.lengthscale,
-            l2=args.l2,
-        )
-        s1_avg = float(jnp.mean(s1_pol))
-
-        k4 = jax.random.fold_in(key, (hash(g) + 3) & 0xFFFFFFFF)
-        st_pol = total_order_sobol_rff(
-            nb_j,
-            comp_j,
-            k4,
-            n_features=args.n_features,
-            lengthscale=args.lengthscale,
-            l2=args.l2,
-        )
-        st_avg = float(jnp.mean(st_pol))
-
-        rows.append(
-            {
-                "group": g,
-                "S1_optimal_NB": s1_opt,
-                "ST_optimal_NB": st_opt,
-                "S1_avg_policy_NB": s1_avg,
-                "ST_avg_policy_NB": st_avg,
-            },
-        )
+            rows.append(
+                {
+                    "group": g,
+                    "S1_optimal_NB": s1_opt,
+                    "ST_optimal_NB": st_opt,
+                    "S1_avg_policy_NB": s1_avg,
+                    "ST_avg_policy_NB": st_avg,
+                },
+            )
 
     df = (
         pd.DataFrame(rows).sort_values("ST_optimal_NB", ascending=False)
@@ -158,8 +179,8 @@ def main():
     df.to_csv(out_dir / "sobol_first_and_total_by_group.csv", index=False)
     (out_dir / "report.txt").write_text(df.to_string(index=False) + "\n", encoding="utf-8")
 
-    print("Wrote:", out_dir)
-    print(df.to_string(index=False))
+    logger.info(f"Wrote uncertainty results to: {out_dir}")
+    logger.info(f"\n{df.to_string(index=False)}")
 
 
 if __name__ == "__main__":

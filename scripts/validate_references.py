@@ -10,8 +10,6 @@ surfaces, resolves long-form evidence keys through an alias map, and reports:
 3. alias targets that point to missing canonical IDs.
 """
 
-from __future__ import annotations
-
 import argparse
 import json
 import re
@@ -19,7 +17,15 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
 from loguru import logger
+
+from src.utils.logging_config import setup_logging
+
+setup_logging(level="INFO")
 
 SCAN_PATTERNS = ("*.md", "*.tex", "*.py", "*.yaml", "*.yml", "*.json")
 SKIP_PARTS = {".git", ".venv", "outputs", "__pycache__", ".pytest_cache", ".mypy_cache", "external", ".tmp_streamlit_deploy_check", "study", "tests"}

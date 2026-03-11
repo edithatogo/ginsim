@@ -8,7 +8,12 @@ import bibtexparser
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+from loguru import logger
+
+from src.utils.logging_config import setup_logging
 from src.utils.path_resolver import resolve_path
+
+setup_logging(level="INFO")
 
 
 def harvest_citations():
@@ -32,7 +37,7 @@ def harvest_citations():
     out_path = resolve_path("docs/CITATION_GRAPH.json")
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(graph, f, indent=2)
-    print("Citation Graph Generated.")
+    logger.success("Citation Graph Generated.")
 
 
 if __name__ == "__main__":

@@ -18,6 +18,9 @@ from loguru import logger
 
 from src.model.parameters import load_jurisdiction_parameters
 from src.model.pipeline import run_full_pipeline
+from src.utils.logging_config import setup_logging
+
+setup_logging(level="INFO")
 
 OUTPUT_FILE = project_root / "outputs" / "results_manifest.json"
 

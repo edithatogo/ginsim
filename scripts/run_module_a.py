@@ -8,13 +8,23 @@ Usage:
 
 import argparse
 import json
+import sys
 from pathlib import Path
+
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+from loguru import logger
 
 from src.model.module_a_behavior_wrappers import (
     compute_testing_uptake,
     get_standard_policies,
 )
 from src.model.parameters import get_default_parameters
+from src.utils.logging_config import setup_logging
+
+setup_logging(level="INFO")
 
 
 def main():
@@ -32,22 +42,22 @@ def main():
 
     args = parser.parse_args()
 
-    print("=" * 60)
-    print("MODULE A: BEHAVIOR/DETERRENCE")
-    print("=" * 60)
+    logger.info("=" * 60)
+    logger.info("MODULE A: BEHAVIOR/DETERRENCE")
+    logger.info("=" * 60)
 
     # Load parameters
     params = get_default_parameters()
-    print(f"Loaded parameters for {params.jurisdiction}")
+    logger.info(f"Loaded parameters for {params.jurisdiction}")
 
     # Get policy
     policies = get_standard_policies()
     policy = policies[args.policy]
-    print(f"Policy: {policy.name}")
+    logger.info(f"Policy: {policy.name}")
 
     # Compute testing uptake
     uptake = compute_testing_uptake(params, policy)
-    print(f"\nTesting Uptake: {uptake:.4f}")
+    logger.info(f"Testing Uptake: {uptake:.4f}")
 
     # Save results
     output_dir = Path(args.output)
@@ -68,8 +78,8 @@ def main():
     with open(output_file, "w") as f:
         json.dump(results, f, indent=2)
 
-    print(f"\n✓ Results saved to {output_file}")
-    print("=" * 60)
+    logger.success(f"Results saved to {output_file}")
+    logger.info("=" * 60)
 
 
 if __name__ == "__main__":

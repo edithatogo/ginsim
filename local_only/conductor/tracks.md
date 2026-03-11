@@ -6,6 +6,7 @@ This registry is the index of Conductor tracks for this repository.
 
 | Track ID | Title | Status | Link |
 |---|---|---|---|
+| gdpe_0028_institutionalized_logging | Institutionalized Logging | ✅ Complete | [track](./tracks/gdpe_0028_institutionalized_logging/index.md) |
 | gdpe_0046_teaching_personas | Teaching Personas from Internal Documents | ✅ Complete | [track](./tracks/gdpe_0046_teaching_personas/index.md) |
 | gdpe_0022_empirical_traceability_and_legacy_closure | Empirical traceability and legacy analysis closure | Completed | [track](./tracks/gdpe_0022_empirical_traceability_and_legacy_closure/index.md) |
 
@@ -13,7 +14,7 @@ This registry is the index of Conductor tracks for this repository.
 
 | Track ID | Title | Status | Link |
 |---|---|---|---|
-| _None_ | | | |
+| gdpe_0047_game_engine_hardening | Game Engine Hardening (Module A & D logic paths) | âœ… Complete | [track](./tracks/gdpe_0047_game_engine_hardening/index.md) |
 
 ## Completed Follow-up Tracks
 

@@ -6,7 +6,12 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+from loguru import logger
+
+from src.utils.logging_config import setup_logging
 from src.utils.path_resolver import resolve_path
+
+setup_logging(level="INFO")
 
 
 def get_git_logs():
@@ -16,14 +21,14 @@ def get_git_logs():
             ["git", "log", "--pretty=format:%as|%s", "--since=1.day"], text=True
         )
         return res.split("\n")
-    except:
+    except Exception:
         return []
 
 
 def update_log(track_id):
     log_path = resolve_path(f"conductor/tracks/{track_id}/LOG_OBSERVABILITY.md")
     if not log_path.exists():
-        print(f"Error: Log not found at {log_path}")
+        logger.error(f"Log not found at {log_path}")
         return
 
     logs = get_git_logs()

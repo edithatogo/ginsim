@@ -10,9 +10,19 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+from loguru import logger
+
+from src.utils.logging_config import setup_logging
 from scripts.reporting_common import build_reporting_bundle, write_reporting_tables
+
+setup_logging(level="INFO")
 
 
 def main() -> None:
@@ -44,20 +54,20 @@ def main() -> None:
         else (meta_dir / "tables" if meta_dir is not None else run_dir / "tables")
     )
 
-    print("=" * 60)
-    print("TABLE GENERATION")
-    print("=" * 60)
+    logger.info("=" * 60)
+    logger.info("TABLE GENERATION")
+    logger.info("=" * 60)
 
     bundle = build_reporting_bundle(meta_dir=meta_dir, run_dir=run_dir)
     generated = write_reporting_tables(output_dir, bundle)
 
-    print(f"Source runs: {', '.join(sorted(bundle['run_dirs']))}")
+    logger.info(f"Source runs: {', '.join(sorted(bundle['run_dirs']))}")
     for name, path in generated.items():
-        print(f"  ✓ {name}: {path.name}")
+        logger.success(f"  {name}: {path.name}")
 
-    print("=" * 60)
-    print(f"✓ Reporting tables generated in {output_dir}")
-    print("=" * 60)
+    logger.info("=" * 60)
+    logger.success(f"Reporting tables generated in {output_dir}")
+    logger.info("=" * 60)
 
 
 if __name__ == "__main__":

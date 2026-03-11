@@ -64,21 +64,26 @@ def compute_perceived_penalty(
 
     enforcement_factor = jnp.asarray(enforcement_strength) * eff
 
-    if allow_genetic_test_results:
-        restriction_strength = 0.0
-    elif sum_insured_caps is not None:
-        avg_protection_high = taper_function(
-            jnp.asarray(1.0),
-            jnp.asarray(0.0),
-            jnp.asarray(taper_range) / 1000000.0,
-        )
-        base_restriction = 1.0 - jnp.asarray(high_sum_insured_share)
-        taper_bonus = jnp.asarray(high_sum_insured_share) * avg_protection_high
-        restriction_strength = (base_restriction + taper_bonus) * (
-            0.7 + 0.3 * jnp.asarray(moratorium_effect)
-        )
-    else:
-        restriction_strength = 1.0
+    # JAX-compatible restriction strength logic
+    # 1. No restriction if genetic results allowed
+    # 2. Threshold protection if caps exist
+    # 3. Full restriction otherwise
+    avg_protection_high = taper_function(
+        jnp.asarray(1.0),
+        jnp.asarray(0.0),
+        jnp.asarray(taper_range) / 1000000.0,
+    )
+    base_restriction = 1.0 - jnp.asarray(high_sum_insured_share)
+    taper_bonus = jnp.asarray(high_sum_insured_share) * avg_protection_high
+    threshold_restriction = (base_restriction + taper_bonus) * (
+        0.7 + 0.3 * jnp.asarray(moratorium_effect)
+    )
+
+    restriction_strength = jnp.where(
+        allow_genetic_test_results,
+        0.0,
+        jnp.where(sum_insured_caps is not None, threshold_restriction, 1.0),
+    )
 
     penalty_reduction = restriction_strength * (0.5 + 0.5 * enforcement_factor)
     penalty_reduction = jnp.clip(penalty_reduction, 0.0, 0.95)
@@ -131,8 +136,9 @@ def compute_testing_utility(
     utility = jnp.asarray(benefits) - jnp.asarray(perceived_penalty) - spatial_test_cost
 
     if individual_characteristics is not None:
-        for factor, weight in individual_characteristics.items():
-            utility = utility + weight * individual_characteristics.get(factor, 0.0)
+        for factor, val in individual_characteristics.items():
+            # Add value directly (assuming they are pre-weighted shifts or utility components)
+            utility = utility + jnp.asarray(val)
 
     return utility
 
@@ -154,6 +160,7 @@ def compute_testing_uptake(
     rng_key: Array | None = None,
     remoteness_index: float = 0.0,
     year: int = 0,
+    individual_characteristics: dict[str, Any] | None = None,
 ) -> Float[Array, ""]:
     """
     Compute aggregate testing uptake.
@@ -186,6 +193,7 @@ def compute_testing_uptake(
     utilities = compute_testing_utility(
         benefits,
         perceived_penalty,
+        individual_characteristics=individual_characteristics,
         medicare_cost_share=getattr(params, "medicare_cost_share", 0.0),
         remoteness_index=remoteness_index,
         remoteness_weight=getattr(params, "remoteness_weight", 0.20),

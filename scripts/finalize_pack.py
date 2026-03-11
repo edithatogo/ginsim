@@ -6,7 +6,12 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+from loguru import logger
+
+from src.utils.logging_config import setup_logging
 from src.utils.path_resolver import resolve_path
+
+setup_logging(level="INFO")
 
 
 def create_final_pack():
@@ -26,7 +31,7 @@ def create_final_pack():
             if resolved.exists():
                 # Store relative to root in zip
                 z.write(resolved, arcname=f)
-    print("Final Diamond Pack Created.")
+    logger.success("Final Diamond Pack Created.")
 
 
 if __name__ == "__main__":

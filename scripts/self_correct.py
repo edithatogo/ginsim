@@ -3,6 +3,16 @@ import subprocess
 import sys
 from pathlib import Path
 
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+from loguru import logger
+
+from src.utils.logging_config import setup_logging
+
+setup_logging(level="INFO")
+
 STATE_FILE = Path(".conductor_remediation_state.json")
 
 
@@ -19,7 +29,7 @@ def save_state(state):
 
 
 def run_tests():
-    print("Running tests for remediation...")
+    logger.info("Running tests for remediation...")
     result = subprocess.run(
         ["uv", "run", "pytest", "-v", "--cov=src"], capture_output=True, text=True
     )
@@ -31,7 +41,7 @@ def main():
     rc, out, err = run_tests()
 
     if rc == 0:
-        print("SUCCESS: Tests passed. Resetting circuit breaker.")
+        logger.success("SUCCESS: Tests passed. Resetting circuit breaker.")
         save_state({"attempts": 0, "last_error": None})
         sys.exit(0)
 
@@ -40,11 +50,11 @@ def main():
     save_state(state)
 
     if state["attempts"] >= 3:
-        print(f"CIRCUIT BREAKER TRIGGERED: Failed {state['attempts']} times.")
-        print(f"LAST ERROR: {state['last_error']}")
+        logger.error(f"CIRCUIT BREAKER TRIGGERED: Failed {state['attempts']} times.")
+        logger.error(f"LAST ERROR: {state['last_error']}")
         sys.exit(1)
 
-    print(f"REMEDIATION REQUIRED: Attempt {state['attempts']}/3. Error captured in state file.")
+    logger.warning(f"REMEDIATION REQUIRED: Attempt {state['attempts']}/3. Error captured in state file.")
     sys.exit(2)  # Code 2 means "Retry allowed"
 
 

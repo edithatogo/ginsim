@@ -1,11 +1,18 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 from typing import Any
 
 import pandas as pd
 from pydantic import BaseModel, ValidationError
+
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+from loguru import logger
 
 from src.model.param_schema import (
     BehaviorParamsDraw,
@@ -15,7 +22,10 @@ from src.model.param_schema import (
     PassThroughParamsDraw,
     PolicyMappingParamsDraw,
 )
+from src.utils.logging_config import setup_logging
 from src.utils.posterior import save_draws_npy
+
+setup_logging(level="INFO")
 
 SCHEMAS: dict[str, type[BaseModel]] = {
     "behavior": BehaviorParamsDraw,
@@ -63,7 +73,7 @@ def main():
 
     draws = convert(Path(args.csv), args.kind)
     save_draws_npy(Path(args.out), draws)
-    print(f"Wrote {len(draws)} draws to {args.out}")
+    logger.success(f"Wrote {len(draws)} draws to {args.out}")
 
 
 if __name__ == "__main__":

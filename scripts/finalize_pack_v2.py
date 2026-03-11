@@ -6,7 +6,12 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+from loguru import logger
+
+from src.utils.logging_config import setup_logging
 from src.utils.path_resolver import resolve_path
+
+setup_logging(level="INFO")
 
 
 def create_v2_pack():
@@ -30,7 +35,7 @@ def create_v2_pack():
             resolved = resolve_path(f)
             if resolved.exists():
                 z.write(resolved, arcname=f)
-    print("Final Diamond Pack v2.0 Created.")
+    logger.success("Final Diamond Pack v2.0 Created.")
 
 
 if __name__ == "__main__":

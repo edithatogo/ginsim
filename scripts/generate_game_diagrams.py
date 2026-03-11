@@ -7,9 +7,20 @@ Usage:
 """
 
 import argparse
+import sys
 from pathlib import Path
 
 import matplotlib as mpl
+
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+from loguru import logger
+
+from src.utils.logging_config import setup_logging
+
+setup_logging(level="INFO")
 
 mpl.use("Agg")
 import matplotlib.pyplot as plt
@@ -39,18 +50,18 @@ def save_figure(fig, output_path: Path, dpi: int = 1200, formats: list | None = 
         if fmt == "png":
             path = output_path.with_suffix(".png")
             fig.savefig(path, dpi=dpi, bbox_inches="tight", facecolor="white")
-            print(f"  ✓ Saved {path.name} ({dpi}dpi)")
+            logger.success(f"  Saved {path.name} ({dpi}dpi)")
         elif fmt == "svg":
             path = output_path.with_suffix(".svg")
             fig.savefig(path, bbox_inches="tight", facecolor="white")
-            print(f"  ✓ Saved {path.name}")
+            logger.success(f"  Saved {path.name}")
 
     plt.close(fig)
 
 
 def generate_module_a_diagram(output_dir: Path, dpi: int, formats: list):
     """Generate Module A: Behavior/Deterrence game structure diagram."""
-    print("Generating Module A: Behavior/Deterrence diagram...")
+    logger.info("Generating Module A: Behavior/Deterrence diagram...")
 
     fig, ax = plt.subplots(figsize=(12, 8))
     ax.set_xlim(0, 12)
@@ -155,7 +166,7 @@ def generate_module_a_diagram(output_dir: Path, dpi: int, formats: list):
 
 def generate_module_c_diagram(output_dir: Path, dpi: int, formats: list):
     """Generate Module C: Insurance Equilibrium (Rothschild-Stiglitz) diagram."""
-    print("Generating Module C: Insurance Equilibrium diagram...")
+    logger.info("Generating Module C: Insurance Equilibrium diagram...")
 
     fig, ax = plt.subplots(figsize=(12, 8))
     ax.set_xlim(0, 12)
@@ -283,7 +294,7 @@ def generate_module_c_diagram(output_dir: Path, dpi: int, formats: list):
 
 def generate_module_d_diagram(output_dir: Path, dpi: int, formats: list):
     """Generate Module D: Proxy Substitution diagram."""
-    print("Generating Module D: Proxy Substitution diagram...")
+    logger.info("Generating Module D: Proxy Substitution diagram...")
 
     fig, ax = plt.subplots(figsize=(12, 8))
     ax.set_xlim(0, 12)
@@ -397,7 +408,7 @@ def generate_module_d_diagram(output_dir: Path, dpi: int, formats: list):
 
 def generate_module_e_diagram(output_dir: Path, dpi: int, formats: list):
     """Generate Module E: Pass-Through diagram."""
-    print("Generating Module E: Pass-Through diagram...")
+    logger.info("Generating Module E: Pass-Through diagram...")
 
     fig, ax = plt.subplots(figsize=(12, 8))
     ax.set_xlim(0, 12)
@@ -483,7 +494,7 @@ def generate_module_e_diagram(output_dir: Path, dpi: int, formats: list):
 
 def generate_module_f_diagram(output_dir: Path, dpi: int, formats: list):
     """Generate Module F: Data Quality Externality diagram."""
-    print("Generating Module F: Data Quality Externality diagram...")
+    logger.info("Generating Module F: Data Quality Externality diagram...")
 
     fig, ax = plt.subplots(figsize=(12, 8))
     ax.set_xlim(0, 12)
@@ -597,7 +608,7 @@ def generate_module_f_diagram(output_dir: Path, dpi: int, formats: list):
 
 def generate_enforcement_diagram(output_dir: Path, dpi: int, formats: list):
     """Generate Enforcement: Compliance Game diagram."""
-    print("Generating Enforcement: Compliance Game diagram...")
+    logger.info("Generating Enforcement: Compliance Game diagram...")
 
     fig, ax = plt.subplots(figsize=(12, 8))
     ax.set_xlim(0, 12)
@@ -711,7 +722,7 @@ def generate_enforcement_diagram(output_dir: Path, dpi: int, formats: list):
 
 def generate_equilibrium_concepts_diagram(output_dir: Path, dpi: int, formats: list):
     """Generate comprehensive equilibrium concepts diagram."""
-    print("Generating Equilibrium Concepts diagram...")
+    logger.info("Generating Equilibrium Concepts diagram...")
 
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
     fig.suptitle("Equilibrium Concepts Across Games", fontsize=16, fontweight="bold")
@@ -887,7 +898,7 @@ def generate_equilibrium_concepts_diagram(output_dir: Path, dpi: int, formats: l
 
 def generate_payoff_matrices_diagram(output_dir: Path, dpi: int, formats: list):
     """Generate payoff matrices for games where applicable."""
-    print("Generating Payoff Matrices diagram...")
+    logger.info("Generating Payoff Matrices diagram...")
 
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
     fig.suptitle("Payoff Matrices", fontsize=16, fontweight="bold")
@@ -1066,9 +1077,9 @@ def main():
     output_dir = Path(args.output)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    print("=" * 60)
-    print("GAME STRUCTURE DIAGRAM GENERATION")
-    print("=" * 60)
+    logger.info("=" * 60)
+    logger.info("GAME STRUCTURE DIAGRAM GENERATION")
+    logger.info("=" * 60)
 
     # Generate all diagrams
     generate_module_a_diagram(output_dir, args.dpi, args.formats)
@@ -1080,12 +1091,12 @@ def main():
     generate_equilibrium_concepts_diagram(output_dir, args.dpi, args.formats)
     generate_payoff_matrices_diagram(output_dir, args.dpi, args.formats)
 
-    print("=" * 60)
-    print(f"✓ All 8 game diagrams generated in {output_dir}")
-    print("  - 6 game structure diagrams")
-    print("  - 1 equilibrium concepts diagram")
-    print("  - 1 payoff matrices diagram")
-    print("=" * 60)
+    logger.info("=" * 60)
+    logger.success(f"All 8 game diagrams generated in {output_dir}")
+    logger.info("  - 6 game structure diagrams")
+    logger.info("  - 1 equilibrium concepts diagram")
+    logger.info("  - 1 payoff matrices diagram")
+    logger.info("=" * 60)
 
 
 if __name__ == "__main__":

@@ -6,10 +6,19 @@ Consolidates all public artifacts, result manifests, and supplementary
 documentation into a single reviewer-ready ZIP archive.
 """
 
+import sys
 import zipfile
 from pathlib import Path
 
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
 from loguru import logger
+
+from src.utils.logging_config import setup_logging
+
+setup_logging(level="INFO")
 
 
 def main():

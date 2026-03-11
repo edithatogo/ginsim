@@ -1,5 +1,5 @@
 from beartype import beartype
-from loguru import logger
+from src.utils.logging_config import logger
 from pydantic import BaseModel, Field, field_validator
 
 

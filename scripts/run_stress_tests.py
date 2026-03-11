@@ -6,14 +6,19 @@ Usage:
     python -m scripts.run_stress_tests --output outputs/stress_tests/
 """
 
-from __future__ import annotations
-
 import argparse
+import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 import yaml
+
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+from loguru import logger
 
 from src.model.module_a_behavior import get_standard_policies
 from src.model.parameters import (
@@ -22,6 +27,9 @@ from src.model.parameters import (
     load_jurisdiction_parameters,
 )
 from src.model.pipeline import evaluate_single_policy
+from src.utils.logging_config import setup_logging
+
+setup_logging(level="INFO")
 
 SCENARIOS = {
     "A_100pct_testing_uptake": {
@@ -150,10 +158,10 @@ def run_stress_test(
     scenario_name: str, scenario_config: dict[str, Any], jurisdiction: str = "australia"
 ) -> dict[str, Any]:
     """Run a single stress-test scenario through the active policy pipeline."""
-    print(f"\n{'=' * 60}")
-    print(f"Running scenario: {scenario_name}")
-    print(f"Description: {scenario_config['description']}")
-    print(f"{'=' * 60}")
+    logger.info("-" * 60)
+    logger.info(f"Running scenario: {scenario_name}")
+    logger.info(f"Description: {scenario_config['description']}")
+    logger.info("-" * 60)
 
     base_params = build_base_params(jurisdiction)
     params = base_params.model_copy(update=scenario_config["parameters"])
@@ -178,12 +186,12 @@ def run_stress_test(
 
     issues = validate_outputs(output, scenario_name)
     if issues:
-        print("[WARN] Validation issues found:")
+        logger.warning("Validation issues found:")
         for issue in issues:
-            print(f"   - {issue}")
+            logger.warning(f"   - {issue}")
         output["validation_issues"] = issues
     else:
-        print("[PASS] Validation passed")
+        logger.success("Validation passed")
 
     return output
 
@@ -280,12 +288,12 @@ def main() -> None:
     output_dir = Path(args.output)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    print("=" * 60)
-    print("STRESS TEST RUNNER")
-    print("=" * 60)
-    print(f"Jurisdiction: {args.jurisdiction}")
-    print(f"Output directory: {output_dir}")
-    print(f"Scenarios to test: {len(SCENARIOS)}")
+    logger.info("=" * 60)
+    logger.info("STRESS TEST RUNNER")
+    logger.info("=" * 60)
+    logger.info(f"Jurisdiction: {args.jurisdiction}")
+    logger.info(f"Output directory: {output_dir}")
+    logger.info(f"Scenarios to test: {len(SCENARIOS)}")
 
     all_results: dict[str, dict[str, Any]] = {}
 
@@ -301,11 +309,11 @@ def main() -> None:
     summary_file = output_dir / "SUMMARY.md"
     summary_file.write_text(summary, encoding="utf-8")
 
-    print(f"\n{'=' * 60}")
-    print("Stress tests complete!")
-    print(f"Results saved to: {output_dir}")
-    print(f"Summary: {summary_file}")
-    print(f"{'=' * 60}")
+    logger.info("-" * 60)
+    logger.success("Stress tests complete!")
+    logger.info(f"Results saved to: {output_dir}")
+    logger.info(f"Summary: {summary_file}")
+    logger.info("-" * 60)
 
 
 if __name__ == "__main__":

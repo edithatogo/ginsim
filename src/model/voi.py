@@ -70,3 +70,8 @@ def compute_evppi(
     max_e_w = jnp.max(jnp.mean(expected_welfare_matrix, axis=1))
 
     return jnp.maximum(0.0, e_max_e_w_cond - max_e_w)
+
+
+# Aliases for backward compatibility
+evpi = compute_evpi
+evppi = compute_evppi

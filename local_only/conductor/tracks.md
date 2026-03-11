@@ -14,7 +14,6 @@ This registry is the index of Conductor tracks for this repository.
 
 | Track ID | Title | Status | Link |
 |---|---|---|---|
-| gdpe_0047_game_engine_hardening | Game Engine Hardening (Module A & D logic paths) | âœ… Complete | [track](./tracks/gdpe_0047_game_engine_hardening/index.md) |
 
 ## Completed Follow-up Tracks
 
@@ -41,7 +40,8 @@ This registry is the index of Conductor tracks for this repository.
 
 | Track ID | Title | Status | Link |
 |---|---|---|---|
-| gdpe_0014_repo_professionalization | Repository Professionalization & Remote Monitoring | ✅ Complete | [archived](./archive/gdpe_0014_repo_professionalization/index.md) |
+| gdpe_0047_game_engine_hardening | Game Engine Hardening (Module A & D logic paths) | ✅ Complete | [archived](./archive/gdpe_0047_game_engine_hardening/index.md) |
+| gdpe_0014_repo_professionalization | Repository Professionalization & Remote Monitoring | âœ… Complete | [archived](./archive/gdpe_0014_repo_professionalization/index.md) |
 | gdpe_0013_external_validation | External Validation & Historical Concordance | ✅ Complete | [archived](./archive/gdpe_0013_external_validation/index.md) |
 | gdpe_0012_dashboard_enhancements | Dashboard enhancements (diagrams, sensitivity, JAX verification) | ✅ Complete | [archived](./archive/gdpe_0012_dashboard_enhancements/index.md) |
 | gdpe_0011_streamlit_e2e | Streamlit dashboard E2E testing + gin-sim repo | ✅ Complete | [archived](./archive/gdpe_0011_streamlit_e2e/index.md) |

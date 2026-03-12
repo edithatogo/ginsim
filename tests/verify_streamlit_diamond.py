@@ -15,19 +15,19 @@ def test_main_app_diamond_rigor():
     # 1. No initial errors
     assert not at.error, f"Errors found on main page: {at.error}"
 
-    # 2. Verify new narrative title
-    assert "Policy Impact Explorer" in at.title[0].value
+    # 2. Verify title
+    assert "Global Policy Explorer" in at.title[0].value
 
-    # 3. Trigger Model Run
+    # 3. Trigger Evaluation
     # Find button by label
-    run_button = next(b for b in at.button if "Run Model" in b.label)
+    run_button = next(b for b in at.button if "Run Evaluation" in b.label)
     run_button.click().run()
 
     # 4. Check for errors after run
     assert not at.error
 
-    # 5. Verify big-number headlines (Metrics)
-    assert any("People Choosing to Test" in m.label for m in at.metric)
+    # 5. Verify metrics
+    assert any("Testing Uptake" in m.label for m in at.metric)
     assert any("Net Social Benefit" in m.label for m in at.metric)
 
 
@@ -48,7 +48,14 @@ def test_scenarios_page_diamond_rigor():
 
     assert not at.error
     assert "Policy Scenarios & Stories" in at.title[0].value
-    assert any("Status Quo" in b.label for b in at.button)
+    
+    # Trigger analysis to see scenarios
+    run_button = next(b for b in at.button if "Run Comparative Analysis" in b.label)
+    run_button.click().run()
+    
+    assert not at.error
+    # Check if results are shown
+    assert "High-Rigor Comparative Matrix" in at.subheader[0].value
 
 
 def test_delta_view_page_diamond_rigor():

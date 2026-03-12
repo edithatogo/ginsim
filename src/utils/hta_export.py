@@ -49,12 +49,17 @@ class HTAExporter:
         }
 
         # 2. Prepare Inputs (Model Parameters)
-        # We extract key parameters, handling JAX arrays
+        # 3. Prepare Outcomes (Welfare Ledger)
         def _to_plain(val: Any) -> Any:
+            """Recursive conversion of JAX/NumPy types to plain Python."""
             if hasattr(val, "tolist"):
                 return val.tolist()
             if isinstance(val, (np.float32, np.float64, np.int32, np.int64)):
                 return float(val)
+            if isinstance(val, dict):
+                return {k: _to_plain(v) for k, v in val.items()}
+            if isinstance(val, (list, tuple)):
+                return [_to_plain(v) for v in val]
             return val
 
         input_params = {
@@ -63,7 +68,6 @@ class HTAExporter:
             if k not in ["jurisdiction", "calibration_date"]
         }
 
-        # 3. Prepare Outcomes (Welfare Ledger)
         outcomes = {
             "utilitarian_welfare": float(result.welfare_impact),
             "equity_weighted_welfare": float(result.equity_weighted_welfare),
@@ -78,8 +82,9 @@ class HTAExporter:
                 "testing_uptake": float(result.testing_uptake),
                 "compliance_rate": float(result.compliance_rate),
             },
-            "clinical": result.clinical_outcomes,
-            "market": result.insurance_premiums,
+            "clinical": _to_plain(result.clinical_outcomes),
+            "market": _to_plain(result.insurance_premiums),
+            "all_metrics": _to_plain(result.all_metrics),
         }
 
         # 4. Assemble Dossier

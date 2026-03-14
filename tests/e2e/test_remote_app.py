@@ -8,74 +8,81 @@ from playwright.sync_api import Frame, Page, sync_playwright
 
 REMOTE_DASHBOARD_URL = os.environ.get("GDPE_REMOTE_DASHBOARD_URL")
 REMOTE_DASHBOARD_TIMEOUT_MS = int(os.environ.get("GDPE_REMOTE_DASHBOARD_TIMEOUT_MS", "420000"))
-EXPECTED_HEADING = "Policy Impact Explorer"
-EXPECTED_NAV_BUTTONS = (
-    "Main Dashboard",
-    "Evidence Explorer",
-)
+EXPECTED_HEADING = "Genetic Discrimination: Global Policy Explorer"
 EXPECTED_SIDEBAR_PAGES = (
-    ("Game Diagrams", "Game Diagrams"),
-    ("Sensitivity", "Sensitivity Analysis"),
+    ("Game Diagrams", "Game-Theoretic Module Diagrams"),
+    ("Sensitivity", "Comprehensive Sensitivity & VOI Suite"),
     ("Scenarios", "Policy Scenarios & Stories"),
     ("Extended Games", "Extended Strategic Games"),
-    ("Delta View", "Fairness Audit"),
+    ("Delta View", "Policy Fairness Audit"),
 )
 EXPECTED_RESULT_LABELS = (
-    "People Choosing to Test",
+    "Testing Uptake",
     "Net Social Benefit",
 )
 KNOWN_ERROR_TEXT = (
     "Error installing requirements.",
     "Error running app",
     "This app has encountered an error",
+    "TypeError:",
+    "Traceback:",
     "Could not find page:",
     "Please contact support.",
 )
 
 
-def _surface_text(page: Page) -> str:
+def _surface_text(surface: Page | Frame) -> str:
     """Read outer page text defensively for smoke assertions."""
     try:
-        return page.locator("body").inner_text(timeout=10_000)
+        return surface.locator("body").inner_text(timeout=10_000)
     except Exception:
         return ""
 
 
-def _frame_body_text(frame: Frame) -> str:
-    """Read a frame body if it is accessible and rendered."""
-    try:
-        return frame.locator("body").inner_text(timeout=5_000)
-    except Exception:
-        return ""
-
-
-def _dashboard_frame_and_text(page: Page) -> tuple[Frame | None, str]:
-    """Return the Streamlit app frame and its text when available."""
+def _dashboard_surface_and_text(page: Page) -> tuple[Page | Frame | None, str]:
+    """Return the Streamlit app surface and its text when available."""
     for frame in page.frames:
-        body_text = _frame_body_text(frame)
-        if EXPECTED_HEADING in body_text:
+        body_text = _surface_text(frame)
+        if EXPECTED_HEADING in body_text or "Adjust Assumptions" in body_text:
             return frame, body_text
 
-    return None, _surface_text(page)
+    body_text = _surface_text(page)
+    if EXPECTED_HEADING in body_text or "Adjust Assumptions" in body_text:
+        return page, body_text
+
+    return None, body_text
 
 
-def _wait_for_frame_text(frame: Frame, expected_text: str, timeout_ms: int = 30_000) -> str:
-    """Wait until expected text appears in the dashboard frame."""
+def _wait_for_surface_text(surface: Page | Frame, expected_text: str, timeout_ms: int = 30_000) -> str:
+    """Wait until expected text appears in the dashboard surface."""
     deadline = time.time() + (timeout_ms / 1000)
     last_text = ""
 
     while time.time() < deadline:
-        body_text = _frame_body_text(frame)
+        body_text = _surface_text(surface)
         if expected_text in body_text:
             return body_text
 
         last_text = body_text[:500]
-        frame.page.wait_for_timeout(1_500)
+        if isinstance(surface, Frame):
+            surface.page.wait_for_timeout(1_500)
+        else:
+            surface.wait_for_timeout(1_500)
 
     pytest.fail(f"Timed out waiting for {expected_text!r}. Last frame text: {last_text}")
 
 
-def _wait_for_dashboard(page: Page, remote_url: str) -> tuple[Frame, str]:
+def _click_and_wait(surface: Page | Frame, button_name: str, expected_text: str, timeout_ms: int = 45_000) -> str:
+    """Click a button and wait for the expected output text to appear."""
+    surface.get_by_role("button", name=button_name).click(timeout=30_000)
+    if isinstance(surface, Frame):
+        surface.page.wait_for_timeout(3_000)
+    else:
+        surface.wait_for_timeout(3_000)
+    return _wait_for_surface_text(surface, expected_text, timeout_ms=timeout_ms)
+
+
+def _wait_for_dashboard(page: Page, remote_url: str) -> tuple[Page | Frame, str]:
     """Poll until the deployed dashboard becomes available or timeout expires."""
     deadline = time.time() + (REMOTE_DASHBOARD_TIMEOUT_MS / 1000)
     last_state = "dashboard did not render"
@@ -85,10 +92,10 @@ def _wait_for_dashboard(page: Page, remote_url: str) -> tuple[Frame, str]:
             page.goto(remote_url, wait_until="domcontentloaded", timeout=120_000)
 
         page.wait_for_timeout(8_000)
-        dashboard_frame, body_text = _dashboard_frame_and_text(page)
+        dashboard_surface, body_text = _dashboard_surface_and_text(page)
 
-        if dashboard_frame is not None:
-            return dashboard_frame, body_text
+        if dashboard_surface is not None:
+            return dashboard_surface, body_text
 
         matched_error = next((text for text in KNOWN_ERROR_TEXT if text in body_text), None)
         if matched_error is not None:
@@ -105,7 +112,7 @@ def _wait_for_dashboard(page: Page, remote_url: str) -> tuple[Frame, str]:
     )
 
 
-@pytest.mark.slow()
+@pytest.mark.slow
 def test_remote_app_loads():
     """Verify the deployed Streamlit app loads and core controls execute."""
     if not REMOTE_DASHBOARD_URL:
@@ -117,28 +124,55 @@ def test_remote_app_loads():
         page = context.new_page()
 
         try:
-            dashboard_frame, body_text = _wait_for_dashboard(page, REMOTE_DASHBOARD_URL)
+            dashboard_surface, body_text = _wait_for_dashboard(page, REMOTE_DASHBOARD_URL)
 
             assert EXPECTED_HEADING in body_text
             assert "Adjust Assumptions" in body_text
-            assert "Advanced Controls" in body_text
+            assert "Distributional Equity" in body_text
 
-            # Run the model
-            run_btn = dashboard_frame.get_by_role("button", name="🔬 Run Model Analysis")
+            run_btn = dashboard_surface.get_by_role("button", name="🔬 Run Evaluation")
             run_btn.click(timeout=30_000)
             page.wait_for_timeout(8_000)
 
-            body_text = _frame_body_text(dashboard_frame)
+            body_text = _surface_text(dashboard_surface)
             for label in EXPECTED_RESULT_LABELS:
                 assert label in body_text
 
-            # Check sidebar navigation
-            sidebar_nav = dashboard_frame.get_by_test_id("stSidebarNavItems")
+            sidebar_nav = dashboard_surface.get_by_test_id("stSidebarNavItems")
             for sidebar_label, expected_heading in EXPECTED_SIDEBAR_PAGES:
                 sidebar_nav.get_by_role("link", name=sidebar_label).click(timeout=30_000)
                 page.wait_for_timeout(5_000)
-                body_text = _wait_for_frame_text(dashboard_frame, expected_heading)
+                body_text = _wait_for_surface_text(dashboard_surface, expected_heading)
                 assert expected_heading in body_text
+
+                if sidebar_label == "Sensitivity":
+                    body_text = _click_and_wait(
+                        dashboard_surface,
+                        "🎲 Run PSA Simulation",
+                        "Expected Uptake (Mean)",
+                    )
+                    assert "Expected Welfare (Mean)" in body_text
+                elif sidebar_label == "Scenarios":
+                    body_text = _click_and_wait(
+                        dashboard_surface,
+                        "🔍 Run Comparative Analysis",
+                        "High-Rigor Comparative Matrix",
+                    )
+                    assert "Net Social Benefit" in body_text
+                elif sidebar_label == "Extended Games":
+                    body_text = _click_and_wait(
+                        dashboard_surface,
+                        "🔬 Run Game Simulation",
+                        "Reconstruction Accuracy",
+                    )
+                    assert "Welfare Loss" in body_text
+                elif sidebar_label == "Delta View":
+                    body_text = _click_and_wait(
+                        dashboard_surface,
+                        "⚖️ Audit Policies",
+                        "Fairness Verdict Matrix",
+                    )
+                    assert "Ethical Category" in body_text
 
             logger.success("Remote verification passed.")
         finally:

@@ -151,7 +151,7 @@ def test_remote_app_loads():
                         "🎲 Run PSA Simulation",
                         "Expected Uptake (Mean)",
                     )
-                    assert "Expected Welfare (Mean)" in body_text
+                    assert "95% CrI:" in body_text
                 elif sidebar_label == "Scenarios":
                     body_text = _click_and_wait(
                         dashboard_surface,

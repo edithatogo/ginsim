@@ -1,38 +1,64 @@
 """
-Narrative Fairness Audit Logic.
-
-Translates mathematical welfare outcomes into ethical/fairness categories.
+Fairness and distributional equity analysis module.
 """
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+from typing import Any
+
+
+@dataclass(frozen=True)
+class FairnessResult:
+    """Metrics for policy fairness audit."""
+
+    is_fair: bool
+    score: float
+    verdict: str
+    reasons: list[str]
+
 
 def audit_policy_fairness(
-    uptake_delta: float,
-    welfare_delta: float,
-    premium_change: float,
-) -> dict[str, str]:
+    uptake_delta: Any,
+    welfare_delta: Any,
+    premium_delta: Any,
+) -> FairnessResult:
     """
-    Categorize a policy shift based on ethical frameworks.
+    Audit a policy reform for distributional fairness.
+    Uses Any to allow JAX tracers.
     """
-    verdict = "Neutral"
-    rationale = "The policy maintains the status quo distribution of costs and benefits."
+    reasons = []
 
-    # 1. Rawlsian Equity (Focus on high-risk/vulnerable)
-    if uptake_delta > 0.05 and premium_change <= 0:
-        verdict = "Rawlsian Equity"
-        rationale = "Significantly increases participation for vulnerable groups without increasing financial barriers."
+    # 1. Equity of Access (Uptake)
+    # If uptake increases, it's generally fairer (less deterrence)
+    u_fair = float(uptake_delta) >= -0.01
+    if not u_fair:
+        reasons.append("Significant decrease in testing uptake suggests increased deterrents.")
 
-    # 2. Utilitarian Efficiency
-    elif welfare_delta > 1000000:
-        verdict = "Utilitarian Efficiency"
-        rationale = "Maximizes total societal benefit, even if some individual costs increase."
+    # 2. Economic Efficiency (Welfare)
+    w_fair = float(welfare_delta) >= 0.0
+    if not w_fair:
+        reasons.append("Net social welfare loss detected.")
 
-    # 3. Precautionary Protection
-    elif uptake_delta > 0 and premium_change > 0:
-        verdict = "Precautionary Protection"
-        rationale = (
-            "Prioritizes information concealment and testing uptake over market pricing efficiency."
-        )
+    # 3. Consumer Protection (Premiums)
+    p_fair = float(premium_delta) <= 0.05
+    if not p_fair:
+        reasons.append("Excessive premium loading for high-risk individuals.")
 
-    return {"ethical_category": verdict, "narrative_rationale": rationale}
+    # Aggregate
+    is_fair = u_fair and w_fair and p_fair
+    score = (float(u_fair) + float(w_fair) + float(p_fair)) / 3.0
+
+    if is_fair:
+        verdict = "FAIR: Policy enhances or maintains social equity."
+    elif score >= 0.6:
+        verdict = "MARGINAL: Policy has trade-offs but overall acceptable."
+    else:
+        verdict = "UNFAIR: Policy introduces significant inequities."
+
+    return FairnessResult(
+        is_fair=is_fair,
+        score=score,
+        verdict=verdict,
+        reasons=reasons
+    )

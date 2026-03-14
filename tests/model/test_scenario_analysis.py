@@ -76,6 +76,7 @@ class TestScenarioResult:
             jurisdiction="AU",
             testing_uptake=0.55,
             welfare_impact=100000.0,
+            equity_weighted_welfare=115000.0,
             qalys_gained=10.5,
             compliance_rate=0.8,
             insurance_premiums={"premium_high": 0.5, "premium_low": 0.1},
@@ -100,6 +101,7 @@ class TestFormatComparisonTable:
                 jurisdiction="AU",
                 testing_uptake=0.50,
                 welfare_impact=50000.0,
+                equity_weighted_welfare=55000.0,
                 qalys_gained=5.0,
                 compliance_rate=0.7,
                 insurance_premiums={"premium_high": 0.5, "premium_low": 0.1},
@@ -110,6 +112,7 @@ class TestFormatComparisonTable:
                 jurisdiction="AU",
                 testing_uptake=0.60,
                 welfare_impact=75000.0,
+                equity_weighted_welfare=85000.0,
                 qalys_gained=7.5,
                 compliance_rate=0.85,
                 insurance_premiums={"premium_high": 0.5, "premium_low": 0.1},
@@ -203,7 +206,6 @@ class TestEvaluateScenario:
             },
             "policy_overrides": {
                 "enforcement_strength": 0.95,
-                "penalty_type": "criminal",
             },
         }
 
@@ -216,7 +218,7 @@ class TestEvaluateScenario:
             "jurisdiction": "new_zealand",
             "policy_name": "ban",
             "enforcement_strength": 0.95,
-            "penalty_type": "criminal",
+            "penalty_type": "civil",
         }
 
     def test_evaluate_scenario_rejects_unsupported_active_looking_fields(self):

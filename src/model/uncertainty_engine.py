@@ -49,12 +49,12 @@ def calculate_summary_stats(results: Array, n_subsamples: int = 100) -> dict[str
     }
 
 
-def evaluate_core_numerical(params: ModelParameters, policy: PolicyConfig) -> dict[str, Any]:
+def evaluate_core_numerical(params: ModelParameters, policy: PolicyConfig) -> dict[str, Array]:
     """
     JIT-compatible numerical kernel that returns only arrays.
     """
     # Use global evaluate_single_policy but extract only numbers
-    res = evaluate_single_policy(params, policy)
+    res = evaluate_single_policy(params, policy, include_proofs=False)
     return {
         "uptake": res.testing_uptake,
         "welfare": res.welfare_impact,
@@ -136,7 +136,7 @@ def run_psa(
         "time_horizon": _to_batch(getattr(base_params, "time_horizon", 10)),
         "tech_improvement_rate": _to_batch(getattr(base_params, "tech_improvement_rate", 0.15)),
     }
-    batch_params = ModelParameters.model_validate(batch_params_data)
+    batch_params = ModelParameters(**batch_params_data)
 
     raw_results = evaluate_batch(batch_params, policy)
 
@@ -199,7 +199,7 @@ def run_full_voi_analysis(
         "time_horizon": _to_batch(getattr(base_params, "time_horizon", 10)),
         "tech_improvement_rate": _to_batch(getattr(base_params, "tech_improvement_rate", 0.15)),
     }
-    batch_params = ModelParameters.model_validate(batch_params_data)
+    batch_params = ModelParameters(**batch_params_data)
 
     welfare_matrix = []
     for p in policy_list:

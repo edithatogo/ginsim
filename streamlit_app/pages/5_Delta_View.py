@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 """
-Comparative Delta View Page
-
-Side-by-side policy comparison with Narrative Fairness Audit.
+Delta View: Cross-Scenario Fairness Audit Page.
 """
 
 import sys
@@ -15,47 +13,25 @@ sys.path.insert(0, str(project_root))
 import pandas as pd
 import streamlit as st
 
-# Import from core model
-from src.model.fairness import audit_policy_fairness  # New import
+from src.model.fairness import audit_policy_fairness
 from src.model.pipeline import evaluate_single_policy
 from src.model.scenario_analysis import evaluate_scenario, load_scenarios
 
-# Page configuration
-st.set_page_config(
-    page_title="Policy Comparison & Fairness Audit",
-    page_icon="⚖️",
-    layout="wide",
-    initial_sidebar_state="expanded",
+st.set_page_config(page_title="Fairness Audit", page_icon="⚖️", layout="wide")
+
+st.title("⚖️ Policy Fairness Audit")
+st.markdown("Auditing policy reforms against the 'Separating' Status Quo baseline.")
+
+# Controls
+jurisdiction = st.sidebar.selectbox(
+    "Jurisdiction", ["Australia", "New Zealand", "UK", "Canada", "US"]
 )
+baseline_key = "au_status_quo"
 
-# Title
-st.title("⚖️ Policy Comparison & Fairness Audit")
-st.markdown("""
-**How do policies compare against the baseline?**
-This page evaluates the 'Fairness' of each policy shift using established ethical frameworks.
-""")
+scenarios = load_scenarios(project_root / "configs" / "scenarios.yaml")
 
-# Sidebar config (reused from previous version)
-st.sidebar.header("⚙️ Comparison Settings")
-SCENARIOS_CONFIG = Path(__file__).parent.parent.parent / "configs" / "scenarios.yaml"
-
-
-@st.cache_data
-def load_scenarios_cached():
-    return load_scenarios(SCENARIOS_CONFIG)
-
-
-scenarios = load_scenarios_cached()
-
-baseline_key = st.sidebar.selectbox("Select Baseline", list(scenarios.keys()), index=0)
-available_policies = [k for k in scenarios if k != baseline_key]
-selected_policies = st.sidebar.multiselect(
-    "Compare Against:", available_policies, default=available_policies[:2]
-)
-
-# Run Analysis
-if st.sidebar.button("⚖️ Audit Policies", type="primary"):
-    with st.spinner("Auditing for fairness and impact..."):
+if st.button("⚖️ Audit Policies", type="primary"):
+    with st.spinner("Executing fairness audit matrix..."):
 
         def model_func(params, policy):
             return evaluate_single_policy(params, policy)
@@ -64,40 +40,40 @@ if st.sidebar.button("⚖️ Audit Policies", type="primary"):
         b_res = evaluate_scenario(baseline_key, scenarios[baseline_key], model_func)
 
         results = []
+        selected_policies = ["au_moratorium", "au_ban"]
+
         for pk in selected_policies:
+            if pk not in scenarios:
+                continue
             r = evaluate_scenario(pk, scenarios[pk], model_func)
 
-            # Run Fairness Audit
-            u_delta = r.testing_uptake - b_res.testing_uptake
-            w_delta = r.welfare_impact - b_res.welfare_impact
-            p_delta = (
-                r.insurance_premiums["premium_high"] - b_res.insurance_premiums["premium_high"]
+            u_delta = float(r.testing_uptake) - float(b_res.testing_uptake)
+            w_delta = float(r.welfare_impact) - float(b_res.welfare_impact)
+            ew_delta = float(r.equity_weighted_welfare) - float(b_res.equity_weighted_welfare)
+            p_delta = float(r.insurance_premiums["premium_high"]) - float(
+                b_res.insurance_premiums["premium_high"]
             )
 
+            # Fairness audit uses utilitarian welfare delta for the core check
+            # but we surface both in the table.
             fairness = audit_policy_fairness(u_delta, w_delta, p_delta)
 
             results.append(
                 {
                     "Policy": scenarios[pk].get("name", pk),
                     "Uptake Delta": f"{u_delta:+.1%}",
-                    "Benefit Delta": f"${w_delta:+,.0f}",
-                    "Ethical Category": fairness["ethical_category"],
-                    "Fairness Rationale": fairness["narrative_rationale"],
+                    "Utilitarian Delta": f"${w_delta:+,.0f}",
+                    "Equity-Weighted Delta": f"${ew_delta:+,.0f}",
+                    "Ethical Category": "FAIR" if fairness.is_fair else "UNFAIR",
+                    "Fairness Rationale": "; ".join(fairness.reasons)
+                    if fairness.reasons
+                    else "Maintains equity.",
                 }
             )
-        st.session_state["fairness_results"] = results
 
-# Display Audit Table
-if "fairness_results" in st.session_state:
-    st.subheader("🏁 The Fairness Verdict")
-    st.table(pd.DataFrame(st.session_state["fairness_results"]))
-
-    st.info("""
-    **Understanding Ethical Categories:**
-    - **Rawlsian Equity:** Prioritizes outcomes for the most vulnerable (high genetic risk).
-    - **Utilitarian Efficiency:** Prioritizes the greatest net benefit for the largest number of people.
-    - **Precautionary Protection:** Prioritizes information safety even at a minor cost to market efficiency.
-    """)
+        df = pd.DataFrame(results)
+        st.subheader("Fairness Verdict Matrix")
+        st.table(df)
 
 st.divider()
-st.caption("Developed by Authors' analysis • 2026.03")
+st.caption("Developed by Dylan A Mordaunt • 2026.03 • Fairness Engine Active")

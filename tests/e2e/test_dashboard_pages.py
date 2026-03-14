@@ -9,10 +9,9 @@ def test_sensitivity_page_runs_analysis() -> None:
     app.run()
     assert "Comprehensive Sensitivity & VOI Suite" in app.title[0].value
 
-    run_button = next(b for b in app.button if "Generate Tornado Chart" in b.label)
-    run_button.click().run()
+    run_button_psa = next(b for b in app.button if "Run PSA Simulation" in b.label)
+    run_button_psa.click().run()
 
-    # AppTest check for charts
     assert len(app.get("plotly_chart")) >= 1
 
 
@@ -41,7 +40,6 @@ def test_extended_games_page_runs_each_game(game_name: str, expected_metric: str
     app.run()
     assert "Extended Strategic Games" in app.title[0].value
 
-    # Page 4 uses radio for game selection
     app.radio[0].set_value(game_name).run()
 
     run_button = next(b for b in app.button if "Run Game" in b.label)
@@ -58,4 +56,4 @@ def test_delta_view_page_runs_comparison_and_download() -> None:
     run_button = next(b for b in app.button if "Audit Policies" in b.label)
     run_button.click().run()
 
-    assert any("Fairness Verdict" in sub.value for sub in app.subheader)
+    assert any("Fairness Verdict Matrix" in sub.value for sub in app.subheader)

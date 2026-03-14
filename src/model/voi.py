@@ -1,75 +1,77 @@
 """
-VOI: Value of Information utilities
+VOI (Value of Information) calculation engine.
 
-Scaffold module: replace placeholders with jurisdiction-specific, data-driven implementations.
-
-Design goals:
-- Pure functions compatible with JAX transforms (jit, vmap, scan).
-- Deterministic randomness via explicit PRNG keys.
-- Vectorized computations where possible.
+Implements expected value of perfect information (EVPI) and partial information (EVPPI)
+logic for genetic policy uncertainty.
 """
 
 from __future__ import annotations
 
-try:
-    import jax
-    import jax.numpy as jnp
-except Exception as e:
-    msg = (
-        "JAX (and jaxlib) must be installed to run this module. "
-        "Install platform-appropriate jaxlib and rerun."
-    )
-    raise ImportError(
-        msg,
-    ) from e
+import jax
+import jax.numpy as jnp
+from jax import jit
+from jaxtyping import Array, Float
 
 
-def evpi(net_benefit: jnp.ndarray) -> jnp.ndarray:
+@jit
+def compute_evpi(
+    expected_welfare_matrix: Float[Array, "n_policies n_draws"],
+) -> Float[Array, ""]:
     """
-    Expected Value of Perfect Information.
-    net_benefit: array [S, P] where S draws, P policies. Higher is better.
-    EVPI = E[max_p NB] - max_p E[NB]
+    Calculate EVPI as the difference between information-first and baseline-first expectations.
     """
-    term1 = jnp.mean(jnp.max(net_benefit, axis=1))
-    term2 = jnp.max(jnp.mean(net_benefit, axis=0))
-    return term1 - term2
+    # Mean of max vs max of means
+    e_max_w = jnp.mean(jnp.max(expected_welfare_matrix, axis=0))
+    max_e_w = jnp.max(jnp.mean(expected_welfare_matrix, axis=1))
+    return jnp.maximum(0.0, e_max_w - max_e_w)
 
 
-def evppi(net_benefit: jnp.ndarray, param_samples: jnp.ndarray, n_bins: int = 20) -> jnp.ndarray:
+@jit(static_argnames=["n_bins"])
+def compute_evppi(
+    expected_welfare_matrix: Float[Array, "n_policies n_draws"],
+    parameter_draws: Float[Array, "*"],
+    n_bins: int = 20,
+) -> Float[Array, ""]:
     """
-    Very lightweight EVPPI estimator by binning a scalar parameter.
-    For production, replace with regression-based EVPPI (e.g., GAM/GP) or
-    nested Monte Carlo with smoothing.
-
-    net_benefit: [S, P]
-    param_samples: [S]
+    Calculate EVPPI for a specific parameter using a stratified mean approach.
+    Efficient JAX implementation avoiding nested loops.
     """
-    # sort by parameter
-    idx = jnp.argsort(param_samples)
-    nb = net_benefit[idx]
-    ps = param_samples[idx]
+    n_draws = expected_welfare_matrix.shape[1]
 
-    # bin edges by quantiles
-    qs = jnp.linspace(0.0, 1.0, n_bins + 1)
-    edges = jnp.quantile(ps, qs)
+    # 1. Bin the parameter draws
+    p_min, p_max = jnp.min(parameter_draws), jnp.max(parameter_draws)
+    # Avoid zero range
+    safe_p_max = jnp.maximum(p_max, p_min + 1e-7)
 
-    def bin_value(i: jnp.ndarray) -> jnp.ndarray:
-        lo, hi = edges[i], edges[i + 1]
-        last_bin = i == (n_bins - 1)
-        upper_ok = jnp.where(last_bin, ps <= hi, ps < hi)
-        m = (ps >= lo) & upper_ok
-        weights = m.astype(nb.dtype)
-        count = jnp.sum(weights)
-        weighted_nb = nb * weights[:, None]
-        mean_by_policy = jnp.where(
-            count > 0,
-            jnp.sum(weighted_nb, axis=0) / jnp.maximum(count, 1.0),
-            jnp.zeros(nb.shape[1], dtype=nb.dtype),
-        )
-        w = jnp.mean(weights)
-        val = jnp.where(count > 0, jnp.max(mean_by_policy), 0.0)
-        return w * val
+    # Calculate bin indices for each draw
+    bins = jnp.floor((parameter_draws - p_min) / (safe_p_max - p_min) * n_bins).astype(jnp.int32)
+    bins = jnp.clip(bins, 0, n_bins - 1)
 
-    term1 = jnp.sum(jax.vmap(bin_value)(jnp.arange(n_bins)))
-    term2 = jnp.max(jnp.mean(net_benefit, axis=0))
-    return term1 - term2
+    # 2. Compute conditional expected welfare for each policy in each bin
+    # We use segments for efficient grouping
+    def get_bin_means(policy_row):
+        bin_sums = jnp.zeros(n_bins).at[bins].add(policy_row)
+        bin_counts = jnp.zeros(n_bins).at[bins].add(1.0)
+        return bin_sums / jnp.maximum(bin_counts, 1.0)
+
+    # Map over all policies
+    conditional_welfare = jax.vmap(get_bin_means)(expected_welfare_matrix)
+
+    # 3. EVPPI Calculation
+    # E [ max_j (E[W|p]) ]
+    # We take the mean across bins, weighted by bin counts
+    bin_counts = jnp.zeros(n_bins).at[bins].add(1.0)
+    bin_probs = bin_counts / n_draws
+
+    inner_expectations = jnp.max(conditional_welfare, axis=0)
+    e_max_e_w_cond = jnp.sum(inner_expectations * bin_probs)
+
+    # Max of overall means (same as in EVPI)
+    max_e_w = jnp.max(jnp.mean(expected_welfare_matrix, axis=1))
+
+    return jnp.maximum(0.0, e_max_e_w_cond - max_e_w)
+
+
+# Aliases for backward compatibility
+evpi = compute_evpi
+evppi = compute_evppi

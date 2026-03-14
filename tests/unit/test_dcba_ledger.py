@@ -156,12 +156,14 @@ class TestFormatDCBAResult:
         """Test that formatting returns a string."""
         result = DCBAResult(
             net_welfare=jnp.array(1000),
+            equity_weighted_welfare=jnp.array(1200),
             consumer_surplus=jnp.array(500),
             producer_surplus=jnp.array(200),
             health_benefits=jnp.array(400),
             fiscal_impact=jnp.array(-100),
-            distributional_weight=jnp.array(1.0),
             research_externalities=jnp.array(0.0),
+            distributional_weight=jnp.array(1.0),
+            equity_factor=jnp.array(1.2),
         )
 
         formatted = format_dcba_result(result)
@@ -169,4 +171,4 @@ class TestFormatDCBAResult:
         assert isinstance(formatted, str)
         assert "DCBA" in formatted
         assert "Consumer Surplus" in formatted
-        assert "Net Welfare" in formatted
+        assert "Utilitarian Welfare" in formatted

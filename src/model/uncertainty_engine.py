@@ -213,4 +213,3 @@ def run_full_voi_analysis(
         },
         "w_matrix": w_matrix,
     }
-}

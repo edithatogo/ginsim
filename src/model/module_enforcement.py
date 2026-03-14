@@ -28,11 +28,19 @@ class DictObject(dict[str, Any]):
         self[name] = value
 
 
+# Register for JAX
+jax.tree_util.register_pytree_node(
+    DictObject,
+    lambda x: (tuple(x.values()), tuple(x.keys())),
+    lambda keys, values: DictObject(dict(zip(keys, values, strict=True))),
+)
+
+
 @jit
 def _compute_expected_penalty_jit(
-    penalty_max: float | Array,
-    detection_prob: float | Array,
-    enforcement_effectiveness: float | Array,
+    penalty_max: Any,
+    detection_prob: Any,
+    enforcement_effectiveness: Any,
 ) -> Float[Array, ""]:
     return (
         jnp.asarray(penalty_max)
@@ -44,20 +52,22 @@ def _compute_expected_penalty_jit(
 def compute_expected_penalty(
     penalty_max: Any,
     detection_prob: Any = 0.05,
-    enforcement_effectiveness: Any = 0.5,
+    enforcement_effectiveness: Any = 1.0,
     **kwargs: Any,
-) -> Any:
+) -> Float[Array, ""]:
     """Public wrapper with alias support."""
     d_prob = kwargs.get("detection_probability", detection_prob)
     return _compute_expected_penalty_jit(
-        float(penalty_max), float(d_prob), float(enforcement_effectiveness)
+        jnp.asarray(penalty_max),
+        jnp.asarray(d_prob),
+        jnp.asarray(enforcement_effectiveness)
     )
 
 
 @jit
 def _compute_compliance_decision_jit(
-    expected_penalty: float | Array,
-    compliance_cost: float | Array,
+    expected_penalty: Any,
+    compliance_cost: Any,
 ) -> Float[Array, ""]:
     diff = jnp.asarray(expected_penalty) - jnp.asarray(compliance_cost)
     return jax.nn.sigmoid(diff)
@@ -70,7 +80,10 @@ def compute_compliance_decision(
 ) -> Any:
     """Public wrapper with alias support."""
     benefit = kwargs.get("violation_benefit", compliance_cost)
-    return _compute_compliance_decision_jit(float(expected_penalty), float(benefit))
+    return _compute_compliance_decision_jit(
+        jnp.asarray(expected_penalty),
+        jnp.asarray(benefit)
+    )
 
 
 def compute_compliance_equilibrium(
@@ -108,8 +121,8 @@ def compute_enforcement_effect(
         strength = getattr(reform_policy, "enforcement_strength", 1.0)
         effectiveness = getattr(params, "enforcement_effectiveness", 0.5)
     else:
-        strength = float(params)
-        effectiveness = float(baseline_policy) if baseline_policy is not None else 0.5
+        strength = params
+        effectiveness = baseline_policy if baseline_policy is not None else 0.5
 
     res = jnp.clip(jnp.asarray(strength) * jnp.asarray(effectiveness), 0.0, 1.0)
     return DictObject(
@@ -133,7 +146,7 @@ def compute_optimal_enforcement(
         budget = getattr(params, "enforcement_budget", 1000000.0)
         marginal_cost = getattr(params, "marginal_cost_enforcement", 0.1)
     else:
-        budget = float(params)
+        budget = params
         marginal_cost = 0.1
 
     res = jnp.clip(jnp.asarray(budget) / (jnp.asarray(marginal_cost) + 1e-10), 0.0, 1.0)
@@ -152,8 +165,8 @@ def compute_violation_benefit(
     loading_savings: Any = 0.1,
 ) -> Any:
     """Compute benefit of policy violation."""
-    r = 0.2 if hasattr(risk_reduction, "baseline_loading") else float(risk_reduction)
-    ls = 0.1 if hasattr(loading_savings, "allow_genetic_test_results") else float(loading_savings)
+    r = 0.2 if hasattr(risk_reduction, "baseline_loading") else risk_reduction
+    ls = 0.1 if hasattr(loading_savings, "allow_genetic_test_results") else loading_savings
     return jnp.asarray(r) + jnp.asarray(ls)
 
 

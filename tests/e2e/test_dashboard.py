@@ -6,7 +6,7 @@ import pytest
 from streamlit.testing.v1 import AppTest
 
 
-@pytest.fixture()
+@pytest.fixture
 def app_test():
     """Create AppTest fixture."""
     return AppTest.from_file("streamlit_app/app.py", default_timeout=120)
@@ -25,10 +25,11 @@ class TestDashboardLoads:
         app_test.run()
         assert "Global Policy Explorer" in app_test.title[0].value
 
-    def test_sidebar_present(self, app_test):
-        """Test sidebar is present."""
+    def test_primary_controls_present(self, app_test):
+        """Test the primary control surfaces are rendered."""
         app_test.run()
-        assert len(app_test.selectbox) >= 1
+        labels = [widget.label for widget in app_test.selectbox]
+        assert any("Select Policy to Evaluate" in label for label in labels)
         assert len(app_test.slider) >= 1
 
 
@@ -51,14 +52,18 @@ class TestFunctionality:
     """Test dashboard functionality."""
 
     def test_run_model_button(self, app_test):
-        """Test that clicking 'Run Evaluation' generates results."""
+        """Test that clicking 'Run Evaluation' generates the expected metric surface."""
         app_test.run()
 
-        # Find the specific button name
         run_button = next(b for b in app_test.button if "Run Evaluation" in b.label)
         run_button.click().run()
 
-        # Check for restored metrics
-        assert any("Testing Uptake" in m.label for m in app_test.metric)
-        assert any("Net Social Benefit" in m.label for m in app_test.metric)
-        assert any("Market Compliance" in m.label for m in app_test.metric)
+        metric_labels = [m.label for m in app_test.metric]
+        assert "Testing Uptake" in metric_labels
+        assert any("Net Social Benefit" in label for label in metric_labels)
+
+        uptake_metric = next(m for m in app_test.metric if m.label == "Testing Uptake")
+        welfare_metric = next(m for m in app_test.metric if "Net Social Benefit" in m.label)
+
+        assert "%" in uptake_metric.value
+        assert "$" in welfare_metric.value

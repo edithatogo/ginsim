@@ -14,7 +14,7 @@ from src.model.module_enforcement import (
     compute_violation_benefit,
     get_standard_enforcement_parameters,
 )
-from src.model.parameters import ModelParameters, get_default_parameters, PolicyConfig
+from src.model.parameters import PolicyConfig, get_default_parameters
 
 
 class TestDetectionProbability:

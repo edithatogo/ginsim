@@ -14,7 +14,7 @@ from src.model.module_c_insurance_eq import (
     pooling_equilibrium,
     separating_equilibrium,
 )
-from src.model.parameters import ModelParameters, get_default_parameters, PolicyConfig
+from src.model.parameters import PolicyConfig, get_default_parameters
 
 
 def main():

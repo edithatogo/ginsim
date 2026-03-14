@@ -11,7 +11,7 @@ from src.model.module_d_proxy import (
     compute_underwriting_accuracy,
     get_standard_features,
 )
-from src.model.parameters import ModelParameters, get_default_parameters
+from src.model.parameters import get_default_parameters
 
 
 class TestRiskScore:

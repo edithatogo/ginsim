@@ -7,9 +7,9 @@ from streamlit.testing.v1 import AppTest
 def test_sensitivity_page_runs_analysis() -> None:
     app = AppTest.from_file("streamlit_app/pages/2_Sensitivity.py", default_timeout=60)
     app.run()
-    assert "Sensitivity & Robustness Analysis" in app.title[0].value
+    assert "Comprehensive Sensitivity & VOI Suite" in app.title[0].value
 
-    run_button = next(b for b in app.button if "Run Tornado Analysis" in b.label)
+    run_button = next(b for b in app.button if "Generate Tornado Chart" in b.label)
     run_button.click().run()
 
     # AppTest check for charts

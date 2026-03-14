@@ -5,7 +5,6 @@ Parameter schemas and loading logic for the economic model.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
 import yaml
 from pydantic import BaseModel, ConfigDict
@@ -54,6 +53,8 @@ class ModelParameters(BaseModel):
     research_participation_value: float
     ppp_conversion_factor: float = 1.0
     high_sum_insured_share: float = 0.25  # Share of market above typical caps
+    equity_factor: float = 1.0
+    taper_range: float = 0.0
 
     # Enforcement
     enforcement_effectiveness: float
@@ -62,6 +63,15 @@ class ModelParameters(BaseModel):
     marginal_cost_enforcement: float
     compliance_cost_fixed: float
     detection_prob_baseline: float
+    acc_deterrence_offset: float = 0.0
+    pharmac_qaly_threshold: float = 50000.0
+    medicare_cost_share: float = 0.0
+    audit_intensity: float = 0.5
+    audit_intensity_apra: float = 0.5
+    audit_intensity_asic: float = 0.5
+    remoteness_weight: float = 0.2
+    time_horizon: int = 10
+    tech_improvement_rate: float = 0.15
 
     # Metadata
     jurisdiction: str
@@ -78,20 +88,20 @@ def load_jurisdiction_parameters(jurisdiction: str) -> ModelParameters:
     # Look for config relative to project root
     # Try multiple common locations for reliability
     roots = [Path.cwd(), Path(__file__).parent.parent.parent]
-    
+
     config_path = None
     for root in roots:
         target = root / "configs" / "jurisdictions" / f"{jurisdiction}.yaml"
         if target.exists():
             config_path = target
             break
-            
+
     if not config_path:
         raise FileNotFoundError(f"Config for jurisdiction '{jurisdiction}' not found.")
-        
-    with open(config_path, "r", encoding="utf-8") as f:
+
+    with open(config_path, encoding="utf-8") as f:
         data = yaml.safe_load(f)
-        
+
     return ModelParameters(**data)
 
 
@@ -123,7 +133,7 @@ def get_default_parameters() -> ModelParameters:
             compliance_cost_fixed=5000.0,
             detection_prob_baseline=0.05,
             jurisdiction="australia",
-            calibration_date="2026-03-03"
+            calibration_date="2026-03-03",
         )
 
 

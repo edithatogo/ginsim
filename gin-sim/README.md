@@ -20,6 +20,9 @@ streamlit run gin-sim/app.py
 ```
 
 This launches the same dashboard served by [`streamlit_app/app.py`](../streamlit_app/app.py).
+`gin-sim/requirements.txt` intentionally delegates to
+[`streamlit_app/requirements.txt`](../streamlit_app/requirements.txt) so the
+public deployment and the locally tested dashboard use the same runtime stack.
 
 ## Smoke Suite
 

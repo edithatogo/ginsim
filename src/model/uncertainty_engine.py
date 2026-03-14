@@ -20,7 +20,8 @@ from src.inference.priors import sample_parameter_matrix
 
 from .parameters import ModelParameters, PolicyConfig
 from .pipeline import evaluate_single_policy, get_standard_policies
-from .voi import compute_evpi, compute_evppi
+from .voi import evpi as compute_evpi
+from .voi import evppi as compute_evppi
 
 
 @dataclass(frozen=True)
@@ -48,7 +49,7 @@ def calculate_summary_stats(results: Array, n_subsamples: int = 100) -> dict[str
     }
 
 
-def evaluate_core_numerical(params: ModelParameters, policy: PolicyConfig) -> dict[str, Array]:
+def evaluate_core_numerical(params: ModelParameters, policy: PolicyConfig) -> dict[str, Any]:
     """
     JIT-compatible numerical kernel that returns only arrays.
     """
@@ -95,44 +96,47 @@ def run_psa(
         return jnp.full((n_draws,), float(val))
 
     # 2. Build the vectorized parameter tree
-    batch_params = ModelParameters(
-        jurisdiction=base_params.jurisdiction,
-        calibration_date=base_params.calibration_date,
-        baseline_testing_uptake=_to_batch(base_params.baseline_testing_uptake),
+    batch_params_data: dict[str, Any] = {
+        "jurisdiction": base_params.jurisdiction,
+        "calibration_date": base_params.calibration_date,
+        "baseline_testing_uptake": _to_batch(base_params.baseline_testing_uptake),
         # Bayesian Varied Fields
-        deterrence_elasticity=prior_draws["deterrence_elasticity"],
-        adverse_selection_elasticity=-prior_draws[
+        "deterrence_elasticity": prior_draws["deterrence_elasticity"],
+        "adverse_selection_elasticity": -prior_draws[
             "adverse_selection_elasticity"
         ],  # Negative by convention
-        equity_factor=prior_draws["equity_factor"],
+        "equity_factor": prior_draws["equity_factor"],
         # Constants
-        moratorium_effect=_to_batch(base_params.moratorium_effect),
-        demand_elasticity_high_risk=_to_batch(base_params.demand_elasticity_high_risk),
-        baseline_loading=_to_batch(base_params.baseline_loading),
-        family_history_sensitivity=_to_batch(base_params.family_history_sensitivity),
-        proxy_substitution_rate=_to_batch(base_params.proxy_substitution_rate),
-        pass_through_rate=_to_batch(base_params.pass_through_rate),
-        research_participation_elasticity=_to_batch(base_params.research_participation_elasticity),
-        research_participation_value=_to_batch(base_params.research_participation_value),
-        ppp_conversion_factor=_to_batch(base_params.ppp_conversion_factor),
-        high_sum_insured_share=_to_batch(base_params.high_sum_insured_share),
-        taper_range=_to_batch(getattr(base_params, "taper_range", 0.0)),
-        enforcement_effectiveness=_to_batch(base_params.enforcement_effectiveness),
-        complaint_rate=_to_batch(base_params.complaint_rate),
-        enforcement_budget=_to_batch(base_params.enforcement_budget),
-        marginal_cost_enforcement=_to_batch(base_params.marginal_cost_enforcement),
-        compliance_cost_fixed=_to_batch(base_params.compliance_cost_fixed),
-        detection_prob_baseline=_to_batch(base_params.detection_prob_baseline),
-        acc_deterrence_offset=_to_batch(base_params.acc_deterrence_offset),
-        pharmac_qaly_threshold=_to_batch(base_params.pharmac_qaly_threshold),
-        medicare_cost_share=_to_batch(base_params.medicare_cost_share),
-        audit_intensity=_to_batch(base_params.audit_intensity),
-        audit_intensity_apra=_to_batch(getattr(base_params, "audit_intensity_apra", 0.50)),
-        audit_intensity_asic=_to_batch(getattr(base_params, "audit_intensity_asic", 0.50)),
-        remoteness_weight=_to_batch(base_params.remoteness_weight),
-        time_horizon=_to_batch(getattr(base_params, "time_horizon", 10)),
-        tech_improvement_rate=_to_batch(getattr(base_params, "tech_improvement_rate", 0.15)),
-    )
+        "moratorium_effect": _to_batch(base_params.moratorium_effect),
+        "demand_elasticity_high_risk": _to_batch(base_params.demand_elasticity_high_risk),
+        "baseline_loading": _to_batch(base_params.baseline_loading),
+        "family_history_sensitivity": _to_batch(base_params.family_history_sensitivity),
+        "proxy_substitution_rate": _to_batch(base_params.proxy_substitution_rate),
+        "pass_through_rate": _to_batch(base_params.pass_through_rate),
+        "research_participation_elasticity": _to_batch(
+            base_params.research_participation_elasticity
+        ),
+        "research_participation_value": _to_batch(base_params.research_participation_value),
+        "ppp_conversion_factor": _to_batch(base_params.ppp_conversion_factor),
+        "high_sum_insured_share": _to_batch(base_params.high_sum_insured_share),
+        "taper_range": _to_batch(getattr(base_params, "taper_range", 0.0)),
+        "enforcement_effectiveness": _to_batch(base_params.enforcement_effectiveness),
+        "complaint_rate": _to_batch(base_params.complaint_rate),
+        "enforcement_budget": _to_batch(base_params.enforcement_budget),
+        "marginal_cost_enforcement": _to_batch(base_params.marginal_cost_enforcement),
+        "compliance_cost_fixed": _to_batch(base_params.compliance_cost_fixed),
+        "detection_prob_baseline": _to_batch(base_params.detection_prob_baseline),
+        "acc_deterrence_offset": _to_batch(base_params.acc_deterrence_offset),
+        "pharmac_qaly_threshold": _to_batch(base_params.pharmac_qaly_threshold),
+        "medicare_cost_share": _to_batch(base_params.medicare_cost_share),
+        "audit_intensity": _to_batch(base_params.audit_intensity),
+        "audit_intensity_apra": _to_batch(getattr(base_params, "audit_intensity_apra", 0.50)),
+        "audit_intensity_asic": _to_batch(getattr(base_params, "audit_intensity_asic", 0.50)),
+        "remoteness_weight": _to_batch(base_params.remoteness_weight),
+        "time_horizon": _to_batch(getattr(base_params, "time_horizon", 10)),
+        "tech_improvement_rate": _to_batch(getattr(base_params, "tech_improvement_rate", 0.15)),
+    }
+    batch_params = ModelParameters.model_validate(batch_params_data)
 
     raw_results = evaluate_batch(batch_params, policy)
 
@@ -159,40 +163,43 @@ def run_full_voi_analysis(
     def _to_batch(val):
         return jnp.full((n_draws,), float(val))
 
-    batch_params = ModelParameters(
-        jurisdiction=base_params.jurisdiction,
-        calibration_date=base_params.calibration_date,
-        baseline_testing_uptake=_to_batch(base_params.baseline_testing_uptake),
-        deterrence_elasticity=prior_draws["deterrence_elasticity"],
-        adverse_selection_elasticity=-prior_draws["adverse_selection_elasticity"],
-        equity_factor=prior_draws["equity_factor"],
-        moratorium_effect=_to_batch(base_params.moratorium_effect),
-        demand_elasticity_high_risk=_to_batch(base_params.demand_elasticity_high_risk),
-        baseline_loading=_to_batch(base_params.baseline_loading),
-        family_history_sensitivity=_to_batch(base_params.family_history_sensitivity),
-        proxy_substitution_rate=_to_batch(base_params.proxy_substitution_rate),
-        pass_through_rate=_to_batch(base_params.pass_through_rate),
-        research_participation_elasticity=_to_batch(base_params.research_participation_elasticity),
-        research_participation_value=_to_batch(base_params.research_participation_value),
-        ppp_conversion_factor=_to_batch(base_params.ppp_conversion_factor),
-        high_sum_insured_share=_to_batch(base_params.high_sum_insured_share),
-        taper_range=_to_batch(getattr(base_params, "taper_range", 0.0)),
-        enforcement_effectiveness=_to_batch(base_params.enforcement_effectiveness),
-        complaint_rate=_to_batch(base_params.complaint_rate),
-        enforcement_budget=_to_batch(base_params.enforcement_budget),
-        marginal_cost_enforcement=_to_batch(base_params.marginal_cost_enforcement),
-        compliance_cost_fixed=_to_batch(base_params.compliance_cost_fixed),
-        detection_prob_baseline=_to_batch(base_params.detection_prob_baseline),
-        acc_deterrence_offset=_to_batch(base_params.acc_deterrence_offset),
-        pharmac_qaly_threshold=_to_batch(base_params.pharmac_qaly_threshold),
-        medicare_cost_share=_to_batch(base_params.medicare_cost_share),
-        audit_intensity=_to_batch(base_params.audit_intensity),
-        audit_intensity_apra=_to_batch(getattr(base_params, "audit_intensity_apra", 0.50)),
-        audit_intensity_asic=_to_batch(getattr(base_params, "audit_intensity_asic", 0.50)),
-        remoteness_weight=_to_batch(base_params.remoteness_weight),
-        time_horizon=_to_batch(getattr(base_params, "time_horizon", 10)),
-        tech_improvement_rate=_to_batch(getattr(base_params, "tech_improvement_rate", 0.15)),
-    )
+    batch_params_data: dict[str, Any] = {
+        "jurisdiction": base_params.jurisdiction,
+        "calibration_date": base_params.calibration_date,
+        "baseline_testing_uptake": _to_batch(base_params.baseline_testing_uptake),
+        "deterrence_elasticity": prior_draws["deterrence_elasticity"],
+        "adverse_selection_elasticity": -prior_draws["adverse_selection_elasticity"],
+        "equity_factor": prior_draws["equity_factor"],
+        "moratorium_effect": _to_batch(base_params.moratorium_effect),
+        "demand_elasticity_high_risk": _to_batch(base_params.demand_elasticity_high_risk),
+        "baseline_loading": _to_batch(base_params.baseline_loading),
+        "family_history_sensitivity": _to_batch(base_params.family_history_sensitivity),
+        "proxy_substitution_rate": _to_batch(base_params.proxy_substitution_rate),
+        "pass_through_rate": _to_batch(base_params.pass_through_rate),
+        "research_participation_elasticity": _to_batch(
+            base_params.research_participation_elasticity
+        ),
+        "research_participation_value": _to_batch(base_params.research_participation_value),
+        "ppp_conversion_factor": _to_batch(base_params.ppp_conversion_factor),
+        "high_sum_insured_share": _to_batch(base_params.high_sum_insured_share),
+        "taper_range": _to_batch(getattr(base_params, "taper_range", 0.0)),
+        "enforcement_effectiveness": _to_batch(base_params.enforcement_effectiveness),
+        "complaint_rate": _to_batch(base_params.complaint_rate),
+        "enforcement_budget": _to_batch(base_params.enforcement_budget),
+        "marginal_cost_enforcement": _to_batch(base_params.marginal_cost_enforcement),
+        "compliance_cost_fixed": _to_batch(base_params.compliance_cost_fixed),
+        "detection_prob_baseline": _to_batch(base_params.detection_prob_baseline),
+        "acc_deterrence_offset": _to_batch(base_params.acc_deterrence_offset),
+        "pharmac_qaly_threshold": _to_batch(base_params.pharmac_qaly_threshold),
+        "medicare_cost_share": _to_batch(base_params.medicare_cost_share),
+        "audit_intensity": _to_batch(base_params.audit_intensity),
+        "audit_intensity_apra": _to_batch(getattr(base_params, "audit_intensity_apra", 0.50)),
+        "audit_intensity_asic": _to_batch(getattr(base_params, "audit_intensity_asic", 0.50)),
+        "remoteness_weight": _to_batch(base_params.remoteness_weight),
+        "time_horizon": _to_batch(getattr(base_params, "time_horizon", 10)),
+        "tech_improvement_rate": _to_batch(getattr(base_params, "tech_improvement_rate", 0.15)),
+    }
+    batch_params = ModelParameters.model_validate(batch_params_data)
 
     welfare_matrix = []
     for p in policy_list:
@@ -213,4 +220,3 @@ def run_full_voi_analysis(
         },
         "w_matrix": w_matrix,
     }
-}

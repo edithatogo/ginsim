@@ -7,12 +7,15 @@ from streamlit.testing.v1 import AppTest
 def test_sensitivity_page_runs_analysis() -> None:
     app = AppTest.from_file("streamlit_app/pages/2_Sensitivity.py", default_timeout=60)
     app.run()
-    assert "Sensitivity & Robustness Analysis" in app.title[0].value
+    assert "Comprehensive Sensitivity & VOI Suite" in app.title[0].value
 
-    run_button = next(b for b in app.button if "Run Tornado Analysis" in b.label)
-    run_button.click().run()
+    # Navigate to Tornado tab (Tab 2, index 2)
+    # Alternatively, PSA tab (Tab 0) also has a run button
+    run_button_psa = next(b for b in app.button if "Run PSA Simulation" in b.label)
+    run_button_psa.click().run()
 
-    # AppTest check for charts
+    # The simulation takes a few seconds, AppTest might need another run or longer wait
+    # We'll try to get it directly
     assert len(app.get("plotly_chart")) >= 1
 
 

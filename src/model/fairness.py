@@ -56,9 +56,4 @@ def audit_policy_fairness(
     else:
         verdict = "UNFAIR: Policy introduces significant inequities."
 
-    return FairnessResult(
-        is_fair=is_fair,
-        score=score,
-        verdict=verdict,
-        reasons=reasons
-    )
+    return FairnessResult(is_fair=is_fair, score=score, verdict=verdict, reasons=reasons)

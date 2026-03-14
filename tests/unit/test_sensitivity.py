@@ -1,1 +1,102 @@
-IiIiDQpVbml0IHRlc3RzIGZvciBzZW5zaXRpdml0eSBhbmFseXNpcyBmdW5jdGlvbnMuDQoiIiINCg0KZnJvbSBzcmMubW9kZWwucGFyYW1ldGVycyBpbXBvcnQgUG9saWN5Q29uZmlnLCBnZXRfZGVmYXVsdF9wYXJhbWV0ZXJzDQpmcm9tIHNyYy5tb2RlbC5zZW5zaXRpdml0eSBpbXBvcnQgKA0KICAgIFNlbnNpdGl2aXR5UmVzdWx0LA0KICAgIHJ1bl9zY2VuYXJpb19hbmFseXNpcywNCiAgICB0b3JuYWRvX2FuYWx5c2lzLA0KKQ0KDQoNCmNsYXNzIFRlc3RPbmVXYXlTZW5zaXRpdml0eToNCiAgICAiIiJUZXN0cyBmb3Igb25lLXdheSBzZW5zaXRpdml0eSBhbmFseXNpcy4iIiINCg0KICAgIGRlZiB0ZXN0X3JldHVybnNfc2Vuc2l0aXZpdHlfcmVzdWx0KHNlbGYpOg0KICAgICAgICAiIiJUZXN0IHRoYXQgYW5hbHlzaXMgcmV0dXJucyBhIFNlbnNpdGl2aXR5UmVzdWx0LiIiIg0KDQogICAgICAgIGRlZiBtb2RlbChwKToNCiAgICAgICAgICAgIHJldHVybiBwLmRldGVycmVuY2VfZWxhc3RpY2l0eSAqIDEwDQoNCiAgICAgICAgcGFyYW1zID0gZ2V0X2RlZmF1bHRfcGFyYW1ldGVycygpDQogICAgICAgIHBhcmFtcyA9IHBhcmFtcy5tb2RlbF9jb3B5KHVwZGF0ZT17ImRldGVycmVuY2VfZWxhc3RpY2l0eSI6IDAuNX0pDQoNCiAgICAgICAgcmVzdWx0cyA9IHRvcm5hZG9fYW5hbHlzaXMoDQogICAgICAgICAgICBtb2RlbF9mbj1tb2RlbCwNCiAgICAgICAgICAgIHBhcmFtcz1wYXJhbXMsDQogICAgICAgICAgICBwYXJhbV9uYW1lcz1bImRldGVycmVuY2VfZWxhc3RpY2l0eSJdLA0KICAgICAgICApDQoNCiAgICAgICAgYXNzZXJ0IGxlbihyZXN1bHRzKSA9PSAxDQogICAgICAgIGFzc2VydCBpc2luc3RhbmNlKHJlc3VsdHNbMF0sIFNlbnNpdGl2aXR5UmVzdWx0KQ0KDQogICAgZGVmIHRlc3Rfc2Vuc2l0aXZpdHlfaW5kZXhfcG9zaXRpdmUoc2VsZik6DQogICAgICAgICIiIlRlc3QgdGhhdCBzZW5zaXRpdml0eSBpbmRleCBpcyBjb3JyZWN0bHkgY2FsY3VsYXRlZC4iIiINCg0KICAgICAgICBkZWYgbW9kZWwocCk6DQogICAgICAgICAgICByZXR1cm4gcC5kZXRlcnJlbmNlX2VsYXN0aWNpdHkNCg0KICAgICAgICBwYXJhbXMgPSBnZXRfZGVmYXVsdF9wYXJhbWV0ZXJzKCkNCiAgICAgICAgcGFyYW1zID0gcGFyYW1zLm1vZGVsX2NvcHkodXBkYXRlPXsiZGV0ZXJyZW5jZV9lbGFzdGljaXR5IjogMS4wfSkNCg0KICAgICAgICByZXN1bHRzID0gdG9ybmFkb19hbmFseXNpcygNCiAgICAgICAgICAgIG1vZGVsX2ZuPW1vZGVsLA0KICAgICAgICAgICAgcGFyYW1zPXBhcmFtcywNCiAgICAgICAgICAgIHBhcmFtX25hbWVzPVsiZGV0ZXJyZW5jZV9lbGFzdGljaXR5Il0sDQogICAgICAgICAgICB2YXJpYXRpb249MC4xLA0KICAgICAgICApDQoNCiAgICAgICAgIyBJbmRleCBzaG91bGQgYmUgcG9zaXRpdmUgZm9yIGluY3JlYXNpbmcgZnVuY3Rpb24NCiAgICAgICAgYXNzZXJ0IHJlc3VsdHNbMF0uc2Vuc2l0aXZpdHlfaW5kZXggPiAwDQoNCg0KY2xhc3MgVGVzdFRvcm5hZG9BbmFseXNpczoNCiAgICAiIiJUZXN0cyBmb3IgdG9ybmFkbyBhbmFseXNpcyBhZ2dyZWdhdGlvbi4iIiINCg0KICAgIGRlZiB0ZXN0X3JldHVybnNfc29ydGVkX3Jlc3VsdHMoc2VsZik6DQogICAgICAgICIiIlRlc3QgdGhhdCByZXN1bHRzIGFyZSBzb3J0ZWQgYnkgaW1wYWN0LiIiIg0KDQogICAgICAgIGRlZiBtb2RlbChwKToNCiAgICAgICAgICAgIHJldHVybiBwLmRldGVycmVuY2VfZWxhc3RpY2l0eSArIDIgKiBwLm1vcmF0b3JpdW1fZWZmZWN0DQoNCiAgICAgICAgcGFyYW1zID0gZ2V0X2RlZmF1bHRfcGFyYW1ldGVycygpDQogICAgICAgIHBhcmFtcyA9IHBhcmFtcy5tb2RlbF9jb3B5KHVwZGF0ZT17ImRldGVycmVuY2VfZWxhc3RpY2l0eSI6IDEuMCwgIm1vcmF0b3JpdW1fZWZmZWN0IjogMS4wfSkNCg0KICAgICAgICByZXN1bHRzID0gdG9ybmFkb19hbmFseXNpcygNCiAgICAgICAgICAgIG1vZGVsX2ZuPW1vZGVsLA0KICAgICAgICAgICAgcGFyYW1zPXBhcmFtcywNCiAgICAgICAgICAgIHBhcmFtX25hbWVzPVsiZGV0ZXJyZW5jZV9lbGFzdGljaXR5IiwgIm1vcmF0b3JpdW1fZWZmZWN0Il0sDQogICAgICAgICkNCg0KICAgICAgICBhc3NlcnQgbGVuKHJlc3VsdHMpID09IDINCiAgICAgICAgIyBtb3JhdG9yaXVtX2VmZmVjdCBoYXMgbGFyZ2VyIHdlaWdodCAoMiB2cyAxKQ0KICAgICAgICBhc3NlcnQgcmVzdWx0c1swXS5wYXJhbWV0ZXJfbmFtZSA9PSAibW9yYXRvcml1bV9lZmZlY3QiDQoNCg0KY2xhc3MgVGVzdFNjZW5hcmlvQW5hbHlzaXM6DQogICAgIiIiVGVzdHMgZm9yIHNjZW5hcmlvIGFuYWx5c2lzLiIiIg0KDQogICAgZGVmIHRlc3RfcmV0dXJuc19zY2VuYXJpb19yZXN1bHRzKHNlbGYpOg0KICAgICAgICAiIiJUZXN0IHRoYXQgc2NlbmFyaW8gYW5hbHlzaXMgcmV0dXJucyByZXN1bHRzLiIiIg0KDQogICAgICAgIGRlZiBtb2RlbChwLCBwb2wpOg0KICAgICAgICAgICAgcmV0dXJuIHAuZGV0ZXJyZW5jZV9lbGFzdGljaXR5ICogKDIuMCBpZiBwb2wuYWxsb3dfZ2VuZXRpY190ZXN0X3Jlc3VsdHMgZWxzZSAxLjApDQoNCiAgICAgICAgcGFyYW1zID0gZ2V0X2RlZmF1bHRfcGFyYW1ldGVycygpDQogICAgICAgIHBhcmFtcyA9IHBhcmFtcy5tb2RlbF9jb3B5KHVwZGF0ZT17ImRldGVycmVuY2VfZWxhc3RpY2l0eSI6IDEwLjB9KQ0KDQogICAgICAgIHBvbGljaWVzID0gWw0KICAgICAgICAgICAgUG9saWN5Q29uZmlnKG5hbWU9InNxIiwgZGVzY3JpcHRpb249IlNRIiwgYWxsb3dfZ2VuZXRpY190ZXN0X3Jlc3VsdHM9VHJ1ZSksDQogICAgICAgICAgICBQb2xpY3lDb25maWcobmFtZT0iYmFuIiwgZGVzY3JpcHRpb249IkJhbiIsIGFsbG93X2dlbmV0aWNfdGVzdF9yZXN1bHRzPUZhbHNlKSwNCiAgICAgICAgXQ0KDQogICAgICAgIHJlc3VsdHMgPSBydW5fc2NlbmFyaW9fYW5hbHlzaXMoDQogICAgICAgICAgICBtb2RlbF9mbj1tb2RlbCwNCiAgICAgICAgICAgIGJhc2VfcGFyYW1zPXBhcmFtcywNCiAgICAgICAgICAgIHBvbGljaWVzPXBvbGljaWVzLA0KICAgICAgICApDQoNCiAgICAgICAgYXNzZXJ0IGxlbihyZXN1bHRzKSA9PSAyDQogICAgICAgIGFzc2VydCByZXN1bHRzWyJzcSJdID09IDIwLjANCiAgICAgICAgYXNzZXJ0IHJlc3VsdHNbImJhbiJdID09IDEwLjANCg==
+"""
+Unit tests for sensitivity analysis functions.
+"""
+
+from src.model.parameters import PolicyConfig, get_default_parameters
+from src.model.sensitivity import (
+    SensitivityResult,
+    run_scenario_analysis,
+    tornado_analysis,
+)
+
+
+class TestOneWaySensitivity:
+    """Tests for one-way sensitivity analysis."""
+
+    def test_returns_sensitivity_result(self):
+        """Test that analysis returns a SensitivityResult."""
+
+        def model(p):
+            return p.deterrence_elasticity * 10
+
+        params = get_default_parameters()
+        params = params.model_copy(update={"deterrence_elasticity": 0.5})
+
+        results = tornado_analysis(
+            model_fn=model,
+            params=params,
+            param_names=["deterrence_elasticity"],
+        )
+
+        assert len(results) == 1
+        assert isinstance(results[0], SensitivityResult)
+
+    def test_sensitivity_index_positive(self):
+        """Test that sensitivity index is correctly calculated."""
+
+        def model(p):
+            return p.deterrence_elasticity
+
+        params = get_default_parameters()
+        params = params.model_copy(update={"deterrence_elasticity": 1.0})
+
+        results = tornado_analysis(
+            model_fn=model,
+            params=params,
+            param_names=["deterrence_elasticity"],
+            variation=0.1,
+        )
+
+        # Index should be positive for increasing function
+        assert results[0].sensitivity_index > 0
+
+
+class TestTornadoAnalysis:
+    """Tests for tornado analysis aggregation."""
+
+    def test_returns_sorted_results(self):
+        """Test that results are sorted by impact."""
+
+        def model(p):
+            return p.deterrence_elasticity + 2 * p.moratorium_effect
+
+        params = get_default_parameters()
+        params = params.model_copy(update={"deterrence_elasticity": 1.0, "moratorium_effect": 1.0})
+
+        results = tornado_analysis(
+            model_fn=model,
+            params=params,
+            param_names=["deterrence_elasticity", "moratorium_effect"],
+        )
+
+        assert len(results) == 2
+        # moratorium_effect has larger weight (2 vs 1)
+        assert results[0].parameter_name == "moratorium_effect"
+
+
+class TestScenarioAnalysis:
+    """Tests for scenario analysis."""
+
+    def test_returns_scenario_results(self):
+        """Test that scenario analysis returns results."""
+
+        def model(p, pol):
+            return p.deterrence_elasticity * (2.0 if pol.allow_genetic_test_results else 1.0)
+
+        params = get_default_parameters()
+        params = params.model_copy(update={"deterrence_elasticity": 10.0})
+
+        policies = [
+            PolicyConfig(name="sq", description="SQ", allow_genetic_test_results=True),
+            PolicyConfig(name="ban", description="Ban", allow_genetic_test_results=False),
+        ]
+
+        results = run_scenario_analysis(
+            model_fn=model,
+            base_params=params,
+            policies=policies,
+        )
+
+        assert len(results) == 2
+        assert results["sq"] == 20.0
+        assert results["ban"] == 10.0

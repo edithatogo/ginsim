@@ -61,4 +61,4 @@ def test_delta_view_page_runs_comparison_and_download() -> None:
     run_button = next(b for b in app.button if "Audit Policies" in b.label)
     run_button.click().run()
 
-    assert any("Fairness Verdict" in sub.value for sub in app.subheader)
+    assert any("Fairness Verdict Matrix" in sub.value for sub in app.subheader)

@@ -1,1 +1,216 @@
-IiIiDQpVbmlmaWVkIFNlbnNpdGl2aXR5IEVuZ2luZSAoRGlhbW9uZCBTdGFuZGFyZCkuDQoNCkNvbnNvbGlkYXRlcyBKQVgtdmVjdG9yaXplZCBEU0EsIFBTQSwgYW5kIFNvYm9sIGFuYWx5c2lzIGZvcg0KaGlnaC1wZXJmb3JtYW5jZSB1bmNlcnRhaW50eSBxdWFudGlmaWNhdGlvbi4NCk5vdyBpbnRlZ3JhdGVkIHdpdGggQmF5ZXNpYW4gUHJpb3IgR3JvdW5kaW5nIChUcmFjayAwMDM5KS4NCiIiIg0KDQpmcm9tIF9fZnV0dXJlX18gaW1wb3J0IGFubm90YXRpb25zDQoNCmZyb20gZGF0YWNsYXNzZXMgaW1wb3J0IGRhdGFjbGFzcw0KZnJvbSB0eXBpbmcgaW1wb3J0IEFueQ0KDQppbXBvcnQgamF4DQppbXBvcnQgamF4Lm51bXB5IGFzIGpucA0KZnJvbSBqYXggaW1wb3J0IGppdCwgdm1hcA0KZnJvbSBqYXh0eXBpbmcgaW1wb3J0IEFycmF5DQoNCmZyb20gc3JjLmluZmVyZW5jZS5wcmlvcnMgaW1wb3J0IHNhbXBsZV9wYXJhbWV0ZXJfbWF0cml4DQoNCmZyb20gLnBhcmFtZXRlcnMgaW1wb3J0IE1vZGVsUGFyYW1ldGVycywgUG9saWN5Q29uZmlnDQpmcm9tIC5waXBlbGluZSBpbXBvcnQgZXZhbHVhdGVfc2luZ2xlX3BvbGljeSwgZ2V0X3N0YW5kYXJkX3BvbGljaWVzDQpmcm9tIC52b2kgaW1wb3J0IGNvbXB1dGVfZXZwaSwgY29tcHV0ZV9ldnBwaQ0KDQoNCkBkYXRhY2xhc3MoZnJvemVuPVRydWUpDQpjbGFzcyBVbmNlcnRhaW50eVJlc3VsdDoNCiAgICAiIiJDb25zb2xpZGF0ZWQgc3VtbWFyeSBvZiBhIE1vbnRlIENhcmxvIHJ1bi4iIiINCg0KICAgIG1lYW46IEFueQ0KICAgIG1lZGlhbjogQW55DQogICAgbG93ZXJfOTU6IEFueQ0KICAgIHVwcGVyXzk1OiBBbnkNCiAgICBzdGQ6IEFueQ0KICAgIHNhbXBsZXM6IEFueQ0KDQoNCkBqaXQNCmRlZiBjYWxjdWxhdGVfc3VtbWFyeV9zdGF0cyhyZXN1bHRzOiBBcnJheSwgbl9zdWJzYW1wbGVzOiBpbnQgPSAxMDApIC0+IGRpY3Rbc3RyLCBBbnldOg0KICAgICIiIkNvbXB1dGUgc3VtbWFyeSBzdGF0aXN0aWNzIGZvciBhIGJhdGNoIG9mIHJlc3VsdHMuIiIiDQogICAgcmV0dXJuIHsNCiAgICAgICAgIm1lYW4iOiBqbnAubWVhbihyZXN1bHRzKSwNCiAgICAgICAgIm1lZGlhbiI6IGpucC5tZWRpYW4ocmVzdWx0cyksDQogICAgICAgICJsb3dlcl85NSI6IGpucC5wZXJjZW50aWxlKHJlc3VsdHMsIDIuNSksDQogICAgICAgICJ1cHBlcl85NSI6IGpucC5wZXJjZW50aWxlKHJlc3VsdHMsIDk3LjUpLA0KICAgICAgICAic3RkIjogam5wLnN0ZChyZXN1bHRzKSwNCiAgICAgICAgInNhbXBsZXMiOiByZXN1bHRzWzpuX3N1YnNhbXBsZXNdLA0KICAgIH0NCg0KDQpkZWYgZXZhbHVhdGVfY29yZV9udW1lcmljYWwocGFyYW1zOiBNb2RlbFBhcmFtZXRlcnMsIHBvbGljeTogUG9saWN5Q29uZmlnKSAtPiBkaWN0W3N0ciwgQXJyYXldOg0KICAgICIiIg0KICAgIEpJVC1jb21wYXRpYmxlIG51bWVyaWNhbCBrZXJuZWwgdGhhdCByZXR1cm5zIG9ubHkgYXJyYXlzLg0KICAgICIiIg0KICAgICMgVXNlIGdsb2JhbCBldmFsdWF0ZV9zaW5nbGVfcG9saWN5IGJ1dCBleHRyYWN0IG9ubHkgbnVtYmVycw0KICAgIHJlcyA9IGV2YWx1YXRlX3NpbmdsZV9wb2xpY3kocGFyYW1zLCBwb2xpY3kpDQogICAgcmV0dXJuIHsNCiAgICAgICAgInVwdGFrZSI6IHJlcy50ZXN0aW5nX3VwdGFrZSwNCiAgICAgICAgIndlbGZhcmUiOiByZXMud2VsZmFyZV9pbXBhY3QsDQogICAgfQ0KDQoNCmRlZiBldmFsdWF0ZV9iYXRjaCgNCiAgICBwYXJhbXNfbWF0cml4OiBNb2RlbFBhcmFtZXRlcnMsDQogICAgcG9saWN5OiBQb2xpY3lDb25maWcsDQopIC0+IGRpY3Rbc3RyLCBBbnldOg0KICAgICIiIg0KICAgIFZlY3Rvcml6ZWQgZXZhbHVhdGlvbiBvZiBhIHBvbGljeSBvdmVyIGEgbWF0cml4IG9mIHBhcmFtZXRlcnMuDQogICAgIiIiDQogICAgdm1hcF9ldmFsID0gdm1hcChldmFsdWF0ZV9jb3JlX251bWVyaWNhbCwgaW5fYXhlcz0oMCwgTm9uZSkpDQogICAgcmVzdWx0cyA9IHZtYXBfZXZhbChwYXJhbXNfbWF0cml4LCBwb2xpY3kpDQoNCiAgICByZXR1cm4gew0KICAgICAgICAidXB0YWtlIjogY2FsY3VsYXRlX3N1bW1hcnlfc3RhdHMocmVzdWx0c1sidXB0YWtlIl0pLA0KICAgICAgICAid2VsZmFyZSI6IGNhbGN1bGF0ZV9zdW1tYXJ5X3N0YXRzKHJlc3VsdHNbIndlbGZhcmUiXSksDQogICAgICAgICJyYXdfd2VsZmFyZSI6IHJlc3VsdHNbIndlbGZhcmUiXSwNCiAgICB9DQoNCg0KZGVmIHJ1bl9wc2EoDQogICAgYmFzZV9wYXJhbXM6IE1vZGVsUGFyYW1ldGVycywNCiAgICBwb2xpY3k6IFBvbGljeUNvbmZpZywNCiAgICBuX2RyYXdzOiBpbnQgPSAxMDAwLA0KICAgIHNlZWQ6IGludCA9IDIwMjYwMzAzLA0KKSAtPiBkaWN0W3N0ciwgVW5jZXJ0YWludHlSZXN1bHRdOg0KICAgICIiIg0KICAgIFJ1biBQcm9iYWJpbGlzdGljIFNlbnNpdGl2aXR5IEFuYWx5c2lzIChQU0EpIHVzaW5nIEJheWVzaWFuIFByaW9ycy4NCiAgICAiIiINCiAgICBrZXkgPSBqYXgucmFuZG9tLlBSTkdLZXkoc2VlZCkNCg0KICAgICMgMS4gR2VuZXJhdGUgcGFyYW1ldGVyIG1hdHJpeCBmcm9tIEdST1VOREVEIFBSSU9SUyAoTm8gbW9yZSB1bmlmb3JtIGppdHRlcikNCiAgICBwcmlvcl9kcmF3cyA9IHNhbXBsZV9wYXJhbWV0ZXJfbWF0cml4KGtleSwgbl9kcmF3cywgYmFzZV9wYXJhbXMuanVyaXNkaWN0aW9uKQ0KDQogICAgZGVmIF90b19iYXRjaCh2YWwpOg0KICAgICAgICByZXR1cm4gam5wLmZ1bGwoKG5fZHJhd3MsKSwgZmxvYXQodmFsKSkNCg0KICAgICMgMi4gQnVpbGQgdGhlIHZlY3Rvcml6ZWQgcGFyYW1ldGVyIHRyZWUNCiAgICBiYXRjaF9wYXJhbXMgPSBNb2RlbFBhcmFtZXRlcnMoDQogICAgICAgIGp1cmlzZGljdGlvbj1iYXNlX3BhcmFtcy5qdXJpc2RpY3Rpb24sDQogICAgICAgIGNhbGlicmF0aW9uX2RhdGU9YmFzZV9wYXJhbXMuY2FsaWJyYXRpb25fZGF0ZSwNCiAgICAgICAgYmFzZWxpbmVfdGVzdGluZ191cHRha2U9X3RvX2JhdGNoKGJhc2VfcGFyYW1zLmJhc2VsaW5lX3Rlc3RpbmdfdXB0YWtlKSwNCiAgICAgICAgIyBCYXllc2lhbiBWYXJpZWQgRmllbGRzDQogICAgICAgIGRldGVycmVuY2VfZWxhc3RpY2l0eT1wcmlvcl9kcmF3c1siZGV0ZXJyZW5jZV9lbGFzdGljaXR5Il0sDQogICAgICAgIGFkdmVyc2Vfc2VsZWN0aW9uX2VsYXN0aWNpdHk9LXByaW9yX2RyYXdzWw0KICAgICAgICAgICAgImFkdmVyc2Vfc2VsZWN0aW9uX2VsYXN0aWNpdHkiDQogICAgICAgIF0sICAjIE5lZ2F0aXZlIGJ5IGNvbnZlbnRpb24NCiAgICAgICAgZXF1aXR5X2ZhY3Rvcj1wcmlvcl9kcmF3c1siZXF1aXR5X2ZhY3RvciJdLA0KICAgICAgICAjIENvbnN0YW50cw0KICAgICAgICBtb3JhdG9yaXVtX2VmZmVjdD1fdG9fYmF0Y2goYmFzZV9wYXJhbXMubW9yYXRvcml1bV9lZmZlY3QpLA0KICAgICAgICBkZW1hbmRfZWxhc3RpY2l0eV9oaWdoX3Jpc2s9X3RvX2JhdGNoKGJhc2VfcGFyYW1zLmRlbWFuZF9lbGFzdGljaXR5X2hpZ2hfcmlzayksDQogICAgICAgIGJhc2VsaW5lX2xvYWRpbmc9X3RvX2JhdGNoKGJhc2VfcGFyYW1zLmJhc2VsaW5lX2xvYWRpbmcpLA0KICAgICAgICBmYW1pbHlfaGlzdG9yeV9zZW5zaXRpdml0eT1fdG9fYmF0Y2goYmFzZV9wYXJhbXMuZmFtaWx5X2hpc3Rvcnlfc2Vuc2l0aXZpdHkpLA0KICAgICAgICBwcm94eV9zdWJzdGl0dXRpb25fcmF0ZT1fdG9fYmF0Y2goYmFzZV9wYXJhbXMucHJveHlfc3Vic3RpdHV0aW9uX3JhdGUpLA0KICAgICAgICBwYXNzX3Rocm91Z2hfcmF0ZT1fdG9fYmF0Y2goYmFzZV9wYXJhbXMucGFzc190aHJvdWdoX3JhdGUpLA0KICAgICAgICByZXNlYXJjaF9wYXJ0aWNpcGF0aW9uX2VsYXN0aWNpdHk9X3RvX2JhdGNoKGJhc2VfcGFyYW1zLnJlc2VhcmNoX3BhcnRpY2lwYXRpb25fZWxhc3RpY2l0eSksDQogICAgICAgIHJlc2VhcmNoX3BhcnRpY2lwYXRpb25fdmFsdWU9X3RvX2JhdGNoKGJhc2VfcGFyYW1zLnJlc2VhcmNoX3BhcnRpY2lwYXRpb25fdmFsdWUpLA0KICAgICAgICBwcHBfY29udmVyc2lvbl9mYWN0b3I9X3RvX2JhdGNoKGJhc2VfcGFyYW1zLnBwcF9jb252ZXJzaW9uX2ZhY3RvciksDQogICAgICAgIGhpZ2hfc3VtX2luc3VyZWRfc2hhcmU9X3RvX2JhdGNoKGJhc2VfcGFyYW1zLmhpZ2hfc3VtX2luc3VyZWRfc2hhcmUpLA0KICAgICAgICB0YXBlcl9yYW5nZT1fdG9fYmF0Y2goZ2V0YXR0cihiYXNlX3BhcmFtcywgInRhcGVyX3JhbmdlIiwgMC4wKSksDQogICAgICAgIGVuZm9yY2VtZW50X2VmZmVjdGl2ZW5lc3M9X3RvX2JhdGNoKGJhc2VfcGFyYW1zLmVuZm9yY2VtZW50X2VmZmVjdGl2ZW5lc3MpLA0KICAgICAgICBjb21wbGFpbnRfcmF0ZT1fdG9fYmF0Y2goYmFzZV9wYXJhbXMuY29tcGxhaW50X3JhdGUpLA0KICAgICAgICBlbmZvcmNlbWVudF9idWRnZXQ9X3RvX2JhdGNoKGJhc2VfcGFyYW1zLmVuZm9yY2VtZW50X2J1ZGdldCksDQogICAgICAgIG1hcmdpbmFsX2Nvc3RfZW5mb3JjZW1lbnQ9X3RvX2JhdGNoKGJhc2VfcGFyYW1zLm1hcmdpbmFsX2Nvc3RfZW5mb3JjZW1lbnQpLA0KICAgICAgICBjb21wbGlhbmNlX2Nvc3RfZml4ZWQ9X3RvX2JhdGNoKGJhc2VfcGFyYW1zLmNvbXBsaWFuY2VfY29zdF9maXhlZCksDQogICAgICAgIGRldGVjdGlvbl9wcm9iX2Jhc2VsaW5lPV90b19iYXRjaChiYXNlX3BhcmFtcy5kZXRlY3Rpb25fcHJvYl9iYXNlbGluZSksDQogICAgICAgIGFjY19kZXRlcnJlbmNlX29mZnNldD1fdG9fYmF0Y2goYmFzZV9wYXJhbXMuYWNjX2RldGVycmVuY2Vfb2Zmc2V0KSwNCiAgICAgICAgcGhhcm1hY19xYWx5X3RocmVzaG9sZD1fdG9fYmF0Y2goYmFzZV9wYXJhbXMucGhhcm1hY19xYWx5X3RocmVzaG9sZCksDQogICAgICAgIG1lZGljYXJlX2Nvc3Rfc2hhcmU9X3RvX2JhdGNoKGJhc2VfcGFyYW1zLm1lZGljYXJlX2Nvc3Rfc2hhcmUpLA0KICAgICAgICBhdWRpdF9pbnRlbnNpdHk9X3RvX2JhdGNoKGJhc2VfcGFyYW1zLmF1ZGl0X2ludGVuc2l0eSksDQogICAgICAgIGF1ZGl0X2ludGVuc2l0eV9hcHJhPV90b19iYXRjaChnZXRhdHRyKGJhc2VfcGFyYW1zLCAiYXVkaXRfaW50ZW5zaXR5X2FwcmEiLCAwLjUwKSksDQogICAgICAgIGF1ZGl0X2ludGVuc2l0eV9hc2ljPV90b19iYXRjaChnZXRhdHRyKGJhc2VfcGFyYW1zLCAiYXVkaXRfaW50ZW5zaXR5X2FzaWMiLCAwLjUwKSksDQogICAgICAgIHJlbW90ZW5lc3Nfd2VpZ2h0PV90b19iYXRjaChiYXNlX3BhcmFtcy5yZW1vdGVuZXNzX3dlaWdodCksDQogICAgICAgIHRpbWVfaG9yaXpvbj1fdG9fYmF0Y2goZ2V0YXR0cihiYXNlX3BhcmFtcywgInRpbWVfaG9yaXpvbiIsIDEwKSksDQogICAgICAgIHRlY2hfaW1wcm92ZW1lbnRfcmF0ZT1fdG9fYmF0Y2goZ2V0YXR0cihiYXNlX3BhcmFtcywgInRlY2hfaW1wcm92ZW1lbnRfcmF0ZSIsIDAuMTUpKSwNCiAgICApDQoNCiAgICByYXdfcmVzdWx0cyA9IGV2YWx1YXRlX2JhdGNoKGJhdGNoX3BhcmFtcywgcG9saWN5KQ0KDQogICAgcmV0dXJuIHsNCiAgICAgICAgInVwdGFrZSI6IFVuY2VydGFpbnR5UmVzdWx0KCoqcmF3X3Jlc3VsdHNbInVwdGFrZSJdKSwNCiAgICAgICAgIndlbGZhcmUiOiBVbmNlcnRhaW50eVJlc3VsdCgqKnJhd19yZXN1bHRzWyJ3ZWxmYXJlIl0pLA0KICAgIH0NCg0KDQpkZWYgcnVuX2Z1bGxfdm9pX2FuYWx5c2lzKA0KICAgIGJhc2VfcGFyYW1zOiBNb2RlbFBhcmFtZXRlcnMsDQogICAgbl9kcmF3czogaW50ID0gMTAwMCwNCiAgICBzZWVkOiBpbnQgPSAyMDI2MDMwMywNCikgLT4gZGljdFtzdHIsIEFueV06DQogICAgIiIiDQogICAgUnVuIGNvbXByZWhlbnNpdmUgVk9JIGFuYWx5c2lzIHVzaW5nIEJheWVzaWFuIFByaW9ycy4NCiAgICAiIiINCiAgICBwb2xpY2llcyA9IGdldF9zdGFuZGFyZF9wb2xpY2llcygpDQogICAgcG9saWN5X2xpc3QgPSBsaXN0KHBvbGljaWVzLnZhbHVlcygpKQ0KDQogICAga2V5ID0gamF4LnJhbmRvbS5QUk5HS2V5KHNlZWQpDQogICAgcHJpb3JfZHJhd3MgPSBzYW1wbGVfcGFyYW1ldGVyX21hdHJpeChrZXksIG5fZHJhd3MsIGJhc2VfcGFyYW1zLmp1cmlzZGljdGlvbikNCg0KICAgIGRlZiBfdG9fYmF0Y2godmFsKToNCiAgICAgICAgcmV0dXJuIGpucC5mdWxsKChuX2RyYXdzLCksIGZsb2F0KHZhbCkpDQoNCiAgICBiYXRjaF9wYXJhbXMgPSBNb2RlbFBhcmFtZXRlcnMoDQogICAgICAgIGp1cmlzZGljdGlvbj1iYXNlX3BhcmFtcy5qdXJpc2RpY3Rpb24sDQogICAgICAgIGNhbGlicmF0aW9uX2RhdGU9YmFzZV9wYXJhbXMuY2FsaWJyYXRpb25fZGF0ZSwNCiAgICAgICAgYmFzZWxpbmVfdGVzdGluZ191cHRha2U9X3RvX2JhdGNoKGJhc2VfcGFyYW1zLmJhc2VsaW5lX3Rlc3RpbmdfdXB0YWtlKSwNCiAgICAgICAgZGV0ZXJyZW5jZV9lbGFzdGljaXR5PXByaW9yX2RyYXdzWyJkZXRlcnJlbmNlX2VsYXN0aWNpdHkiXSwNCiAgICAgICAgYWR2ZXJzZV9zZWxlY3Rpb25fZWxhc3RpY2l0eT0tcHJpb3JfZHJhd3NbImFkdmVyc2Vfc2VsZWN0aW9uX2VsYXN0aWNpdHkiXSwNCiAgICAgICAgZXF1aXR5X2ZhY3Rvcj1wcmlvcl9kcmF3c1siZXF1aXR5X2ZhY3RvciJdLA0KICAgICAgICBtb3JhdG9yaXVtX2VmZmVjdD1fdG9fYmF0Y2goYmFzZV9wYXJhbXMubW9yYXRvcml1bV9lZmZlY3QpLA0KICAgICAgICBkZW1hbmRfZWxhc3RpY2l0eV9oaWdoX3Jpc2s9X3RvX2JhdGNoKGJhc2VfcGFyYW1zLmRlbWFuZF9lbGFzdGljaXR5X2hpZ2hfcmlzayksDQogICAgICAgIGJhc2VsaW5lX2xvYWRpbmc9X3RvX2JhdGNoKGJhc2VfcGFyYW1zLmJhc2VsaW5lX2xvYWRpbmcpLA0KICAgICAgICBmYW1pbHlfaGlzdG9yeV9zZW5zaXRpdml0eT1fdG9fYmF0Y2goYmFzZV9wYXJhbXMuZmFtaWx5X2hpc3Rvcnlfc2Vuc2l0aXZpdHkpLA0KICAgICAgICBwcm94eV9zdWJzdGl0dXRpb25fcmF0ZT1fdG9fYmF0Y2goYmFzZV9wYXJhbXMucHJveHlfc3Vic3RpdHV0aW9uX3JhdGUpLA0KICAgICAgICBwYXNzX3Rocm91Z2hfcmF0ZT1fdG9fYmF0Y2goYmFzZV9wYXJhbXMucGFzc190aHJvdWdoX3JhdGUpLA0KICAgICAgICByZXNlYXJjaF9wYXJ0aWNpcGF0aW9uX2VsYXN0aWNpdHk9X3RvX2JhdGNoKGJhc2VfcGFyYW1zLnJlc2VhcmNoX3BhcnRpY2lwYXRpb25fZWxhc3RpY2l0eSksDQogICAgICAgIHJlc2VhcmNoX3BhcnRpY2lwYXRpb25fdmFsdWU9X3RvX2JhdGNoKGJhc2VfcGFyYW1zLnJlc2VhcmNoX3BhcnRpY2lwYXRpb25fdmFsdWUpLA0KICAgICAgICBwcHBfY29udmVyc2lvbl9mYWN0b3I9X3RvX2JhdGNoKGJhc2VfcGFyYW1zLnBwcF9jb252ZXJzaW9uX2ZhY3RvciksDQogICAgICAgIGhpZ2hfc3VtX2luc3VyZWRfc2hhcmU9X3RvX2JhdGNoKGJhc2VfcGFyYW1zLmhpZ2hfc3VtX2luc3VyZWRfc2hhcmUpLA0KICAgICAgICB0YXBlcl9yYW5nZT1fdG9fYmF0Y2goZ2V0YXR0cihiYXNlX3BhcmFtcywgInRhcGVyX3JhbmdlIiwgMC4wKSksDQogICAgICAgIGVuZm9yY2VtZW50X2VmZmVjdGl2ZW5lc3M9X3RvX2JhdGNoKGJhc2VfcGFyYW1zLmVuZm9yY2VtZW50X2VmZmVjdGl2ZW5lc3MpLA0KICAgICAgICBjb21wbGFpbnRfcmF0ZT1fdG9fYmF0Y2goYmFzZV9wYXJhbXMuY29tcGxhaW50X3JhdGUpLA0KICAgICAgICBlbmZvcmNlbWVudF9idWRnZXQ9X3RvX2JhdGNoKGJhc2VfcGFyYW1zLmVuZm9yY2VtZW50X2J1ZGdldCksDQogICAgICAgIG1hcmdpbmFsX2Nvc3RfZW5mb3JjZW1lbnQ9X3RvX2JhdGNoKGJhc2VfcGFyYW1zLm1hcmdpbmFsX2Nvc3RfZW5mb3JjZW1lbnQpLA0KICAgICAgICBjb21wbGlhbmNlX2Nvc3RfZml4ZWQ9X3RvX2JhdGNoKGJhc2VfcGFyYW1zLmNvbXBsaWFuY2VfY29zdF9maXhlZCksDQogICAgICAgIGRldGVjdGlvbl9wcm9iX2Jhc2VsaW5lPV90b19iYXRjaChiYXNlX3BhcmFtcy5kZXRlY3Rpb25fcHJvYl9iYXNlbGluZSksDQogICAgICAgIGFjY19kZXRlcnJlbmNlX29mZnNldD1fdG9fYmF0Y2goYmFzZV9wYXJhbXMuYWNjX2RldGVycmVuY2Vfb2Zmc2V0KSwNCiAgICAgICAgcGhhcm1hY19xYWx5X3RocmVzaG9sZD1fdG9fYmF0Y2goYmFzZV9wYXJhbXMucGhhcm1hY19xYWx5X3RocmVzaG9sZCksDQogICAgICAgIG1lZGljYXJlX2Nvc3Rfc2hhcmU9X3RvX2JhdGNoKGJhc2VfcGFyYW1zLm1lZGljYXJlX2Nvc3Rfc2hhcmUpLA0KICAgICAgICBhdWRpdF9pbnRlbnNpdHk9X3RvX2JhdGNoKGJhc2VfcGFyYW1zLmF1ZGl0X2ludGVuc2l0eSksDQogICAgICAgIGF1ZGl0X2ludGVuc2l0eV9hcHJhPV90b19iYXRjaChnZXRhdHRyKGJhc2VfcGFyYW1zLCAiYXVkaXRfaW50ZW5zaXR5X2FwcmEiLCAwLjUwKSksDQogICAgICAgIGF1ZGl0X2ludGVuc2l0eV9hc2ljPV90b19iYXRjaChnZXRhdHRyKGJhc2VfcGFyYW1zLCAiYXVkaXRfaW50ZW5zaXR5X2FzaWMiLCAwLjUwKSksDQogICAgICAgIHJlbW90ZW5lc3Nfd2VpZ2h0PV90b19iYXRjaChiYXNlX3BhcmFtcy5yZW1vdGVuZXNzX3dlaWdodCksDQogICAgICAgIHRpbWVfaG9yaXpvbj1fdG9fYmF0Y2goZ2V0YXR0cihiYXNlX3BhcmFtcywgInRpbWVfaG9yaXpvbiIsIDEwKSksDQogICAgICAgIHRlY2hfaW1wcm92ZW1lbnRfcmF0ZT1fdG9fYmF0Y2goZ2V0YXR0cihiYXNlX3BhcmFtcywgInRlY2hfaW1wcm92ZW1lbnRfcmF0ZSIsIDAuMTUpKSwNCiAgICApDQoNCiAgICB3ZWxmYXJlX21hdHJpeCA9IFtdDQogICAgZm9yIHAgaW4gcG9saWN5X2xpc3Q6DQogICAgICAgIHJlcyA9IGV2YWx1YXRlX2JhdGNoKGJhdGNoX3BhcmFtcywgcCkNCiAgICAgICAgd2VsZmFyZV9tYXRyaXguYXBwZW5kKHJlc1sicmF3X3dlbGZhcmUiXSkNCg0KICAgIHdfbWF0cml4ID0gam5wLnN0YWNrKHdlbGZhcmVfbWF0cml4KQ0KDQogICAgZXZwaSA9IGNvbXB1dGVfZXZwaSh3X21hdHJpeCkNCiAgICBldnBwaV9kZXRlcnJlbmNlID0gY29tcHV0ZV9ldnBwaSh3X21hdHJpeCwgcHJpb3JfZHJhd3NbImRldGVycmVuY2VfZWxhc3RpY2l0eSJdKQ0KICAgIGV2cHBpX2FzID0gY29tcHV0ZV9ldnBwaSh3X21hdHJpeCwgcHJpb3JfZHJhd3NbImFkdmVyc2Vfc2VsZWN0aW9uX2VsYXN0aWNpdHkiXSkNCg0KICAgIHJldHVybiB7DQogICAgICAgICJldnBpIjogZmxvYXQoZXZwaSksDQogICAgICAgICJldnBwaSI6IHsNCiAgICAgICAgICAgICJEZXRlcnJlbmNlIEVsYXN0aWNpdHkiOiBmbG9hdChldnBwaV9kZXRlcnJlbmNlKSwNCiAgICAgICAgICAgICJBZHZlcnNlIFNlbGVjdGlvbiI6IGZsb2F0KGV2cHBpX2FzKSwNCiAgICAgICAgfSwNCiAgICAgICAgIndfbWF0cml4Ijogd19tYXRyaXgsDQogICAgfQ0K
+"""
+Unified Sensitivity Engine (Diamond Standard).
+
+Consolidates JAX-vectorized DSA, PSA, and Sobol analysis for
+high-performance uncertainty quantification.
+Now integrated with Bayesian Prior Grounding (Track 0039).
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Any
+
+import jax
+import jax.numpy as jnp
+from jax import jit, vmap
+from jaxtyping import Array
+
+from src.inference.priors import sample_parameter_matrix
+
+from .parameters import ModelParameters, PolicyConfig
+from .pipeline import evaluate_single_policy, get_standard_policies
+from .voi import compute_evpi, compute_evppi
+
+
+@dataclass(frozen=True)
+class UncertaintyResult:
+    """Consolidated summary of a Monte Carlo run."""
+
+    mean: Any
+    median: Any
+    lower_95: Any
+    upper_95: Any
+    std: Any
+    samples: Any
+
+
+@jit
+def calculate_summary_stats(results: Array, n_subsamples: int = 100) -> dict[str, Any]:
+    """Compute summary statistics for a batch of results."""
+    return {
+        "mean": jnp.mean(results),
+        "median": jnp.median(results),
+        "lower_95": jnp.percentile(results, 2.5),
+        "upper_95": jnp.percentile(results, 97.5),
+        "std": jnp.std(results),
+        "samples": results[:n_subsamples],
+    }
+
+
+def evaluate_core_numerical(params: ModelParameters, policy: PolicyConfig) -> dict[str, Array]:
+    """
+    JIT-compatible numerical kernel that returns only arrays.
+    """
+    # Use global evaluate_single_policy but extract only numbers
+    res = evaluate_single_policy(params, policy)
+    return {
+        "uptake": res.testing_uptake,
+        "welfare": res.welfare_impact,
+    }
+
+
+def evaluate_batch(
+    params_matrix: ModelParameters,
+    policy: PolicyConfig,
+) -> dict[str, Any]:
+    """
+    Vectorized evaluation of a policy over a matrix of parameters.
+    """
+    vmap_eval = vmap(evaluate_core_numerical, in_axes=(0, None))
+    results = vmap_eval(params_matrix, policy)
+
+    return {
+        "uptake": calculate_summary_stats(results["uptake"]),
+        "welfare": calculate_summary_stats(results["welfare"]),
+        "raw_welfare": results["welfare"],
+    }
+
+
+def run_psa(
+    base_params: ModelParameters,
+    policy: PolicyConfig,
+    n_draws: int = 1000,
+    seed: int = 20260303,
+) -> dict[str, UncertaintyResult]:
+    """
+    Run Probabilistic Sensitivity Analysis (PSA) using Bayesian Priors.
+    """
+    key = jax.random.PRNGKey(seed)
+
+    # 1. Generate parameter matrix from GROUNDED PRIORS (No more uniform jitter)
+    prior_draws = sample_parameter_matrix(key, n_draws, base_params.jurisdiction)
+
+    def _to_batch(val):
+        return jnp.full((n_draws,), float(val))
+
+    # 2. Build the vectorized parameter tree
+    batch_params = ModelParameters(
+        jurisdiction=base_params.jurisdiction,
+        calibration_date=base_params.calibration_date,
+        baseline_testing_uptake=_to_batch(base_params.baseline_testing_uptake),
+        # Bayesian Varied Fields
+        deterrence_elasticity=prior_draws["deterrence_elasticity"],
+        adverse_selection_elasticity=-prior_draws[
+            "adverse_selection_elasticity"
+        ],  # Negative by convention
+        equity_factor=prior_draws["equity_factor"],
+        # Constants
+        moratorium_effect=_to_batch(base_params.moratorium_effect),
+        demand_elasticity_high_risk=_to_batch(base_params.demand_elasticity_high_risk),
+        baseline_loading=_to_batch(base_params.baseline_loading),
+        family_history_sensitivity=_to_batch(base_params.family_history_sensitivity),
+        proxy_substitution_rate=_to_batch(base_params.proxy_substitution_rate),
+        pass_through_rate=_to_batch(base_params.pass_through_rate),
+        research_participation_elasticity=_to_batch(base_params.research_participation_elasticity),
+        research_participation_value=_to_batch(base_params.research_participation_value),
+        ppp_conversion_factor=_to_batch(base_params.ppp_conversion_factor),
+        high_sum_insured_share=_to_batch(base_params.high_sum_insured_share),
+        taper_range=_to_batch(getattr(base_params, "taper_range", 0.0)),
+        enforcement_effectiveness=_to_batch(base_params.enforcement_effectiveness),
+        complaint_rate=_to_batch(base_params.complaint_rate),
+        enforcement_budget=_to_batch(base_params.enforcement_budget),
+        marginal_cost_enforcement=_to_batch(base_params.marginal_cost_enforcement),
+        compliance_cost_fixed=_to_batch(base_params.compliance_cost_fixed),
+        detection_prob_baseline=_to_batch(base_params.detection_prob_baseline),
+        acc_deterrence_offset=_to_batch(base_params.acc_deterrence_offset),
+        pharmac_qaly_threshold=_to_batch(base_params.pharmac_qaly_threshold),
+        medicare_cost_share=_to_batch(base_params.medicare_cost_share),
+        audit_intensity=_to_batch(base_params.audit_intensity),
+        audit_intensity_apra=_to_batch(getattr(base_params, "audit_intensity_apra", 0.50)),
+        audit_intensity_asic=_to_batch(getattr(base_params, "audit_intensity_asic", 0.50)),
+        remoteness_weight=_to_batch(base_params.remoteness_weight),
+        time_horizon=_to_batch(getattr(base_params, "time_horizon", 10)),
+        tech_improvement_rate=_to_batch(getattr(base_params, "tech_improvement_rate", 0.15)),
+    )
+
+    raw_results = evaluate_batch(batch_params, policy)
+
+    return {
+        "uptake": UncertaintyResult(**raw_results["uptake"]),
+        "welfare": UncertaintyResult(**raw_results["welfare"]),
+    }
+
+
+def run_full_voi_analysis(
+    base_params: ModelParameters,
+    n_draws: int = 1000,
+    seed: int = 20260303,
+) -> dict[str, Any]:
+    """
+    Run comprehensive VOI analysis using Bayesian Priors.
+    """
+    policies = get_standard_policies()
+    policy_list = list(policies.values())
+
+    key = jax.random.PRNGKey(seed)
+    prior_draws = sample_parameter_matrix(key, n_draws, base_params.jurisdiction)
+
+    def _to_batch(val):
+        return jnp.full((n_draws,), float(val))
+
+    batch_params = ModelParameters(
+        jurisdiction=base_params.jurisdiction,
+        calibration_date=base_params.calibration_date,
+        baseline_testing_uptake=_to_batch(base_params.baseline_testing_uptake),
+        deterrence_elasticity=prior_draws["deterrence_elasticity"],
+        adverse_selection_elasticity=-prior_draws["adverse_selection_elasticity"],
+        equity_factor=prior_draws["equity_factor"],
+        moratorium_effect=_to_batch(base_params.moratorium_effect),
+        demand_elasticity_high_risk=_to_batch(base_params.demand_elasticity_high_risk),
+        baseline_loading=_to_batch(base_params.baseline_loading),
+        family_history_sensitivity=_to_batch(base_params.family_history_sensitivity),
+        proxy_substitution_rate=_to_batch(base_params.proxy_substitution_rate),
+        pass_through_rate=_to_batch(base_params.pass_through_rate),
+        research_participation_elasticity=_to_batch(base_params.research_participation_elasticity),
+        research_participation_value=_to_batch(base_params.research_participation_value),
+        ppp_conversion_factor=_to_batch(base_params.ppp_conversion_factor),
+        high_sum_insured_share=_to_batch(base_params.high_sum_insured_share),
+        taper_range=_to_batch(getattr(base_params, "taper_range", 0.0)),
+        enforcement_effectiveness=_to_batch(base_params.enforcement_effectiveness),
+        complaint_rate=_to_batch(base_params.complaint_rate),
+        enforcement_budget=_to_batch(base_params.enforcement_budget),
+        marginal_cost_enforcement=_to_batch(base_params.marginal_cost_enforcement),
+        compliance_cost_fixed=_to_batch(base_params.compliance_cost_fixed),
+        detection_prob_baseline=_to_batch(base_params.detection_prob_baseline),
+        acc_deterrence_offset=_to_batch(base_params.acc_deterrence_offset),
+        pharmac_qaly_threshold=_to_batch(base_params.pharmac_qaly_threshold),
+        medicare_cost_share=_to_batch(base_params.medicare_cost_share),
+        audit_intensity=_to_batch(base_params.audit_intensity),
+        audit_intensity_apra=_to_batch(getattr(base_params, "audit_intensity_apra", 0.50)),
+        audit_intensity_asic=_to_batch(getattr(base_params, "audit_intensity_asic", 0.50)),
+        remoteness_weight=_to_batch(base_params.remoteness_weight),
+        time_horizon=_to_batch(getattr(base_params, "time_horizon", 10)),
+        tech_improvement_rate=_to_batch(getattr(base_params, "tech_improvement_rate", 0.15)),
+    )
+
+    welfare_matrix = []
+    for p in policy_list:
+        res = evaluate_batch(batch_params, p)
+        welfare_matrix.append(res["raw_welfare"])
+
+    w_matrix = jnp.stack(welfare_matrix)
+
+    evpi = compute_evpi(w_matrix)
+    evppi_deterrence = compute_evppi(w_matrix, prior_draws["deterrence_elasticity"])
+    evppi_as = compute_evppi(w_matrix, prior_draws["adverse_selection_elasticity"])
+
+    return {
+        "evpi": float(evpi),
+        "evppi": {
+            "Deterrence Elasticity": float(evppi_deterrence),
+            "Adverse Selection": float(evppi_as),
+        },
+        "w_matrix": w_matrix,
+    }
+}

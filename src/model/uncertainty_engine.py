@@ -91,6 +91,7 @@ def run_psa(
 
     # 1. Generate parameter matrix from GROUNDED PRIORS (No more uniform jitter)
     prior_draws = sample_parameter_matrix(key, n_draws, base_params.jurisdiction)
+    signed_adverse_selection = -prior_draws["adverse_selection_elasticity"]
 
     def _to_batch(val):
         return jnp.full((n_draws,), float(val))
@@ -102,9 +103,7 @@ def run_psa(
         "baseline_testing_uptake": _to_batch(base_params.baseline_testing_uptake),
         # Bayesian Varied Fields
         "deterrence_elasticity": prior_draws["deterrence_elasticity"],
-        "adverse_selection_elasticity": -prior_draws[
-            "adverse_selection_elasticity"
-        ],  # Negative by convention
+        "adverse_selection_elasticity": signed_adverse_selection,  # Negative by convention
         "equity_factor": prior_draws["equity_factor"],
         # Constants
         "moratorium_effect": _to_batch(base_params.moratorium_effect),
@@ -159,6 +158,7 @@ def run_full_voi_analysis(
 
     key = jax.random.PRNGKey(seed)
     prior_draws = sample_parameter_matrix(key, n_draws, base_params.jurisdiction)
+    signed_adverse_selection = -prior_draws["adverse_selection_elasticity"]
 
     def _to_batch(val):
         return jnp.full((n_draws,), float(val))
@@ -168,7 +168,7 @@ def run_full_voi_analysis(
         "calibration_date": base_params.calibration_date,
         "baseline_testing_uptake": _to_batch(base_params.baseline_testing_uptake),
         "deterrence_elasticity": prior_draws["deterrence_elasticity"],
-        "adverse_selection_elasticity": -prior_draws["adverse_selection_elasticity"],
+        "adverse_selection_elasticity": signed_adverse_selection,
         "equity_factor": prior_draws["equity_factor"],
         "moratorium_effect": _to_batch(base_params.moratorium_effect),
         "demand_elasticity_high_risk": _to_batch(base_params.demand_elasticity_high_risk),
@@ -206,11 +206,11 @@ def run_full_voi_analysis(
         res = evaluate_batch(batch_params, p)
         welfare_matrix.append(res["raw_welfare"])
 
-    w_matrix = jnp.stack(welfare_matrix)
+    w_matrix = jnp.stack(welfare_matrix, axis=1)
 
     evpi = compute_evpi(w_matrix)
     evppi_deterrence = compute_evppi(w_matrix, prior_draws["deterrence_elasticity"])
-    evppi_as = compute_evppi(w_matrix, prior_draws["adverse_selection_elasticity"])
+    evppi_as = compute_evppi(w_matrix, signed_adverse_selection)
 
     return {
         "evpi": float(evpi),

@@ -46,7 +46,7 @@ def sample_parameter_matrix(
     jurisdiction: str = "australia",
 ) -> dict[str, Array]:
     """Generate a full matrix of Bayesian prior draws."""
-    keys = jr.split(key, 5)
+    keys = jr.split(key, 3)
     suite = BayesianPriorSuite()
 
     return {

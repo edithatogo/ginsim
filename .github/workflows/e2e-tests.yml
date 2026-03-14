@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+  apptest:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,21 +16,79 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.10'
+        python-version: '3.11'
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
 
     - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install pytest streamlit
+      run: uv sync --locked --all-extras
 
-    - name: Run E2E tests
-      run: |
-        python -m pytest tests/e2e/test_dashboard.py tests/e2e/test_dashboard_pages.py -v --tb=short
+    - name: Install dashboard runtime dependencies
+      run: uv pip install -r streamlit_app/requirements.txt playwright pytest-playwright
+
+    - name: Run AppTest suite
+      run: uv run pytest tests/e2e/test_dashboard.py -q --tb=short
 
     - name: Upload test results
       uses: actions/upload-artifact@v4
       if: always()
       with:
         name: test-results
-        path: test-results/
+        path: coverage.xml
+
+  local-browser-smoke:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
+
+    - name: Install dependencies
+      run: uv sync --locked --all-extras
+
+    - name: Install dashboard runtime dependencies
+      run: uv pip install -r streamlit_app/requirements.txt playwright pytest-playwright
+
+    - name: Install Playwright browser
+      run: uv run playwright install --with-deps chromium
+
+    - name: Start local Streamlit app
+      run: |
+        nohup uv run streamlit run streamlit_app/app.py --server.headless true --server.port 8501 > streamlit.log 2>&1 &
+
+    - name: Wait for local app health
+      run: |
+        for i in {1..60}; do
+          if curl -fsS http://127.0.0.1:8501/_stcore/health > /dev/null; then
+            exit 0
+          fi
+          sleep 2
+        done
+        echo "Local Streamlit app did not become healthy" >&2
+        cat streamlit.log >&2 || true
+        exit 1
+
+    - name: Run local browser smoke test
+      env:
+        GDPE_REMOTE_DASHBOARD_URL: http://127.0.0.1:8501
+        GDPE_REMOTE_DASHBOARD_TIMEOUT_MS: "120000"
+      run: uv run pytest tests/e2e/test_remote_app.py -q --tb=short
+
+    - name: Upload Streamlit log
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: local-streamlit-log
+        path: streamlit.log

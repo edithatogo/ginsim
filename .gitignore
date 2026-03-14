@@ -46,16 +46,20 @@ Thumbs.db
 
 # Logs
 *.log
+.coverage
+coverage.xml
 
 # Temporary files
 *.tmp
 temp/
+.tmp_streamlit_deploy_check/
 
 # Binary files (Office documents, PDFs)
 *.docx
 *.pdf
 *.pptx
 *.xlsx
+*.zip
 
 # Data files (add manually if needed)
 data/raw/
@@ -83,3 +87,8 @@ outputs/posterior_samples/*.csv
 
 # Run manifests (keep structure, not content)
 outputs/runs/
+
+# Generated submission bundles and local archives
+archive/*.zip
+*_submission_pack*.zip
+submission_package_*.zip

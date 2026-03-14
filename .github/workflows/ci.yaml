@@ -25,6 +25,9 @@ jobs:
     - name: Install dependencies
       run: uv sync --locked --all-extras
 
+    - name: Install dashboard runtime dependencies
+      run: uv pip install -r streamlit_app/requirements.txt
+
     - name: Run Pytest (Generate Coverage)
       run: uv run pytest -v --cov=src --cov-report=xml
 

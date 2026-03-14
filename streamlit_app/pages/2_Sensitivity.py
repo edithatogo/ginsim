@@ -17,6 +17,7 @@ sys.path.insert(0, str(project_root))
 
 import plotly.express as px
 import plotly.graph_objects as go
+import pandas as pd
 import streamlit as st
 
 from src.model.module_a_behavior import get_standard_policies

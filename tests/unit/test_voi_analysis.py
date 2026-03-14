@@ -5,7 +5,7 @@ Unit tests for Value of Information (VOI) Analysis.
 import jax.numpy as jnp
 import numpy as np
 
-from src.model.parameters import ModelParameters, get_default_parameters, PolicyConfig
+from src.model.parameters import PolicyConfig, get_default_parameters
 from src.model.voi_analysis import (
     VOIResult,
     compute_evpi,
@@ -79,8 +79,8 @@ class TestRunVOIAnalysis:
         """Test the full analysis orchestration."""
         params_samples = [get_default_parameters() for _ in range(5)]
         policies = [
-            PolicyConfig(name="p1", description="d1"),
-            PolicyConfig(name="p2", description="d2"),
+            PolicyConfig(name="p1", description="d1", allow_genetic_test_results=True),
+            PolicyConfig(name="p2", description="d2", allow_genetic_test_results=False),
         ]
 
         def mock_model(p, pol):

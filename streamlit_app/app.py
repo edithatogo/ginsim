@@ -17,13 +17,13 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
+from src.model.adversarial_engine import AdversarialEngine
+from src.model.agentic_auditor import AgenticAuditor
 from src.model.module_a_behavior import compute_testing_uptake, get_standard_policies
 from src.model.parameters import load_jurisdiction_parameters
 from src.model.pipeline import evaluate_single_policy, simulate_evolution
-from src.model.adversarial_engine import AdversarialEngine
-from src.model.agentic_auditor import AgenticAuditor
-from src.utils.persona_distiller import PersonaDistiller
 from src.utils.hta_export import HTAExporter
+from src.utils.persona_distiller import PersonaDistiller
 
 # =============================================================================
 # Visual Design System
@@ -113,7 +113,17 @@ st.markdown("### Benchmarking and Temporal Evolution Analysis (Track gdpe_0042)"
 STANDARD_POLICIES = get_standard_policies()
 
 # 2. Main Narrative Tabs
-tab_main, tab_bench, tab_sandbox, tab_spatial, tab_redteam, tab_delphi, tab_interop, tab_narrative, tab_evidence = st.tabs(
+(
+    tab_main,
+    tab_bench,
+    tab_sandbox,
+    tab_spatial,
+    tab_redteam,
+    tab_delphi,
+    tab_interop,
+    tab_narrative,
+    tab_evidence,
+) = st.tabs(
     [
         "🏠 Primary Evaluation",
         "🌍 Global Benchmarking",
@@ -225,6 +235,29 @@ with tab_main:
             st.write(f"**Information Gap:** {gap:.1%}")
             st.write(f"**Informational Redundancy:** {redundancy:.1%}")
             st.caption(f"Evidence Anchor: `{ev_key}`")
+
+        with st.expander("Technical Proofs"):
+            proofs = res.all_metrics.get("proofs", {})
+            if proofs:
+                p1, p2, p3 = st.columns(3)
+                p1.metric("Equilibrium Type", str(proofs.get("equilibrium_type", "n/a")).title())
+                p2.metric(
+                    "FOC Residual",
+                    f"{float(proofs.get('premium_stationarity', 0.0)):.3e}",
+                )
+                p3.metric(
+                    "Compliance Residual",
+                    f"{float(proofs.get('compliance_fixed_point_residual', 0.0)):.3e}",
+                )
+                st.caption(
+                    "Jacobian and Hessian diagnostics are computed from the current policy solve."
+                )
+                st.write(
+                    f"Jacobian: `{float(proofs.get('premium_jacobian', 0.0)):.3e}`  "
+                    f"Hessian: `{float(proofs.get('premium_hessian', 0.0)):.3e}`"
+                )
+            else:
+                st.info("Proof diagnostics will appear after an evaluation run.")
 
     if "temporal_history" in st.session_state:
         st.divider()
@@ -384,9 +417,13 @@ with tab_redteam:
         rt_individuals = st.number_input("Individuals for Uptake Simulation", 100, 2000, 500)
 
     if st.button("🚀 Run Adversarial Search", type="primary"):
-        engine = AdversarialEngine(learning_rate=rt_lr, steps=rt_steps, n_individuals=int(rt_individuals))
+        engine = AdversarialEngine(
+            learning_rate=rt_lr, steps=rt_steps, n_individuals=int(rt_individuals)
+        )
 
-        current_params = get_params(jurisdiction, deterrence_level, moratorium_belief, baseline_uptake)
+        current_params = get_params(
+            jurisdiction, deterrence_level, moratorium_belief, baseline_uptake
+        )
         p_target = STANDARD_POLICIES[rt_policy.lower()]
         p_base = STANDARD_POLICIES["status_quo"]
 
@@ -394,7 +431,9 @@ with tab_redteam:
             rt_result = engine.find_worst_case(p_target, p_base, current_params)
 
         if rt_result.success:
-            st.success(f"Worst-Case Scenario Found (Welfare Delta: ${rt_result.min_welfare_delta:,.2f}M)")
+            st.success(
+                f"Worst-Case Scenario Found (Welfare Delta: ${rt_result.min_welfare_delta:,.2f}M)"
+            )
 
             # Display optimized parameters
             st.write("### Adversarial Parameter Combination")
@@ -426,10 +465,15 @@ with tab_redteam:
 
             if res_r and res_b:
                 comp_data = []
+
                 # Helper to add components
                 def add_comp(name, r_val, b_val):
-                    comp_data.append({"Component": name, "Policy": rt_policy, "Value ($M)": float(r_val)})
-                    comp_data.append({"Component": name, "Policy": "Status Quo", "Value ($M)": float(b_val)})
+                    comp_data.append(
+                        {"Component": name, "Policy": rt_policy, "Value ($M)": float(r_val)}
+                    )
+                    comp_data.append(
+                        {"Component": name, "Policy": "Status Quo", "Value ($M)": float(b_val)}
+                    )
 
                 add_comp("Consumer Surplus", res_r.consumer_surplus, res_b.consumer_surplus)
                 add_comp("Insurer Profits", res_r.producer_surplus, res_b.producer_surplus)
@@ -437,17 +481,31 @@ with tab_redteam:
                 add_comp("Fiscal Impact", res_r.fiscal_impact, res_b.fiscal_impact)
 
                 df_comp = pd.DataFrame(comp_data)
-                fig_comp = px.bar(df_comp, x="Component", y="Value ($M)", color="Policy", barmode="group", title=f"Welfare Components: {rt_policy} vs Status Quo (Worst-Case)")
+                fig_comp = px.bar(
+                    df_comp,
+                    x="Component",
+                    y="Value ($M)",
+                    color="Policy",
+                    barmode="group",
+                    title=f"Welfare Components: {rt_policy} vs Status Quo (Worst-Case)",
+                )
                 fig_comp.update_layout(template="plotly_white")
                 st.plotly_chart(fig_comp, use_container_width=True)
 
             st.write("### Optimization Path (Robustness Search)")
             if rt_result.loss_history:
-                df_loss = pd.DataFrame({
-                    "Step": range(len(rt_result.loss_history)),
-                    "Welfare Delta ($M)": rt_result.loss_history
-                })
-                fig_loss = px.line(df_loss, x="Step", y="Welfare Delta ($M)", title="Gradient Descent towards Failure")
+                df_loss = pd.DataFrame(
+                    {
+                        "Step": range(len(rt_result.loss_history)),
+                        "Welfare Delta ($M)": rt_result.loss_history,
+                    }
+                )
+                fig_loss = px.line(
+                    df_loss,
+                    x="Step",
+                    y="Welfare Delta ($M)",
+                    title="Gradient Descent towards Failure",
+                )
                 fig_loss.update_layout(template="plotly_white")
                 st.plotly_chart(fig_loss, use_container_width=True)
 
@@ -467,12 +525,14 @@ with tab_delphi:
     )
 
     if not enable_auditor:
-        st.warning("Agentic Audit Layer is disabled in the sidebar. Please enable it to use this feature.")
+        st.warning(
+            "Agentic Audit Layer is disabled in the sidebar. Please enable it to use this feature."
+        )
     elif "main_result" not in st.session_state:
         st.warning("Please run a primary evaluation first to provide data for the audit.")
     else:
         res = st.session_state["main_result"]
-        
+
         # Initialize Auditor and Distiller
         if "auditor" not in st.session_state:
             st.session_state["auditor"] = AgenticAuditor()
@@ -481,16 +541,24 @@ with tab_delphi:
 
         # --- TEACHING INTERFACE ---
         with st.expander("🎓 Teach New Persona from Policy Document"):
-            st.write("Provide a text-based policy statement to 'distill' a new stakeholder persona.")
+            st.write(
+                "Provide a text-based policy statement to 'distill' a new stakeholder persona."
+            )
             custom_name = st.text_input("Persona Name:", placeholder="e.g., Māori Health Board")
-            policy_text = st.text_area("Policy Statement / Text:", height=150, placeholder="Paste policy document text here...")
-            
+            policy_text = st.text_area(
+                "Policy Statement / Text:",
+                height=150,
+                placeholder="Paste policy document text here...",
+            )
+
             if st.button("🧠 Distill & Add Persona"):
                 if custom_name and policy_text:
                     with st.spinner("Distilling priorities..."):
                         new_config = distiller.distill_persona(policy_text, name=custom_name)
                         auditor.add_persona(new_config)
-                        st.success(f"Persona '{custom_name}' taught successfully and added to registry.")
+                        st.success(
+                            f"Persona '{custom_name}' taught successfully and added to registry."
+                        )
                         # Clear history to force re-audit with new persona
                         if "delphi_history" in st.session_state:
                             del st.session_state["delphi_history"]
@@ -509,35 +577,43 @@ with tab_delphi:
         if "delphi_history" in st.session_state:
             history = st.session_state["delphi_history"]
             last_round = history[-1]
-            
+
             with c_del2:
                 # 1. Divergence Plot
-                div_data = [auditor.compute_divergence(r)["coefficient_of_variation"] for r in history]
-                df_div = pd.DataFrame({"Round": range(1, len(div_data) + 1), "Epistemic Divergence (CV)": div_data})
-                fig_div = px.line(df_div, x="Round", y="Epistemic Divergence (CV)", title="Consensus Trend (Delphi Protocol)")
+                div_data = [
+                    auditor.compute_divergence(r)["coefficient_of_variation"] for r in history
+                ]
+                df_div = pd.DataFrame(
+                    {"Round": range(1, len(div_data) + 1), "Epistemic Divergence (CV)": div_data}
+                )
+                fig_div = px.line(
+                    df_div,
+                    x="Round",
+                    y="Epistemic Divergence (CV)",
+                    title="Consensus Trend (Delphi Protocol)",
+                )
                 fig_div.update_layout(template="plotly_white")
                 st.plotly_chart(fig_div, use_container_width=True)
 
             st.divider()
             col_v1, col_v2 = st.columns([1, 1])
-            
+
             with col_v1:
                 st.write("### Persona Welfare Polar Plot")
                 # Prepare data for Radar Chart
                 categories = [v.name for v in last_round.values()]
                 values = [v.subjective_welfare for v in last_round.values()]
-                
+
                 fig_radar = go.Figure()
-                fig_radar.add_trace(go.Scatterpolar(
-                    r=values,
-                    theta=categories,
-                    fill='toself',
-                    name='Subjective Welfare ($M)'
-                ))
+                fig_radar.add_trace(
+                    go.Scatterpolar(
+                        r=values, theta=categories, fill="toself", name="Subjective Welfare ($M)"
+                    )
+                )
                 fig_radar.update_layout(
-                    polar=dict(radialaxis=dict(visible=True)),
+                    polar={"radialaxis": {"visible": True}},
                     showlegend=False,
-                    template="plotly_white"
+                    template="plotly_white",
                 )
                 st.plotly_chart(fig_radar, use_container_width=True)
 

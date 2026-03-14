@@ -1,6 +1,8 @@
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
+from dataclasses import dataclass
+from os import environ
 from pathlib import Path
 
 # Add project root to path
@@ -12,6 +14,21 @@ from loguru import logger
 from src.utils.logging_config import setup_logging
 
 setup_logging(level="INFO")
+
+RUFF_TARGETS = ["src", "streamlit_app", "tests", "gin-sim", "scripts", "noxfile.py"]
+PYRIGHT_TARGETS = ["src"]
+PYTEST_ARGS = [
+    "tests/e2e/test_dashboard.py",
+    "tests/e2e/test_dashboard_pages.py",
+    "tests/unit/test_gin_sim_wrapper.py",
+]
+MIN_COVERAGE = float(environ.get("GDPE_MIN_COVERAGE", "45"))
+
+
+@dataclass(frozen=True)
+class Check:
+    name: str
+    command: list[str]
 
 
 def run_cmd(cmd_list):
@@ -34,24 +51,44 @@ def get_coverage():
     return line_rate * 100.0
 
 
+def require_success(check: Check) -> None:
+    """Run a check and exit immediately on failure."""
+    logger.info(f"Running {check.name}: {' '.join(check.command)}")
+    rc, stdout, stderr = run_cmd(check.command)
+    if rc != 0:
+        logger.error(f"FAILED: {check.name}\nSTDOUT:\n{stdout}\nSTDERR:\n{stderr}")
+        sys.exit(1)
+
+
 def main():
     logger.info("=== Diamond Standard Quality Gate ===")
+    checks = [
+        Check("Ruff format", ["uv", "run", "ruff", "format", "--check", *RUFF_TARGETS]),
+        Check("Ruff lint", ["uv", "run", "ruff", "check", *RUFF_TARGETS]),
+        Check("Pyright", ["uv", "run", "pyright", *PYRIGHT_TARGETS]),
+        Check(
+            "Pytest fast suite",
+            [
+                "uv",
+                "run",
+                "pytest",
+                "--cov=src",
+                "--cov-report=xml",
+                "--cov-report=term-missing:skip-covered",
+                *PYTEST_ARGS,
+            ],
+        ),
+    ]
 
-    logger.info("Checking Lint (Ruff)...")
-    lint_rc, _, lint_err = run_cmd(["uv", "run", "ruff", "check", "."])
-    if lint_rc != 0:
-        logger.error(f"FAILED: Linting errors found.\n{lint_err}")
-        sys.exit(1)
-
-    logger.info("Checking Types (Pyright)...")
-    type_rc, _, type_err = run_cmd(["uv", "run", "pyright", "src/"])
-    if type_rc != 0:
-        logger.error(f"FAILED: Type errors found.\n{type_err}")
-        sys.exit(1)
+    for check in checks:
+        require_success(check)
 
     logger.info("Checking Coverage...")
     coverage = get_coverage()
     logger.info(f"Total Coverage: {coverage:.2f}%")
+    if coverage < MIN_COVERAGE:
+        logger.error(f"FAILED: Coverage {coverage:.2f}% is below required {MIN_COVERAGE:.2f}%")
+        sys.exit(1)
 
     logger.success("QUALITY GATE: PASS")
     sys.exit(0)

@@ -16,17 +16,20 @@ def test_conservation_of_surplus_utilitarian():
     """
     params = get_default_parameters()
     # Disable EVERYTHING that creates non-market value/cost
-    clean_params = params.model_copy(update={
-        "research_participation_value": 0.0,
-        "pharmac_qaly_threshold": 0.0,
-        "medicare_cost_share": 0.0,
-        "enforcement_budget": 0.0,
-        "compliance_cost_fixed": 0.0,
-        "baseline_loading": 0.0,
-        "adverse_selection_elasticity": 0.0
-    })
+    clean_params = params.model_copy(
+        update={
+            "research_participation_value": 0.0,
+            "pharmac_qaly_threshold": 0.0,
+            "medicare_cost_share": 0.0,
+            "enforcement_budget": 0.0,
+            "compliance_cost_fixed": 0.0,
+            "baseline_loading": 0.0,
+            "adverse_selection_elasticity": 0.0,
+        }
+    )
 
     from src.model.module_a_behavior import get_standard_policies
+
     policies = get_standard_policies()
 
     # We evaluate two policies and compare them to each other
@@ -55,6 +58,7 @@ def test_policy_monotonicity_uptake():
     """
     params = get_default_parameters()
     from src.model.module_a_behavior import get_standard_policies
+
     policies = get_standard_policies()
 
     res_sq = evaluate_single_policy(params, policies["status_quo"])
@@ -76,6 +80,7 @@ def test_actuarial_fairness_identity():
     """
     params = get_default_parameters()
     from src.model.module_a_behavior import get_standard_policies
+
     policy = get_standard_policies()["status_quo"]
 
     result = evaluate_single_policy(params, policy)

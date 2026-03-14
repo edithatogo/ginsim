@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import datetime
 import json
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -24,10 +24,10 @@ class HTAOutcomeSchema:
     """Standardized schema for HTA dossiers."""
 
     version: str = "1.0.0"
-    metadata: dict[str, Any] = None
-    inputs: dict[str, Any] = None
-    policy: dict[str, Any] = None
-    outcomes: dict[str, Any] = None
+    metadata: dict[str, Any] = field(default_factory=dict)
+    inputs: dict[str, Any] = field(default_factory=dict)
+    policy: dict[str, Any] = field(default_factory=dict)
+    outcomes: dict[str, Any] = field(default_factory=dict)
     uncertainty: dict[str, Any] | None = None
 
 
@@ -54,7 +54,7 @@ class HTAExporter:
             """Recursive conversion of JAX/NumPy types to plain Python."""
             if hasattr(val, "tolist"):
                 return val.tolist()
-            if isinstance(val, (np.float32, np.float64, np.int32, np.int64)):
+            if isinstance(val, (np.floating, np.integer)):
                 return float(val)
             if isinstance(val, dict):
                 return {k: _to_plain(v) for k, v in val.items()}

@@ -2,11 +2,12 @@
 repos:
   # Python linting and formatting
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.3.0
+    rev: v0.14.0
     hooks:
       - id: ruff
-        args: [--fix, --exit-non-zero-on-fix]
+        args: [src, streamlit_app, tests, gin-sim, scripts, noxfile.py]
       - id: ruff-format
+        args: [--check, src, streamlit_app, tests, gin-sim, scripts, noxfile.py]
 
   # Security - Secret Scanning
   - repo: https://github.com/Yelp/detect-secrets
@@ -43,6 +44,11 @@ repos:
   # Local validation hooks
   - repo: local
     hooks:
+      - id: pyright
+        name: Pyright (Core Source)
+        entry: uv run pyright src
+        language: system
+        pass_filenames: false
       - id: bibtex-validator
         name: BibTeX Validator (Local)
         entry: python scripts/validate_bibtex.py context/references.bib

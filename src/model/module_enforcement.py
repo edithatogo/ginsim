@@ -58,9 +58,7 @@ def compute_expected_penalty(
     """Public wrapper with alias support."""
     d_prob = kwargs.get("detection_probability", detection_prob)
     return _compute_expected_penalty_jit(
-        jnp.asarray(penalty_max),
-        jnp.asarray(d_prob),
-        jnp.asarray(enforcement_effectiveness)
+        jnp.asarray(penalty_max), jnp.asarray(d_prob), jnp.asarray(enforcement_effectiveness)
     )
 
 
@@ -80,10 +78,7 @@ def compute_compliance_decision(
 ) -> Any:
     """Public wrapper with alias support."""
     benefit = kwargs.get("violation_benefit", compliance_cost)
-    return _compute_compliance_decision_jit(
-        jnp.asarray(expected_penalty),
-        jnp.asarray(benefit)
-    )
+    return _compute_compliance_decision_jit(jnp.asarray(expected_penalty), jnp.asarray(benefit))
 
 
 def compute_compliance_equilibrium(

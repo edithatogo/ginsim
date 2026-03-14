@@ -48,11 +48,11 @@ def test_scenarios_page_diamond_rigor():
 
     assert not at.error
     assert "Policy Scenarios & Stories" in at.title[0].value
-    
+
     # Trigger analysis to see scenarios
     run_button = next(b for b in at.button if "Run Comparative Analysis" in b.label)
     run_button.click().run()
-    
+
     assert not at.error
     # Check if results are shown
     assert "High-Rigor Comparative Matrix" in at.subheader[0].value

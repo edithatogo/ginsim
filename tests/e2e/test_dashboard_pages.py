@@ -9,14 +9,22 @@ def test_sensitivity_page_runs_analysis() -> None:
     app.run()
     assert "Comprehensive Sensitivity & VOI Suite" in app.title[0].value
 
-    # Navigate to Tornado tab (Tab 2, index 2)
-    # Alternatively, PSA tab (Tab 0) also has a run button
     run_button_psa = next(b for b in app.button if "Run PSA Simulation" in b.label)
     run_button_psa.click().run()
-
-    # The simulation takes a few seconds, AppTest might need another run or longer wait
-    # We'll try to get it directly
     assert len(app.get("plotly_chart")) >= 1
+
+
+def test_sensitivity_page_runs_voi_metrics() -> None:
+    app = AppTest.from_file("streamlit_app/pages/2_Sensitivity.py", default_timeout=60)
+    app.run()
+
+    draws_input = next(n for n in app.number_input if "Monte Carlo Draws" in n.label)
+    draws_input.set_value(100).run()
+
+    run_button_voi = next(b for b in app.button if "Calculate VOI Metrics" in b.label)
+    run_button_voi.click().run()
+
+    assert any("Global EVPI" in metric.label for metric in app.metric)
 
 
 def test_scenarios_page_runs_comparison_and_exposes_download() -> None:
@@ -56,9 +64,9 @@ def test_extended_games_page_runs_each_game(game_name: str, expected_metric: str
 def test_delta_view_page_runs_comparison_and_download() -> None:
     app = AppTest.from_file("streamlit_app/pages/5_Delta_View.py", default_timeout=60)
     app.run()
-    assert "Fairness Audit" in app.title[0].value
+    assert "Policy Fairness Audit" in app.title[0].value
 
     run_button = next(b for b in app.button if "Audit Policies" in b.label)
     run_button.click().run()
 
-    assert any("Fairness Verdict" in sub.value for sub in app.subheader)
+    assert any("Fairness Verdict Matrix" in sub.value for sub in app.subheader)

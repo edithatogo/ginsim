@@ -9,7 +9,6 @@ from __future__ import annotations
 
 from typing import Any
 
-import jax
 import jax.numpy as jnp
 from loguru import logger
 
@@ -19,6 +18,15 @@ class EconomicSanityChecker:
     Enforces mathematical invariants on model results.
     JAX-compatible implementation.
     """
+
+    @staticmethod
+    def _is_concrete(value: Any) -> bool:
+        """Return True when a value can be safely materialized as a Python float."""
+        try:
+            float(jnp.mean(jnp.asarray(value)))
+        except Exception:
+            return False
+        return True
 
     @staticmethod
     def verify_result(result: Any) -> None:
@@ -40,7 +48,7 @@ class EconomicSanityChecker:
         # Note: We cannot branch on tracers during JIT/vmap.
         # We rely on the fact that JAX arrays will propagate these values.
         # For non-traced runs (concrete), we can log.
-        if not isinstance(uptake, jax.core.Tracer):
+        if EconomicSanityChecker._is_concrete(uptake):
             if float(jnp.mean(uptake)) < -1e-6:
                 logger.error(
                     f"INVARIANT VIOLATION: Negative testing uptake ({float(jnp.mean(uptake)):.4f})"
@@ -68,8 +76,7 @@ class EconomicSanityChecker:
             u_sq = jnp.asarray(results["status_quo"].testing_uptake)
             u_ban = jnp.asarray(results["ban"].testing_uptake)
 
-            if (
-                not isinstance(u_sq, jax.core.Tracer)
-                and float(jnp.mean(u_ban)) < float(jnp.mean(u_sq)) - 1e-6
+            if EconomicSanityChecker._is_concrete(u_sq) and (
+                float(jnp.mean(u_ban)) < float(jnp.mean(u_sq)) - 1e-6
             ):
                 logger.error("INVARIANT VIOLATION: Ban uptake < Status Quo uptake")

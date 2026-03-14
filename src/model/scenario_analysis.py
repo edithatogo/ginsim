@@ -48,13 +48,7 @@ def _build_model_parameters(scenario_config: dict[str, Any]) -> Any:
 
     # 1. Determine jurisdiction
     j_code = scenario_config.get("jurisdiction", "AU").strip().upper()
-    j_map = {
-        "AU": "australia",
-        "NZ": "new_zealand",
-        "UK": "uk",
-        "CA": "canada",
-        "US": "us"
-    }
+    j_map = {"AU": "australia", "NZ": "new_zealand", "UK": "uk", "CA": "canada", "US": "us"}
     j_id = j_map.get(j_code, "australia")
 
     # 2. Load base parameters for that jurisdiction
@@ -108,7 +102,7 @@ def _build_policy_config(scenario_name: str, scenario_config: dict[str, Any]) ->
 
     parameter_values = scenario_config.get("parameters", {})
     valid_policy_fields = {f.name for f in fields(PolicyConfig)}
-    
+
     for key, value in parameter_values.items():
         if key in valid_policy_fields and key not in policy_updates:
             policy_updates[key] = value
@@ -155,8 +149,10 @@ def evaluate_scenario(
     # Extract metrics
     testing_uptake = result.testing_uptake if hasattr(result, "testing_uptake") else 0.0
     welfare_impact = result.welfare_impact if hasattr(result, "welfare_impact") else 0.0
-    equity_weighted_welfare = result.equity_weighted_welfare if hasattr(result, "equity_weighted_welfare") else 0.0
-    qalys_gained = 0.0 # Placeholder
+    equity_weighted_welfare = (
+        result.equity_weighted_welfare if hasattr(result, "equity_weighted_welfare") else 0.0
+    )
+    qalys_gained = 0.0  # Placeholder
     compliance_rate = result.compliance_rate if hasattr(result, "compliance_rate") else 0.0
     insurance_premiums = (
         result.insurance_premiums
@@ -205,7 +201,8 @@ def compare_scenarios(
         for r in results:
             if r.scenario_name != baseline_name:
                 deltas[r.scenario_name] = {
-                    "testing_uptake_delta": float(r.testing_uptake) - float(baseline.testing_uptake),
+                    "testing_uptake_delta": float(r.testing_uptake)
+                    - float(baseline.testing_uptake),
                     "welfare_delta": float(r.welfare_impact) - float(baseline.welfare_impact),
                     "compliance_delta": float(r.compliance_rate) - float(baseline.compliance_rate),
                 }
@@ -254,6 +251,7 @@ def run_scenario_analysis(
 
     if model_func is None:
         from src.model.pipeline import evaluate_single_policy as default_model_func
+
         model_func = default_model_func
 
     scenarios = load_scenarios(config_path)

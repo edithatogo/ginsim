@@ -6,7 +6,9 @@ requires-python = ">=3.11, <3.13"
 dependencies = [
   "jax>=0.4.25",
   "jaxlib>=0.4.25",
+  "pandas>=2.0.0",
   "numpy>=1.26",
+  "openpyxl>=3.1.0",
   "polars>=0.20.0",
   "numpyro>=0.15.0",
   "optax>=0.2.2",
@@ -53,36 +55,43 @@ dev = [
 
 [tool.ruff]
 line-length = 100
-target-version = "py310"
+target-version = "py311"
 exclude = [
     "external",
-    "gin-sim",
     ".venv",
     "__pycache__",
+    "local_only",
+    "outputs",
+    "check-*.py",
+    "check_conductor.py",
 ]
 
 [tool.ruff.lint]
-# Select rules
 select = ["E", "W", "F", "I", "N", "UP", "S", "B", "A", "C4", "T10", "ISC", "ICN", "G", "PIE", "T20", "PT", "Q", "RET", "SIM", "TID", "TCH", "FLY", "RUF"]
-# Ignore rules
 ignore = [
     "F722", "E501", "COM812", "PLR2004", "ARG", "PLR0913", "PLR0915", "ANN", "D", "PTH", "PERF", "ERA", "RUF001", "RUF003", "S603", "S607", "S602",
     "E402", "N806", "S101", "S314", "E722", "B007", "DTZ", "PLW1510",
-    "TCH", # Disable type-checking block requirement (breaks beartype/jaxtyping runtime)
-    "RET505", "UP038", "B904", # allow else after return for readability
+    "TCH",
+    "RET505", "B904",
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["INP001"]
 "scripts/*" = ["T201", "INP001"]
 "streamlit_app/*" = ["T201", "INP001"]
+"gin-sim/*.py" = ["N999", "RUF100"]
+"gin-sim/pages/*.py" = ["N999", "RUF100"]
 
 [tool.pyright]
-pythonVersion = "3.10"
+pythonVersion = "3.11"
 typeCheckingMode = "basic"
 exclude = ["**/tests/**", "**/scripts/**", "**/external/**", ".venv", "outputs"]
+reportMissingTypeStubs = false
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-v --cov=src --cov-report=xml"
+addopts = "-v --strict-config --strict-markers --cov=src --cov-report=xml --cov-fail-under=45"
 filterwarnings = ["ignore::DeprecationWarning"]
+markers = [
+  "slow: tests that hit deployed services or use slower browser/network interactions",
+]

@@ -76,3 +76,9 @@ def test_deployment_requirements_install_project_runtime():
 
     assert "-e ." in root_requirements
     assert "-e ." in gin_sim_requirements
+
+
+def test_gin_sim_requirements_delegate_to_dashboard_runtime():
+    gin_sim_requirements = GIN_SIM_REQUIREMENTS.read_text(encoding="utf-8")
+
+    assert "-r ../streamlit_app/requirements.txt" in gin_sim_requirements

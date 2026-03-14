@@ -42,20 +42,18 @@ class BayesianPriorSuite:
         Jurisdiction-specific priors for equity factor.
         """
         base_map = {
-            "new_zealand": 1.35, # Maori Health Sovereignty
+            "new_zealand": 1.35,  # Maori Health Sovereignty
             "australia": 1.15,
             "us": 1.40,
             "uk": 1.20,
-            "canada": 1.10
+            "canada": 1.10,
         }
         mu = base_map.get(jurisdiction.lower(), 1.0)
         return mu + jr.normal(key, (n_draws,)) * 0.05
 
 
 def sample_parameter_matrix(
-    key: Array,
-    n_draws: int,
-    jurisdiction: str = "australia"
+    key: Array, n_draws: int, jurisdiction: str = "australia"
 ) -> dict[str, Array]:
     """
     Generate a full matrix of Bayesian prior draws.

@@ -163,7 +163,9 @@ def compute_proxy_substitution_effect(
 
         # 2. Medical Marker Component (Hersch 2019: ~30-50% capture)
         # TEMPORAL DYNAMICS: AI capabilities improve proxy extraction over time
-        tech_multiplier = 1.0 + (getattr(params, "tech_improvement_rate", 0.15) * float(year))
+        tech_multiplier = 1.0 + (
+            getattr(params, "tech_improvement_rate", 0.15) * jnp.asarray(year, dtype=jnp.float32)
+        )
         mm_capture = jnp.minimum(1.0, params.proxy_substitution_rate * tech_multiplier)
 
         # Aggregate redundancy: Insurers use the best available proxy suite
@@ -173,14 +175,14 @@ def compute_proxy_substitution_effect(
         enforcement_drag = 1.0 - (0.25 * reform_policy.enforcement_strength)
 
         # Resulting accuracy
-        reform_accuracy = float(baseline_accuracy * informational_redundancy * enforcement_drag)
+        reform_accuracy = baseline_accuracy * informational_redundancy * enforcement_drag
         evidence_key = "taylor_2021_hersch_2019_combined_temporal"
 
-    accuracy_loss = float(baseline_accuracy - reform_accuracy)
+    accuracy_loss = baseline_accuracy - reform_accuracy
 
     # Information Gap: How much genetic info remains effectively hidden (1 - redundancy)
-    residual_information_gap = float(
-        max(0.0, 1.0 - (reform_accuracy / (baseline_accuracy + 1e-10)))
+    residual_information_gap = jnp.maximum(
+        0.0, 1.0 - (reform_accuracy / (baseline_accuracy + 1e-10))
     )
 
     return {
@@ -188,7 +190,7 @@ def compute_proxy_substitution_effect(
         "accuracy_reform": reform_accuracy,
         "accuracy_loss": accuracy_loss,
         "residual_information_gap": residual_information_gap,
-        "informational_redundancy": float(informational_redundancy),
+        "informational_redundancy": informational_redundancy,
         "source_evidence_key": evidence_key,
     }
 

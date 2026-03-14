@@ -53,7 +53,7 @@ def evaluate_core_numerical(params: ModelParameters, policy: PolicyConfig) -> di
     JIT-compatible numerical kernel that returns only arrays.
     """
     # Use global evaluate_single_policy but extract only numbers
-    res = evaluate_single_policy(params, policy)
+    res = evaluate_single_policy(params, policy, include_proofs=False)
     return {
         "uptake": res.testing_uptake,
         "welfare": res.welfare_impact,

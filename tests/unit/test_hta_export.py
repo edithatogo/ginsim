@@ -9,7 +9,7 @@ from src.model.reporting_common import PolicyEvaluationResult
 from src.utils.hta_export import HTAExporter
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_result():
     dcba = DCBAResult(
         consumer_surplus=100.0,

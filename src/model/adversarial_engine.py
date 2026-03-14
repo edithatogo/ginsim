@@ -45,7 +45,9 @@ class AdversarialResult(NamedTuple):
     baseline_welfare_result: Any = None
 
 
-def parameter_mapping(theta: dict[str, Any], base_params: ModelParameters) -> tuple[ModelParameters, dict[str, Any]]:
+def parameter_mapping(
+    theta: dict[str, Any], base_params: ModelParameters
+) -> tuple[ModelParameters, dict[str, Any]]:
     """
     Map unbounded optimizer variables (theta) to bounded model parameters.
 
@@ -204,7 +206,7 @@ class AdversarialEngine:
 
         init_state = (initial_theta, opt_state)
 
-        (final_theta, final_opt_state), (theta_history, losses) = jax.jit(
+        (_final_theta, _final_opt_state), (theta_history, losses) = jax.jit(
             lambda s: jax.lax.scan(step_fn_with_history, s, None, length=self.steps)
         )(init_state)
 

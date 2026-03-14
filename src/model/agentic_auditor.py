@@ -9,8 +9,8 @@ Supports dynamic 'Teaching' of new personas from external documents.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
 from pathlib import Path
+from typing import Any
 
 import jax.numpy as jnp
 import yaml
@@ -37,20 +37,20 @@ class AgenticAuditor:
     """
 
     def __init__(
-        self, 
+        self,
         config_path: str = "configs/stakeholder_personas.yaml",
-        taught_path: str = "configs/taught_stakeholders.yaml"
+        taught_path: str = "configs/taught_stakeholders.yaml",
     ):
         self.config_path = config_path
         self.taught_path = taught_path
         self.personas = {}
-        
+
         # 1. Load standard personas
         self._load_standard_personas()
-        
+
         # 2. Load taught (cached) personas
         self._load_taught_personas()
-        
+
         logger.info(f"AgenticAuditor initialized with {len(self.personas)} personas.")
 
     def _load_standard_personas(self):
@@ -94,12 +94,11 @@ class AgenticAuditor:
             with open(self.config_path) as f:
                 standard_config = yaml.safe_load(f)
             standard_ids = set(standard_config.get("personas", {}).keys())
-            
+
             taught_personas = {
-                pid: pdata for pid, pdata in self.personas.items() 
-                if pid not in standard_ids
+                pid: pdata for pid, pdata in self.personas.items() if pid not in standard_ids
             }
-            
+
             if taught_personas:
                 with open(self.taught_path, "w") as f:
                     yaml.dump({"personas": taught_personas}, f)

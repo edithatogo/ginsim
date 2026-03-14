@@ -23,13 +23,16 @@ st.title("⚖️ Policy Fairness Audit")
 st.markdown("Auditing policy reforms against the 'Separating' Status Quo baseline.")
 
 # Controls
-jurisdiction = st.sidebar.selectbox("Jurisdiction", ["Australia", "New Zealand", "UK", "Canada", "US"])
+jurisdiction = st.sidebar.selectbox(
+    "Jurisdiction", ["Australia", "New Zealand", "UK", "Canada", "US"]
+)
 baseline_key = "au_status_quo"
 
 scenarios = load_scenarios(project_root / "configs" / "scenarios.yaml")
 
 if st.button("⚖️ Audit Policies", type="primary"):
     with st.spinner("Executing fairness audit matrix..."):
+
         def model_func(params, policy):
             return evaluate_single_policy(params, policy)
 
@@ -47,7 +50,9 @@ if st.button("⚖️ Audit Policies", type="primary"):
             u_delta = float(r.testing_uptake) - float(b_res.testing_uptake)
             w_delta = float(r.welfare_impact) - float(b_res.welfare_impact)
             ew_delta = float(r.equity_weighted_welfare) - float(b_res.equity_weighted_welfare)
-            p_delta = float(r.insurance_premiums["premium_high"]) - float(b_res.insurance_premiums["premium_high"])
+            p_delta = float(r.insurance_premiums["premium_high"]) - float(
+                b_res.insurance_premiums["premium_high"]
+            )
 
             # Fairness audit uses utilitarian welfare delta for the core check
             # but we surface both in the table.
@@ -60,7 +65,9 @@ if st.button("⚖️ Audit Policies", type="primary"):
                     "Utilitarian Delta": f"${w_delta:+,.0f}",
                     "Equity-Weighted Delta": f"${ew_delta:+,.0f}",
                     "Ethical Category": "FAIR" if fairness.is_fair else "UNFAIR",
-                    "Fairness Rationale": "; ".join(fairness.reasons) if fairness.reasons else "Maintains equity.",
+                    "Fairness Rationale": "; ".join(fairness.reasons)
+                    if fairness.reasons
+                    else "Maintains equity.",
                 }
             )
 

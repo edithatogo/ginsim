@@ -30,6 +30,15 @@ KNOWN_ERROR_TEXT = (
     "Please contact support.",
 )
 
+FATAL_REMOTE_ERROR_TEXT = (
+    "Error installing requirements.",
+    "Error running app",
+    "This app has encountered an error",
+    "TypeError:",
+    "Traceback:",
+    "Could not find page:",
+)
+
 
 def _surface_text(surface: Page | Frame) -> str:
     """Read outer page text defensively for smoke assertions."""
@@ -53,7 +62,9 @@ def _dashboard_surface_and_text(page: Page) -> tuple[Page | Frame | None, str]:
     return None, body_text
 
 
-def _wait_for_surface_text(surface: Page | Frame, expected_text: str, timeout_ms: int = 30_000) -> str:
+def _wait_for_surface_text(
+    surface: Page | Frame, expected_text: str, timeout_ms: int = 30_000
+) -> str:
     """Wait until expected text appears in the dashboard surface."""
     deadline = time.time() + (timeout_ms / 1000)
     last_text = ""
@@ -72,7 +83,9 @@ def _wait_for_surface_text(surface: Page | Frame, expected_text: str, timeout_ms
     pytest.fail(f"Timed out waiting for {expected_text!r}. Last frame text: {last_text}")
 
 
-def _click_and_wait(surface: Page | Frame, button_name: str, expected_text: str, timeout_ms: int = 45_000) -> str:
+def _click_and_wait(
+    surface: Page | Frame, button_name: str, expected_text: str, timeout_ms: int = 45_000
+) -> str:
     """Click a button and wait for the expected output text to appear."""
     surface.get_by_role("button", name=button_name).click(timeout=30_000)
     if isinstance(surface, Frame):
@@ -100,6 +113,10 @@ def _wait_for_dashboard(page: Page, remote_url: str) -> tuple[Page | Frame, str]
         matched_error = next((text for text in KNOWN_ERROR_TEXT if text in body_text), None)
         if matched_error is not None:
             last_state = matched_error
+            if matched_error in FATAL_REMOTE_ERROR_TEXT:
+                pytest.fail(
+                    f"Remote dashboard at {remote_url} returned a fatal app error: {matched_error}"
+                )
             page.wait_for_timeout(15_000)
             continue
 
@@ -151,14 +168,14 @@ def test_remote_app_loads():
                         "🎲 Run PSA Simulation",
                         "Expected Uptake (Mean)",
                     )
-                    assert "Expected Welfare (Mean)" in body_text
+                    assert "95% CrI:" in body_text
                 elif sidebar_label == "Scenarios":
                     body_text = _click_and_wait(
                         dashboard_surface,
                         "🔍 Run Comparative Analysis",
                         "High-Rigor Comparative Matrix",
                     )
-                    assert "Net Social Benefit" in body_text
+                    assert "Societal Welfare by Scenario (DCBA Integrated)" in body_text
                 elif sidebar_label == "Extended Games":
                     body_text = _click_and_wait(
                         dashboard_surface,

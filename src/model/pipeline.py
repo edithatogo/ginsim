@@ -7,7 +7,7 @@ the 100% full economic impact of genetic discrimination policy regimes.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 import jax.numpy as jnp
 from loguru import logger
@@ -19,6 +19,7 @@ from . import module_c_insurance_eq as mod_c
 from . import module_d_proxy as mod_d
 from . import module_enforcement as mod_e
 from . import module_f_data_quality as mod_f
+from . import proof_engine
 from .parameters import ModelParameters, PolicyConfig, get_default_parameters
 from .reporting_common import PolicyEvaluationResult
 from .sanity_checker import EconomicSanityChecker
@@ -29,6 +30,7 @@ def evaluate_single_policy(
     policy: PolicyConfig,
     year: int = 0,
     is_annual: bool = False,
+    include_proofs: bool = True,
 ) -> PolicyEvaluationResult:
     """
     Execute full clinical-economic pipeline for a single policy configuration.
@@ -80,6 +82,7 @@ def evaluate_single_policy(
     )
 
     # 8. Aggregate into Result Object
+    proof_bundle = proof_engine.summarize_proofs(p_params, p_policy) if include_proofs else {}
     result = PolicyEvaluationResult(
         policy_name=p_policy.name,
         jurisdiction=p_params.jurisdiction,
@@ -104,6 +107,7 @@ def evaluate_single_policy(
             "proxy": proxy,
             "clinical": clinical,
             "data_quality": data_quality,
+            "proofs": proof_bundle,
             "welfare": {
                 "consumer_surplus": dcba_res.consumer_surplus,
                 "producer_surplus": dcba_res.producer_surplus,
@@ -192,9 +196,10 @@ def compare_policies(
 ) -> dict[str, Any] | Any:
     """Compare two policies and return delta metrics."""
     if isinstance(params, dict) and "status_quo" in params:
-        res_base = params[baseline_name]
+        typed_params = cast(dict[str, PolicyEvaluationResult], params)
+        res_base = typed_params[baseline_name]
         results = {}
-        for name, res in params.items():
+        for name, res in typed_params.items():
             if name == baseline_name:
                 continue
             results[name] = {
@@ -206,7 +211,8 @@ def compare_policies(
         return results if reform_name is None else results.get(reform_name)
 
     # Parameters mode
-    res_base = evaluate_single_policy(params, get_standard_policies()["status_quo"])
+    typed_params = cast(ModelParameters, params)
+    res_base = evaluate_single_policy(typed_params, get_standard_policies()["status_quo"])
     return {
         "uptake_delta": 0.0,
         "welfare_delta": 0.0,
@@ -217,7 +223,11 @@ def compare_policies(
 
 def generate_policy_summary(result: Any) -> str:
     """Generate summary. Handles dict or result object."""
-    res = result["status_quo"] if isinstance(result, dict) and "status_quo" in result else result
+    res = (
+        cast(dict[str, PolicyEvaluationResult], result)["status_quo"]
+        if isinstance(result, dict) and "status_quo" in result
+        else cast(PolicyEvaluationResult, result)
+    )
 
     lines = [
         f"POLICY IMPACT SUMMARY: {res.policy_name}",

@@ -158,7 +158,6 @@ def compute_fiscal_impact(
     )
 
 
-@jit(static_argnames=["time_horizon", "discount_rate", "is_annual"])
 def compute_dcba(
     testing_uptake: Array | float,
     baseline_uptake: Array | float,
@@ -218,27 +217,33 @@ def compute_dcba(
         # Research loss is also discounted
         re = re * compute_discount_factor(time_horizon, discount_rate, is_annual=True)
 
-    # 1. Compute net local welfare (Utilitarian)
-    net_welfare_local = cs + ps + hb + fi - re
-
-    # 2. Compute Equity-Adjusted Welfare
-    # We apply the equity_factor primarily to health and consumer surplus (direct people impact)
-    weighted_welfare_local = (cs + hb) * _to_float_scalar(equity_factor) + (ps + fi - re)
-
-    # 3. Apply PPP normalization to all components
+    # Apply PPP normalization to all components first so returned ledger values are
+    # arithmetically self-consistent under float32.
     ppp = jnp.asarray(ppp_conversion_factor)
     dist_weight = _to_float_scalar(distributional_weight)
+    equity = _to_float_scalar(equity_factor)
+
+    cs_scaled = cs * ppp
+    ps_scaled = ps * ppp
+    hb_scaled = hb * ppp
+    fi_scaled = fi * ppp
+    re_scaled = re * ppp
+
+    component_welfare = cs_scaled + ps_scaled + hb_scaled + fi_scaled - re_scaled
+    equity_component_welfare = (cs_scaled + hb_scaled) * equity + (
+        ps_scaled + fi_scaled - re_scaled
+    )
 
     return DCBAResult(
-        net_welfare=net_welfare_local * ppp * dist_weight,
-        equity_weighted_welfare=weighted_welfare_local * ppp * dist_weight,
-        consumer_surplus=cs * ppp,
-        producer_surplus=ps * ppp,
-        health_benefits=hb * ppp,
-        fiscal_impact=fi * ppp,
-        research_externalities=re * ppp,
+        net_welfare=component_welfare * dist_weight,
+        equity_weighted_welfare=equity_component_welfare * dist_weight,
+        consumer_surplus=cs_scaled,
+        producer_surplus=ps_scaled,
+        health_benefits=hb_scaled,
+        fiscal_impact=fi_scaled,
+        research_externalities=re_scaled,
         distributional_weight=dist_weight,
-        equity_factor=_to_float_scalar(equity_factor),
+        equity_factor=equity,
         time_horizon=time_horizon,
     )
 

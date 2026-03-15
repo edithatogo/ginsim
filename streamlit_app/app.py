@@ -768,13 +768,25 @@ with tab_narrative:
     st.write("Authoritative narrative generation with live data binding from simulation results.")
 
     draft_path = Path("local_only/docs/manuscript_draft.md")
+    narrative_script_path = Path("scripts/inject_manuscript_data.py")
+    narrative_updater_available = narrative_script_path.exists()
 
-    if st.button("🔄 Update Narrative", type="primary"):
+    if not narrative_updater_available:
+        st.info(
+            "Narrative updates are unavailable in this deployment because the manuscript "
+            "injection script is not bundled here."
+        )
+
+    if st.button(
+        "🔄 Update Narrative",
+        type="primary",
+        disabled=not narrative_updater_available,
+    ):
         with st.spinner("Injecting live data into manuscript template..."):
             import subprocess
 
             try:
-                subprocess.run([sys.executable, "scripts/inject_manuscript_data.py"], check=True)
+                subprocess.run([sys.executable, str(narrative_script_path)], check=True)
                 st.success("Narrative updated successfully!")
             except Exception as e:
                 st.error(f"Failed to update narrative: {e}")
@@ -785,7 +797,10 @@ with tab_narrative:
         st.markdown("---")
         st.markdown(content)
     else:
-        st.warning("Manuscript draft not found. Click 'Update Narrative' to generate it.")
+        if narrative_updater_available:
+            st.warning("Manuscript draft not found. Click 'Update Narrative' to generate it.")
+        else:
+            st.info("No manuscript draft is bundled with this deployment.")
 
 with tab_evidence:
     st.subheader("🧬 Diamond-Standard Traceability")

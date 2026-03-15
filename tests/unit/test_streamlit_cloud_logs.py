@@ -47,3 +47,21 @@ TypeError: unexpected config value
     assert len(findings) == 2
     assert findings[0].sources == (inner_name,)
     assert findings[0].signature == "Error running app"
+
+
+def test_summarise_streamlit_cloud_log_extracts_deployment_failures(tmp_path: Path) -> None:
+    log_path = tmp_path / "deployment.log"
+    log_path.write_text(
+        """
+[04:14:12] 🐙 Pulling code changes from Github...
+[04:14:13] ❗️ Updating the app files has failed: exit status 1
+/home/adminuser/venv/bin/python3: can't open file '/mount/src/ginsim/scripts/inject_manuscript_data.py': [Errno 2] No such file or directory
+""".strip(),
+        encoding="utf-8",
+    )
+
+    findings = summarise_streamlit_cloud_log(log_path)
+
+    assert len(findings) == 1
+    assert findings[0].count == 1
+    assert "inject_manuscript_data.py" in findings[0].signature

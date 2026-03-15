@@ -8,6 +8,7 @@ the quality of genomic research data.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import partial
 from typing import Any
 
 import jax
@@ -88,7 +89,7 @@ def compute_participation_probability(
     return jnp.clip(participation_prob, 0.0, 1.0)
 
 
-@jit(static_argnames=["params", "policy"])
+@partial(jit, static_argnames=("params", "policy"))
 def compute_participation_rate(
     params: ModelParameters,
     policy: PolicyConfig,
@@ -143,7 +144,7 @@ def compute_selection_bias(
     return max_bias * (1.0 - jnp.asarray(participation_rate))
 
 
-@jit(static_argnames=["params", "policy", "reform"])
+@partial(jit, static_argnames=("params", "policy", "reform"))
 def _compute_data_quality_core(
     params: ModelParameters,
     policy: PolicyConfig,

@@ -9,6 +9,7 @@ correlated proxies for genetic risk.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import partial
 from typing import Any
 
 import jax
@@ -29,7 +30,7 @@ class UnderwritingAccuracy:
     mispricing_error: float
 
 
-@jit(static_argnames=["params", "policy", "max_iterations", "noise_level"])
+@partial(jit, static_argnames=("params", "policy", "max_iterations", "noise_level"))
 def optimize_underwriting(
     params: ModelParameters,
     policy: PolicyConfig,

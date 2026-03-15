@@ -72,3 +72,14 @@ class TestFunctionality:
 
         assert "%" in uptake_metric.value
         assert "$" in welfare_metric.value
+
+    def test_narrative_update_is_disabled_when_script_is_missing(self, app_test):
+        """Test the manuscript update action is guarded when the injector script is absent."""
+        app_test.run()
+
+        narrative_button = next(b for b in app_test.button if "Update Narrative" in b.label)
+        assert narrative_button.disabled
+        assert any(
+            "Narrative updates are unavailable in this deployment" in info.value
+            for info in app_test.info
+        )

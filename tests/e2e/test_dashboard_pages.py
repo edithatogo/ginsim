@@ -32,7 +32,7 @@ def test_sensitivity_page_runs_voi_metrics() -> None:
     app = AppTest.from_file("streamlit_app/pages/2_Sensitivity.py", default_timeout=60)
     app.run()
 
-    draws_input = next(n for n in app.number_input if "Monte Carlo Draws" in n.label)
+    draws_input = next(n for n in app.number_input if "Number of simulation draws" in n.label)
     draws_input.set_value(100).run()
 
     run_button_voi = next(b for b in app.button if "Calculate VOI Metrics" in b.label)

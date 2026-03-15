@@ -30,7 +30,9 @@ from streamlit_app.dashboard_ui import (
     jurisdiction_to_config_id,
     render_current_run_summary,
     render_footer,
+    render_glossary,
     render_sidebar_build_info,
+    render_view_mode_sidebar,
 )
 
 # Page configuration
@@ -40,13 +42,30 @@ st.set_page_config(
     layout="wide",
 )
 
-st.title("📊 Comprehensive Sensitivity & VOI Suite")
-st.markdown("Quantifying policy robustness and the value of scientific evidence.")
+audience_mode = render_view_mode_sidebar()
+
+st.title("📊 Uncertainty Explorer")
+st.markdown(
+    "See how uncertain assumptions can change the result, and which unknowns matter most."
+)
+render_glossary(audience_mode)
 
 # Sidebar Settings
-st.sidebar.header("⚙️ Global MC Settings")
-n_draws = st.sidebar.number_input("Monte Carlo Draws", 100, 10000, 1000, step=100)
-policy_name = st.sidebar.selectbox("Target Policy", ["Status Quo", "Moratorium", "Ban"])
+st.sidebar.header("⚙️ Simulation settings")
+n_draws = st.sidebar.number_input("Number of simulation draws", 100, 10000, 1000, step=100)
+if audience_mode == "General audience":
+    policy_name = st.sidebar.selectbox(
+        "Policy to test",
+        ["Current Rules", "Temporary Ban", "Full Ban"],
+    )
+    policy_id = {
+        "Current Rules": "status_quo",
+        "Temporary Ban": "moratorium",
+        "Full Ban": "ban",
+    }[policy_name]
+else:
+    policy_name = st.sidebar.selectbox("Policy to test", ["Status Quo", "Moratorium", "Ban"])
+    policy_id = policy_name.lower().replace(" ", "_")
 jurisdiction = st.sidebar.selectbox("Jurisdiction", JURISDICTION_OPTIONS)
 render_sidebar_build_info()
 
@@ -61,69 +80,76 @@ render_current_run_summary(
 )
 
 tab_psa, tab_voi, tab_tornado = st.tabs(
-    ["🎲 Probabilistic (PSA)", "💎 Value of Info (VOI)", "🌪️ One-Way (Tornado)"]
+    [
+        "🎲 Uncertainty simulation",
+        "💎 Value of better evidence",
+        "🌪️ One factor at a time",
+    ]
 )
 
 # 1. PSA TAB
 with tab_psa:
-    st.subheader("Monte Carlo Uncertainty Propagation")
+    st.subheader("Uncertainty simulation")
+    st.caption(
+        "This runs the model many times with different plausible assumptions to show a range of outcomes."
+    )
     if st.button("🎲 Run PSA Simulation", type="primary"):
         with st.spinner(f"Executing {n_draws} JAX-vectorized simulations..."):
             policies = get_standard_policies()
-            target_policy = policies[policy_name.lower().replace(" ", "_")]
+            target_policy = policies[policy_id]
 
             res_psa = run_psa(base_params, target_policy, n_draws=n_draws)
 
             c1, c2 = st.columns(2)
             with c1:
-                st.metric("Expected Uptake (Mean)", f"{res_psa['uptake'].mean:.1%}")
+                st.metric("Average testing uptake", f"{res_psa['uptake'].mean:.1%}")
                 st.caption(
-                    f"95% CrI: [{res_psa['uptake'].lower_95:.1%}, {res_psa['uptake'].upper_95:.1%}]"
+                    f"Likely range: [{res_psa['uptake'].lower_95:.1%}, {res_psa['uptake'].upper_95:.1%}]"
                 )
 
                 # Histogram
                 fig_uptake = px.histogram(
                     res_psa["uptake"].samples.tolist(),
                     nbins=30,
-                    title="Uptake Distribution",
-                    labels={"value": "Predicted Uptake"},
+                    title="Range of predicted testing uptake",
+                    labels={"value": "Predicted testing uptake"},
                 )
                 fig_uptake.update_layout(template="plotly_white", showlegend=False)
                 st.plotly_chart(fig_uptake, use_container_width=True)
 
             with c2:
-                st.metric("Expected Welfare (Mean)", f"${res_psa['welfare'].mean:,.0f}")
+                st.metric("Average social benefit", f"${res_psa['welfare'].mean:,.0f}")
                 st.caption(
-                    f"95% CrI: [${res_psa['welfare'].lower_95:,.0f}, ${res_psa['welfare'].upper_95:,.0f}]"
+                    f"Likely range: [${res_psa['welfare'].lower_95:,.0f}, ${res_psa['welfare'].upper_95:,.0f}]"
                 )
 
                 # Histogram
                 fig_welfare = px.histogram(
                     res_psa["welfare"].samples.tolist(),
                     nbins=30,
-                    title="Welfare Distribution (PPP)",
-                    labels={"value": "Standardized Welfare Impact ($)"},
+                    title="Range of predicted social benefit",
+                    labels={"value": "Social benefit ($)"},
                 )
                 fig_welfare.update_layout(template="plotly_white", showlegend=False)
                 st.plotly_chart(fig_welfare, use_container_width=True)
 
 # 2. VOI TAB
 with tab_voi:
-    st.subheader("Expected Value of Information (EVPI)")
+    st.subheader("Value of better evidence")
     st.markdown(
-        "How much is it worth to resolve all parameter uncertainty before choosing a policy?"
+        "This asks how valuable it would be to reduce uncertainty before choosing a policy."
     )
 
     if st.button("💎 Calculate VOI Metrics", type="primary"):
         with st.spinner("Computing global welfare matrix..."):
             voi_res = run_full_voi_analysis(base_params, n_draws=n_draws)
 
-            st.metric("Global EVPI (Total Uncertainty)", f"${voi_res['evpi']:,.2f}")
+            st.metric("Value of removing uncertainty", f"${voi_res['evpi']:,.2f}")
             st.info(
-                "EVPI represents the maximum a society should pay for perfect scientific evidence to eliminate all decision risk."
+                "This is the maximum amount it would be worth paying for perfect evidence that removes decision risk."
             )
 
-            st.subheader("Partial Information Value (EVPPI)")
+            st.subheader("Which unknown matters most?")
             evppi_df = pd.DataFrame(
                 [
                     {"Parameter": k, "Value of Information ($)": v}
@@ -136,28 +162,31 @@ with tab_voi:
                 x="Value of Information ($)",
                 y="Parameter",
                 orientation="h",
-                title="Research Priorities: Which parameter matters most?",
+                title="Which uncertain assumption matters most?",
             )
             fig_voi.update_layout(template="plotly_white")
             st.plotly_chart(fig_voi, use_container_width=True)
 
 # 3. TORNADO TAB
 with tab_tornado:
-    st.subheader("One-Way Deterministic Sensitivity")
+    st.subheader("One factor at a time")
+    st.caption(
+        "Important: this chart currently shows how each assumption changes testing uptake only, not the full welfare result."
+    )
     param_options = {
-        "Deterrence Elasticity": "deterrence_elasticity",
-        "Moratorium Effect": "moratorium_effect",
-        "Adverse Selection": "adverse_selection_elasticity",
-        "Baseline Loading": "baseline_loading",
+        "Fear reduces testing": "deterrence_elasticity",
+        "Restrictions feel reassuring": "moratorium_effect",
+        "Adverse selection pressure": "adverse_selection_elasticity",
+        "Baseline insurance loading": "baseline_loading",
     }
 
     selected_params = st.multiselect(
-        "Parameters to Vary", list(param_options.keys()), default=list(param_options.keys())
+        "Assumptions to vary", list(param_options.keys()), default=list(param_options.keys())
     )
 
     if st.button("🌪️ Generate Tornado Chart", type="primary"):
         policies = get_standard_policies()
-        policy = policies[policy_name.lower().replace(" ", "_")]
+        policy = policies[policy_id]
 
         def model_func(p):
             res = evaluate_single_policy(p, policy)
@@ -180,8 +209,8 @@ with tab_tornado:
             )
         )
         fig_t.update_layout(
-            title="Impact on Testing Uptake (±25% variation)", template="plotly_white"
+            title="Impact on testing uptake (±25% variation)", template="plotly_white"
         )
         st.plotly_chart(fig_t, use_container_width=True)
 
-render_footer("JAX-Vectorized Uncertainty Suite")
+render_footer("Uncertainty Explorer")

@@ -17,25 +17,30 @@ from src.model.fairness import audit_policy_fairness
 from src.model.module_a_behavior import get_standard_policies
 from src.model.parameters import load_jurisdiction_parameters
 from src.model.pipeline import evaluate_single_policy
+from src.model.scenario_analysis import (
+    evaluate_scenario,
+    filter_scenarios_by_jurisdiction,
+    get_scenario_display_name,
+    load_scenarios,
+)
 from streamlit_app.dashboard_ui import (
     JURISDICTION_OPTIONS,
     jurisdiction_to_code,
     jurisdiction_to_config_id,
     render_current_run_summary,
     render_footer,
+    render_glossary,
     render_sidebar_build_info,
-)
-from streamlit_app.scenario_runtime import (
-    evaluate_scenario,
-    filter_scenarios_by_jurisdiction,
-    get_scenario_display_name,
-    load_scenarios,
+    render_view_mode_sidebar,
 )
 
 st.set_page_config(page_title="Fairness Audit", page_icon="⚖️", layout="wide")
 
-st.title("⚖️ Policy Fairness Audit")
-st.markdown("Auditing policy reforms against the 'Separating' Status Quo baseline.")
+audience_mode = render_view_mode_sidebar()
+
+st.title("⚖️ Fairness Check")
+st.markdown("Compare reform scenarios against the current rules and flag uneven effects.")
+render_glossary(audience_mode)
 
 # Controls
 jurisdiction = st.sidebar.selectbox("Jurisdiction", JURISDICTION_OPTIONS)
@@ -91,18 +96,18 @@ if st.button("⚖️ Audit Policies", type="primary"):
                 results.append(
                     {
                         "Policy": get_scenario_display_name(pk, config),
-                        "Uptake Delta": f"{u_delta:+.1%}",
-                        "Utilitarian Delta": f"${w_delta:+,.0f}",
-                        "Equity-Weighted Delta": f"${ew_delta:+,.0f}",
-                        "Ethical Category": "FAIR" if fairness.is_fair else "UNFAIR",
-                        "Fairness Rationale": "; ".join(fairness.reasons)
+                        "Change in testing uptake": f"{u_delta:+.1%}",
+                        "Change in social benefit": f"${w_delta:+,.0f}",
+                        "Change after equity weighting": f"${ew_delta:+,.0f}",
+                        "Fairness verdict": "FAIR" if fairness.is_fair else "UNFAIR",
+                        "Reason": "; ".join(fairness.reasons)
                         if fairness.reasons
                         else "Maintains equity.",
                     }
                 )
 
             df = pd.DataFrame(results)
-            st.subheader("Fairness Verdict Matrix")
+            st.subheader("Fairness results")
             st.table(df)
 
-render_footer("Fairness Engine Active")
+render_footer("Fairness Check")

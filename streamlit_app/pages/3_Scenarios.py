@@ -15,23 +15,28 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from src.model.pipeline import evaluate_single_policy
-from streamlit_app.dashboard_ui import (
-    render_current_run_summary,
-    render_footer,
-    render_sidebar_build_info,
-)
-from streamlit_app.scenario_runtime import (
+from src.model.scenario_analysis import (
     evaluate_scenario,
     filter_scenarios_by_jurisdiction,
     get_scenario_display_name,
     load_scenarios,
 )
+from streamlit_app.dashboard_ui import (
+    render_current_run_summary,
+    render_footer,
+    render_glossary,
+    render_sidebar_build_info,
+    render_view_mode_sidebar,
+)
 
 # Page configuration
 st.set_page_config(page_title="Scenario Analysis", page_icon="🎯", layout="wide")
 
-st.title("🎯 Policy Scenarios & Stories")
-st.markdown("Compare high-rigor outcomes across predefined policy narratives.")
+audience_mode = render_view_mode_sidebar()
+
+st.title("🎯 Scenario Comparison")
+st.markdown("Compare a small set of policy stories side by side.")
+render_glossary(audience_mode)
 
 # 1. Load Scenarios
 SCENARIOS_CONFIG = Path(__file__).parent.parent.parent / "configs" / "scenarios.yaml"
@@ -39,7 +44,7 @@ scenarios = load_scenarios(SCENARIOS_CONFIG)
 scenario_labels = {key: get_scenario_display_name(key, config) for key, config in scenarios.items()}
 
 selected_scenario_key = st.sidebar.selectbox(
-    "Predefined Scenario",
+    "Scenario to anchor on",
     list(scenarios.keys()),
     format_func=lambda key: scenario_labels[key],
 )
@@ -56,9 +61,10 @@ render_current_run_summary(
     },
 )
 st.info(selected_scenario.get("description", "Predefined scenario comparison surface."))
+st.caption("Choose one named scenario, then compare it with the other scenarios from the same jurisdiction.")
 
 # 2. Run Analysis
-if st.sidebar.button("🔍 Run Comparative Analysis", type="primary"):
+if st.button("🔍 Compare scenarios", type="primary"):
     with st.spinner("Executing comparative analysis for the selected jurisdiction..."):
         results = []
         ordered_scope = sorted(
@@ -78,7 +84,7 @@ if st.sidebar.button("🔍 Run Comparative Analysis", type="primary"):
             )
 
         df = pd.DataFrame(results)
-        st.subheader("High-Rigor Comparative Matrix")
+        st.subheader("Scenario comparison table")
         st.caption(
             f"Showing the {selected_jurisdiction_code} comparison set anchored on "
             f"{scenario_labels[selected_scenario_key]}."
@@ -104,8 +110,8 @@ if st.sidebar.button("🔍 Run Comparative Analysis", type="primary"):
             )
         )
         fig.update_layout(
-            title="Societal Welfare by Scenario (DCBA Integrated)", template="plotly_white"
+            title="Overall social benefit by scenario", template="plotly_white"
         )
         st.plotly_chart(fig, use_container_width=True)
 
-render_footer("Scenario Comparison Surface")
+render_footer("Scenario Comparison")

@@ -34,23 +34,29 @@ class TestDashboardLoads:
         """Test the primary control surfaces are rendered."""
         app_test.run()
         labels = [widget.label for widget in app_test.selectbox]
-        assert any("Select Policy to Evaluate" in label for label in labels)
+        assert any("Choose a policy" in label for label in labels)
         assert len(app_test.slider) >= 1
 
 
 class TestSidebarControls:
     """Test all sidebar controls."""
 
+    def test_view_mode_defaults_to_general(self, app_test):
+        """Test the app defaults to the general-audience layout."""
+        app_test.run()
+        view_mode = next(r for r in app_test.radio if "View mode" in r.label)
+        assert view_mode.value == "General audience"
+
     def test_policy_selection(self, app_test):
         """Test policy regime selection."""
         app_test.run()
         # Find by label to be safe
-        policy_box = next(s for s in app_test.selectbox if "Select Policy to Evaluate" in s.label)
-        assert policy_box.value == "Status Quo"
+        policy_box = next(s for s in app_test.selectbox if "Choose a policy" in s.label)
+        assert policy_box.value == "Current Rules"
 
         # Change policy
-        policy_box.select("Moratorium").run()
-        assert policy_box.value == "Moratorium"
+        policy_box.select("Temporary Ban").run()
+        assert policy_box.value == "Temporary Ban"
 
 
 class TestFunctionality:
@@ -64,11 +70,13 @@ class TestFunctionality:
         run_button.click().run()
 
         metric_labels = [m.label for m in app_test.metric]
-        assert "Testing Uptake" in metric_labels
-        assert any("Net Social Benefit" in label for label in metric_labels)
+        assert "People choosing genetic testing" in metric_labels
+        assert "Overall benefit to society" in metric_labels
 
-        uptake_metric = next(m for m in app_test.metric if m.label == "Testing Uptake")
-        welfare_metric = next(m for m in app_test.metric if "Net Social Benefit" in m.label)
+        uptake_metric = next(
+            m for m in app_test.metric if m.label == "People choosing genetic testing"
+        )
+        welfare_metric = next(m for m in app_test.metric if m.label == "Overall benefit to society")
 
         assert "%" in uptake_metric.value
         assert "$" in welfare_metric.value

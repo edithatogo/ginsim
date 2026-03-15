@@ -7,7 +7,8 @@ from streamlit.testing.v1 import AppTest
 def test_sensitivity_page_runs_analysis() -> None:
     app = AppTest.from_file("streamlit_app/pages/2_Sensitivity.py", default_timeout=60)
     app.run()
-    assert "Comprehensive Sensitivity & VOI Suite" in app.title[0].value
+    assert "Uncertainty Explorer" in app.title[0].value
+    assert any(r.label == "View mode" and r.value == "General audience" for r in app.radio)
     assert any(
         metric.label == "Jurisdiction" and metric.value == "Australia" for metric in app.metric
     )
@@ -37,22 +38,22 @@ def test_sensitivity_page_runs_voi_metrics() -> None:
     run_button_voi = next(b for b in app.button if "Calculate VOI Metrics" in b.label)
     run_button_voi.click().run()
 
-    assert any("Global EVPI" in metric.label for metric in app.metric)
+    assert any("Value of removing uncertainty" in metric.label for metric in app.metric)
 
 
 def test_scenarios_page_runs_comparison_and_exposes_download() -> None:
     app = AppTest.from_file("streamlit_app/pages/3_Scenarios.py", default_timeout=60)
     app.run()
-    assert "Policy Scenarios & Stories" in app.title[0].value
+    assert "Scenario Comparison" in app.title[0].value
     assert any(
         metric.label == "Focus Scenario" and "Australia 2025 Genetic Ban" in metric.value
         for metric in app.metric
     )
 
-    run_button = next(b for b in app.button if "Run Comparative Analysis" in b.label)
+    run_button = next(b for b in app.button if "Compare scenarios" in b.label)
     run_button.click().run()
 
-    assert any("Comparative Matrix" in sub.value for sub in app.subheader)
+    assert any("Scenario comparison table" in sub.value for sub in app.subheader)
     assert len(app.dataframe) >= 1
 
 
@@ -60,7 +61,7 @@ def test_scenarios_page_updates_focus_context_for_selected_scenario() -> None:
     app = AppTest.from_file("streamlit_app/pages/3_Scenarios.py", default_timeout=60)
     app.run()
 
-    scenario_box = next(s for s in app.selectbox if s.label == "Predefined Scenario")
+    scenario_box = next(s for s in app.selectbox if s.label == "Scenario to anchor on")
     scenario_box.select("uk_code").run()
 
     assert any(
@@ -94,7 +95,7 @@ def test_extended_games_page_runs_each_game(game_name: str, expected_metric: str
 def test_delta_view_page_runs_comparison_and_download() -> None:
     app = AppTest.from_file("streamlit_app/pages/5_Delta_View.py", default_timeout=60)
     app.run()
-    assert "Policy Fairness Audit" in app.title[0].value
+    assert "Fairness Check" in app.title[0].value
     assert any(
         metric.label == "Jurisdiction" and metric.value == "Australia" for metric in app.metric
     )
@@ -102,7 +103,7 @@ def test_delta_view_page_runs_comparison_and_download() -> None:
     run_button = next(b for b in app.button if "Audit Policies" in b.label)
     run_button.click().run()
 
-    assert any("Fairness Verdict Matrix" in sub.value for sub in app.subheader)
+    assert any("Fairness results" in sub.value for sub in app.subheader)
 
 
 def test_delta_view_updates_context_for_selected_jurisdiction() -> None:

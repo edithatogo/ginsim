@@ -129,7 +129,7 @@ def _wait_for_dashboard(page: Page, remote_url: str) -> tuple[Page | Frame, str]
     )
 
 
-@pytest.mark.slow
+@pytest.mark.slow()
 def test_remote_app_loads():
     """Verify the deployed Streamlit app loads and core controls execute."""
     if not REMOTE_DASHBOARD_URL:
@@ -188,6 +188,11 @@ def test_remote_app_loads():
                         dashboard_surface,
                         "⚖️ Audit Policies",
                         "Fairness Verdict Matrix",
+                    )
+                    body_text = _wait_for_surface_text(
+                        dashboard_surface,
+                        "Ethical Category",
+                        timeout_ms=60_000,
                     )
                     assert "Ethical Category" in body_text
 

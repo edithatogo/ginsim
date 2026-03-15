@@ -169,7 +169,7 @@ def run_full_voi_analysis(
         res = evaluate_batch(batch_params, p)
         welfare_matrix.append(res["raw_welfare"])
 
-    w_matrix = jnp.stack(welfare_matrix, axis=1)
+    w_matrix = jnp.stack(welfare_matrix, axis=0)
 
     evpi = compute_evpi(w_matrix)
     evppi_deterrence = compute_evppi(w_matrix, prior_draws["deterrence_elasticity"])

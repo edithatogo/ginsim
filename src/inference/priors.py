@@ -23,7 +23,7 @@ class BayesianPriorSuite:
 
     @staticmethod
     def draw_deterrence_elasticity(key: Array, n_draws: int) -> Array:
-        """Prior: Gamma(2.0, 10.0) with mean near 0.2."""
+        """Prior: Gamma(shape=2.0, scale=0.1) with mean near 0.2."""
         return jr.gamma(key, 2.0, shape=(n_draws,)) * 0.1
 
     @staticmethod

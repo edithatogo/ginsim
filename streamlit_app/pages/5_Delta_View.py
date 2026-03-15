@@ -26,12 +26,37 @@ st.markdown("Auditing policy reforms against the 'Separating' Status Quo baselin
 jurisdiction = st.sidebar.selectbox(
     "Jurisdiction", ["Australia", "New Zealand", "UK", "Canada", "US"]
 )
-baseline_key = "au_status_quo"
 
 scenarios = load_scenarios(project_root / "configs" / "scenarios.yaml")
 
+scenario_keys_by_jurisdiction = {
+    "Australia": {
+        "baseline": "au_status_quo",
+        "policies": ["au_fsc_moratorium", "au_2025_ban"],
+    },
+    "New Zealand": {
+        "baseline": "nz_current",
+        "policies": [],
+    },
+    "UK": {
+        "baseline": "uk_code",
+        "policies": [],
+    },
+    "Canada": {
+        "baseline": "canada_gnda",
+        "policies": [],
+    },
+    "US": {
+        "baseline": "usa_gina",
+        "policies": [],
+    },
+}
+
 if st.button("⚖️ Audit Policies", type="primary"):
     with st.spinner("Executing fairness audit matrix..."):
+        scenario_keys = scenario_keys_by_jurisdiction[jurisdiction]
+        baseline_key = scenario_keys["baseline"]
+        selected_policies = scenario_keys["policies"]
 
         def model_func(params, policy):
             return evaluate_single_policy(params, policy)
@@ -40,7 +65,6 @@ if st.button("⚖️ Audit Policies", type="primary"):
         b_res = evaluate_scenario(baseline_key, scenarios[baseline_key], model_func)
 
         results = []
-        selected_policies = ["au_moratorium", "au_ban"]
 
         for pk in selected_policies:
             if pk not in scenarios:
@@ -73,7 +97,13 @@ if st.button("⚖️ Audit Policies", type="primary"):
 
         df = pd.DataFrame(results)
         st.subheader("Fairness Verdict Matrix")
-        st.table(df)
+        if df.empty:
+            st.info(
+                f"No comparable reform scenarios are configured yet for {jurisdiction}. "
+                "The fairness audit currently supports Australian reform comparisons."
+            )
+        else:
+            st.table(df)
 
 st.divider()
 st.caption("Developed by Dylan A Mordaunt • 2026.03 • Fairness Engine Active")

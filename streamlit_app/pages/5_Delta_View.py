@@ -1,1 +1,109 @@
-IyEvdXNyL2Jpbi9lbnYgcHl0aG9uMw0KIiIiDQpEZWx0YSBWaWV3OiBDcm9zcy1TY2VuYXJpbyBGYWlybmVzcyBBdWRpdCBQYWdlLg0KIiIiDQoNCmltcG9ydCBzeXMNCmZyb20gcGF0aGxpYiBpbXBvcnQgUGF0aA0KDQojIEFkZCBwcm9qZWN0IHJvb3QgdG8gcGF0aA0KcHJvamVjdF9yb290ID0gUGF0aChfX2ZpbGVfXykucGFyZW50LnBhcmVudC5wYXJlbnQNCnN5cy5wYXRoLmluc2VydCgwLCBzdHIocHJvamVjdF9yb290KSkNCg0KaW1wb3J0IHBhbmRhcyBhcyBwZA0KaW1wb3J0IHN0cmVhbWxpdCBhcyBzdA0KDQpmcm9tIHNyYy5tb2RlbC5mYWlybmVzcyBpbXBvcnQgYXVkaXRfcG9saWN5X2ZhaXJuZXNzDQpmcm9tIHNyYy5tb2RlbC5waXBlbGluZSBpbXBvcnQgZXZhbHVhdGVfc2luZ2xlX3BvbGljeQ0KZnJvbSBzcmMubW9kZWwuc2NlbmFyaW9fYW5hbHlzaXMgaW1wb3J0IGV2YWx1YXRlX3NjZW5hcmlvLCBsb2FkX3NjZW5hcmlvcw0KDQpzdC5zZXRfcGFnZV9jb25maWcocGFnZV90aXRsZT0iRmFpcm5lc3MgQXVkaXQiLCBwYWdlX2ljb249IuKalu+4jyIsIGxheW91dD0id2lkZSIpDQoNCnN0LnRpdGxlKCLimpbvuI8gUG9saWN5IEZhaXJuZXNzIEF1ZGl0IikNCnN0Lm1hcmtkb3duKCJBdWRpdGluZyBwb2xpY3kgcmVmb3JtcyBhZ2FpbnN0IHRoZSAnU2VwYXJhdGluZycgU3RhdHVzIFF1byBiYXNlbGluZS4iKQ0KDQojIENvbnRyb2xzDQpqdXJpc2RpY3Rpb24gPSBzdC5zaWRlYmFyLnNlbGVjdGJveCgiSnVyaXNkaWN0aW9uIiwgWyJBdXN0cmFsaWEiLCAiTmV3IFplYWxhbmQiLCAiVUsiLCAiQ2FuYWRhIiwgIlVTIl0pDQpiYXNlbGluZV9rZXkgPSAiYXVfc3RhdHVzX3F1byINCg0Kc2NlbmFyaW9zID0gbG9hZF9zY2VuYXJpb3MocHJvamVjdF9yb290IC8gImNvbmZpZ3MiIC8gInNjZW5hcmlvcy55YW1sIikNCg0KaWYgc3QuYnV0dG9uKCLimpbvuI8gQXVkaXQgUG9saWNpZXMiLCB0eXBlPSJwcmltYXJ5Iik6DQogICAgd2l0aCBzdC5zcGlubmVyKCJFeGVjdXRpbmcgZmFpcm5lc3MgYXVkaXQgbWF0cml4Li4uIik6DQogICAgICAgIGRlZiBtb2RlbF9mdW5jKHBhcmFtcywgcG9saWN5KToNCiAgICAgICAgICAgIHJldHVybiBldmFsdWF0ZV9zaW5nbGVfcG9saWN5KHBhcmFtcywgcG9saWN5KQ0KDQogICAgICAgICMgQmFzZSByZXN1bHQNCiAgICAgICAgYl9yZXMgPSBldmFsdWF0ZV9zY2VuYXJpbyhiYXNlbGluZV9rZXksIHNjZW5hcmlvc1tiYXNlbGluZV9rZXldLCBtb2RlbF9mdW5jKQ0KDQogICAgICAgIHJlc3VsdHMgPSBbXQ0KICAgICAgICBzZWxlY3RlZF9wb2xpY2llcyA9IFsiYXVfbW9yYXRvcml1bSIsICJhdV9iYW4iXQ0KDQogICAgICAgIGZvciBwayBpbiBzZWxlY3RlZF9wb2xpY2llczoNCiAgICAgICAgICAgIGlmIHBrIG5vdCBpbiBzY2VuYXJpb3M6DQogICAgICAgICAgICAgICAgY29udGludWUNCiAgICAgICAgICAgIHIgPSBldmFsdWF0ZV9zY2VuYXJpbyhwaywgc2NlbmFyaW9zW3BrXSwgbW9kZWxfZnVuYykNCg0KICAgICAgICAgICAgdV9kZWx0YSA9IGZsb2F0KHIudGVzdGluZ191cHRha2UpIC0gZmxvYXQoYl9yZXMudGVzdGluZ191cHRha2UpDQogICAgICAgICAgICB3X2RlbHRhID0gZmxvYXQoci53ZWxmYXJlX2ltcGFjdCkgLSBmbG9hdChiX3Jlcy53ZWxmYXJlX2ltcGFjdCkNCiAgICAgICAgICAgIGV3X2RlbHRhID0gZmxvYXQoci5lcXVpdHlfd2VpZ2h0ZWRfd2VsZmFyZSkgLSBmbG9hdChiX3Jlcy5lcXVpdHlfd2VpZ2h0ZWRfd2VsZmFyZSkNCiAgICAgICAgICAgIHBfZGVsdGEgPSBmbG9hdChyLmluc3VyYW5jZV9wcmVtaXVtc1sicHJlbWl1bV9oaWdoIl0pIC0gZmxvYXQoYl9yZXMuaW5zdXJhbmNlX3ByZW1pdW1zWyJwcmVtaXVtX2hpZ2giXSkNCg0KICAgICAgICAgICAgIyBGYWlybmVzcyBhdWRpdCB1c2VzIHV0aWxpdGFyaWFuIHdlbGZhcmUgZGVsdGEgZm9yIHRoZSBjb3JlIGNoZWNrDQogICAgICAgICAgICAjIGJ1dCB3ZSBzdXJmYWNlIGJvdGggaW4gdGhlIHRhYmxlLg0KICAgICAgICAgICAgZmFpcm5lc3MgPSBhdWRpdF9wb2xpY3lfZmFpcm5lc3ModV9kZWx0YSwgd19kZWx0YSwgcF9kZWx0YSkNCg0KICAgICAgICAgICAgcmVzdWx0cy5hcHBlbmQoDQogICAgICAgICAgICAgICAgew0KICAgICAgICAgICAgICAgICAgICAiUG9saWN5Ijogc2NlbmFyaW9zW3BrXS5nZXQoIm5hbWUiLCBwayksDQogICAgICAgICAgICAgICAgICAgICJVcHRha2UgRGVsdGEiOiBmInt1X2RlbHRhOisuMSV9IiwNCiAgICAgICAgICAgICAgICAgICAgIlV0aWxpdGFyaWFuIERlbHRhIjogZiIke3dfZGVsdGE6KywuMGZ9IiwNCiAgICAgICAgICAgICAgICAgICAgIkVxdWl0eS1XZWlnaHRlZCBEZWx0YSI6IGYiJHtld19kZWx0YTorLC4wZn0iLA0KICAgICAgICAgICAgICAgICAgICAiRXRoaWNhbCBDYXRlZ29yeSI6ICJGQUlSIiBpZiBmYWlybmVzcy5pc19mYWlyIGVsc2UgIlVORkFJUiIsDQogICAgICAgICAgICAgICAgICAgICJGYWlybmVzcyBSYXRpb25hbGUiOiAiOyAiLmpvaW4oZmFpcm5lc3MucmVhc29ucykgaWYgZmFpcm5lc3MucmVhc29ucyBlbHNlICJNYWludGFpbnMgZXF1aXR5LiIsDQogICAgICAgICAgICAgICAgfQ0KICAgICAgICAgICAgKQ0KDQogICAgICAgIGRmID0gcGQuRGF0YUZyYW1lKHJlc3VsdHMpDQogICAgICAgIHN0LnN1YmhlYWRlcigiRmFpcm5lc3MgVmVyZGljdCBNYXRyaXgiKQ0KICAgICAgICBzdC50YWJsZShkZikNCg0Kc3QuZGl2aWRlcigpDQpzdC5jYXB0aW9uKCJEZXZlbG9wZWQgYnkgRHlsYW4gQSBNb3JkYXVudCDigKIgMjAyNi4wMyDigKIgRmFpcm5lc3MgRW5naW5lIEFjdGl2ZSIpDQo=
+#!/usr/bin/env python3
+"""
+Delta View: Cross-Scenario Fairness Audit Page.
+"""
+
+import sys
+from pathlib import Path
+
+# Add project root to path
+project_root = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(project_root))
+
+import pandas as pd
+import streamlit as st
+
+from src.model.fairness import audit_policy_fairness
+from src.model.pipeline import evaluate_single_policy
+from src.model.scenario_analysis import evaluate_scenario, load_scenarios
+
+st.set_page_config(page_title="Fairness Audit", page_icon="⚖️", layout="wide")
+
+st.title("⚖️ Policy Fairness Audit")
+st.markdown("Auditing policy reforms against the 'Separating' Status Quo baseline.")
+
+# Controls
+jurisdiction = st.sidebar.selectbox(
+    "Jurisdiction", ["Australia", "New Zealand", "UK", "Canada", "US"]
+)
+
+scenarios = load_scenarios(project_root / "configs" / "scenarios.yaml")
+
+scenario_keys_by_jurisdiction = {
+    "Australia": {
+        "baseline": "au_status_quo",
+        "policies": ["au_fsc_moratorium", "au_2025_ban"],
+    },
+    "New Zealand": {
+        "baseline": "nz_current",
+        "policies": [],
+    },
+    "UK": {
+        "baseline": "uk_code",
+        "policies": [],
+    },
+    "Canada": {
+        "baseline": "canada_gnda",
+        "policies": [],
+    },
+    "US": {
+        "baseline": "usa_gina",
+        "policies": [],
+    },
+}
+
+if st.button("⚖️ Audit Policies", type="primary"):
+    with st.spinner("Executing fairness audit matrix..."):
+        scenario_keys = scenario_keys_by_jurisdiction[jurisdiction]
+        baseline_key = scenario_keys["baseline"]
+        selected_policies = scenario_keys["policies"]
+
+        def model_func(params, policy):
+            return evaluate_single_policy(params, policy)
+
+        # Base result
+        b_res = evaluate_scenario(baseline_key, scenarios[baseline_key], model_func)
+
+        results = []
+
+        for pk in selected_policies:
+            if pk not in scenarios:
+                continue
+            r = evaluate_scenario(pk, scenarios[pk], model_func)
+
+            u_delta = float(r.testing_uptake) - float(b_res.testing_uptake)
+            w_delta = float(r.welfare_impact) - float(b_res.welfare_impact)
+            ew_delta = float(r.equity_weighted_welfare) - float(b_res.equity_weighted_welfare)
+            p_delta = float(r.insurance_premiums["premium_high"]) - float(
+                b_res.insurance_premiums["premium_high"]
+            )
+
+            # Fairness audit uses utilitarian welfare delta for the core check
+            # but we surface both in the table.
+            fairness = audit_policy_fairness(u_delta, w_delta, p_delta)
+
+            results.append(
+                {
+                    "Policy": scenarios[pk].get("name", pk),
+                    "Uptake Delta": f"{u_delta:+.1%}",
+                    "Utilitarian Delta": f"${w_delta:+,.0f}",
+                    "Equity-Weighted Delta": f"${ew_delta:+,.0f}",
+                    "Ethical Category": "FAIR" if fairness.is_fair else "UNFAIR",
+                    "Fairness Rationale": "; ".join(fairness.reasons)
+                    if fairness.reasons
+                    else "Maintains equity.",
+                }
+            )
+
+        df = pd.DataFrame(results)
+        st.subheader("Fairness Verdict Matrix")
+        if df.empty:
+            st.info(
+                f"No comparable reform scenarios are configured yet for {jurisdiction}. "
+                "The fairness audit currently supports Australian reform comparisons."
+            )
+        else:
+            st.table(df)
+
+st.divider()
+st.caption("Developed by Dylan A Mordaunt • 2026.03 • Fairness Engine Active")

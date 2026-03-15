@@ -1,1 +1,205 @@
-aW1wb3J0IG9zCmltcG9ydCB0aW1lCmZyb20gY29udGV4dGxpYiBpbXBvcnQgc3VwcHJlc3MKCmltcG9ydCBweXRlc3QKZnJvbSBsb2d1cnUgaW1wb3J0IGxvZ2dlcgpmcm9tIHBsYXl3cmlnaHQuc3luY19hcGkgaW1wb3J0IEZyYW1lLCBQYWdlLCBzeW5jX3BsYXl3cmlnaHQKClJFTU9URV9EQVNIQk9BUkRfVVJMID0gb3MuZW52aXJvbi5nZXQoIkdEUEVfUkVNT1RFX0RBU0hCT0FSRF9VUkwiKQpSRU1PVEVfREFTSEJPQVJEX1RJTUVPVVRfTVMgPSBpbnQob3MuZW52aXJvbi5nZXQoIkdEUEVfUkVNT1RFX0RBU0hCT0FSRF9USU1FT1VUX01TIiwgIjQyMDAwMCIpKQpFWFBFQ1RFRF9IRUFESU5HID0gIkdlbmV0aWMgRGlzY3JpbWluYXRpb246IEdsb2JhbCBQb2xpY3kgRXhwbG9yZXIiCkVYUEVDVEVEX1NJREVCQVJfUEFHRVMgPSAoCiAgICAoIkdhbWUgRGlhZ3JhbXMiLCAiR2FtZS1UaGVvcmV0aWMgTW9kdWxlIERpYWdyYW1zIiksCiAgICAoIlNlbnNpdGl2aXR5IiwgIkNvbXByZWhlbnNpdmUgU2Vuc2l0aXZpdHkgJiBWT0kgU3VpdGUiKSwKICAgICgiU2NlbmFyaW9zIiwgIlBvbGljeSBTY2VuYXJpb3MgJiBTdG9yaWVzIiksCiAgICAoIkV4dGVuZGVkIEdhbWVzIiwgIkV4dGVuZGVkIFN0cmF0ZWdpYyBHYW1lcyIpLAogICAgKCJEZWx0YSBWaWV3IiwgIlBvbGljeSBGYWlybmVzcyBBdWRpdCIpLAopCkVYUEVDVEVEX1JFU1VMVF9MQUJFTFMgPSAoCiAgICAiVGVzdGluZyBVcHRha2UiLAogICAgIk5ldCBTb2NpYWwgQmVuZWZpdCIsCikKS05PV05fRVJST1JfVEVYVCA9ICgKICAgICJFcnJvciBpbnN0YWxsaW5nIHJlcXVpcmVtZW50cy4iLAogICAgIkVycm9yIHJ1bm5pbmcgYXBwIiwKICAgICJUaGlzIGFwcCBoYXMgZW5jb3VudGVyZWQgYW4gZXJyb3IiLAogICAgIlR5cGVFcnJvcjoiLAogICAgIlRyYWNlYmFjazoiLAogICAgIkNvdWxkIG5vdCBmaW5kIHBhZ2U6IiwKICAgICJQbGVhc2UgY29udGFjdCBzdXBwb3J0LiIsCikKCgpkZWYgX3N1cmZhY2VfdGV4dChzdXJmYWNlOiBQYWdlIHwgRnJhbWUpIC0+IHN0cjoKICAgICIiIlJlYWQgb3V0ZXIgcGFnZSB0ZXh0IGRlZmVuc2l2ZWx5IGZvciBzbW9rZSBhc3NlcnRpb25zLiIiIgogICAgdHJ5OgogICAgICAgIHJldHVybiBzdXJmYWNlLmxvY2F0b3IoImJvZHkiKS5pbm5lcl90ZXh0KHRpbWVvdXQ9MTBfMDAwKQogICAgZXhjZXB0IEV4Y2VwdGlvbjoKICAgICAgICByZXR1cm4gIiIKCgpkZWYgX2Rhc2hib2FyZF9zdXJmYWNlX2FuZF90ZXh0KHBhZ2U6IFBhZ2UpIC0+IHR1cGxlW1BhZ2UgfCBGcmFtZSB8IE5vbmUsIHN0cl06CiAgICAiIiJSZXR1cm4gdGhlIFN0cmVhbWxpdCBhcHAgc3VyZmFjZSBhbmQgaXRzIHRleHQgd2hlbiBhdmFpbGFibGUuIiIiCiAgICBmb3IgZnJhbWUgaW4gcGFnZS5mcmFtZXM6CiAgICAgICAgYm9keV90ZXh0ID0gX3N1cmZhY2VfdGV4dChmcmFtZSkKICAgICAgICBpZiBFWFBFQ1RFRF9IRUFESU5HIGluIGJvZHlfdGV4dCBvciAiQWRqdXN0IEFzc3VtcHRpb25zIiBpbiBib2R5X3RleHQ6CiAgICAgICAgICAgIHJldHVybiBmcmFtZSwgYm9keV90ZXh0CgogICAgYm9keV90ZXh0ID0gX3N1cmZhY2VfdGV4dChwYWdlKQogICAgaWYgRVhQRUNURURfSEVBRElORyBpbiBib2R5X3RleHQgb3IgIkFkanVzdCBBc3N1bXB0aW9ucyIgaW4gYm9keV90ZXh0OgogICAgICAgIHJldHVybiBwYWdlLCBib2R5X3RleHQKCiAgICByZXR1cm4gTm9uZSwgYm9keV90ZXh0CgoKZGVmIF93YWl0X2Zvcl9zdXJmYWNlX3RleHQoc3VyZmFjZTogUGFnZSB8IEZyYW1lLCBleHBlY3RlZF90ZXh0OiBzdHIsIHRpbWVvdXRfbXM6IGludCA9IDMwXzAwMCkgLT4gc3RyOgogICAgIiIiV2FpdCB1bnRpbCBleHBlY3RlZCB0ZXh0IGFwcGVhcnMgaW4gdGhlIGRhc2hib2FyZCBzdXJmYWNlLiIiIgogICAgZGVhZGxpbmUgPSB0aW1lLnRpbWUoKSArICh0aW1lb3V0X21zIC8gMTAwMCkKICAgIGxhc3RfdGV4dCA9ICIiCgogICAgd2hpbGUgdGltZS50aW1lKCkgPCBkZWFkbGluZToKICAgICAgICBib2R5X3RleHQgPSBfc3VyZmFjZV90ZXh0KHN1cmZhY2UpCiAgICAgICAgaWYgZXhwZWN0ZWRfdGV4dCBpbiBib2R5X3RleHQ6CiAgICAgICAgICAgIHJldHVybiBib2R5X3RleHQKCiAgICAgICAgbGFzdF90ZXh0ID0gYm9keV90ZXh0Wzo1MDBdCiAgICAgICAgaWYgaXNpbnN0YW5jZShzdXJmYWNlLCBGcmFtZSk6CiAgICAgICAgICAgIHN1cmZhY2UucGFnZS53YWl0X2Zvcl90aW1lb3V0KDFfNTAwKQogICAgICAgIGVsc2U6CiAgICAgICAgICAgIHN1cmZhY2Uud2FpdF9mb3JfdGltZW91dCgxXzUwMCkKCiAgICBweXRlc3QuZmFpbChmIlRpbWVkIG91dCB3YWl0aW5nIGZvciB7ZXhwZWN0ZWRfdGV4dCFyfS4gTGFzdCBmcmFtZSB0ZXh0OiB7bGFzdF90ZXh0fSIpCgoKZGVmIF9jbGlja19hbmRfd2FpdChzdXJmYWNlOiBQYWdlIHwgRnJhbWUsIGJ1dHRvbl9uYW1lOiBzdHIsIGV4cGVjdGVkX3RleHQ6IHN0ciwgdGltZW91dF9tczogaW50ID0gNDVfMDAwKSAtPiBzdHI6CiAgICAiIiJDbGljayBhIGJ1dHRvbiBhbmQgd2FpdCBmb3IgdGhlIGV4cGVjdGVkIG91dHB1dCB0ZXh0IHRvIGFwcGVhci4iIiIKICAgIHN1cmZhY2UuZ2V0X2J5X3JvbGUoImJ1dHRvbiIsIG5hbWU9YnV0dG9uX25hbWUpLmNsaWNrKHRpbWVvdXQ9MzBfMDAwKQogICAgaWYgaXNpbnN0YW5jZShzdXJmYWNlLCBGcmFtZSk6CiAgICAgICAgc3VyZmFjZS5wYWdlLndhaXRfZm9yX3RpbWVvdXQoM18wMDApCiAgICBlbHNlOgogICAgICAgIHN1cmZhY2Uud2FpdF9mb3JfdGltZW91dCgzXzAwMCkKICAgIHJldHVybiBfd2FpdF9mb3Jfc3VyZmFjZV90ZXh0KHN1cmZhY2UsIGV4cGVjdGVkX3RleHQsIHRpbWVvdXRfbXM9dGltZW91dF9tcykKCgpkZWYgX3dhaXRfZm9yX2Rhc2hib2FyZChwYWdlOiBQYWdlLCByZW1vdGVfdXJsOiBzdHIpIC0+IHR1cGxlW1BhZ2UgfCBGcmFtZSwgc3RyXToKICAgICIiIlBvbGwgdW50aWwgdGhlIGRlcGxveWVkIGRhc2hib2FyZCBiZWNvbWVzIGF2YWlsYWJsZSBvciB0aW1lb3V0IGV4cGlyZXMuIiIiCiAgICBkZWFkbGluZSA9IHRpbWUudGltZSgpICsgKFJFTU9URV9EQVNIQk9BUkRfVElNRU9VVF9NUyAvIDEwMDApCiAgICBsYXN0X3N0YXRlID0gImRhc2hib2FyZCBkaWQgbm90IHJlbmRlciIKDQogICAgd2hpbGUgdGltZS50aW1lKCkgPCBkZWFkbGluZToNCiAgICAgICAgd2l0aCBzdXBwcmVzcyhFeGNlcHRpb24pOgogICAgICAgICAgICBwYWdlLmdvdG8ocmVtb3RlX3VybCwgd2FpdF91bnRpbD0iZG9tY29udGVudGxvYWRlZCIsIHRpbWVvdXQ9MTIwXzAwMCkKCiAgICAgICAgcGFnZS53YWl0X2Zvcl90aW1lb3V0KDhfMDAwKQogICAgICAgIGRhc2hib2FyZF9zdXJmYWNlLCBib2R5X3RleHQgPSBfZGFzaGJvYXJkX3N1cmZhY2VfYW5kX3RleHQocGFnZSkKCiAgICAgICAgaWYgZGFzaGJvYXJkX3N1cmZhY2UgaXMgbm90IE5vbmU6CiAgICAgICAgICAgIHJldHVybiBkYXNoYm9hcmRfc3VyZmFjZSwgYm9keV90ZXh0CgogICAgICAgIG1hdGNoZWRfZXJyb3IgPSBuZXh0KCh0ZXh0IGZvciB0ZXh0IGluIEtOT1dOX0VSUk9SX1RFWFQgaWYgdGV4dCBpbiBib2R5X3RleHQpLCBOb25lKQogICAgICAgIGlmIG1hdGNoZWRfZXJyb3IgaXMgbm90IE5vbmU6CiAgICAgICAgICAgIGxhc3Rfc3RhdGUgPSBtYXRjaGVkX2Vycm9yCiAgICAgICAgICAgIHBhZ2Uud2FpdF9mb3JfdGltZW91dCgxNV8wMDApCiAgICAgICAgICAgIGNvbnRpbnVlDQoNCiAgICAgICAgbGFzdF9zdGF0ZSA9IGJvZHlfdGV4dFs6NTAwXQ0KICAgICAgICBwYWdlLndhaXRfZm9yX3RpbWVvdXQoMTBfMDAwKQ0KDQogICAgcHl0ZXN0LmZhaWwoDQogICAgICAgIGYiUmVtb3RlIGRhc2hib2FyZCBhdCB7cmVtb3RlX3VybH0gbmV2ZXIgYmVjYW1lIHJlYWR5IHdpdGhpbiAiDQogICAgICAgIGYie1JFTU9URV9EQVNIQk9BUkRfVElNRU9VVF9NUyAvIDEwMDA6LjBmfXMuIExhc3Qgc3RhdGU6IHtsYXN0X3N0YXRlfSINCiAgICApDQoNCg0KQHB5dGVzdC5tYXJrLnNsb3cNCmRlZiB0ZXN0X3JlbW90ZV9hcHBfbG9hZHMoKToNCiAgICAiIiJWZXJpZnkgdGhlIGRlcGxveWVkIFN0cmVhbWxpdCBhcHAgbG9hZHMgYW5kIGNvcmUgY29udHJvbHMgZXhlY3V0ZS4iIiINCiAgICBpZiBub3QgUkVNT1RFX0RBU0hCT0FSRF9VUkw6DQogICAgICAgIHB5dGVzdC5za2lwKCJTZXQgR0RQRV9SRU1PVEVfREFTSEJPQVJEX1VSTCB0byBydW4gcmVtb3RlIGRhc2hib2FyZCBzbW9rZSBjaGVja3MuIikNCg0KICAgIHdpdGggc3luY19wbGF5d3JpZ2h0KCkgYXMgcDoKICAgICAgICBicm93c2VyID0gcC5jaHJvbWl1bS5sYXVuY2goaGVhZGxlc3M9VHJ1ZSkKICAgICAgICBjb250ZXh0ID0gYnJvd3Nlci5uZXdfY29udGV4dCgpCiAgICAgICAgcGFnZSA9IGNvbnRleHQubmV3X3BhZ2UoKQoKICAgICAgICB0cnk6CiAgICAgICAgICAgIGRhc2hib2FyZF9zdXJmYWNlLCBib2R5X3RleHQgPSBfd2FpdF9mb3JfZGFzaGJvYXJkKHBhZ2UsIFJFTU9URV9EQVNIQk9BUkRfVVJMKQoKICAgICAgICAgICAgYXNzZXJ0IEVYUEVDVEVEX0hFQURJTkcgaW4gYm9keV90ZXh0CiAgICAgICAgICAgIGFzc2VydCAiQWRqdXN0IEFzc3VtcHRpb25zIiBpbiBib2R5X3RleHQKICAgICAgICAgICAgYXNzZXJ0ICJEaXN0cmlidXRpb25hbCBFcXVpdHkiIGluIGJvZHlfdGV4dAoKICAgICAgICAgICAgcnVuX2J0biA9IGRhc2hib2FyZF9zdXJmYWNlLmdldF9ieV9yb2xlKCJidXR0b24iLCBuYW1lPSLwn5SsIFJ1biBFdmFsdWF0aW9uIikKICAgICAgICAgICAgcnVuX2J0bi5jbGljayh0aW1lb3V0PTMwXzAwMCkKICAgICAgICAgICAgcGFnZS53YWl0X2Zvcl90aW1lb3V0KDhfMDAwKQoKICAgICAgICAgICAgYm9keV90ZXh0ID0gX3N1cmZhY2VfdGV4dChkYXNoYm9hcmRfc3VyZmFjZSkKICAgICAgICAgICAgZm9yIGxhYmVsIGluIEVYUEVDVEVEX1JFU1VMVF9MQUJFTFM6CiAgICAgICAgICAgICAgICBhc3NlcnQgbGFiZWwgaW4gYm9keV90ZXh0CgogICAgICAgICAgICBzaWRlYmFyX25hdiA9IGRhc2hib2FyZF9zdXJmYWNlLmdldF9ieV90ZXN0X2lkKCJzdFNpZGViYXJOYXZJdGVtcyIpCiAgICAgICAgICAgIGZvciBzaWRlYmFyX2xhYmVsLCBleHBlY3RlZF9oZWFkaW5nIGluIEVYUEVDVEVEX1NJREVCQVJfUEFHRVM6CiAgICAgICAgICAgICAgICBzaWRlYmFyX25hdi5nZXRfYnlfcm9sZSgibGluayIsIG5hbWU9c2lkZWJhcl9sYWJlbCkuY2xpY2sodGltZW91dD0zMF8wMDApCiAgICAgICAgICAgICAgICBwYWdlLndhaXRfZm9yX3RpbWVvdXQoNV8wMDApCiAgICAgICAgICAgICAgICBib2R5X3RleHQgPSBfd2FpdF9mb3Jfc3VyZmFjZV90ZXh0KGRhc2hib2FyZF9zdXJmYWNlLCBleHBlY3RlZF9oZWFkaW5nKQogICAgICAgICAgICAgICAgYXNzZXJ0IGV4cGVjdGVkX2hlYWRpbmcgaW4gYm9keV90ZXh0CgogICAgICAgICAgICAgICAgaWYgc2lkZWJhcl9sYWJlbCA9PSAiU2Vuc2l0aXZpdHkiOgogICAgICAgICAgICAgICAgICAgIGJvZHlfdGV4dCA9IF9jbGlja19hbmRfd2FpdCgKICAgICAgICAgICAgICAgICAgICAgICAgZGFzaGJvYXJkX3N1cmZhY2UsCiAgICAgICAgICAgICAgICAgICAgICAgICLwn46yIFJ1biBQU0EgU2ltdWxhdGlvbiIsCiAgICAgICAgICAgICAgICAgICAgICAgICJFeHBlY3RlZCBVcHRha2UgKE1lYW4pIiwKICAgICAgICAgICAgICAgICAgICApCiAgICAgICAgICAgICAgICAgICAgYXNzZXJ0ICI5NSUgQ3JJOiIgaW4gYm9keV90ZXh0CiAgICAgICAgICAgICAgICBlbGlmIHNpZGViYXJfbGFiZWwgPT0gIlNjZW5hcmlvcyI6CiAgICAgICAgICAgICAgICAgICAgYm9keV90ZXh0ID0gX2NsaWNrX2FuZF93YWl0KAogICAgICAgICAgICAgICAgICAgICAgICBkYXNoYm9hcmRfc3VyZmFjZSwKICAgICAgICAgICAgICAgICAgICAgICAgIvCflI0gUnVuIENvbXBhcmF0aXZlIEFuYWx5c2lzIiwKICAgICAgICAgICAgICAgICAgICAgICAgIkhpZ2gtUmlnb3IgQ29tcGFyYXRpdmUgTWF0cml4IiwKICAgICAgICAgICAgICAgICAgICApCiAgICAgICAgICAgICAgICAgICAgYXNzZXJ0ICJTb2NpZXRhbCBXZWxmYXJlIGJ5IFNjZW5hcmlvIChEQ0JBIEludGVncmF0ZWQpIiBpbiBib2R5X3RleHQKICAgICAgICAgICAgICAgIGVsaWYgc2lkZWJhcl9sYWJlbCA9PSAiRXh0ZW5kZWQgR2FtZXMiOgogICAgICAgICAgICAgICAgICAgIGJvZHlfdGV4dCA9IF9jbGlja19hbmRfd2FpdCgKICAgICAgICAgICAgICAgICAgICAgICAgZGFzaGJvYXJkX3N1cmZhY2UsCiAgICAgICAgICAgICAgICAgICAgICAgICLwn5SsIFJ1biBHYW1lIFNpbXVsYXRpb24iLAogICAgICAgICAgICAgICAgICAgICAgICAiUmVjb25zdHJ1Y3Rpb24gQWNjdXJhY3kiLAogICAgICAgICAgICAgICAgICAgICkKICAgICAgICAgICAgICAgICAgICBhc3NlcnQgIldlbGZhcmUgTG9zcyIgaW4gYm9keV90ZXh0CiAgICAgICAgICAgICAgICBlbGlmIHNpZGViYXJfbGFiZWwgPT0gIkRlbHRhIFZpZXciOgogICAgICAgICAgICAgICAgICAgIGJvZHlfdGV4dCA9IF9jbGlja19hbmRfd2FpdCgKICAgICAgICAgICAgICAgICAgICAgICAgZGFzaGJvYXJkX3N1cmZhY2UsCiAgICAgICAgICAgICAgICAgICAgICAgICLimpbvuI8gQXVkaXQgUG9saWNpZXMiLAogICAgICAgICAgICAgICAgICAgICAgICAiRmFpcm5lc3MgVmVyZGljdCBNYXRyaXgiLAogICAgICAgICAgICAgICAgICAgICkKICAgICAgICAgICAgICAgICAgICBhc3NlcnQgIkV0aGljYWwgQ2F0ZWdvcnkiIGluIGJvZHlfdGV4dAoKICAgICAgICAgICAgbG9nZ2VyLnN1Y2Nlc3MoIlJlbW90ZSB2ZXJpZmljYXRpb24gcGFzc2VkLiIpCiAgICAgICAgZmluYWxseToKICAgICAgICAgICAgYnJvd3Nlci5jbG9zZSgpCg0KDQppZiBfX25hbWVfXyA9PSAiX19tYWluX18iOg0KICAgIHRlc3RfcmVtb3RlX2FwcF9sb2FkcygpDQo=
+import os
+import time
+from contextlib import suppress
+
+import pytest
+from loguru import logger
+from playwright.sync_api import Frame, Page, sync_playwright
+
+REMOTE_DASHBOARD_URL = os.environ.get("GDPE_REMOTE_DASHBOARD_URL")
+REMOTE_DASHBOARD_TIMEOUT_MS = int(os.environ.get("GDPE_REMOTE_DASHBOARD_TIMEOUT_MS", "420000"))
+EXPECTED_HEADING = "Genetic Discrimination: Global Policy Explorer"
+EXPECTED_SIDEBAR_PAGES = (
+    ("Game Diagrams", "Game-Theoretic Module Diagrams"),
+    ("Sensitivity", "Comprehensive Sensitivity & VOI Suite"),
+    ("Scenarios", "Policy Scenarios & Stories"),
+    ("Extended Games", "Extended Strategic Games"),
+    ("Delta View", "Policy Fairness Audit"),
+)
+EXPECTED_RESULT_LABELS = (
+    "Testing Uptake",
+    "Net Social Benefit",
+)
+KNOWN_ERROR_TEXT = (
+    "Error installing requirements.",
+    "Error running app",
+    "This app has encountered an error",
+    "TypeError:",
+    "Traceback:",
+    "Could not find page:",
+    "Please contact support.",
+)
+
+FATAL_REMOTE_ERROR_TEXT = (
+    "Error installing requirements.",
+    "Error running app",
+    "This app has encountered an error",
+    "TypeError:",
+    "Traceback:",
+    "Could not find page:",
+)
+
+
+def _surface_text(surface: Page | Frame) -> str:
+    """Read outer page text defensively for smoke assertions."""
+    try:
+        return surface.locator("body").inner_text(timeout=10_000)
+    except Exception:
+        return ""
+
+
+def _dashboard_surface_and_text(page: Page) -> tuple[Page | Frame | None, str]:
+    """Return the Streamlit app surface and its text when available."""
+    for frame in page.frames:
+        body_text = _surface_text(frame)
+        if EXPECTED_HEADING in body_text or "Adjust Assumptions" in body_text:
+            return frame, body_text
+
+    body_text = _surface_text(page)
+    if EXPECTED_HEADING in body_text or "Adjust Assumptions" in body_text:
+        return page, body_text
+
+    return None, body_text
+
+
+def _wait_for_surface_text(
+    surface: Page | Frame, expected_text: str, timeout_ms: int = 30_000
+) -> str:
+    """Wait until expected text appears in the dashboard surface."""
+    deadline = time.time() + (timeout_ms / 1000)
+    last_text = ""
+
+    while time.time() < deadline:
+        body_text = _surface_text(surface)
+        if expected_text in body_text:
+            return body_text
+
+        last_text = body_text[:500]
+        if isinstance(surface, Frame):
+            surface.page.wait_for_timeout(1_500)
+        else:
+            surface.wait_for_timeout(1_500)
+
+    pytest.fail(f"Timed out waiting for {expected_text!r}. Last frame text: {last_text}")
+
+
+def _click_and_wait(
+    surface: Page | Frame, button_name: str, expected_text: str, timeout_ms: int = 45_000
+) -> str:
+    """Click a button and wait for the expected output text to appear."""
+    surface.get_by_role("button", name=button_name).click(timeout=30_000)
+    if isinstance(surface, Frame):
+        surface.page.wait_for_timeout(3_000)
+    else:
+        surface.wait_for_timeout(3_000)
+    return _wait_for_surface_text(surface, expected_text, timeout_ms=timeout_ms)
+
+
+def _wait_for_dashboard(page: Page, remote_url: str) -> tuple[Page | Frame, str]:
+    """Poll until the deployed dashboard becomes available or timeout expires."""
+    deadline = time.time() + (REMOTE_DASHBOARD_TIMEOUT_MS / 1000)
+    last_state = "dashboard did not render"
+
+    while time.time() < deadline:
+        with suppress(Exception):
+            page.goto(remote_url, wait_until="domcontentloaded", timeout=120_000)
+
+        page.wait_for_timeout(8_000)
+        dashboard_surface, body_text = _dashboard_surface_and_text(page)
+
+        if dashboard_surface is not None:
+            return dashboard_surface, body_text
+
+        matched_error = next((text for text in KNOWN_ERROR_TEXT if text in body_text), None)
+        if matched_error is not None:
+            last_state = matched_error
+            if matched_error in FATAL_REMOTE_ERROR_TEXT:
+                pytest.fail(
+                    f"Remote dashboard at {remote_url} returned a fatal app error: {matched_error}"
+                )
+            page.wait_for_timeout(15_000)
+            continue
+
+        last_state = body_text[:500]
+        page.wait_for_timeout(10_000)
+
+    pytest.fail(
+        f"Remote dashboard at {remote_url} never became ready within "
+        f"{REMOTE_DASHBOARD_TIMEOUT_MS / 1000:.0f}s. Last state: {last_state}"
+    )
+
+
+@pytest.mark.slow()
+def test_remote_app_loads():
+    """Verify the deployed Streamlit app loads and core controls execute."""
+    if not REMOTE_DASHBOARD_URL:
+        pytest.skip("Set GDPE_REMOTE_DASHBOARD_URL to run remote dashboard smoke checks.")
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        context = browser.new_context()
+        page = context.new_page()
+
+        try:
+            dashboard_surface, body_text = _wait_for_dashboard(page, REMOTE_DASHBOARD_URL)
+
+            assert EXPECTED_HEADING in body_text
+            assert "Adjust Assumptions" in body_text
+            assert "Distributional Equity" in body_text
+
+            run_btn = dashboard_surface.get_by_role("button", name="🔬 Run Evaluation")
+            run_btn.click(timeout=30_000)
+            page.wait_for_timeout(8_000)
+
+            body_text = _surface_text(dashboard_surface)
+            for label in EXPECTED_RESULT_LABELS:
+                assert label in body_text
+
+            sidebar_nav = dashboard_surface.get_by_test_id("stSidebarNavItems")
+            for sidebar_label, expected_heading in EXPECTED_SIDEBAR_PAGES:
+                sidebar_nav.get_by_role("link", name=sidebar_label).click(timeout=30_000)
+                page.wait_for_timeout(5_000)
+                body_text = _wait_for_surface_text(dashboard_surface, expected_heading)
+                assert expected_heading in body_text
+
+                if sidebar_label == "Sensitivity":
+                    body_text = _click_and_wait(
+                        dashboard_surface,
+                        "🎲 Run PSA Simulation",
+                        "Expected Uptake (Mean)",
+                    )
+                    assert "95% CrI:" in body_text
+                elif sidebar_label == "Scenarios":
+                    body_text = _click_and_wait(
+                        dashboard_surface,
+                        "🔍 Run Comparative Analysis",
+                        "High-Rigor Comparative Matrix",
+                    )
+                    assert "Societal Welfare by Scenario (DCBA Integrated)" in body_text
+                elif sidebar_label == "Extended Games":
+                    body_text = _click_and_wait(
+                        dashboard_surface,
+                        "🔬 Run Game Simulation",
+                        "Reconstruction Accuracy",
+                    )
+                    assert "Welfare Loss" in body_text
+                elif sidebar_label == "Delta View":
+                    body_text = _click_and_wait(
+                        dashboard_surface,
+                        "⚖️ Audit Policies",
+                        "Fairness Verdict Matrix",
+                    )
+                    body_text = _wait_for_surface_text(
+                        dashboard_surface,
+                        "Ethical Category",
+                        timeout_ms=60_000,
+                    )
+                    assert "Ethical Category" in body_text
+
+            logger.success("Remote verification passed.")
+        finally:
+            browser.close()
+
+
+if __name__ == "__main__":
+    test_remote_app_loads()

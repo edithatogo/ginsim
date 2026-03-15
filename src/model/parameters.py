@@ -55,29 +55,42 @@ class PolicyConfig:
 
 
 # Register PolicyConfig as a PyTree
-def _policy_config_flatten(config: PolicyConfig):
+def _policy_config_flatten(config: PolicyConfig) -> tuple[tuple[Any, Any, Any], tuple[Any, ...]]:
     children = (
         config.enforcement_strength,
         config.penalty_max,
         config.taper_range,
     )
-    aux_data = {
-        "name": config.name,
-        "description": config.description,
-        "allow_genetic_test_results": config.allow_genetic_test_results,
-        "allow_family_history": config.allow_family_history,
-        "sum_insured_caps": config.sum_insured_caps,
-        "penalty_type": config.penalty_type,
-    }
+    aux_data = (
+        config.name,
+        config.description,
+        config.allow_genetic_test_results,
+        config.allow_family_history,
+        tuple(sorted((config.sum_insured_caps or {}).items())),
+        config.penalty_type,
+    )
     return (children, aux_data)
 
 
-def _policy_config_unflatten(aux_data: dict[str, Any], children: tuple[Any, ...]):
+def _policy_config_unflatten(aux_data: tuple[Any, ...], children: tuple[Any, ...]) -> PolicyConfig:
+    (
+        name,
+        description,
+        allow_genetic_test_results,
+        allow_family_history,
+        sum_insured_caps_items,
+        penalty_type,
+    ) = aux_data
     return PolicyConfig(
+        name=name,
+        description=description,
+        allow_genetic_test_results=allow_genetic_test_results,
+        allow_family_history=allow_family_history,
         enforcement_strength=children[0],
         penalty_max=children[1],
         taper_range=children[2],
-        **aux_data,
+        sum_insured_caps=dict(sum_insured_caps_items) or None,
+        penalty_type=penalty_type,
     )
 
 
@@ -173,7 +186,9 @@ class ModelParameters:
 # =============================================================================
 # JAX PyTree Registration
 # =============================================================================
-def _model_params_flatten(params: ModelParameters):
+def _model_params_flatten(
+    params: ModelParameters,
+) -> tuple[tuple[Any, ...], tuple[str, str]]:
     children = (
         params.baseline_testing_uptake,
         params.deterrence_elasticity,
@@ -206,15 +221,17 @@ def _model_params_flatten(params: ModelParameters):
         params.time_horizon,
         params.tech_improvement_rate,
     )
-    aux_data = {
-        "jurisdiction": params.jurisdiction,
-        "calibration_date": params.calibration_date,
-    }
+    aux_data = (params.jurisdiction, params.calibration_date)
     return (children, aux_data)
 
 
-def _model_params_unflatten(aux_data: dict[str, Any], children: tuple[Any, ...]):
+def _model_params_unflatten(
+    aux_data: tuple[str, str], children: tuple[Any, ...]
+) -> ModelParameters:
+    jurisdiction, calibration_date = aux_data
     return ModelParameters(
+        jurisdiction=jurisdiction,
+        calibration_date=calibration_date,
         baseline_testing_uptake=children[0],
         deterrence_elasticity=children[1],
         moratorium_effect=children[2],
@@ -245,7 +262,6 @@ def _model_params_unflatten(aux_data: dict[str, Any], children: tuple[Any, ...])
         remoteness_weight=children[27],
         time_horizon=children[28],
         tech_improvement_rate=children[29],
-        **aux_data,
     )
 
 

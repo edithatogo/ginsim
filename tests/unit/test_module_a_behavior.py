@@ -10,7 +10,7 @@ from src.model.module_a_behavior_wrappers import (
     compute_testing_uptake,
     get_standard_policies,
 )
-from src.model.parameters import ModelParameters, get_default_parameters, PolicyConfig
+from src.model.parameters import PolicyConfig, get_default_parameters
 
 
 class TestPerceivedPenalty:

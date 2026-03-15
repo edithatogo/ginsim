@@ -69,13 +69,20 @@ ignore = [
     "F722", "E501", "COM812", "PLR2004", "ARG", "PLR0913", "PLR0915", "ANN", "D", "PTH", "PERF", "ERA", "RUF001", "RUF003", "S603", "S607", "S602",
     "E402", "N806", "S101", "S314", "E722", "B007", "DTZ", "PLW1510",
     "TCH", # Disable type-checking block requirement (breaks beartype/jaxtyping runtime)
-    "RET505", "UP038", "B904", # allow else after return for readability
+    "RET505", "B904", # allow else after return for readability
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["INP001"]
 "scripts/*" = ["T201", "INP001"]
+"scripts/quality_gate.py" = ["T201", "INP001", "N817"]
+"scripts/run_evppi_by_group_from_run_dir.py" = ["I001"]
+"tests/e2e/test_dashboard.py" = ["PT001"]
+"tests/e2e/test_remote_app.py" = ["PT023"]
 "streamlit_app/*" = ["T201", "INP001"]
+"gin-sim/__init__.py" = ["N999"]
+"gin-sim/pages/__init__.py" = ["N999"]
+"gin-sim/pages/*.py" = ["N999"]
 
 [tool.pyright]
 pythonVersion = "3.10"

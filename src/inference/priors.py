@@ -13,40 +13,28 @@ from jaxtyping import Array
 
 
 class BayesianPriorSuite:
-    """
-    Manages Bayesian priors for model calibration.
-    """
+    """Manages Bayesian priors for model calibration."""
 
     @staticmethod
     def draw_adverse_selection_elasticity(key: Array, n_draws: int) -> Array:
-        """
-        Prior: LogNormal(-1.2, 0.3)
-        Grounded in separation theory.
-        """
-        # We sample LogNormal and negate to ensure negative elasticity
+        """Prior: LogNormal(-1.2, 0.3) grounded in separation theory."""
         log_samples = -jr.normal(key, (n_draws,)) * 0.3 - 1.2
         return jnp.exp(log_samples)
 
     @staticmethod
     def draw_deterrence_elasticity(key: Array, n_draws: int) -> Array:
-        """
-        Prior: Gamma(2.0, 10.0) -> Mean 0.2
-        Grounded in survey data.
-        """
-        # JAX Gamma sampling
+        """Prior: Gamma(shape=2.0, scale=0.1) with mean near 0.2."""
         return jr.gamma(key, 2.0, shape=(n_draws,)) * 0.1
 
     @staticmethod
     def draw_equity_factor(key: Array, n_draws: int, jurisdiction: str) -> Array:
-        """
-        Jurisdiction-specific priors for equity factor.
-        """
+        """Jurisdiction-specific priors for equity factor."""
         base_map = {
-            "new_zealand": 1.35, # Maori Health Sovereignty
+            "new_zealand": 1.35,  # Maori Health Sovereignty
             "australia": 1.15,
             "us": 1.40,
             "uk": 1.20,
-            "canada": 1.10
+            "canada": 1.10,
         }
         mu = base_map.get(jurisdiction.lower(), 1.0)
         return mu + jr.normal(key, (n_draws,)) * 0.05
@@ -55,12 +43,10 @@ class BayesianPriorSuite:
 def sample_parameter_matrix(
     key: Array,
     n_draws: int,
-    jurisdiction: str = "australia"
+    jurisdiction: str = "australia",
 ) -> dict[str, Array]:
-    """
-    Generate a full matrix of Bayesian prior draws.
-    """
-    keys = jr.split(key, 5)
+    """Generate a full matrix of Bayesian prior draws."""
+    keys = jr.split(key, 3)
     suite = BayesianPriorSuite()
 
     return {

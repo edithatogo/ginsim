@@ -40,11 +40,13 @@ def evaluate_sandbox_policy(
 
     # Use Australia as the sandbox base population
     base_params = load_jurisdiction_parameters("australia")
-    params = base_params.model_copy(update={
-        "baseline_testing_uptake": baseline_testing_uptake,
-        "deterrence_elasticity": deterrence_elasticity,
-        "enforcement_effectiveness": enforcement_effectiveness,
-    })
+    params = base_params.model_copy(
+        update={
+            "baseline_testing_uptake": baseline_testing_uptake,
+            "deterrence_elasticity": deterrence_elasticity,
+            "enforcement_effectiveness": enforcement_effectiveness,
+        }
+    )
     policy = build_sandbox_policy(
         enforcement_strength=enforcement_effectiveness,
         penalty_rate=penalty_rate,

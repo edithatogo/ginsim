@@ -9,13 +9,9 @@ def test_sensitivity_page_runs_analysis() -> None:
     app.run()
     assert "Comprehensive Sensitivity & VOI Suite" in app.title[0].value
 
-    # Navigate to Tornado tab (Tab 2, index 2)
-    # Alternatively, PSA tab (Tab 0) also has a run button
     run_button_psa = next(b for b in app.button if "Run PSA Simulation" in b.label)
     run_button_psa.click().run()
 
-    # The simulation takes a few seconds, AppTest might need another run or longer wait
-    # We'll try to get it directly
     assert len(app.get("plotly_chart")) >= 1
 
 
@@ -44,7 +40,6 @@ def test_extended_games_page_runs_each_game(game_name: str, expected_metric: str
     app.run()
     assert "Extended Strategic Games" in app.title[0].value
 
-    # Page 4 uses radio for game selection
     app.radio[0].set_value(game_name).run()
 
     run_button = next(b for b in app.button if "Run Game" in b.label)

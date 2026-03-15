@@ -79,11 +79,12 @@ def compute_perceived_penalty(
         0.7 + 0.3 * jnp.asarray(moratorium_effect)
     )
 
-    restriction_strength = jnp.where(
-        allow_genetic_test_results,
-        0.0,
-        jnp.where(sum_insured_caps is not None, threshold_restriction, 1.0),
-    )
+    if allow_genetic_test_results:
+        restriction_strength = jnp.asarray(0.0)
+    elif sum_insured_caps is not None:
+        restriction_strength = threshold_restriction
+    else:
+        restriction_strength = jnp.asarray(1.0)
 
     penalty_reduction = restriction_strength * (0.5 + 0.5 * enforcement_factor)
     penalty_reduction = jnp.clip(penalty_reduction, 0.0, 0.95)

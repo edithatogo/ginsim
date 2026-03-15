@@ -10,6 +10,9 @@ permissions:
   issues: write
   pull-requests: write
 
+env:
+  RENOVATE_TOKEN: ${{ secrets.RENOVATE_TOKEN }}
+
 jobs:
   renovate:
     runs-on: ubuntu-latest
@@ -17,12 +20,12 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Skip when Renovate token is not configured
-        if: ${{ secrets.RENOVATE_TOKEN == '' }}
+        if: ${{ env.RENOVATE_TOKEN == '' }}
         run: echo "RENOVATE_TOKEN is not configured; skipping Renovate run."
 
       - name: Run Renovate
-        if: ${{ secrets.RENOVATE_TOKEN != '' }}
+        if: ${{ env.RENOVATE_TOKEN != '' }}
         uses: renovatebot/github-action@v46.1.4
         with:
           configurationFile: .github/renovate.json5
-          token: ${{ secrets.RENOVATE_TOKEN }}
+          token: ${{ env.RENOVATE_TOKEN }}

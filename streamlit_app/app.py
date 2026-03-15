@@ -17,19 +17,32 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
-from src.model.adversarial_engine import AdversarialEngine
-from src.model.agentic_auditor import AgenticAuditor
 from src.model.module_a_behavior import compute_testing_uptake, get_standard_policies
 from src.model.parameters import load_jurisdiction_parameters
 from src.model.pipeline import evaluate_single_policy, simulate_evolution
-from src.utils.hta_export import HTAExporter
-from src.utils.persona_distiller import PersonaDistiller
 from streamlit_app.dashboard_ui import (
     render_current_run_summary,
     render_footer,
     render_sidebar_build_info,
     render_start_here,
 )
+
+try:
+    from src.model.adversarial_engine import AdversarialEngine
+except ImportError:
+    AdversarialEngine = None
+
+try:
+    from src.model.agentic_auditor import AgenticAuditor
+    from src.utils.persona_distiller import PersonaDistiller
+except ImportError:
+    AgenticAuditor = None
+    PersonaDistiller = None
+
+try:
+    from src.utils.hta_export import HTAExporter
+except ImportError:
+    HTAExporter = None
 
 # =============================================================================
 # Visual Design System
@@ -45,6 +58,10 @@ STYLE = {
         "health": "#CC79A7",
     },
 }
+
+ADVERSARIAL_ENGINE_AVAILABLE = AdversarialEngine is not None
+AUDITOR_LAYER_AVAILABLE = AgenticAuditor is not None and PersonaDistiller is not None
+HTA_EXPORT_AVAILABLE = HTAExporter is not None
 
 
 def get_policy_color(policy_name: str) -> str:
@@ -95,8 +112,13 @@ use_equity_weights = st.sidebar.toggle(
 st.sidebar.subheader("🤖 Governance & Audit")
 enable_auditor = st.sidebar.toggle(
     "Enable Agentic Audit Layer",
-    value=True,
-    help="Activates the multi-persona Delphi Protocol for scenario auditing.",
+    value=AUDITOR_LAYER_AVAILABLE,
+    disabled=not AUDITOR_LAYER_AVAILABLE,
+    help=(
+        "Activates the multi-persona Delphi Protocol for scenario auditing."
+        if AUDITOR_LAYER_AVAILABLE
+        else "The agentic auditor modules are not available in this deployment."
+    ),
 )
 
 with st.sidebar.expander("⚙️ Advanced Controls"):
@@ -125,6 +147,9 @@ render_current_run_summary(
         "Deterrence": deterrence_level,
         "Moratorium": moratorium_belief,
         "Equity": "On" if use_equity_weights else "Off",
+        "Audit Layer": (
+            "On" if enable_auditor else ("Unavailable" if not AUDITOR_LAYER_AVAILABLE else "Off")
+        ),
     },
 )
 
@@ -434,115 +459,122 @@ with tab_redteam:
     st.write(
         "Find the 'Worst-Case' parameters that collapse a policy's welfare gain using gradient-based optimization (JAX/Optax)."
     )
-
-    c_rt1, c_rt2 = st.columns(2)
-    with c_rt1:
-        rt_policy = st.selectbox("Policy to Stress Test:", ["Moratorium", "Ban"])
-        rt_steps = st.slider("Optimization Steps", 50, 300, 100)
-    with c_rt2:
-        rt_lr = st.slider("Learning Rate", 0.01, 0.20, 0.05)
-        rt_individuals = st.number_input("Individuals for Uptake Simulation", 100, 2000, 500)
-
-    if st.button("🚀 Run Adversarial Search", type="primary"):
-        engine = AdversarialEngine(
-            learning_rate=rt_lr, steps=rt_steps, n_individuals=int(rt_individuals)
+    if not ADVERSARIAL_ENGINE_AVAILABLE:
+        st.info(
+            "Economic red-teaming is unavailable in this deployment because the adversarial engine "
+            "module is not part of the current shipped code surface."
         )
+    else:
+        c_rt1, c_rt2 = st.columns(2)
+        with c_rt1:
+            rt_policy = st.selectbox("Policy to Stress Test:", ["Moratorium", "Ban"])
+            rt_steps = st.slider("Optimization Steps", 50, 300, 100)
+        with c_rt2:
+            rt_lr = st.slider("Learning Rate", 0.01, 0.20, 0.05)
+            rt_individuals = st.number_input("Individuals for Uptake Simulation", 100, 2000, 500)
 
-        current_params = get_params(
-            jurisdiction, deterrence_level, moratorium_belief, baseline_uptake
-        )
-        p_target = STANDARD_POLICIES[rt_policy.lower()]
-        p_base = STANDARD_POLICIES["status_quo"]
-
-        with st.spinner(f"Searching for failure modes of '{rt_policy}'..."):
-            rt_result = engine.find_worst_case(p_target, p_base, current_params)
-
-        if rt_result.success:
-            st.success(
-                f"Worst-Case Scenario Found (Welfare Delta: ${rt_result.min_welfare_delta:,.2f}M)"
+        if st.button("🚀 Run Adversarial Search", type="primary"):
+            engine = AdversarialEngine(
+                learning_rate=rt_lr, steps=rt_steps, n_individuals=int(rt_individuals)
             )
 
-            # Display optimized parameters
-            st.write("### Adversarial Parameter Combination")
-
-            theta = rt_result.worst_case_theta
-            col_p1, col_p2, col_p3 = st.columns(3)
-            col_p1.metric("Optimized Prevalence", f"{theta['final_proportion_high']:.1%}")
-            col_p2.metric("Optimized Loading", f"{theta['final_loading']:.1%}")
-            col_p3.metric("Fear Elasticity", f"{theta['final_as_elasticity']:.2f}")
-
-            col_p4, col_p5, col_p6 = st.columns(3)
-            col_p4.metric("High-Risk Cost", f"{theta['final_risk_high']:.2f}")
-            col_p5.metric("Low-Risk Cost", f"{theta['final_risk_low']:.2f}")
-            col_p6.metric("High-Risk Elasticity", f"{theta['final_demand_elasticity_high']:.2f}")
-
-            # Interpretation
-            st.warning(
-                f"**Interpretation:** In this scenario, the {rt_policy} policy delivers its minimum value. "
-                "The model 'broke' the policy by maximizing the prevalence of high-risk individuals and the markup (loading), "
-                "while making people extremely sensitive to the 'fear of discrimination' (as_elasticity)."
+            current_params = get_params(
+                jurisdiction, deterrence_level, moratorium_belief, baseline_uptake
             )
+            p_target = STANDARD_POLICIES[rt_policy.lower()]
+            p_base = STANDARD_POLICIES["status_quo"]
 
-            # Optimization Path
-            st.write("### Comparison under Stress-Test Parameters")
+            with st.spinner(f"Searching for failure modes of '{rt_policy}'..."):
+                rt_result = engine.find_worst_case(p_target, p_base, current_params)
 
-            # Extract components from the stored DCBAResult objects
-            res_r = rt_result.reform_welfare_result
-            res_b = rt_result.baseline_welfare_result
+            if rt_result.success:
+                st.success(
+                    f"Worst-Case Scenario Found (Welfare Delta: ${rt_result.min_welfare_delta:,.2f}M)"
+                )
 
-            if res_r and res_b:
-                comp_data = []
+                # Display optimized parameters
+                st.write("### Adversarial Parameter Combination")
 
-                # Helper to add components
-                def add_comp(name, r_val, b_val):
-                    comp_data.append(
-                        {"Component": name, "Policy": rt_policy, "Value ($M)": float(r_val)}
+                theta = rt_result.worst_case_theta
+                col_p1, col_p2, col_p3 = st.columns(3)
+                col_p1.metric("Optimized Prevalence", f"{theta['final_proportion_high']:.1%}")
+                col_p2.metric("Optimized Loading", f"{theta['final_loading']:.1%}")
+                col_p3.metric("Fear Elasticity", f"{theta['final_as_elasticity']:.2f}")
+
+                col_p4, col_p5, col_p6 = st.columns(3)
+                col_p4.metric("High-Risk Cost", f"{theta['final_risk_high']:.2f}")
+                col_p5.metric("Low-Risk Cost", f"{theta['final_risk_low']:.2f}")
+                col_p6.metric(
+                    "High-Risk Elasticity", f"{theta['final_demand_elasticity_high']:.2f}"
+                )
+
+                # Interpretation
+                st.warning(
+                    f"**Interpretation:** In this scenario, the {rt_policy} policy delivers its minimum value. "
+                    "The model 'broke' the policy by maximizing the prevalence of high-risk individuals and the markup (loading), "
+                    "while making people extremely sensitive to the 'fear of discrimination' (as_elasticity)."
+                )
+
+                # Optimization Path
+                st.write("### Comparison under Stress-Test Parameters")
+
+                # Extract components from the stored DCBAResult objects
+                res_r = rt_result.reform_welfare_result
+                res_b = rt_result.baseline_welfare_result
+
+                if res_r and res_b:
+                    comp_data = []
+
+                    # Helper to add components
+                    def add_comp(name, r_val, b_val):
+                        comp_data.append(
+                            {"Component": name, "Policy": rt_policy, "Value ($M)": float(r_val)}
+                        )
+                        comp_data.append(
+                            {"Component": name, "Policy": "Status Quo", "Value ($M)": float(b_val)}
+                        )
+
+                    add_comp("Consumer Surplus", res_r.consumer_surplus, res_b.consumer_surplus)
+                    add_comp("Insurer Profits", res_r.producer_surplus, res_b.producer_surplus)
+                    add_comp("Health Benefits", res_r.health_benefits, res_b.health_benefits)
+                    add_comp("Fiscal Impact", res_r.fiscal_impact, res_b.fiscal_impact)
+
+                    df_comp = pd.DataFrame(comp_data)
+                    fig_comp = px.bar(
+                        df_comp,
+                        x="Component",
+                        y="Value ($M)",
+                        color="Policy",
+                        barmode="group",
+                        title=f"Welfare Components: {rt_policy} vs Status Quo (Worst-Case)",
                     )
-                    comp_data.append(
-                        {"Component": name, "Policy": "Status Quo", "Value ($M)": float(b_val)}
+                    fig_comp.update_layout(template="plotly_white")
+                    st.plotly_chart(fig_comp, use_container_width=True)
+
+                st.write("### Optimization Path (Robustness Search)")
+                if rt_result.loss_history:
+                    df_loss = pd.DataFrame(
+                        {
+                            "Step": range(len(rt_result.loss_history)),
+                            "Welfare Delta ($M)": rt_result.loss_history,
+                        }
+                    )
+                    fig_loss = px.line(
+                        df_loss,
+                        x="Step",
+                        y="Welfare Delta ($M)",
+                        title="Gradient Descent towards Failure",
+                    )
+                    fig_loss.update_layout(template="plotly_white")
+                    st.plotly_chart(fig_loss, use_container_width=True)
+
+                    st.info(
+                        "The optimization seeks the parameter set that minimizes the welfare difference between the Reform and Status Quo. "
+                        "A negative value indicates the reform is actively worse than doing nothing under these adversarial assumptions."
                     )
 
-                add_comp("Consumer Surplus", res_r.consumer_surplus, res_b.consumer_surplus)
-                add_comp("Insurer Profits", res_r.producer_surplus, res_b.producer_surplus)
-                add_comp("Health Benefits", res_r.health_benefits, res_b.health_benefits)
-                add_comp("Fiscal Impact", res_r.fiscal_impact, res_b.fiscal_impact)
-
-                df_comp = pd.DataFrame(comp_data)
-                fig_comp = px.bar(
-                    df_comp,
-                    x="Component",
-                    y="Value ($M)",
-                    color="Policy",
-                    barmode="group",
-                    title=f"Welfare Components: {rt_policy} vs Status Quo (Worst-Case)",
-                )
-                fig_comp.update_layout(template="plotly_white")
-                st.plotly_chart(fig_comp, use_container_width=True)
-
-            st.write("### Optimization Path (Robustness Search)")
-            if rt_result.loss_history:
-                df_loss = pd.DataFrame(
-                    {
-                        "Step": range(len(rt_result.loss_history)),
-                        "Welfare Delta ($M)": rt_result.loss_history,
-                    }
-                )
-                fig_loss = px.line(
-                    df_loss,
-                    x="Step",
-                    y="Welfare Delta ($M)",
-                    title="Gradient Descent towards Failure",
-                )
-                fig_loss.update_layout(template="plotly_white")
-                st.plotly_chart(fig_loss, use_container_width=True)
-
-                st.info(
-                    "The optimization seeks the parameter set that minimizes the welfare difference between the Reform and Status Quo. "
-                    "A negative value indicates the reform is actively worse than doing nothing under these adversarial assumptions."
-                )
-
-        else:
-            st.error("Optimization failed to converge or returned NaNs.")
+            else:
+                st.error("Optimization failed to converge or returned NaNs.")
 
 # TAB 5: STAKEHOLDER CONSENSUS
 with tab_delphi:
@@ -551,7 +583,12 @@ with tab_delphi:
         "Simulate a consensus-building process among diverse stakeholder personas (Treasury, Lancet, etc.)."
     )
 
-    if not enable_auditor:
+    if not AUDITOR_LAYER_AVAILABLE:
+        st.info(
+            "The agentic audit layer is unavailable in this deployment because the auditor "
+            "modules are not part of the current shipped code surface."
+        )
+    elif not enable_auditor:
         st.warning(
             "Agentic Audit Layer is disabled in the sidebar. Please enable it to use this feature."
         )
@@ -668,7 +705,12 @@ with tab_interop:
         "Export model results in standardized formats for Health Technology Assessment (HTA) dossiers or cross-platform integration."
     )
 
-    if "main_result" not in st.session_state:
+    if not HTA_EXPORT_AVAILABLE:
+        st.info(
+            "HTA export is unavailable in this deployment because the exporter module is not part "
+            "of the current shipped code surface."
+        )
+    elif "main_result" not in st.session_state:
         st.warning("Please run an evaluation in the 'Primary Evaluation' tab first to export data.")
     else:
         res = st.session_state["main_result"]

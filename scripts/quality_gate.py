@@ -36,11 +36,12 @@ def get_coverage():
 
 def main():
     logger.info("=== Diamond Standard Quality Gate ===")
+    lint_targets = ["src", "streamlit_app", "tests", "gin-sim", "scripts", "noxfile.py"]
 
     logger.info("Checking Lint (Ruff)...")
-    lint_rc, _, lint_err = run_cmd(["uv", "run", "ruff", "check", "."])
+    lint_rc, lint_out, lint_err = run_cmd(["uv", "run", "ruff", "check", *lint_targets])
     if lint_rc != 0:
-        logger.error(f"FAILED: Linting errors found.\n{lint_err}")
+        logger.error(f"FAILED: Linting errors found.\n{lint_out}{lint_err}")
         sys.exit(1)
 
     logger.info("Checking Types (Pyright)...")

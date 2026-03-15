@@ -132,6 +132,27 @@ def load_scenarios(config_path: Path | str) -> dict[str, Any]:
     return config.get("scenarios", {})
 
 
+def get_scenario_display_name(scenario_name: str, scenario_config: dict[str, Any]) -> str:
+    """Return a user-facing scenario label."""
+    explicit_name = scenario_config.get("name")
+    if isinstance(explicit_name, str) and explicit_name.strip():
+        return explicit_name
+    return scenario_name.replace("_", " ").title()
+
+
+def filter_scenarios_by_jurisdiction(
+    scenarios: dict[str, dict[str, Any]],
+    jurisdiction_code: str,
+) -> dict[str, dict[str, Any]]:
+    """Return only the scenarios for a given jurisdiction code."""
+    normalized = jurisdiction_code.strip().upper()
+    return {
+        name: config
+        for name, config in scenarios.items()
+        if str(config.get("jurisdiction", "")).strip().upper() == normalized
+    }
+
+
 def evaluate_scenario(
     scenario_name: str,
     scenario_config: dict[str, Any],
@@ -159,6 +180,11 @@ def evaluate_scenario(
         if hasattr(result, "insurance_premiums")
         else {"premium_high": 0.0, "premium_low": 0.0}
     )
+    info_gap = 0.0
+    if hasattr(result, "proxy_effects"):
+        info_gap = float(result.proxy_effects.get("residual_information_gap", 0.0))
+    elif hasattr(result, "all_metrics"):
+        info_gap = float(result.all_metrics.get("proxy", {}).get("residual_information_gap", 0.0))
 
     return ScenarioResult(
         scenario_name=scenario_name,
@@ -175,6 +201,7 @@ def evaluate_scenario(
             "equity_weighted_welfare": equity_weighted_welfare,
             "compliance_rate": compliance_rate,
             "insurance_premiums": insurance_premiums,
+            "info_gap": info_gap,
             "policy_name": policy.name,
             "policy_description": policy.description,
         },

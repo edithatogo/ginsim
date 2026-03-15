@@ -6,16 +6,11 @@ import pytest
 from loguru import logger
 from playwright.sync_api import Frame, Page, sync_playwright
 
+from tests.e2e.remote_app_cases import REMOTE_SMOKE_CASES
+
 REMOTE_DASHBOARD_URL = os.environ.get("GDPE_REMOTE_DASHBOARD_URL")
 REMOTE_DASHBOARD_TIMEOUT_MS = int(os.environ.get("GDPE_REMOTE_DASHBOARD_TIMEOUT_MS", "420000"))
 EXPECTED_HEADING = "Genetic Discrimination: Global Policy Explorer"
-EXPECTED_SIDEBAR_PAGES = (
-    ("Game Diagrams", "Game-Theoretic Module Diagrams"),
-    ("Sensitivity", "Comprehensive Sensitivity & VOI Suite"),
-    ("Scenarios", "Policy Scenarios & Stories"),
-    ("Extended Games", "Extended Strategic Games"),
-    ("Delta View", "Policy Fairness Audit"),
-)
 EXPECTED_RESULT_LABELS = (
     "Testing Uptake",
     "Net Social Benefit",
@@ -156,45 +151,26 @@ def test_remote_app_loads():
                 assert label in body_text
 
             sidebar_nav = dashboard_surface.get_by_test_id("stSidebarNavItems")
-            for sidebar_label, expected_heading in EXPECTED_SIDEBAR_PAGES:
-                sidebar_nav.get_by_role("link", name=sidebar_label).click(timeout=30_000)
-                page.wait_for_timeout(5_000)
-                body_text = _wait_for_surface_text(dashboard_surface, expected_heading)
-                assert expected_heading in body_text
+            for case in REMOTE_SMOKE_CASES:
+                sidebar_nav.get_by_role("link", name=case.sidebar_label).click(timeout=30_000)
+                body_text = _wait_for_surface_text(dashboard_surface, case.expected_heading)
+                assert case.expected_heading in body_text
 
-                if sidebar_label == "Sensitivity":
+                if case.action_button is not None:
+                    assert case.expected_text, f"Case {case.sidebar_label!r} must define expected_text when action_button is set."
                     body_text = _click_and_wait(
                         dashboard_surface,
-                        "🎲 Run PSA Simulation",
-                        "Expected Uptake (Mean)",
+                        case.action_button,
+                        case.expected_text,
                     )
-                    assert "95% CrI:" in body_text
-                elif sidebar_label == "Scenarios":
-                    body_text = _click_and_wait(
-                        dashboard_surface,
-                        "🔍 Run Comparative Analysis",
-                        "High-Rigor Comparative Matrix",
-                    )
-                    assert "Societal Welfare by Scenario (DCBA Integrated)" in body_text
-                elif sidebar_label == "Extended Games":
-                    body_text = _click_and_wait(
-                        dashboard_surface,
-                        "🔬 Run Game Simulation",
-                        "Reconstruction Accuracy",
-                    )
-                    assert "Welfare Loss" in body_text
-                elif sidebar_label == "Delta View":
-                    body_text = _click_and_wait(
-                        dashboard_surface,
-                        "⚖️ Audit Policies",
-                        "Fairness Verdict Matrix",
-                    )
+
+                for expected_fragment in case.additional_assertions:
                     body_text = _wait_for_surface_text(
                         dashboard_surface,
-                        "Ethical Category",
+                        expected_fragment,
                         timeout_ms=60_000,
                     )
-                    assert "Ethical Category" in body_text
+                    assert expected_fragment in body_text
 
             logger.success("Remote verification passed.")
         finally:

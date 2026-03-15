@@ -25,15 +25,28 @@ from src.model.parameters import load_jurisdiction_parameters
 from src.model.pipeline import evaluate_single_policy
 from src.model.sensitivity import tornado_analysis
 from src.model.uncertainty_engine import run_full_voi_analysis, run_psa
-from streamlit_app.dashboard_ui import (
-    JURISDICTION_OPTIONS,
-    jurisdiction_to_config_id,
-    render_current_run_summary,
-    render_footer,
-    render_glossary,
-    render_sidebar_build_info,
-    render_view_mode_sidebar,
-)
+
+try:
+    from streamlit_app.dashboard_ui import (
+        JURISDICTION_OPTIONS,
+        jurisdiction_to_config_id,
+        render_current_run_summary,
+        render_footer,
+        render_glossary,
+        render_sidebar_build_info,
+        render_view_mode_sidebar,
+    )
+except ImportError:
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+    from dashboard_ui import (
+        JURISDICTION_OPTIONS,
+        jurisdiction_to_config_id,
+        render_current_run_summary,
+        render_footer,
+        render_glossary,
+        render_sidebar_build_info,
+        render_view_mode_sidebar,
+    )
 
 # Page configuration
 st.set_page_config(

@@ -21,13 +21,24 @@ from src.model.scenario_analysis import (
     get_scenario_display_name,
     load_scenarios,
 )
-from streamlit_app.dashboard_ui import (
-    render_current_run_summary,
-    render_footer,
-    render_glossary,
-    render_sidebar_build_info,
-    render_view_mode_sidebar,
-)
+
+try:
+    from streamlit_app.dashboard_ui import (
+        render_current_run_summary,
+        render_footer,
+        render_glossary,
+        render_sidebar_build_info,
+        render_view_mode_sidebar,
+    )
+except ImportError:
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+    from dashboard_ui import (
+        render_current_run_summary,
+        render_footer,
+        render_glossary,
+        render_sidebar_build_info,
+        render_view_mode_sidebar,
+    )
 
 # Page configuration
 st.set_page_config(page_title="Scenario Analysis", page_icon="🎯", layout="wide")

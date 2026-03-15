@@ -20,14 +20,26 @@ import streamlit as st
 from src.model.module_a_behavior import compute_testing_uptake, get_standard_policies
 from src.model.parameters import load_jurisdiction_parameters
 from src.model.pipeline import evaluate_single_policy, simulate_evolution
-from streamlit_app.dashboard_ui import (
-    render_current_run_summary,
-    render_footer,
-    render_glossary,
-    render_sidebar_build_info,
-    render_start_here,
-    render_view_mode_sidebar,
-)
+
+try:
+    from streamlit_app.dashboard_ui import (
+        render_current_run_summary,
+        render_footer,
+        render_glossary,
+        render_sidebar_build_info,
+        render_start_here,
+        render_view_mode_sidebar,
+    )
+except ImportError:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from dashboard_ui import (
+        render_current_run_summary,
+        render_footer,
+        render_glossary,
+        render_sidebar_build_info,
+        render_start_here,
+        render_view_mode_sidebar,
+    )
 
 try:
     from src.model.adversarial_engine import AdversarialEngine

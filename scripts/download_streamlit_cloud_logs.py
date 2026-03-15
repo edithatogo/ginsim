@@ -90,7 +90,6 @@ def _open_management_surface(page, timeout_ms: int, playwright_timeout):
         manage_page.wait_for_load_state("domcontentloaded", timeout=timeout_ms)
         return manage_page
     except playwright_timeout:
-        _click_first(page, (r"^Manage app$",), timeout_ms)
         page.wait_for_load_state("domcontentloaded", timeout=timeout_ms)
         return page
 
@@ -112,10 +111,8 @@ def main() -> int:
 
         try:
             page.goto(args.app_url, wait_until="domcontentloaded", timeout=timeout_ms)
-            page.wait_for_timeout(5_000)
             manage_page = _open_management_surface(page, timeout_ms, playwright_timeout)
             _click_first(manage_page, (r"^Logs$", r"View logs"), timeout_ms)
-            manage_page.wait_for_timeout(2_000)
 
             with manage_page.expect_download(timeout=timeout_ms) as download_info:
                 _click_first(

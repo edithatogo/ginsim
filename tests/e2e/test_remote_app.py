@@ -153,11 +153,11 @@ def test_remote_app_loads():
             sidebar_nav = dashboard_surface.get_by_test_id("stSidebarNavItems")
             for case in REMOTE_SMOKE_CASES:
                 sidebar_nav.get_by_role("link", name=case.sidebar_label).click(timeout=30_000)
-                page.wait_for_timeout(5_000)
                 body_text = _wait_for_surface_text(dashboard_surface, case.expected_heading)
                 assert case.expected_heading in body_text
 
-                if case.action_button and case.expected_text:
+                if case.action_button is not None:
+                    assert case.expected_text, f"Case {case.sidebar_label!r} must define expected_text when action_button is set."
                     body_text = _click_and_wait(
                         dashboard_surface,
                         case.action_button,

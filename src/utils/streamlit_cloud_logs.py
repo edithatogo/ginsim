@@ -62,6 +62,15 @@ def _looks_like_new_record(line: str) -> bool:
     return bool(cleaned and TIMESTAMP_PREFIX_RE.match(cleaned))
 
 
+def _strip_timestamp_prefix(line: str) -> str:
+    cleaned = line.strip()
+    if TIMESTAMP_PREFIX_RE.match(cleaned):
+        parts = cleaned.split(" ", 2)
+        if len(parts) == 3:
+            return parts[2].strip()
+    return cleaned
+
+
 def _normalise_signature(block: str) -> str:
     lines = [line.strip() for line in block.splitlines() if line.strip()]
     if not lines:
@@ -80,8 +89,8 @@ def _normalise_signature(block: str) -> str:
             frame_line = frame_match.group(1)
             break
     if frame_line:
-        return f"{frame_line} -> {exception_line}"
-    return exception_line
+        return f"{frame_line} -> {_strip_timestamp_prefix(exception_line)}"
+    return _strip_timestamp_prefix(exception_line)
 
 
 def _extract_blocks(text: str) -> list[str]:

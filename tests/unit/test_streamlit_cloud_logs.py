@@ -46,3 +46,4 @@ TypeError: unexpected config value
 
     assert len(findings) == 2
     assert findings[0].sources == (inner_name,)
+    assert findings[0].signature == "Error running app"

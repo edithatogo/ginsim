@@ -21,10 +21,17 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from src.model.module_a_behavior import get_standard_policies
-from src.model.parameters import get_default_parameters
+from src.model.parameters import load_jurisdiction_parameters
 from src.model.pipeline import evaluate_single_policy
 from src.model.sensitivity import tornado_analysis
 from src.model.uncertainty_engine import run_full_voi_analysis, run_psa
+from streamlit_app.dashboard_ui import (
+    JURISDICTION_OPTIONS,
+    jurisdiction_to_config_id,
+    render_current_run_summary,
+    render_footer,
+    render_sidebar_build_info,
+)
 
 # Page configuration
 st.set_page_config(
@@ -40,15 +47,22 @@ st.markdown("Quantifying policy robustness and the value of scientific evidence.
 st.sidebar.header("⚙️ Global MC Settings")
 n_draws = st.sidebar.number_input("Monte Carlo Draws", 100, 10000, 1000, step=100)
 policy_name = st.sidebar.selectbox("Target Policy", ["Status Quo", "Moratorium", "Ban"])
-jurisdiction = st.sidebar.selectbox(
-    "Jurisdiction", ["Australia", "New Zealand", "UK", "Canada", "US"]
+jurisdiction = st.sidebar.selectbox("Jurisdiction", JURISDICTION_OPTIONS)
+render_sidebar_build_info()
+
+base_params = load_jurisdiction_parameters(jurisdiction_to_config_id(jurisdiction))
+render_current_run_summary(
+    "Current Analysis Context",
+    {
+        "Jurisdiction": jurisdiction,
+        "Policy": policy_name,
+        "Draws": f"{n_draws:,}",
+    },
 )
 
 tab_psa, tab_voi, tab_tornado = st.tabs(
     ["🎲 Probabilistic (PSA)", "💎 Value of Info (VOI)", "🌪️ One-Way (Tornado)"]
 )
-
-base_params = get_default_parameters()  # Simple base for analysis
 
 # 1. PSA TAB
 with tab_psa:
@@ -170,5 +184,4 @@ with tab_tornado:
         )
         st.plotly_chart(fig_t, use_container_width=True)
 
-st.divider()
-st.caption("Developed by Dylan A Mordaunt • 2026.03 • JAX-Vectorized Uncertainty Suite")
+render_footer("JAX-Vectorized Uncertainty Suite")

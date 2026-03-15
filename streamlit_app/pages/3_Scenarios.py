@@ -15,7 +15,17 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from src.model.pipeline import evaluate_single_policy
-from src.model.scenario_analysis import load_scenarios
+from src.model.scenario_analysis import (
+    evaluate_scenario,
+    filter_scenarios_by_jurisdiction,
+    get_scenario_display_name,
+    load_scenarios,
+)
+from streamlit_app.dashboard_ui import (
+    render_current_run_summary,
+    render_footer,
+    render_sidebar_build_info,
+)
 
 # Page configuration
 st.set_page_config(page_title="Scenario Analysis", page_icon="🎯", layout="wide")
@@ -26,43 +36,53 @@ st.markdown("Compare high-rigor outcomes across predefined policy narratives.")
 # 1. Load Scenarios
 SCENARIOS_CONFIG = Path(__file__).parent.parent.parent / "configs" / "scenarios.yaml"
 scenarios = load_scenarios(SCENARIOS_CONFIG)
+scenario_labels = {key: get_scenario_display_name(key, config) for key, config in scenarios.items()}
 
-selected_scenario_key = st.sidebar.selectbox("Predefined Scenario", list(scenarios.keys()))
+selected_scenario_key = st.sidebar.selectbox(
+    "Predefined Scenario",
+    list(scenarios.keys()),
+    format_func=lambda key: scenario_labels[key],
+)
+selected_scenario = scenarios[selected_scenario_key]
+selected_jurisdiction_code = str(selected_scenario.get("jurisdiction", "AU")).upper()
+selected_scope = filter_scenarios_by_jurisdiction(scenarios, selected_jurisdiction_code)
+render_sidebar_build_info()
+render_current_run_summary(
+    "Comparison Context",
+    {
+        "Focus Scenario": scenario_labels[selected_scenario_key],
+        "Jurisdiction": selected_jurisdiction_code,
+        "Scope": f"{len(selected_scope)} scenario(s)",
+    },
+)
+st.info(selected_scenario.get("description", "Predefined scenario comparison surface."))
 
 # 2. Run Analysis
 if st.sidebar.button("🔍 Run Comparative Analysis", type="primary"):
-    with st.spinner("Executing full pipeline for all scenarios..."):
-        from src.model.parameters import get_default_parameters
-
-        params = get_default_parameters()
-
+    with st.spinner("Executing comparative analysis for the selected jurisdiction..."):
         results = []
-        for name, config in scenarios.items():
-            # In a real run, we would map config to policy objects
-            # For this UI, we demonstrate the coverage
-            from src.model.module_a_behavior import get_standard_policies
-
-            policies = get_standard_policies()
-            # Heuristic mapping for demo
-            p_obj = policies.get("status_quo")
-            if "ban" in name:
-                p_obj = policies.get("ban")
-            if "moratorium" in name:
-                p_obj = policies.get("moratorium")
-
-            res = evaluate_single_policy(params, p_obj)
+        ordered_scope = sorted(
+            selected_scope.items(),
+            key=lambda item: (item[0] != selected_scenario_key, item[0]),
+        )
+        for name, config in ordered_scope:
+            res = evaluate_scenario(name, config, evaluate_single_policy)
             results.append(
                 {
-                    "Scenario": name.replace("_", " ").title(),
+                    "Scenario": get_scenario_display_name(name, config),
                     "Uptake": float(res.testing_uptake),
                     "Welfare": float(res.welfare_impact),
                     "Compliance": float(res.compliance_rate),
-                    "Info Gap": float(res.proxy_effects["residual_information_gap"]),
+                    "Info Gap": float(res.all_metrics["info_gap"]),
                 }
             )
 
         df = pd.DataFrame(results)
         st.subheader("High-Rigor Comparative Matrix")
+        st.caption(
+            f"Showing the {selected_jurisdiction_code} comparison set anchored on "
+            f"{scenario_labels[selected_scenario_key]}."
+        )
         st.dataframe(
             df.style.format(
                 {
@@ -88,5 +108,4 @@ if st.sidebar.button("🔍 Run Comparative Analysis", type="primary"):
         )
         st.plotly_chart(fig, use_container_width=True)
 
-st.divider()
-st.caption("Developed by Dylan A Mordaunt • 2026.03 • 100% Logic Coverage Verified")
+render_footer("Scenario Comparison Surface")

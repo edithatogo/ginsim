@@ -6,7 +6,7 @@ import pytest
 from streamlit.testing.v1 import AppTest
 
 
-@pytest.fixture()
+@pytest.fixture
 def app_test():
     """Create AppTest fixture."""
     return AppTest.from_file("streamlit_app/app.py", default_timeout=120)
@@ -24,6 +24,11 @@ class TestDashboardLoads:
         """Test dashboard title is present."""
         app_test.run()
         assert "Global Policy Explorer" in app_test.title[0].value
+
+    def test_start_here_guidance_present(self, app_test):
+        """Test the landing page provides a first-run workflow."""
+        app_test.run()
+        assert any("Start Here" in sub.value for sub in app_test.subheader)
 
     def test_primary_controls_present(self, app_test):
         """Test the primary control surfaces are rendered."""

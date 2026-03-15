@@ -16,7 +16,14 @@ EXCEPTION_SUMMARY_RE = re.compile(
     r"^[A-Za-z_][\w.]+(?:Error|Exception|Warning|Exit|Fault|Failure):"
 )
 ERROR_LINE_RE = re.compile(
-    r"\b(?:Error installing requirements|Error running app|Traceback|[A-Za-z_][\w.]+(?:Error|Exception|Warning|Exit|Fault|Failure):)"
+    r"\b(?:"
+    r"Error installing requirements|"
+    r"Error running app|"
+    r"Updating the app files has failed|"
+    r"can't open file|"
+    r"Traceback|"
+    r"[A-Za-z_][\w.]+(?:Error|Exception|Warning|Exit|Fault|Failure):"
+    r")"
 )
 FRAME_RE = re.compile(r'File "([^"]+)", line \d+')
 
@@ -129,7 +136,18 @@ def _extract_blocks(text: str) -> list[str]:
             continue
 
         if _looks_like_error_line(line):
-            blocks.append(line)
+            block_lines = [line]
+            index += 1
+            while index < len(lines):
+                current = lines[index].strip()
+                if not current:
+                    break
+                if _looks_like_new_record(current):
+                    break
+                block_lines.append(current)
+                index += 1
+            blocks.append("\n".join(block_lines))
+            continue
 
         index += 1
 

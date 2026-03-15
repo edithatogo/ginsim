@@ -159,7 +159,7 @@ def compute_fiscal_impact(
     )
 
 
-@jit(static_argnames=["time_horizon", "discount_rate", "is_annual"])
+@partial(jit, static_argnames=("time_horizon", "discount_rate", "is_annual"))
 def compute_dcba(
     testing_uptake: Array | float,
     baseline_uptake: Array | float,

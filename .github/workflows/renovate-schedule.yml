@@ -12,12 +12,16 @@ permissions:
 
 jobs:
   renovate:
-    if: ${{ secrets.RENOVATE_TOKEN != '' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
+      - name: Skip when Renovate token is not configured
+        if: ${{ secrets.RENOVATE_TOKEN == '' }}
+        run: echo "RENOVATE_TOKEN is not configured; skipping Renovate run."
+
       - name: Run Renovate
+        if: ${{ secrets.RENOVATE_TOKEN != '' }}
         uses: renovatebot/github-action@v46.1.4
         with:
           configurationFile: .github/renovate.json5

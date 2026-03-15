@@ -60,7 +60,7 @@ jax.tree_util.register_pytree_node(
 )
 
 
-@jit(static_argnames=["time_horizon", "discount_rate", "is_annual"])
+@jit(static_argnames=("time_horizon", "discount_rate", "is_annual"))
 def compute_discount_factor(
     time_horizon: float | int | Array,
     discount_rate: float | int | Array = 0.03,
@@ -74,7 +74,7 @@ def compute_discount_factor(
     return (1.0 - (1.0 + dr) ** (-th)) / (dr + 1e-10)
 
 
-@jit(static_argnames=["time_horizon", "discount_rate", "is_annual"])
+@jit(static_argnames=("time_horizon", "discount_rate", "is_annual"))
 def compute_consumer_surplus(
     testing_uptake: Array | float,
     insurance_premium: Array | float,
@@ -97,7 +97,7 @@ def compute_consumer_surplus(
     return annual_surplus * cum_discount
 
 
-@jit(static_argnames=["time_horizon", "discount_rate", "is_annual"])
+@jit(static_argnames=("time_horizon", "discount_rate", "is_annual"))
 def compute_producer_surplus(
     insurer_profits: Array | float,
     baseline_profits: Array | float,
@@ -111,7 +111,7 @@ def compute_producer_surplus(
     return annual_surplus * cum_discount
 
 
-@jit(static_argnames=["time_horizon", "discount_rate", "is_annual"])
+@jit(static_argnames=("time_horizon", "discount_rate", "is_annual"))
 def compute_health_benefits(
     testing_uptake: Array | float,
     baseline_uptake: Array | float,
@@ -130,7 +130,7 @@ def compute_health_benefits(
     return annual_benefit * cum_discount
 
 
-@jit(static_argnames=["time_horizon", "discount_rate", "is_annual"])
+@jit(static_argnames=("time_horizon", "discount_rate", "is_annual"))
 def compute_fiscal_impact(
     testing_uptake: Array | float,
     baseline_uptake: Array | float,

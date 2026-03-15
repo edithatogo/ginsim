@@ -67,16 +67,19 @@ def _save_failure_artifacts(page, output_dir: Path, stem: str) -> None:
     (output_dir / f"{stem}.html").write_text(page.content(), encoding="utf-8")
 
 
-def _click_first(page, patterns: tuple[str, ...], timeout_ms: int) -> None:
+def _click_first(page, patterns: tuple[str, ...], timeout_ms: int, playwright_timeout) -> None:
     for pattern in patterns:
         for locator in (
             page.get_by_role("button", name=re.compile(pattern, re.IGNORECASE)),
             page.get_by_role("link", name=re.compile(pattern, re.IGNORECASE)),
             page.get_by_text(re.compile(pattern, re.IGNORECASE)),
         ):
-            if locator.count():
+            try:
+                locator.first.wait_for(state="visible", timeout=timeout_ms)
                 locator.first.click(timeout=timeout_ms)
                 return
+            except playwright_timeout:
+                continue
 
     msg = f"Could not find any UI element matching: {patterns!r}"
     raise RuntimeError(msg)
@@ -85,13 +88,31 @@ def _click_first(page, patterns: tuple[str, ...], timeout_ms: int) -> None:
 def _open_management_surface(page, timeout_ms: int, playwright_timeout):
     try:
         with page.context.expect_page(timeout=timeout_ms) as new_page:
-            _click_first(page, (r"^Manage app$",), timeout_ms)
+            _click_first(page, (r"^Manage app$",), timeout_ms, playwright_timeout)
         manage_page = new_page.value
         manage_page.wait_for_load_state("domcontentloaded", timeout=timeout_ms)
         return manage_page
     except playwright_timeout:
         page.wait_for_load_state("domcontentloaded", timeout=timeout_ms)
         return page
+
+
+def _logs_surface_visible(page, timeout_ms: int, playwright_timeout) -> bool:
+    try:
+        page.get_by_text(re.compile(r"Logs for", re.IGNORECASE)).first.wait_for(
+            state="visible", timeout=timeout_ms
+        )
+        return True
+    except playwright_timeout:
+        return False
+
+
+def _open_app_menu(page, timeout_ms: int, playwright_timeout) -> None:
+    try:
+        page.get_by_test_id("app-menu").first.wait_for(state="visible", timeout=timeout_ms)
+        page.get_by_test_id("app-menu").first.click(timeout=timeout_ms)
+    except playwright_timeout:
+        _click_first(page, (r"^App menu$", r"^Options$", r"^Menu$"), timeout_ms, playwright_timeout)
 
 
 def main() -> int:
@@ -112,13 +133,20 @@ def main() -> int:
         try:
             page.goto(args.app_url, wait_until="domcontentloaded", timeout=timeout_ms)
             manage_page = _open_management_surface(page, timeout_ms, playwright_timeout)
-            _click_first(manage_page, (r"^Logs$", r"View logs"), timeout_ms)
+            if not _logs_surface_visible(manage_page, 5_000, playwright_timeout):
+                _click_first(manage_page, (r"^Logs$", r"View logs"), timeout_ms, playwright_timeout)
+                if not _logs_surface_visible(manage_page, timeout_ms, playwright_timeout):
+                    raise RuntimeError(
+                        "Manage app opened, but the logs surface never became visible."
+                    )
+            _open_app_menu(manage_page, timeout_ms, playwright_timeout)
 
             with manage_page.expect_download(timeout=timeout_ms) as download_info:
                 _click_first(
                     manage_page,
-                    (r"Download logs", r"Export logs", r"Download"),
+                    (r"^Download log$", r"^Download logs$", r"^Export logs$", r"^Download$"),
                     timeout_ms,
+                    playwright_timeout,
                 )
             download = download_info.value
             timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")

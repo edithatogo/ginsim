@@ -76,6 +76,7 @@ STYLE = {
 ADVERSARIAL_ENGINE_AVAILABLE = AdversarialEngine is not None
 AUDITOR_LAYER_AVAILABLE = AgenticAuditor is not None and PersonaDistiller is not None
 HTA_EXPORT_AVAILABLE = HTAExporter is not None
+TRACEABILITY_TAB_AVAILABLE = False
 GENERAL_POLICY_LABELS = {
     "status_quo": "Current Rules",
     "moratorium": "Temporary Ban",
@@ -202,6 +203,21 @@ render_current_run_summary(
         ),
     },
 )
+hidden_research_surfaces: list[str] = []
+if not ADVERSARIAL_ENGINE_AVAILABLE:
+    hidden_research_surfaces.append("Adversarial Red-Teaming")
+if not AUDITOR_LAYER_AVAILABLE:
+    hidden_research_surfaces.append("Stakeholder Consensus")
+if not HTA_EXPORT_AVAILABLE:
+    hidden_research_surfaces.append("Interoperability")
+if not TRACEABILITY_TAB_AVAILABLE:
+    hidden_research_surfaces.append("Evidence & Traceability")
+if audience_mode != "General audience" and hidden_research_surfaces:
+    st.caption(
+        "Hidden unavailable research surfaces: "
+        + ", ".join(hidden_research_surfaces)
+        + "."
+    )
 
 STANDARD_POLICIES = get_standard_policies()
 
@@ -218,11 +234,15 @@ else:
         ("bench", "🌍 Global Benchmarking"),
         ("sandbox", "🧪 Cross-Pollination Sandbox"),
         ("spatial", "🗺️ Spatial Equity"),
-        ("redteam", "🔴 Adversarial Red-Teaming"),
-        ("delphi", "🧑‍⚖️ Stakeholder Consensus"),
-        ("interop", "🔄 Interoperability"),
-        ("evidence", "🔬 Evidence & Traceability"),
     ]
+    if ADVERSARIAL_ENGINE_AVAILABLE:
+        tab_order.append(("redteam", "🔴 Adversarial Red-Teaming"))
+    if AUDITOR_LAYER_AVAILABLE:
+        tab_order.append(("delphi", "🧑‍⚖️ Stakeholder Consensus"))
+    if HTA_EXPORT_AVAILABLE:
+        tab_order.append(("interop", "🔄 Interoperability"))
+    if TRACEABILITY_TAB_AVAILABLE:
+        tab_order.append(("evidence", "🔬 Evidence & Traceability"))
 
 tabs = st.tabs([label for _, label in tab_order])
 tab_map = {key: tab for (key, _), tab in zip(tab_order, tabs, strict=False)}

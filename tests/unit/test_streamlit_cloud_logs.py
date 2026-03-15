@@ -44,9 +44,9 @@ TypeError: unexpected config value
 
     findings = summarise_streamlit_cloud_log(archive_path)
 
-    assert len(findings) == 2
+    assert len(findings) == 1
     assert findings[0].sources == (inner_name,)
-    assert findings[0].signature == "Error running app"
+    assert findings[0].signature == "TypeError: unexpected config value"
 
 
 def test_summarise_streamlit_cloud_log_extracts_deployment_failures(tmp_path: Path) -> None:

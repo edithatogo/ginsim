@@ -21,10 +21,10 @@ class ScenarioRuntimeResult:
 
     scenario_name: str
     jurisdiction: str
-    testing_uptake: Any
-    welfare_impact: Any
-    equity_weighted_welfare: Any
-    compliance_rate: Any
+    testing_uptake: float
+    welfare_impact: float
+    equity_weighted_welfare: float
+    compliance_rate: float
     insurance_premiums: dict[str, Any]
     all_metrics: dict[str, Any]
 
@@ -36,7 +36,14 @@ def load_scenarios(config_path: Path | str) -> dict[str, dict[str, Any]]:
         msg = f"Scenario config not found: {resolved_path}"
         raise FileNotFoundError(msg)
 
-    config = load_yaml_path(resolved_path) or {}
+    raw_config = load_yaml_path(resolved_path)
+    if raw_config is None:
+        return {}
+    if not isinstance(raw_config, dict):
+        msg = f"Scenario config must contain a mapping at the top level: {resolved_path}"
+        raise ValueError(msg)
+
+    config = raw_config
     scenarios = config.get("scenarios", {})
     return scenarios if isinstance(scenarios, dict) else {}
 
@@ -148,12 +155,12 @@ def evaluate_scenario(
     policy = _build_policy_config(scenario_name, scenario_config)
     result = model_func(model_params, policy)
 
-    testing_uptake = result.testing_uptake if hasattr(result, "testing_uptake") else 0.0
-    welfare_impact = result.welfare_impact if hasattr(result, "welfare_impact") else 0.0
+    testing_uptake = float(result.testing_uptake) if hasattr(result, "testing_uptake") else 0.0
+    welfare_impact = float(result.welfare_impact) if hasattr(result, "welfare_impact") else 0.0
     equity_weighted_welfare = (
-        result.equity_weighted_welfare if hasattr(result, "equity_weighted_welfare") else 0.0
+        float(result.equity_weighted_welfare) if hasattr(result, "equity_weighted_welfare") else 0.0
     )
-    compliance_rate = result.compliance_rate if hasattr(result, "compliance_rate") else 0.0
+    compliance_rate = float(result.compliance_rate) if hasattr(result, "compliance_rate") else 0.0
     insurance_premiums = (
         result.insurance_premiums
         if hasattr(result, "insurance_premiums")

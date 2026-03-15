@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import pytest
 
 from streamlit_app.scenario_runtime import (
@@ -10,12 +8,26 @@ from streamlit_app.scenario_runtime import (
 )
 
 
-def test_load_scenarios_reads_real_config() -> None:
-    config_path = Path(__file__).resolve().parents[2] / "configs" / "scenarios.yaml"
+def test_load_scenarios_reads_yaml_mapping(tmp_path) -> None:
+    config_path = tmp_path / "scenarios.yaml"
+    config_path.write_text(
+        """
+scenarios:
+  alpha:
+    jurisdiction: AU
+  beta:
+    name: Beta Scenario
+    jurisdiction: CA
+""".strip(),
+        encoding="utf-8",
+    )
+
     scenarios = load_scenarios(config_path)
 
-    assert "au_2025_ban" in scenarios
-    assert scenarios["canada_gnda"]["jurisdiction"] == "CA"
+    assert scenarios == {
+        "alpha": {"jurisdiction": "AU"},
+        "beta": {"name": "Beta Scenario", "jurisdiction": "CA"},
+    }
 
 
 def test_runtime_helpers_present_human_labels_and_subset_scope() -> None:

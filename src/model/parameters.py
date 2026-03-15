@@ -280,6 +280,12 @@ def load_jurisdiction_parameters(jurisdiction: str) -> ModelParameters:
     if not config_path.exists():
         config_path = Path("configs/jurisdictions") / f"{jurisdiction.lower()}.yaml"
     data = load_yaml_path(config_path)
+    if data is None:
+        msg = f"Jurisdiction config is empty: {config_path}"
+        raise ValueError(msg)
+    if not isinstance(data, dict):
+        msg = f"Jurisdiction config must contain a mapping: {config_path}"
+        raise ValueError(msg)
     return ModelParameters(**data)
 
 

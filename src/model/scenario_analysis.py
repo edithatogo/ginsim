@@ -125,9 +125,21 @@ def load_scenarios(config_path: Path | str) -> dict[str, Any]:
         msg = f"Scenario config not found: {config_path}"
         raise FileNotFoundError(msg)
 
-    config = load_yaml_path(config_path)
+    raw_config = load_yaml_path(config_path)
+    if raw_config is None:
+        return {}
+    if not isinstance(raw_config, dict):
+        msg = f"Scenario config must contain a mapping at the top level: {config_path}"
+        raise ValueError(msg)
 
-    return config.get("scenarios", {})
+    scenarios = raw_config.get("scenarios", {})
+    if scenarios is None:
+        return {}
+    if not isinstance(scenarios, dict):
+        msg = f"Scenario config 'scenarios' entry must be a mapping: {config_path}"
+        raise ValueError(msg)
+
+    return scenarios
 
 
 def get_scenario_display_name(scenario_name: str, scenario_config: dict[str, Any]) -> str:

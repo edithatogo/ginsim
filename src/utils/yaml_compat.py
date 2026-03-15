@@ -14,7 +14,7 @@ def load_yaml_path(path: Path) -> Any:
 
     try:
         import yaml  # type: ignore[import-not-found]
-    except Exception:
+    except ImportError:
         yaml = None
 
     if yaml is not None:
@@ -22,7 +22,7 @@ def load_yaml_path(path: Path) -> Any:
 
     try:
         from msgspec import yaml as msgspec_yaml
-    except Exception as exc:
+    except ImportError as exc:
         msg = (
             "No YAML loader is available. Install PyYAML or msgspec to read "
             f"configuration from {path}."

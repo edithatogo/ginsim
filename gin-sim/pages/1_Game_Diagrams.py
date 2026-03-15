@@ -1,4 +1,3 @@
-# ruff: noqa: E402
 """Deployment wrapper for the game diagrams dashboard page."""
 
 from __future__ import annotations

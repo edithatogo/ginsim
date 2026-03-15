@@ -12,3 +12,4 @@ nashpy>=0.0.32
 matplotlib>=3.8.0
 seaborn>=0.13.0
 pandas>=2.0.0
+msgspec>=0.18.0

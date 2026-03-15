@@ -15,16 +15,16 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from src.model.pipeline import evaluate_single_policy
-from src.model.scenario_analysis import (
-    evaluate_scenario,
-    filter_scenarios_by_jurisdiction,
-    get_scenario_display_name,
-    load_scenarios,
-)
 from streamlit_app.dashboard_ui import (
     render_current_run_summary,
     render_footer,
     render_sidebar_build_info,
+)
+from streamlit_app.scenario_runtime import (
+    evaluate_scenario,
+    filter_scenarios_by_jurisdiction,
+    get_scenario_display_name,
+    load_scenarios,
 )
 
 # Page configuration

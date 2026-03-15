@@ -11,9 +11,8 @@ from dataclasses import dataclass, fields
 from pathlib import Path
 from typing import Any
 
-import yaml
-
 from src.model.parameters import ModelParameters, PolicyConfig, load_jurisdiction_parameters
+from src.utils.yaml_compat import load_yaml_path
 
 ModelFunc = Callable[[Any, Any], Any]
 
@@ -126,8 +125,7 @@ def load_scenarios(config_path: Path | str) -> dict[str, Any]:
         msg = f"Scenario config not found: {config_path}"
         raise FileNotFoundError(msg)
 
-    with open(config_path, encoding="utf-8") as f:
-        config = yaml.safe_load(f)
+    config = load_yaml_path(config_path)
 
     return config.get("scenarios", {})
 

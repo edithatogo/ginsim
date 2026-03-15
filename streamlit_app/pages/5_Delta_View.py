@@ -17,12 +17,6 @@ from src.model.fairness import audit_policy_fairness
 from src.model.module_a_behavior import get_standard_policies
 from src.model.parameters import load_jurisdiction_parameters
 from src.model.pipeline import evaluate_single_policy
-from src.model.scenario_analysis import (
-    evaluate_scenario,
-    filter_scenarios_by_jurisdiction,
-    get_scenario_display_name,
-    load_scenarios,
-)
 from streamlit_app.dashboard_ui import (
     JURISDICTION_OPTIONS,
     jurisdiction_to_code,
@@ -30,6 +24,12 @@ from streamlit_app.dashboard_ui import (
     render_current_run_summary,
     render_footer,
     render_sidebar_build_info,
+)
+from streamlit_app.scenario_runtime import (
+    evaluate_scenario,
+    filter_scenarios_by_jurisdiction,
+    get_scenario_display_name,
+    load_scenarios,
 )
 
 st.set_page_config(page_title="Fairness Audit", page_icon="⚖️", layout="wide")

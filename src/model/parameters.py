@@ -9,7 +9,8 @@ from pathlib import Path
 from typing import Any
 
 import jax
-import yaml
+
+from src.utils.yaml_compat import load_yaml_path
 
 
 @dataclass(frozen=True, eq=False)
@@ -278,8 +279,7 @@ def load_jurisdiction_parameters(jurisdiction: str) -> ModelParameters:
     config_path = config_dir / f"{jurisdiction.lower()}.yaml"
     if not config_path.exists():
         config_path = Path("configs/jurisdictions") / f"{jurisdiction.lower()}.yaml"
-    with open(config_path, encoding="utf-8") as f:
-        data = yaml.safe_load(f)
+    data = load_yaml_path(config_path)
     return ModelParameters(**data)
 
 

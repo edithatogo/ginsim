@@ -71,14 +71,14 @@ def _normalise_signature(block: str) -> str:
         (line for line in reversed(lines) if _looks_like_exception_summary(line)),
         lines[-1],
     )
-    frame_line = next(
-        (
-            FRAME_RE.search(line).group(1)
-            for line in lines
-            if FRAME_RE.search(line) and ("streamlit_app/" in line or "src/" in line)
-        ),
-        "",
-    )
+    frame_line = ""
+    for line in lines:
+        if "streamlit_app/" not in line and "src/" not in line:
+            continue
+        frame_match = FRAME_RE.search(line)
+        if frame_match is not None:
+            frame_line = frame_match.group(1)
+            break
     if frame_line:
         return f"{frame_line} -> {exception_line}"
     return exception_line

@@ -33,7 +33,7 @@ jobs:
       run: uv run pytest tests/e2e/test_dashboard.py -q --tb=short
 
     - name: Upload test results
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       if: always()
       with:
         name: test-results

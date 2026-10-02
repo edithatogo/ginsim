@@ -25,7 +25,7 @@ jobs:
 
       - name: Run Renovate
         if: ${{ env.RENOVATE_TOKEN != '' }}
-        uses: renovatebot/github-action@v46.1.4
+        uses: renovatebot/github-action@v46.3.6
         with:
           configurationFile: .github/renovate.json5
           token: ${{ env.RENOVATE_TOKEN }}

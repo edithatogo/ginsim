@@ -2,7 +2,7 @@
 name = "genetic-discrimination-policy-econ"
 version = "0.2.0"
 description = "JAX-first scaffold for integrated economic evaluation of genetic discrimination policy options"
-requires-python = ">=3.11, <3.13"
+requires-python = ">=3.14, <3.15"
 dependencies = [
   "jax>=0.4.25",
   "jaxlib>=0.4.25",

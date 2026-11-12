@@ -48,7 +48,7 @@ def _theta(draws: list[dict[str, Any]], keys: list[str], n: int) -> np.ndarray:
         col = []
         for i in range(n):
             v = draws[i].get(k, 0.0)
-            if isinstance(v, (int, float)):
+            if isinstance(v, int | float):
                 col.append(float(v))
             else:
                 try:

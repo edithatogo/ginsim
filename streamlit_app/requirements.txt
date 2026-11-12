@@ -1,5 +1,5 @@
 streamlit>=1.32.0
-plotly>=5.19.0
+plotly>=6.6.0
 jax>=0.4.25
 jaxlib>=0.4.25
 numpy>=1.26

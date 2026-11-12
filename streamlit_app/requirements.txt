@@ -13,4 +13,4 @@ matplotlib>=3.8.0
 seaborn>=0.13.0
 pandas>=2.0.0
 msgspec>=0.18.0
-bibtexparser>=1.4,<2
+bibtexparser>=2.1,<3

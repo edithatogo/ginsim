@@ -89,5 +89,5 @@ def compute_clinical_outcomes(uptake: Float[Array, ""]) -> dict[str, Any]:
     return {
         "total_qaly_gains": total_qaly,
         "total_cost_savings": total_savings,
-        "cohort_breakdown": {c.name: r for c, r in zip(cohorts, results, strict=False)},
+        "cohort_breakdown": {c.name: r for c, r in zip(cohorts, results, strict=True)},
     }

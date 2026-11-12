@@ -1,4 +1,0 @@
-# file: C:\Users\60217257\OneDrive - Victoria University of Wellington - STAFF\Project - 2026.03 - Economics and Genetic Discrimination\src\model\pipeline.py
-# hypothesis_version: 6.151.9
-
-['-', '=', 'POLICY COMPARISONS', 'avg_premium', 'compliance_change', 'compliance_rate', 'consumer_surplus', 'data_quality', 'detection_rate', 'enforcement', 'fiscal_impact', 'health_benefits', 'insurance', 'long_term', 'net_welfare', 'participation_reform', 'performance_baseline', 'performance_reform', 'premium_change', 'premium_high_risk', 'premium_low_risk', 'producer_surplus', 'proportion_high', 'proxy', 'research_value_gain', 'risk_high', 'risk_low', 'risk_rating', 'short_term', 'status_quo', 'testing_uptake', 'uninsured_rate', 'violation_rate', 'welfare', 'welfare_change']

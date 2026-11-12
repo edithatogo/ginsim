@@ -1,0 +1,9 @@
+{
+  "track_id": "gdpe_0047_game_engine_hardening",
+  "title": "Game Engine Hardening (Module A & D logic paths)",
+  "type": "hardening",
+  "status": "planned",
+  "created_at": "2026-03-10T09:27:00Z",
+  "updated_at": "2026-03-10T09:27:00Z",
+  "description": "Ensuring 100% PBT coverage for core strategic decision branches in the game engine."
+}

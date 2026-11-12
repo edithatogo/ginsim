@@ -1,0 +1,8 @@
+{
+  "track_id": "gdpe_0028_institutionalized_logging",
+  "type": "chore",
+  "status": "completed",
+  "created_at": "2026-03-08T14:00:00Z",
+  "updated_at": "2026-03-08T15:55:00Z",
+  "description": "Standardize logging project-wide using loguru, replacing print statements."
+}

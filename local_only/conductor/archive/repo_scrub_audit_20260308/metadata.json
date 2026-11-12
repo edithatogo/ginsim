@@ -1,0 +1,8 @@
+{
+  "track_id": "repo_scrub_audit_20260308",
+  "type": "chore",
+  "status": "completed",
+  "created_at": "2026-03-08T12:00:00Z",
+  "updated_at": "2026-03-08T13:45:00Z",
+  "description": "Cleanse remote repo of AI artifacts/context, relocate to local_only, and perform high-rigor audit."
+}

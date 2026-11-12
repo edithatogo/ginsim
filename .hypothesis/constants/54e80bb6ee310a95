@@ -1,4 +1,0 @@
-# file: C:\Users\60217257\OneDrive - Victoria University of Wellington - STAFF\Project - 2026.03 - Economics and Genetic Discrimination\src\model\pipeline.py
-# hypothesis_version: 6.151.9
-
-[0.0, 0.4, 1.0, 2.0, 'Testing Uptake', 'accuracy_loss', 'avg_premium', 'compliance_change', 'insurer_profits', 'net_welfare', 'premium_change', 'premium_high', 'premium_high_change', 'premium_high_delta', 'premium_high_risk', 'premium_low', 'premium_low_risk', 'proxy', 'research_value_gain', 'risk_rating', 'status_quo', 'uninsured_rate', 'uptake_delta', 'welfare', 'welfare_change']

@@ -1,0 +1,14 @@
+{
+  "track_id": "gdpe_0019_review_and_author_metadata",
+  "title": "Comprehensive codebase review and author-metadata alignment",
+  "type": "review",
+  "status": "complete",
+  "created_utc": "2026-03-06T00:00:00Z",
+  "updated_utc": "2026-03-06T00:00:00Z",
+  "dependencies": [
+    "gdpe_0017_reporting_pipeline",
+    "gdpe_0018_dashboard_alignment"
+  ],
+  "estimated_duration_days": 4,
+  "notes": "Completed as a review-and-documentation track. Findings identified a main-dashboard policy-key mismatch, scenario/delta pages that currently compare parameterized status-quo runs rather than true policy regimes, a misleading jurisdiction selector on the landing page, limited dashboard-page E2E coverage, and several opportunities for stronger plain-language guidance. Repository metadata was also updated to use the correct Dylan A Mordaunt / Research Fellow, Faculty of Health, Education and Psychology, Victoria University of Wellington attribution."
+}

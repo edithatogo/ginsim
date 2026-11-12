@@ -1,4 +1,0 @@
-# file: C:\Users\60217257\OneDrive - Victoria University of Wellington - STAFF\Project - 2026.03 - Economics and Genetic Discrimination\scripts\validate_references.py
-# hypothesis_version: 6.151.9
-
-['## Unresolved keys', '*.json', '*.md', '*.py', '*.tex', '*.yaml', '*.yml', ',', '--alias-file', '--output', '--references-file', '--report', '.,;:', '.git', '.json', '.mypy_cache', '.pytest_cache', '.venv', '.yaml', '.yml', '10.', '=', 'Validation passed.', '\\\\cite\\{([^}]+)\\}', '\\\\citep\\{([^}]+)\\}', '\\\\citet\\{([^}]+)\\}', '\\s*\\([^)]*\\)', '\\s+\\+\\s+', '__main__', '__pycache__', 'id', 'ignore', 'outputs', 'references', 'source:\\s*"([^"]+)"', "source:\\s*'([^']+)'", 'store_true', 'utf-8']

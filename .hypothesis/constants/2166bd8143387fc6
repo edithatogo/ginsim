@@ -1,4 +1,0 @@
-# file: streamlit_app\pages\5_Delta_View.py
-# hypothesis_version: 6.151.9
-
-[0.0, 0.005, 0.03, 0.1, 400, 50000, 100000, 1000000, 10000000, '#2ecc71', '#e74c3c', '$,.0f', 'Australia Status Quo', 'Baseline Policy', 'Cost Parameters', 'Cost-Benefit Ratio', 'Discount Rate', 'FSC Moratorium', 'N/A', 'Net Welfare Gain', 'Net Welfare Gain ($)', 'New Zealand Current', 'Policies to Compare', 'Policy', 'Select Baseline', 'Time Horizon (years)', 'administrative_cost', 'au_fsc_moratorium', 'au_status_quo', 'baseline_result', 'best_uptake_policy', 'best_welfare_policy', 'compliance_rate', 'configs', 'delta_analysis', 'delta_comparison.csv', 'discount_rate', 'expanded', 'implementation_cost', 'nz_current', 'outside', 'primary', 'qalys_gained', 'scenarios.yaml', 'stretch', 'testing_uptake', 'text/csv', 'tickformat', 'time_horizon', 'welfare_impact', 'wide', 'Δ Compliance', 'Δ QALYs', 'Δ Uptake', 'Δ Welfare', '🏆 Policy Rankings', '📊', '📋 Summary Insights']

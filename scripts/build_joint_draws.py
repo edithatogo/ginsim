@@ -1,10 +1,20 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 from typing import Any
 
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+from loguru import logger
+
+from src.utils.logging_config import setup_logging
 from src.utils.posterior import deterministic_subsample, load_draws_npy, save_draws_npy
+
+setup_logging(level="INFO")
 
 
 def main():
@@ -48,7 +58,7 @@ def main():
         out_draws.append(d)
 
     save_draws_npy(Path(args.out), out_draws)
-    print(f"Wrote joint draws: {args.out} (n={n}, groups={list(groups.keys())})")
+    logger.success(f"Wrote joint draws: {args.out} (n={n}, groups={list(groups.keys())})")
 
 
 if __name__ == "__main__":

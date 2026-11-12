@@ -197,9 +197,7 @@ render_current_run_summary(
         "Moratorium": moratorium_belief,
         "Equity": "On" if use_equity_weights else "Off",
         "Audit Layer": (
-            "On"
-            if enable_auditor
-            else ("Unavailable" if not AUDITOR_LAYER_AVAILABLE else "Off")
+            "On" if enable_auditor else ("Unavailable" if not AUDITOR_LAYER_AVAILABLE else "Off")
         ),
     },
 )
@@ -213,11 +211,7 @@ if not HTA_EXPORT_AVAILABLE:
 if not TRACEABILITY_TAB_AVAILABLE:
     hidden_research_surfaces.append("Evidence & Traceability")
 if audience_mode != "General audience" and hidden_research_surfaces:
-    st.caption(
-        "Hidden unavailable research surfaces: "
-        + ", ".join(hidden_research_surfaces)
-        + "."
-    )
+    st.caption("Hidden unavailable research surfaces: " + ", ".join(hidden_research_surfaces) + ".")
 
 STANDARD_POLICIES = get_standard_policies()
 
@@ -338,7 +332,9 @@ with tab_map["main"]:
             if audience_mode == "General audience"
             else "Market Compliance"
         )
-        qaly_label = "Health gains" if audience_mode == "General audience" else "Clinical QALY Gains"
+        qaly_label = (
+            "Health gains" if audience_mode == "General audience" else "Clinical QALY Gains"
+        )
 
         c1, c2, c3, c4 = st.columns(4)
         with c1:
@@ -403,7 +399,9 @@ with tab_map["main"]:
                 color="Area",
                 color_discrete_sequence=["#56B4E9", "#009E73", "#D55E00"],
             )
-            fig_simple.update_layout(template="plotly_white", showlegend=False, yaxis_tickformat=".0%")
+            fig_simple.update_layout(
+                template="plotly_white", showlegend=False, yaxis_tickformat=".0%"
+            )
             st.plotly_chart(fig_simple, use_container_width=True)
             st.markdown(
                 f"- **Testing:** about **{float(res.testing_uptake):.0%}** of people choose testing.\n"
@@ -449,7 +447,9 @@ with tab_map["main"]:
                 proofs = res.all_metrics.get("proofs", {})
                 if proofs:
                     p1, p2, p3 = st.columns(3)
-                    p1.metric("Equilibrium Type", str(proofs.get("equilibrium_type", "n/a")).title())
+                    p1.metric(
+                        "Equilibrium Type", str(proofs.get("equilibrium_type", "n/a")).title()
+                    )
                     p2.metric(
                         "FOC Residual",
                         f"{float(proofs.get('premium_stationarity', 0.0)):.3e}",
@@ -518,7 +518,9 @@ with tab_map["bench"]:
     if audience_mode == "General audience":
         st.caption("Use this page to see how the broad result changes across countries.")
     if st.button(
-        "🌐 Compare countries" if audience_mode == "General audience" else "🌐 Run Global Benchmark",
+        "🌐 Compare countries"
+        if audience_mode == "General audience"
+        else "🌐 Run Global Benchmark",
         type="primary" if audience_mode == "General audience" else "secondary",
     ):
         countries = ["Australia", "New Zealand", "UK", "Canada", "US"]
@@ -650,7 +652,9 @@ with tab_map["sandbox"]:
                 title="Two quick checks for this scenario",
                 color_discrete_sequence=["#56B4E9", "#009E73"],
             )
-            fig_counter.update_layout(template="plotly_white", showlegend=False, yaxis_tickformat=".0%")
+            fig_counter.update_layout(
+                template="plotly_white", showlegend=False, yaxis_tickformat=".0%"
+            )
             st.plotly_chart(fig_counter, use_container_width=True)
 
 if "spatial" in tab_map:

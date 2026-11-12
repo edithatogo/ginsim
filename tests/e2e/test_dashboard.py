@@ -2,14 +2,18 @@
 E2E Tests for Streamlit Dashboard (Global Benchmarking Edition)
 """
 
+from pathlib import Path
+
 import pytest
 from streamlit.testing.v1 import AppTest
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
 @pytest.fixture
 def app_test():
     """Create AppTest fixture."""
-    return AppTest.from_file("streamlit_app/app.py", default_timeout=120)
+    return AppTest.from_file(PROJECT_ROOT / "streamlit_app/app.py", default_timeout=120)
 
 
 class TestDashboardLoads:

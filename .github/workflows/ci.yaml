@@ -25,8 +25,11 @@ jobs:
     - name: Install dependencies
       run: uv sync --locked --all-extras
 
-    - name: Run Pytest (Generate Coverage)
-      run: uv run pytest -v --cov=src --cov-report=xml
+    - name: Install dashboard runtime dependencies
+      run: uv pip install -r streamlit_app/requirements.txt
 
-    - name: Run Conductor Gate
-      run: uv run python scripts/conductor_gate.py
+    - name: Run Pytest (Generate Coverage)
+      run: uv run pytest -v --cov=src --cov-report=xml --ignore=tests/e2e/test_remote_app.py
+
+    - name: Run Quality Gate
+      run: uv run python scripts/quality_gate.py

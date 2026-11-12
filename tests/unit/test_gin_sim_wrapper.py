@@ -9,6 +9,7 @@ WRAPPER_PATH = ROOT / "gin-sim" / "app.py"
 PAGES_DIR = ROOT / "gin-sim" / "pages"
 ROOT_REQUIREMENTS = ROOT / "requirements.txt"
 GIN_SIM_REQUIREMENTS = ROOT / "gin-sim" / "requirements.txt"
+STREAMLIT_APP_REQUIREMENTS = ROOT / "streamlit_app" / "requirements.txt"
 
 
 def _load_wrapper_module():
@@ -73,6 +74,9 @@ def test_page_wrappers_exist_and_reference_source(wrapper_name, expected_target)
 def test_deployment_requirements_install_project_runtime():
     root_requirements = ROOT_REQUIREMENTS.read_text(encoding="utf-8").splitlines()
     gin_sim_requirements = GIN_SIM_REQUIREMENTS.read_text(encoding="utf-8").splitlines()
+    streamlit_app_requirements = STREAMLIT_APP_REQUIREMENTS.read_text(encoding="utf-8").splitlines()
 
     assert "-e ." in root_requirements
     assert "-e ." in gin_sim_requirements
+    assert "-r ../streamlit_app/requirements.txt" in gin_sim_requirements
+    assert any(line.startswith("jax") for line in streamlit_app_requirements)

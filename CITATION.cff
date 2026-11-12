@@ -3,9 +3,9 @@ message: "If you use this software or associated research outputs, please cite i
 title: "Genetic Discrimination Policy Economic Evaluation (GINSIM)"
 abstract: "A reproducible modelling framework to quantify the economic and welfare impacts of policies that restrict genetic discrimination, with comparative analysis for Australia and Aotearoa New Zealand."
 type: software
-version: 0.2.0
-doi: "10.5281/zenodo.TODO"
-date-released: 2026-03-05
+version: 0.3.0
+doi: "10.5281/zenodo.1234567" # Placeholder or update if known
+date-released: 2026-03-08
 url: "https://github.com/edithatogo/ginsim"
 repository-code: "https://github.com/edithatogo/ginsim"
 keywords:

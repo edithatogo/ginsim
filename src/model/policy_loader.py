@@ -41,7 +41,7 @@ def _normalize_caps(raw_caps: dict[str, Any] | None) -> dict[str, float] | None:
 
 
 def _normalize_enforcement(value: float | str | None) -> float:
-    if isinstance(value, (int, float)):
+    if isinstance(value, int | float):
         return float(value)
     if value is None:
         return 0.5

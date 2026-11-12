@@ -14,7 +14,9 @@ from src.model.scenario_analysis import (
     ScenarioResult,
     compare_scenarios,
     evaluate_scenario,
+    filter_scenarios_by_jurisdiction,
     format_comparison_table,
+    get_scenario_display_name,
     load_scenarios,
 )
 
@@ -66,6 +68,34 @@ class TestLoadScenarios:
             assert scenarios["test_scenario"]["name"] == "Test Scenario"
 
 
+class TestScenarioHelpers:
+    """Test helper functions used by the Streamlit scenario UI."""
+
+    def test_get_scenario_display_name_prefers_config_name(self):
+        display_name = get_scenario_display_name(
+            "au_2025_ban",
+            {"name": "Australia 2025 Genetic Ban"},
+        )
+        assert display_name == "Australia 2025 Genetic Ban"
+
+    def test_get_scenario_display_name_falls_back_to_titleized_key(self):
+        display_name = get_scenario_display_name("sandbox_strong_enforcement", {})
+        assert display_name == "Sandbox Strong Enforcement"
+
+    def test_filter_scenarios_by_jurisdiction_returns_matching_subset(self):
+        scenarios = {
+            "au_status_quo": {"jurisdiction": "AU"},
+            "au_2025_ban": {"jurisdiction": "AU"},
+            "uk_code": {"jurisdiction": "UK"},
+        }
+
+        filtered = filter_scenarios_by_jurisdiction(scenarios, "AU")
+        assert filtered == {
+            "au_status_quo": {"jurisdiction": "AU"},
+            "au_2025_ban": {"jurisdiction": "AU"},
+        }
+
+
 class TestScenarioResult:
     """Test ScenarioResult dataclass."""
 
@@ -76,8 +106,10 @@ class TestScenarioResult:
             jurisdiction="AU",
             testing_uptake=0.55,
             welfare_impact=100000.0,
+            equity_weighted_welfare=115000.0,
             qalys_gained=10.5,
             compliance_rate=0.8,
+            insurance_premiums={"premium_high": 0.5, "premium_low": 0.1},
             all_metrics={"testing_uptake": 0.55},
         )
         assert result.scenario_name == "test"
@@ -99,8 +131,10 @@ class TestFormatComparisonTable:
                 jurisdiction="AU",
                 testing_uptake=0.50,
                 welfare_impact=50000.0,
+                equity_weighted_welfare=55000.0,
                 qalys_gained=5.0,
                 compliance_rate=0.7,
+                insurance_premiums={"premium_high": 0.5, "premium_low": 0.1},
                 all_metrics={},
             ),
             ScenarioResult(
@@ -108,8 +142,10 @@ class TestFormatComparisonTable:
                 jurisdiction="AU",
                 testing_uptake=0.60,
                 welfare_impact=75000.0,
+                equity_weighted_welfare=85000.0,
                 qalys_gained=7.5,
                 compliance_rate=0.85,
+                insurance_premiums={"premium_high": 0.5, "premium_low": 0.1},
                 all_metrics={},
             ),
         ]
@@ -200,7 +236,6 @@ class TestEvaluateScenario:
             },
             "policy_overrides": {
                 "enforcement_strength": 0.95,
-                "penalty_type": "criminal",
             },
         }
 
@@ -213,7 +248,7 @@ class TestEvaluateScenario:
             "jurisdiction": "new_zealand",
             "policy_name": "ban",
             "enforcement_strength": 0.95,
-            "penalty_type": "criminal",
+            "penalty_type": "civil",
         }
 
     def test_evaluate_scenario_rejects_unsupported_active_looking_fields(self):

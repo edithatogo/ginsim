@@ -109,3 +109,17 @@ def scenario_analysis(
             (reform_outcome / baseline_outcome - 1.0) if baseline_outcome != 0 else 0
         ),
     }
+
+
+def run_scenario_analysis(
+    model_fn: Callable[[ModelParameters, PolicyConfig], float],
+    base_params: ModelParameters,
+    policies: list[PolicyConfig],
+) -> dict[str, float]:
+    """
+    Run scenario analysis across a list of policies.
+    """
+    results = {}
+    for policy in policies:
+        results[policy.name] = float(model_fn(base_params, policy))
+    return results

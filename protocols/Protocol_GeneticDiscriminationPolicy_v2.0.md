@@ -27,7 +27,7 @@ As of v2.0, the model adheres to the following rigorous standards:
 - **Numerical Stability:** All logit-based decision functions (Module A and E) utilize stabilized `jax.nn.sigmoid` kernels.
 - **Equilibrium Verification:** Competitive insurance equilibria (Module C) are formally verified using JAX Jacobians to confirm zero-profit First-Order Conditions (FOC).
 - **Property-Based Testing (PBT):** Core economic identities (e.g., Welfare Conservation: `Net = CS + PS + Fiscal + Health - Research`) are verified using `Hypothesis` across the entire valid parameter space.
-- **Institutionalized Autonomous Loops:** The model development utilizes a 3-strike "Circuit Breaker" and a mandatory "Conductor Gate" enforcing 100% test coverage and zero-defect linting/typing.
+- **Institutionalized Verification Loops:** The model development utilizes a 3-strike "Circuit Breaker" and a mandatory "Quality Gate" enforcing 100% test coverage and zero-defect linting/typing.
 
 ## 4. Conceptual framework
 (See Game-Theoretic framing in `docs/GAME_THEORETIC_FRAMING.md`)
@@ -48,8 +48,8 @@ Policy results are translated into narrative verdicts:
 - **Precautionary Protection:** Focus on information safety.
 
 ## 11. Implementation plan
-- **Diamond Gate Enforcement:** No phase progression is permitted without 100% test coverage and `scripts/conductor_gate.py` passing.
-- **Red Team Critique:** Mandatory adversarial review of all SOTA implementations.
+- **Diamond Gate Enforcement:** No phase progression is permitted without 100% test coverage and `scripts/quality_gate.py` passing.
+- **Critical Review:** Mandatory adversarial review of all SOTA implementations.
 
 ## 13. Outputs
 - **Diamond Submission Pack:** ZIP including `REPRODUCTION_REPORT.md` and `CITATION_GRAPH.json`.

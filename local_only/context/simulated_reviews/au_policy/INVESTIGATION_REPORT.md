@@ -1,6 +1,6 @@
 # Australian Policy Investigation Report: Fiscal & Regulatory Audit
 
-**Personas:** Department of Health, Treasury  
+**Personas:** Department of Health, Treasury
 **Date:** 2026-03-08
 
 ## 1. Summary of Findings

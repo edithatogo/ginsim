@@ -17,7 +17,7 @@ keywords:
   - JAX
   - policy analysis
 abstract: >-
-  GINSIM is a high-performance, JAX-vectorized economic modelling engine designed to 
-  quantify the societal impact of genetic non-discrimination policies. It integrates 
-  behavioral responses, insurance market screening equilibria, and disease-specific 
+  GINSIM is a high-performance, JAX-vectorized economic modelling engine designed to
+  quantify the societal impact of genetic non-discrimination policies. It integrates
+  behavioral responses, insurance market screening equilibria, and disease-specific
   clinical microsimulation into a unified Cost-Benefit Analysis (DCBA) framework.

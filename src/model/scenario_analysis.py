@@ -11,9 +11,8 @@ from dataclasses import dataclass, fields
 from pathlib import Path
 from typing import Any
 
-import yaml
-
 from src.model.parameters import ModelParameters, PolicyConfig, load_jurisdiction_parameters
+from src.utils.yaml_compat import load_yaml_path
 
 ModelFunc = Callable[[Any, Any], Any]
 
@@ -126,10 +125,42 @@ def load_scenarios(config_path: Path | str) -> dict[str, Any]:
         msg = f"Scenario config not found: {config_path}"
         raise FileNotFoundError(msg)
 
-    with open(config_path, encoding="utf-8") as f:
-        config = yaml.safe_load(f)
+    raw_config = load_yaml_path(config_path)
+    if raw_config is None:
+        return {}
+    if not isinstance(raw_config, dict):
+        msg = f"Scenario config must contain a mapping at the top level: {config_path}"
+        raise ValueError(msg)
 
-    return config.get("scenarios", {})
+    scenarios = raw_config.get("scenarios", {})
+    if scenarios is None:
+        return {}
+    if not isinstance(scenarios, dict):
+        msg = f"Scenario config 'scenarios' entry must be a mapping: {config_path}"
+        raise ValueError(msg)
+
+    return scenarios
+
+
+def get_scenario_display_name(scenario_name: str, scenario_config: dict[str, Any]) -> str:
+    """Return a user-facing scenario label."""
+    explicit_name = scenario_config.get("name")
+    if isinstance(explicit_name, str) and explicit_name.strip():
+        return explicit_name
+    return scenario_name.replace("_", " ").title()
+
+
+def filter_scenarios_by_jurisdiction(
+    scenarios: dict[str, dict[str, Any]],
+    jurisdiction_code: str,
+) -> dict[str, dict[str, Any]]:
+    """Return only the scenarios for a given jurisdiction code."""
+    normalized = jurisdiction_code.strip().upper()
+    return {
+        name: config
+        for name, config in scenarios.items()
+        if str(config.get("jurisdiction", "")).strip().upper() == normalized
+    }
 
 
 def evaluate_scenario(
@@ -159,6 +190,11 @@ def evaluate_scenario(
         if hasattr(result, "insurance_premiums")
         else {"premium_high": 0.0, "premium_low": 0.0}
     )
+    info_gap = 0.0
+    if hasattr(result, "proxy_effects"):
+        info_gap = float(result.proxy_effects.get("residual_information_gap", 0.0))
+    elif hasattr(result, "all_metrics"):
+        info_gap = float(result.all_metrics.get("proxy", {}).get("residual_information_gap", 0.0))
 
     return ScenarioResult(
         scenario_name=scenario_name,
@@ -175,6 +211,7 @@ def evaluate_scenario(
             "equity_weighted_welfare": equity_weighted_welfare,
             "compliance_rate": compliance_rate,
             "insurance_premiums": insurance_premiums,
+            "info_gap": info_gap,
             "policy_name": policy.name,
             "policy_description": policy.description,
         },

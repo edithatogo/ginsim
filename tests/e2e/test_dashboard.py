@@ -2,14 +2,18 @@
 E2E Tests for Streamlit Dashboard (Global Benchmarking Edition)
 """
 
+from pathlib import Path
+
 import pytest
 from streamlit.testing.v1 import AppTest
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
 @pytest.fixture
 def app_test():
     """Create AppTest fixture."""
-    return AppTest.from_file("streamlit_app/app.py", default_timeout=120)
+    return AppTest.from_file(PROJECT_ROOT / "streamlit_app/app.py", default_timeout=120)
 
 
 class TestDashboardLoads:
@@ -25,27 +29,38 @@ class TestDashboardLoads:
         app_test.run()
         assert "Global Policy Explorer" in app_test.title[0].value
 
+    def test_start_here_guidance_present(self, app_test):
+        """Test the landing page provides a first-run workflow."""
+        app_test.run()
+        assert any("Start Here" in sub.value for sub in app_test.subheader)
+
     def test_primary_controls_present(self, app_test):
         """Test the primary control surfaces are rendered."""
         app_test.run()
         labels = [widget.label for widget in app_test.selectbox]
-        assert any("Select Policy to Evaluate" in label for label in labels)
+        assert any("Choose a policy" in label for label in labels)
         assert len(app_test.slider) >= 1
 
 
 class TestSidebarControls:
     """Test all sidebar controls."""
 
+    def test_view_mode_defaults_to_general(self, app_test):
+        """Test the app defaults to the general-audience layout."""
+        app_test.run()
+        view_mode = next(r for r in app_test.radio if "View mode" in r.label)
+        assert view_mode.value == "General audience"
+
     def test_policy_selection(self, app_test):
         """Test policy regime selection."""
         app_test.run()
         # Find by label to be safe
-        policy_box = next(s for s in app_test.selectbox if "Select Policy to Evaluate" in s.label)
-        assert policy_box.value == "Status Quo"
+        policy_box = next(s for s in app_test.selectbox if "Choose a policy" in s.label)
+        assert policy_box.value == "Current Rules"
 
         # Change policy
-        policy_box.select("Moratorium").run()
-        assert policy_box.value == "Moratorium"
+        policy_box.select("Temporary Ban").run()
+        assert policy_box.value == "Temporary Ban"
 
 
 class TestFunctionality:
@@ -59,11 +74,13 @@ class TestFunctionality:
         run_button.click().run()
 
         metric_labels = [m.label for m in app_test.metric]
-        assert "Testing Uptake" in metric_labels
-        assert any("Net Social Benefit" in label for label in metric_labels)
+        assert "People choosing genetic testing" in metric_labels
+        assert "Overall benefit to society" in metric_labels
 
-        uptake_metric = next(m for m in app_test.metric if m.label == "Testing Uptake")
-        welfare_metric = next(m for m in app_test.metric if "Net Social Benefit" in m.label)
+        uptake_metric = next(
+            m for m in app_test.metric if m.label == "People choosing genetic testing"
+        )
+        welfare_metric = next(m for m in app_test.metric if m.label == "Overall benefit to society")
 
         assert "%" in uptake_metric.value
         assert "$" in welfare_metric.value

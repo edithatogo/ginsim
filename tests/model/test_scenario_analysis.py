@@ -14,7 +14,9 @@ from src.model.scenario_analysis import (
     ScenarioResult,
     compare_scenarios,
     evaluate_scenario,
+    filter_scenarios_by_jurisdiction,
     format_comparison_table,
+    get_scenario_display_name,
     load_scenarios,
 )
 
@@ -64,6 +66,34 @@ class TestLoadScenarios:
             scenarios = load_scenarios(config_path)
             assert "test_scenario" in scenarios
             assert scenarios["test_scenario"]["name"] == "Test Scenario"
+
+
+class TestScenarioHelpers:
+    """Test helper functions used by the Streamlit scenario UI."""
+
+    def test_get_scenario_display_name_prefers_config_name(self):
+        display_name = get_scenario_display_name(
+            "au_2025_ban",
+            {"name": "Australia 2025 Genetic Ban"},
+        )
+        assert display_name == "Australia 2025 Genetic Ban"
+
+    def test_get_scenario_display_name_falls_back_to_titleized_key(self):
+        display_name = get_scenario_display_name("sandbox_strong_enforcement", {})
+        assert display_name == "Sandbox Strong Enforcement"
+
+    def test_filter_scenarios_by_jurisdiction_returns_matching_subset(self):
+        scenarios = {
+            "au_status_quo": {"jurisdiction": "AU"},
+            "au_2025_ban": {"jurisdiction": "AU"},
+            "uk_code": {"jurisdiction": "UK"},
+        }
+
+        filtered = filter_scenarios_by_jurisdiction(scenarios, "AU")
+        assert filtered == {
+            "au_status_quo": {"jurisdiction": "AU"},
+            "au_2025_ban": {"jurisdiction": "AU"},
+        }
 
 
 class TestScenarioResult:

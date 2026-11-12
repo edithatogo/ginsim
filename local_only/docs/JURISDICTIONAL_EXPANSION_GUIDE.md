@@ -1,6 +1,6 @@
 # Jurisdictional Expansion Guide: SOTA Comparative Roadmap
 
-**Date:** 2026-03-08  
+**Date:** 2026-03-08
 **Context:** Based on Simulated Stakeholder Meeting #1 (Nature, Lancet, Treasury, MoH).
 
 ## 1. Executive Summary
@@ -10,7 +10,7 @@ To elevate GINSIM beyond the Australia/New Zealand context, we recommend adding 
 
 ### #1 United Kingdom (Voluntary Moratorium / ABI Agreement)
 - **Rationale:** The UK has the world's most mature voluntary code between the government and the Association of British Insurers (ABI).
-- **Required Inputs:** 
+- **Required Inputs:**
     - ABI Code of Practice limits.
     - UK-specific disease prevalence (Lynch, BRCA).
     - NHS-specific prevention costs.

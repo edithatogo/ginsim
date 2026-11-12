@@ -6,19 +6,24 @@ import pytest
 from loguru import logger
 from playwright.sync_api import Frame, Page, sync_playwright
 
+os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+os.environ.setdefault("MKL_NUM_THREADS", "1")
+os.environ.setdefault("NUMEXPR_NUM_THREADS", "1")
+
 REMOTE_DASHBOARD_URL = os.environ.get("GDPE_REMOTE_DASHBOARD_URL")
-REMOTE_DASHBOARD_TIMEOUT_MS = int(os.environ.get("GDPE_REMOTE_DASHBOARD_TIMEOUT_MS", "420000"))
+REMOTE_DASHBOARD_TIMEOUT_MS = int(os.environ.get("GDPE_REMOTE_DASHBOARD_TIMEOUT_MS", "240000"))
 EXPECTED_HEADING = "Genetic Discrimination: Global Policy Explorer"
 EXPECTED_SIDEBAR_PAGES = (
     ("Game Diagrams", "Game-Theoretic Module Diagrams"),
-    ("Sensitivity", "Comprehensive Sensitivity & VOI Suite"),
-    ("Scenarios", "Policy Scenarios & Stories"),
+    ("Sensitivity", "Uncertainty Explorer"),
+    ("Scenarios", "Scenario Comparison"),
     ("Extended Games", "Extended Strategic Games"),
-    ("Delta View", "Policy Fairness Audit"),
+    ("Delta View", "Fairness Check"),
 )
 EXPECTED_RESULT_LABELS = (
-    "Testing Uptake",
-    "Net Social Benefit",
+    "People choosing genetic testing",
+    "Overall benefit to society",
 )
 KNOWN_ERROR_TEXT = (
     "Error installing requirements.",
@@ -52,11 +57,11 @@ def _dashboard_surface_and_text(page: Page) -> tuple[Page | Frame | None, str]:
     """Return the Streamlit app surface and its text when available."""
     for frame in page.frames:
         body_text = _surface_text(frame)
-        if EXPECTED_HEADING in body_text or "Adjust Assumptions" in body_text:
+        if EXPECTED_HEADING in body_text or "Choose what to explore" in body_text:
             return frame, body_text
 
     body_text = _surface_text(page)
-    if EXPECTED_HEADING in body_text or "Adjust Assumptions" in body_text:
+    if EXPECTED_HEADING in body_text or "Choose what to explore" in body_text:
         return page, body_text
 
     return None, body_text
@@ -130,6 +135,7 @@ def _wait_for_dashboard(page: Page, remote_url: str) -> tuple[Page | Frame, str]
 
 
 @pytest.mark.slow
+@pytest.mark.timeout(300)
 def test_remote_app_loads():
     """Verify the deployed Streamlit app loads and core controls execute."""
     if not REMOTE_DASHBOARD_URL:
@@ -144,8 +150,8 @@ def test_remote_app_loads():
             dashboard_surface, body_text = _wait_for_dashboard(page, REMOTE_DASHBOARD_URL)
 
             assert EXPECTED_HEADING in body_text
-            assert "Adjust Assumptions" in body_text
-            assert "Distributional Equity" in body_text
+            assert "Choose what to explore" in body_text
+            assert "Start Here" in body_text
 
             run_btn = dashboard_surface.get_by_role("button", name="🔬 Run Evaluation")
             run_btn.click(timeout=30_000)
@@ -166,16 +172,16 @@ def test_remote_app_loads():
                     body_text = _click_and_wait(
                         dashboard_surface,
                         "🎲 Run PSA Simulation",
-                        "Expected Uptake (Mean)",
+                        "Average testing uptake",
                     )
-                    assert "95% CrI:" in body_text
+                    assert "Likely range:" in body_text
                 elif sidebar_label == "Scenarios":
                     body_text = _click_and_wait(
                         dashboard_surface,
-                        "🔍 Run Comparative Analysis",
-                        "High-Rigor Comparative Matrix",
+                        "🔍 Compare scenarios",
+                        "Scenario comparison table",
                     )
-                    assert "Societal Welfare by Scenario (DCBA Integrated)" in body_text
+                    assert "Overall social benefit by scenario" in body_text
                 elif sidebar_label == "Extended Games":
                     body_text = _click_and_wait(
                         dashboard_surface,
@@ -187,9 +193,9 @@ def test_remote_app_loads():
                     body_text = _click_and_wait(
                         dashboard_surface,
                         "⚖️ Audit Policies",
-                        "Fairness Verdict Matrix",
+                        "Fairness results",
                     )
-                    assert "Ethical Category" in body_text
+                    assert "Fairness verdict" in body_text
 
             logger.success("Remote verification passed.")
         finally:

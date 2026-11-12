@@ -7,7 +7,7 @@
 ## 1. The ACC Displacement Effect
 In Australia, a genetic diagnosis (e.g., increased risk of stroke) creates a pure private insurance burden. If the individual is deterred from testing, they lose prevention value.
 
-In New Zealand, the **Accident Compensation Corporation (ACC)** provides no-fault cover for "Treatment Injury" and "Personal Injury." 
+In New Zealand, the **Accident Compensation Corporation (ACC)** provides no-fault cover for "Treatment Injury" and "Personal Injury."
 - **Mechanism:** If a genetic condition leads to an event that ACC covers (e.g., a medical misadventure during preventative surgery or a stroke classified as an injury), the financial downside is partially socialized.
 - **Economic Hypothesis:** This social safety net should *decrease* the price elasticity of demand for private life insurance. Individuals are less "deterred" by private insurance discrimination if they know ACC covers the catastrophic medical/disability costs.
 

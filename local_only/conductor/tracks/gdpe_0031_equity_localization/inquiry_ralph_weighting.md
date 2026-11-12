@@ -5,7 +5,7 @@
 **Question:** How can we mathematically represent Treaty of Waitangi obligations (Aotearoa NZ) and socio-economic equity (AU) without over-simplifying Māori health sovereignty?
 
 ## 1. The Treaty Context (NZ)
-In Aotearoa New Zealand, the **Te Tiriti o Waitangi** (Treaty of Waitangi) provides a mandate for equitable Māori health outcomes. 
+In Aotearoa New Zealand, the **Te Tiriti o Waitangi** (Treaty of Waitangi) provides a mandate for equitable Māori health outcomes.
 - **Health Sovereignty:** Māori must have agency over their data and health journeys.
 - **Equity Gap:** Māori face systemic barriers leading to lower genetic testing uptake and higher disease burden.
 

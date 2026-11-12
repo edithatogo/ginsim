@@ -1,7 +1,7 @@
 # Architectural Blueprint Review: SOTA Global Roadmap (0031-0045)
 
-**Reviewer:** Gemini CLI (via Codebase Investigator)  
-**Target:** Conductor Tracks gdpe_0031 through gdpe_0045  
+**Reviewer:** Gemini CLI (via Codebase Investigator)
+**Target:** Conductor Tracks gdpe_0031 through gdpe_0045
 **Date:** 2026-03-08
 
 ## 1. Executive Summary

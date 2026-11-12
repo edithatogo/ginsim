@@ -5,8 +5,8 @@
 **Question:** Should we add a visualization for the 'Commonwealth Budget Impact' specifically for Medicare testing rebates?
 
 ## 1. The Fiscal Transparency Rationale
-The Commonwealth Treasury persona requested a clear view of how Medicare funding shifts costs from individuals to the government. 
-- **Current View:** The DCBA Ledger has a single "Fiscal Impact" bar. 
+The Commonwealth Treasury persona requested a clear view of how Medicare funding shifts costs from individuals to the government.
+- **Current View:** The DCBA Ledger has a single "Fiscal Impact" bar.
 - **Improvement:** Splitting "Fiscal Impact" into "Direct Testing Costs (Medicare)" and "Downstream Health Savings" would provide a much clearer ROI story for Australian policymakers.
 
 ## 2. Mathematical Impact

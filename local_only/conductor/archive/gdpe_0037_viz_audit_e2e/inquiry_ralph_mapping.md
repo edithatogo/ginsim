@@ -5,11 +5,11 @@
 **Question:** How could the data be misinterpreted between JAX tracers and Streamlit state?
 
 ## 1. The Concretization Trap
-JAX operates on abstract tracers during JIT. Streamlit requires concrete Python floats/integers. 
+JAX operates on abstract tracers during JIT. Streamlit requires concrete Python floats/integers.
 - **Risk:** If we use `float(tracer)` inside a JAX loop, it fails. If we do it *outside* (which we currently do in `pipeline.py`), it works, but we may lose precision or inadvertently convert a high-dimensional array into a single mean, masking distributional variance.
 
 ## 2. Metric Labels vs. Engine Keys
-We recently added many new metrics (Redundancy, Tapering, Remoteness). 
+We recently added many new metrics (Redundancy, Tapering, Remoteness).
 - **Risk:** The dashboard might display "Net Social Benefit" while the engine returns `weighted_welfare`. If the `equity_weighted_toggle` is off but the label doesn't change, we create a "Linguistic Mismatch" that invalidates stakeholder trust.
 
 ## 3. Visual Scale Invariants

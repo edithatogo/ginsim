@@ -13,7 +13,7 @@ This document contains the 'Ralph Thinking' inquiry logs recorded during the dev
 ## 1. The ACC Displacement Effect
 In Australia, a genetic diagnosis (e.g., increased risk of stroke) creates a pure private insurance burden. If the individual is deterred from testing, they lose prevention value.
 
-In New Zealand, the **Accident Compensation Corporation (ACC)** provides no-fault cover for "Treatment Injury" and "Personal Injury." 
+In New Zealand, the **Accident Compensation Corporation (ACC)** provides no-fault cover for "Treatment Injury" and "Personal Injury."
 - **Mechanism:** If a genetic condition leads to an event that ACC covers (e.g., a medical misadventure during preventative surgery or a stroke classified as an injury), the financial downside is partially socialized.
 - **Economic Hypothesis:** This social safety net should *decrease* the price elasticity of demand for private life insurance. Individuals are less "deterred" by private insurance discrimination if they know ACC covers the catastrophic medical/disability costs.
 
@@ -35,8 +35,8 @@ PHARMAC uses a cost-effectiveness threshold (often cited around $20k-$40k per QA
 **Question:** Should we add a visualization for the 'Commonwealth Budget Impact' specifically for Medicare testing rebates?
 
 ## 1. The Fiscal Transparency Rationale
-The Commonwealth Treasury persona requested a clear view of how Medicare funding shifts costs from individuals to the government. 
-- **Current View:** The DCBA Ledger has a single "Fiscal Impact" bar. 
+The Commonwealth Treasury persona requested a clear view of how Medicare funding shifts costs from individuals to the government.
+- **Current View:** The DCBA Ledger has a single "Fiscal Impact" bar.
 - **Improvement:** Splitting "Fiscal Impact" into "Direct Testing Costs (Medicare)" and "Downstream Health Savings" would provide a much clearer ROI story for Australian policymakers.
 
 ## 2. Mathematical Impact
@@ -140,7 +140,7 @@ Currently, our model assumes testing uptake is a function of:
 $$ \text{Uptake} = \sigma(\text{Clinical Benefit} - \text{Insurance Penalty} - \text{Test Cost}) $$
 
 In rural areas, "Test Cost" includes significant travel and time costs (The "Diagnostic Desert" effect).
-- **Hypothesis:** For a rural individual, the "Test Cost" is so high that even if the "Insurance Penalty" is reduced to zero by a statutory ban, the uptake will remain lower than urban baselines. 
+- **Hypothesis:** For a rural individual, the "Test Cost" is so high that even if the "Insurance Penalty" is reduced to zero by a statutory ban, the uptake will remain lower than urban baselines.
 
 ## 2. Spatial Parameters
 We need to introduce a `remoteness_index` (0.0 to 1.0) where:
@@ -190,11 +190,11 @@ where `telehealth_efficacy` is a value between 0.0 and 1.0.
 **Question:** How could the data be misinterpreted between JAX tracers and Streamlit state?
 
 ## 1. The Concretization Trap
-JAX operates on abstract tracers during JIT. Streamlit requires concrete Python floats/integers. 
+JAX operates on abstract tracers during JIT. Streamlit requires concrete Python floats/integers.
 - **Risk:** If we use `float(tracer)` inside a JAX loop, it fails. If we do it *outside* (which we currently do in `pipeline.py`), it works, but we may lose precision or inadvertently convert a high-dimensional array into a single mean, masking distributional variance.
 
 ## 2. Metric Labels vs. Engine Keys
-We recently added many new metrics (Redundancy, Tapering, Remoteness). 
+We recently added many new metrics (Redundancy, Tapering, Remoteness).
 - **Risk:** The dashboard might display "Net Social Benefit" while the engine returns `weighted_welfare`. If the `equity_weighted_toggle` is off but the label doesn't change, we create a "Linguistic Mismatch" that invalidates stakeholder trust.
 
 ## 3. Visual Scale Invariants
@@ -227,13 +227,13 @@ While we have a "Global Efficiency Frontier," it currently uses point estimates 
 - **Stakeholder Value:** Lancet reviewers will instantly look for these to assess the statistical significance of jurisdictional gaps.
 
 ## 2. The Distributional Sink
-The "Welfare Ledger" bar chart shows the *mean* impact. 
+The "Welfare Ledger" bar chart shows the *mean* impact.
 - **Improvement:** A "Distributional Swarm" or "Violin Plot" overlay on the bar chart would show the range of outcomes across the 10,000 Monte Carlo draws.
 - **Stakeholder Value:** Nature reviewers value transparency regarding the variance and skewness of economic results.
 
 ## 3. Ralph's Iterative Improvement
 - **Self-Inquiry:** "Is the dashboard too crowded for these complex charts?"
-- **Answer:** Yes. We should implement a "Rigor Toggle" in the sidebar. 
+- **Answer:** Yes. We should implement a "Rigor Toggle" in the sidebar.
   - **Standard Mode:** Clean, mean-based charts.
   - **Reviewer Mode:** Activates error bars, swarm overlays, and live Jacobians.
 - **Action:** This recommendation is now assigned to **Track `gdpe_0038_sensitivity_overhaul`**, as it requires the vectorized PSA engine to generate the distribution data efficiently.
@@ -526,5 +526,3 @@ To satisfy Nature/Lancet reviewers, we need to prove that our results are not ju
 - **Self-Inquiry:** "What if the reviewer wants to run the dashboard?"
 - **Answer:** We should provide a `Dockerfile` that packages the Streamlit app exactly as we see it.
 - **Action:** Verify and update the root `Dockerfile` to use the current `uv` environment.
-
-

@@ -21,6 +21,9 @@ PYTEST_ARGS = [
     "tests/e2e/test_dashboard.py",
     "tests/e2e/test_dashboard_pages.py",
     "tests/unit/test_gin_sim_wrapper.py",
+    "tests/test_adversarial.py",
+    "tests/test_agentic_auditor.py",
+    "tests/unit/test_hta_export.py",
 ]
 MIN_COVERAGE = float(environ.get("GDPE_MIN_COVERAGE", "45"))
 

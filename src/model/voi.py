@@ -7,6 +7,8 @@ logic for genetic policy uncertainty.
 
 from __future__ import annotations
 
+from functools import partial
+
 import jax
 import jax.numpy as jnp
 from jax import jit
@@ -26,7 +28,7 @@ def compute_evpi(
     return jnp.maximum(0.0, e_max_w - max_e_w)
 
 
-@jit(static_argnames=["n_bins"])
+@partial(jit, static_argnames=("n_bins",))
 def compute_evppi(
     expected_welfare_matrix: Float[Array, "n_policies n_draws"],
     parameter_draws: Float[Array, "*"],

@@ -92,3 +92,8 @@ jobs:
       with:
         name: local-streamlit-log
         path: streamlit.log
+
+    - name: Stop local Streamlit app
+      if: always()
+      run: |
+        pkill -f "streamlit run streamlit_app/app.py" || true

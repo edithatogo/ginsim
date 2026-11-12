@@ -1,6 +1,6 @@
 # New Zealand Policy Investigation Report: Health System & Equity Audit
 
-**Personas:** Ministry of Health, NZ Treasury  
+**Personas:** Ministry of Health, NZ Treasury
 **Date:** 2026-03-08
 
 ## 1. Summary of Findings

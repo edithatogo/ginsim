@@ -9,7 +9,7 @@ Currently, our model assumes testing uptake is a function of:
 $$ \text{Uptake} = \sigma(\text{Clinical Benefit} - \text{Insurance Penalty} - \text{Test Cost}) $$
 
 In rural areas, "Test Cost" includes significant travel and time costs (The "Diagnostic Desert" effect).
-- **Hypothesis:** For a rural individual, the "Test Cost" is so high that even if the "Insurance Penalty" is reduced to zero by a statutory ban, the uptake will remain lower than urban baselines. 
+- **Hypothesis:** For a rural individual, the "Test Cost" is so high that even if the "Insurance Penalty" is reduced to zero by a statutory ban, the uptake will remain lower than urban baselines.
 
 ## 2. Spatial Parameters
 We need to introduce a `remoteness_index` (0.0 to 1.0) where:

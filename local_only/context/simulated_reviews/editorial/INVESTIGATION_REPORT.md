@@ -1,14 +1,14 @@
 # Editorial Investigation Report: Scientific & Clinical Audit
 
-**Personas:** Nature Editor, Lancet Editor, MJA Editor  
+**Personas:** Nature Editor, Lancet Editor, MJA Editor
 **Date:** 2026-03-08
 
 ## 1. Summary of Findings
-The investigation into the 'GINSIM' codebase reveals a highly sophisticated economic modeling framework with a significant clinical 'bottleneck' that would hinder top-tier publication in its current state. 
+The investigation into the 'GINSIM' codebase reveals a highly sophisticated economic modeling framework with a significant clinical 'bottleneck' that would hinder top-tier publication in its current state.
 
 ### Journal Persona Insights:
 1. **Nature (Technical Innovation):** The use of JAX for Jacobian-verified economic equilibria and the 'Diamond Standard' for reproducibility are standout features. However, the 'Information Gap' metric remains abstract and needs clearer empirical grounding in the code.
-2. **Lancet (Clinical Utility):** This is the weakest point. `module_b_clinical.py` is currently a 'toy mapping'. To pass a Lancet-tier review, the model requires integrated microsimulation of specific diseases (e.g., Lynch syndrome, BRCA) to ground QALY gains in real-world clinical data. 
+2. **Lancet (Clinical Utility):** This is the weakest point. `module_b_clinical.py` is currently a 'toy mapping'. To pass a Lancet-tier review, the model requires integrated microsimulation of specific diseases (e.g., Lynch syndrome, BRCA) to ground QALY gains in real-world clinical data.
 3. **MJA (Local Policy):** The AU/NZ focus is well-represented via evidence registers and jurisdiction profiles. The focus on the Australian Life Insurance moratorium is clear, but the impact on GP decision-making is not yet modeled in detail.
 
 ## 2. Answers to User Questions

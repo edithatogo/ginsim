@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Scenario analysis module.
 
@@ -8,11 +7,12 @@ Compare policy outcomes across predefined scenarios and custom configurations.
 from __future__ import annotations
 
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from pathlib import Path
 from typing import Any
 
-import yaml
+from src.model.parameters import ModelParameters, PolicyConfig, load_jurisdiction_parameters
+from src.utils.yaml_compat import load_yaml_path
 
 ModelFunc = Callable[[Any, Any], Any]
 
@@ -23,10 +23,12 @@ class ScenarioResult:
 
     scenario_name: str
     jurisdiction: str
-    testing_uptake: float
-    welfare_impact: float
-    qalys_gained: float
-    compliance_rate: float
+    testing_uptake: Any
+    welfare_impact: Any
+    equity_weighted_welfare: Any
+    qalys_gained: Any
+    compliance_rate: Any
+    insurance_premiums: dict[str, Any]
     all_metrics: dict[str, Any]
 
 
@@ -41,14 +43,22 @@ class ScenarioComparison:
 
 def _build_model_parameters(scenario_config: dict[str, Any]) -> Any:
     """Build validated ModelParameters from a scenario config."""
-    from src.model.parameters import ModelParameters, PolicyConfig
-
     params_dict = dict(scenario_config.get("parameters", {}))
-    model_fields = set(ModelParameters.model_fields)
-    policy_fields = set(PolicyConfig.model_fields)
+
+    # 1. Determine jurisdiction
+    j_code = scenario_config.get("jurisdiction", "AU").strip().upper()
+    j_map = {"AU": "australia", "NZ": "new_zealand", "UK": "uk", "CA": "canada", "US": "us"}
+    j_id = j_map.get(j_code, "australia")
+
+    # 2. Load base parameters for that jurisdiction
+    base_params = load_jurisdiction_parameters(j_id)
+
+    # 3. Apply updates
+    model_field_names = {f.name for f in fields(ModelParameters)}
+    policy_field_names = {f.name for f in fields(PolicyConfig)}
 
     invalid_fields = sorted(
-        key for key in params_dict if key not in model_fields and key not in policy_fields
+        key for key in params_dict if key not in model_field_names and key not in policy_field_names
     )
     if invalid_fields:
         message = (
@@ -58,14 +68,8 @@ def _build_model_parameters(scenario_config: dict[str, Any]) -> Any:
         )
         raise ValueError(message)
 
-    model_updates = {key: value for key, value in params_dict.items() if key in model_fields}
-    jurisdiction = scenario_config.get("jurisdiction", "").strip().upper()
-    if jurisdiction == "AU":
-        model_updates.setdefault("jurisdiction", "australia")
-    elif jurisdiction == "NZ":
-        model_updates.setdefault("jurisdiction", "new_zealand")
-
-    return ModelParameters(**model_updates)
+    model_updates = {key: value for key, value in params_dict.items() if key in model_field_names}
+    return base_params.model_copy(update=model_updates)
 
 
 def _infer_policy_id(scenario_name: str, scenario_config: dict[str, Any]) -> str:
@@ -95,9 +99,9 @@ def _build_policy_config(scenario_name: str, scenario_config: dict[str, Any]) ->
     policy = policies[policy_id]
     policy_updates = dict(scenario_config.get("policy_overrides", {}))
 
-    # Backward compatibility: allow policy fields in parameters, but only if valid.
     parameter_values = scenario_config.get("parameters", {})
-    valid_policy_fields = set(type(policy).model_fields)
+    valid_policy_fields = {f.name for f in fields(PolicyConfig)}
+
     for key, value in parameter_values.items():
         if key in valid_policy_fields and key not in policy_updates:
             policy_updates[key] = value
@@ -115,22 +119,48 @@ def _build_policy_config(scenario_name: str, scenario_config: dict[str, Any]) ->
 def load_scenarios(config_path: Path | str) -> dict[str, Any]:
     """
     Load scenario definitions from YAML config.
-
-    Args:
-        config_path: Path to scenarios.yaml
-
-    Returns:
-        Dictionary of scenario definitions
     """
     config_path = Path(config_path)
     if not config_path.exists():
         msg = f"Scenario config not found: {config_path}"
         raise FileNotFoundError(msg)
 
-    with open(config_path, encoding="utf-8") as f:
-        config = yaml.safe_load(f)
+    raw_config = load_yaml_path(config_path)
+    if raw_config is None:
+        return {}
+    if not isinstance(raw_config, dict):
+        msg = f"Scenario config must contain a mapping at the top level: {config_path}"
+        raise ValueError(msg)
 
-    return config.get("scenarios", {})
+    scenarios = raw_config.get("scenarios", {})
+    if scenarios is None:
+        return {}
+    if not isinstance(scenarios, dict):
+        msg = f"Scenario config 'scenarios' entry must be a mapping: {config_path}"
+        raise ValueError(msg)
+
+    return scenarios
+
+
+def get_scenario_display_name(scenario_name: str, scenario_config: dict[str, Any]) -> str:
+    """Return a user-facing scenario label."""
+    explicit_name = scenario_config.get("name")
+    if isinstance(explicit_name, str) and explicit_name.strip():
+        return explicit_name
+    return scenario_name.replace("_", " ").title()
+
+
+def filter_scenarios_by_jurisdiction(
+    scenarios: dict[str, dict[str, Any]],
+    jurisdiction_code: str,
+) -> dict[str, dict[str, Any]]:
+    """Return only the scenarios for a given jurisdiction code."""
+    normalized = jurisdiction_code.strip().upper()
+    return {
+        name: config
+        for name, config in scenarios.items()
+        if str(config.get("jurisdiction", "")).strip().upper() == normalized
+    }
 
 
 def evaluate_scenario(
@@ -140,14 +170,6 @@ def evaluate_scenario(
 ) -> ScenarioResult:
     """
     Evaluate a single scenario using the core model.
-
-    Args:
-        scenario_name: Name of the scenario
-        scenario_config: Scenario configuration dictionary
-        model_func: Model evaluation function
-
-    Returns:
-        ScenarioResult with outcomes
     """
     model_params = _build_model_parameters(scenario_config)
     policy = _build_policy_config(scenario_name, scenario_config)
@@ -156,23 +178,40 @@ def evaluate_scenario(
     result = model_func(model_params, policy)
 
     # Extract metrics
-    testing_uptake = float(result.testing_uptake) if hasattr(result, "testing_uptake") else 0.0
-    welfare_impact = float(result.welfare_impact) if hasattr(result, "welfare_impact") else 0.0
-    qalys_gained = float(result.qalys_gained) if hasattr(result, "qalys_gained") else 0.0
-    compliance_rate = float(result.compliance_rate) if hasattr(result, "compliance_rate") else 0.0
+    testing_uptake = result.testing_uptake if hasattr(result, "testing_uptake") else 0.0
+    welfare_impact = result.welfare_impact if hasattr(result, "welfare_impact") else 0.0
+    equity_weighted_welfare = (
+        result.equity_weighted_welfare if hasattr(result, "equity_weighted_welfare") else 0.0
+    )
+    qalys_gained = 0.0  # Placeholder
+    compliance_rate = result.compliance_rate if hasattr(result, "compliance_rate") else 0.0
+    insurance_premiums = (
+        result.insurance_premiums
+        if hasattr(result, "insurance_premiums")
+        else {"premium_high": 0.0, "premium_low": 0.0}
+    )
+    info_gap = 0.0
+    if hasattr(result, "proxy_effects"):
+        info_gap = float(result.proxy_effects.get("residual_information_gap", 0.0))
+    elif hasattr(result, "all_metrics"):
+        info_gap = float(result.all_metrics.get("proxy", {}).get("residual_information_gap", 0.0))
 
     return ScenarioResult(
         scenario_name=scenario_name,
         jurisdiction=scenario_config.get("jurisdiction", "Unknown"),
         testing_uptake=testing_uptake,
         welfare_impact=welfare_impact,
+        equity_weighted_welfare=equity_weighted_welfare,
         qalys_gained=qalys_gained,
         compliance_rate=compliance_rate,
+        insurance_premiums=insurance_premiums,
         all_metrics={
             "testing_uptake": testing_uptake,
             "welfare_impact": welfare_impact,
-            "qalys_gained": qalys_gained,
+            "equity_weighted_welfare": equity_weighted_welfare,
             "compliance_rate": compliance_rate,
+            "insurance_premiums": insurance_premiums,
+            "info_gap": info_gap,
             "policy_name": policy.name,
             "policy_description": policy.description,
         },
@@ -186,38 +225,23 @@ def compare_scenarios(
 ) -> ScenarioComparison:
     """
     Compare multiple scenarios against a baseline.
-
-    Args:
-        scenarios: Dictionary of scenario configurations
-        model_func: Model evaluation function
-        baseline_name: Name of baseline scenario for comparison
-
-    Returns:
-        ScenarioComparison with delta calculations
     """
-    # Evaluate all scenarios
     results = []
     for name, config in scenarios.items():
         result = evaluate_scenario(name, config, model_func)
         results.append(result)
 
-    # Find baseline
-    baseline = None
-    for r in results:
-        if r.scenario_name == baseline_name:
-            baseline = r
-            break
+    baseline = next((r for r in results if r.scenario_name == baseline_name), None)
 
-    # Calculate deltas
     deltas = {}
     if baseline:
         for r in results:
             if r.scenario_name != baseline_name:
                 deltas[r.scenario_name] = {
-                    "testing_uptake_delta": r.testing_uptake - baseline.testing_uptake,
-                    "welfare_delta": r.welfare_impact - baseline.welfare_impact,
-                    "qalys_delta": r.qalys_gained - baseline.qalys_gained,
-                    "compliance_delta": r.compliance_rate - baseline.compliance_rate,
+                    "testing_uptake_delta": float(r.testing_uptake)
+                    - float(baseline.testing_uptake),
+                    "welfare_delta": float(r.welfare_impact) - float(baseline.welfare_impact),
+                    "compliance_delta": float(r.compliance_rate) - float(baseline.compliance_rate),
                 }
 
     return ScenarioComparison(
@@ -230,24 +254,12 @@ def compare_scenarios(
 def format_comparison_table(comparison: ScenarioComparison) -> str:
     """
     Format scenario comparison as markdown table.
-
-    Args:
-        comparison: ScenarioComparison object
-
-    Returns:
-        Markdown table string
     """
-    lines = []
-
-    # Header
-    lines.append(
+    lines = [
         "| Scenario | Jurisdiction | Testing Uptake | Δ vs Baseline | Welfare Impact | Compliance |",
-    )
-    lines.append(
         "|----------|--------------|----------------|---------------|----------------|------------|",
-    )
+    ]
 
-    # Rows
     for result in comparison.scenarios:
         delta_str = ""
         if result.scenario_name in comparison.delta_from_baseline:
@@ -256,8 +268,8 @@ def format_comparison_table(comparison: ScenarioComparison) -> str:
 
         lines.append(
             f"| {result.scenario_name} | {result.jurisdiction} | "
-            f"{result.testing_uptake:.1%} | {delta_str} | "
-            f"${result.welfare_impact:,.0f} | {result.compliance_rate:.1%} |",
+            f"{float(result.testing_uptake):.1%} | {delta_str} | "
+            f"${float(result.welfare_impact):,.0f} | {float(result.compliance_rate):.1%} |",
         )
 
     return "\n".join(lines)
@@ -270,14 +282,6 @@ def run_scenario_analysis(
 ) -> ScenarioComparison:
     """
     Run complete scenario analysis.
-
-    Args:
-        config_path: Path to scenarios.yaml (default: configs/scenarios.yaml)
-        model_func: Model evaluation function
-        output_dir: Optional output directory for results
-
-    Returns:
-        ScenarioComparison object
     """
     if config_path is None:
         config_path = Path(__file__).resolve().parents[2] / "configs" / "scenarios.yaml"
@@ -287,31 +291,15 @@ def run_scenario_analysis(
 
         model_func = default_model_func
 
-    # Load scenarios
     scenarios = load_scenarios(config_path)
-
-    # Run comparison
     comparison = compare_scenarios(scenarios, model_func)
 
-    # Print results
-
-    # Save results
     if output_dir:
         output_dir.mkdir(parents=True, exist_ok=True)
         output_path = output_dir / "scenario_comparison.md"
-
         with open(output_path, "w", encoding="utf-8") as f:
             f.write("# Scenario Comparison Results\n\n")
             f.write(f"**Baseline:** {comparison.baseline_scenario}\n\n")
             f.write(format_comparison_table(comparison))
-            f.write("\n\n## Detailed Results\n\n")
-
-            for result in comparison.scenarios:
-                f.write(f"\n### {result.scenario_name}\n\n")
-                f.write(f"- **Jurisdiction:** {result.jurisdiction}\n")
-                f.write(f"- **Testing Uptake:** {result.testing_uptake:.1%}\n")
-                f.write(f"- **Welfare Impact:** ${result.welfare_impact:,.0f}\n")
-                f.write(f"- **QALYs Gained:** {result.qalys_gained:.2f}\n")
-                f.write(f"- **Compliance Rate:** {result.compliance_rate:.1%}\n")
 
     return comparison

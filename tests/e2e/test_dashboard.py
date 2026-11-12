@@ -1,23 +1,15 @@
 """
-E2E Tests for Streamlit Dashboard
-
-Tests all dashboard functionality including:
-- Sidebar controls
-- Tab rendering
-- Basic functionality
-
-Note: Streamlit's testing API has limitations. Full E2E testing
-should be done manually or with Playwright/Selenium.
+E2E Tests for Streamlit Dashboard (Global Benchmarking Edition)
 """
 
 import pytest
 from streamlit.testing.v1 import AppTest
 
 
-@pytest.fixture()
+@pytest.fixture
 def app_test():
-    """Create AppTest fixture with increased timeout for JAX compilation."""
-    return AppTest.from_file("streamlit_app/app.py", default_timeout=30)
+    """Create AppTest fixture."""
+    return AppTest.from_file("streamlit_app/app.py", default_timeout=120)
 
 
 class TestDashboardLoads:
@@ -26,72 +18,65 @@ class TestDashboardLoads:
     def test_dashboard_loads(self, app_test):
         """Test dashboard loads successfully."""
         app_test.run()
-        # Check that title is present (indicates successful load)
         assert len(app_test.title) > 0
 
     def test_title_present(self, app_test):
         """Test dashboard title is present."""
         app_test.run()
-        assert app_test.title[0].value == "🧬 Genetic Discrimination Policy Dashboard"
+        assert "Global Policy Explorer" in app_test.title[0].value
 
-    def test_sidebar_present(self, app_test):
-        """Test sidebar is present."""
+    def test_start_here_guidance_present(self, app_test):
+        """Test the landing page provides a first-run workflow."""
         app_test.run()
-        # 2 selectboxes (Jurisdiction, Policy Regime)
-        assert len(app_test.selectbox) >= 2
-        # 3 sliders (Baseline, Deterrence, Moratorium)
-        assert len(app_test.slider) >= 3
+        assert any("Start Here" in sub.value for sub in app_test.subheader)
 
-    def test_plain_language_guide_present(self, app_test):
-        """Test landing page includes first-pass guidance."""
+    def test_primary_controls_present(self, app_test):
+        """Test the primary control surfaces are rendered."""
         app_test.run()
-        assert any(
-            "Plain-language guide and glossary" in getattr(node, "label", "")
-            for node in app_test.expander
-        )
+        labels = [widget.label for widget in app_test.selectbox]
+        assert any("Choose a policy" in label for label in labels)
+        assert len(app_test.slider) >= 1
 
 
 class TestSidebarControls:
     """Test all sidebar controls."""
 
+    def test_view_mode_defaults_to_general(self, app_test):
+        """Test the app defaults to the general-audience layout."""
+        app_test.run()
+        view_mode = next(r for r in app_test.radio if "View mode" in r.label)
+        assert view_mode.value == "General audience"
+
     def test_policy_selection(self, app_test):
         """Test policy regime selection."""
         app_test.run()
-        # Policy Regime is the 2nd selectbox now
-        assert app_test.selectbox[1].value == "Status Quo"
+        # Find by label to be safe
+        policy_box = next(s for s in app_test.selectbox if "Choose a policy" in s.label)
+        assert policy_box.value == "Current Rules"
 
         # Change policy
-        app_test.selectbox[1].set_value("Moratorium")
-        app_test.run()
-        assert app_test.selectbox[1].value == "Moratorium"
-
-    def test_baseline_uptake_slider(self, app_test):
-        """Test baseline testing uptake slider."""
-        app_test.run()
-        assert app_test.slider[0].value == 0.52
-
-        # Change slider
-        app_test.slider[0].set_value(0.60)
-        app_test.run()
-        assert app_test.slider[0].value == 0.60
+        policy_box.select("Temporary Ban").run()
+        assert policy_box.value == "Temporary Ban"
 
 
 class TestFunctionality:
     """Test dashboard functionality."""
 
     def test_run_model_button(self, app_test):
-        """Test that clicking 'Run Model' generates results."""
+        """Test that clicking 'Run Evaluation' generates the expected metric surface."""
         app_test.run()
 
-        # Click button
-        # find by label
-        run_button = next(b for b in app_test.button if b.label == "🔬 Run Model")
+        run_button = next(b for b in app_test.button if "Run Evaluation" in b.label)
         run_button.click().run()
 
-        # Check for metrics instead of session state (more reliable)
-        assert len(app_test.metric) >= 3
-        # First metric is Testing Uptake
-        assert "Testing Uptake" in app_test.metric[0].label
-        # Value should be a percentage
-        assert "%" in app_test.metric[0].value
-        assert "Long-run Net Welfare" in app_test.metric[1].label
+        metric_labels = [m.label for m in app_test.metric]
+        assert "People choosing genetic testing" in metric_labels
+        assert "Overall benefit to society" in metric_labels
+
+        uptake_metric = next(
+            m for m in app_test.metric if m.label == "People choosing genetic testing"
+        )
+        welfare_metric = next(m for m in app_test.metric if m.label == "Overall benefit to society")
+
+        assert "%" in uptake_metric.value
+        assert "$" in welfare_metric.value

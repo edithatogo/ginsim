@@ -72,7 +72,9 @@ render_current_run_summary(
     },
 )
 st.info(selected_scenario.get("description", "Predefined scenario comparison surface."))
-st.caption("Choose one named scenario, then compare it with the other scenarios from the same jurisdiction.")
+st.caption(
+    "Choose one named scenario, then compare it with the other scenarios from the same jurisdiction."
+)
 
 # 2. Run Analysis
 if st.button("🔍 Compare scenarios", type="primary"):
@@ -120,9 +122,7 @@ if st.button("🔍 Compare scenarios", type="primary"):
                 x=df["Scenario"], y=df["Welfare"], marker_color="#0072B2", name="Net Social Benefit"
             )
         )
-        fig.update_layout(
-            title="Overall social benefit by scenario", template="plotly_white"
-        )
+        fig.update_layout(title="Overall social benefit by scenario", template="plotly_white")
         st.plotly_chart(fig, use_container_width=True)
 
 render_footer("Scenario Comparison")

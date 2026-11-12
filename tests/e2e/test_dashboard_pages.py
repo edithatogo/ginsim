@@ -1,11 +1,17 @@
 """Interaction-level AppTest coverage for non-landing Streamlit pages."""
 
+from pathlib import Path
+
 import pytest
 from streamlit.testing.v1 import AppTest
 
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
 
 def test_sensitivity_page_runs_analysis() -> None:
-    app = AppTest.from_file("streamlit_app/pages/2_Sensitivity.py", default_timeout=60)
+    app = AppTest.from_file(
+        PROJECT_ROOT / "streamlit_app/pages/2_Sensitivity.py", default_timeout=60
+    )
     app.run()
     assert "Uncertainty Explorer" in app.title[0].value
     assert any(r.label == "View mode" and r.value == "General audience" for r in app.radio)
@@ -19,7 +25,9 @@ def test_sensitivity_page_runs_analysis() -> None:
 
 
 def test_sensitivity_page_updates_context_for_selected_jurisdiction() -> None:
-    app = AppTest.from_file("streamlit_app/pages/2_Sensitivity.py", default_timeout=60)
+    app = AppTest.from_file(
+        PROJECT_ROOT / "streamlit_app/pages/2_Sensitivity.py", default_timeout=60
+    )
     app.run()
 
     jurisdiction_box = next(s for s in app.selectbox if s.label == "Jurisdiction")
@@ -29,7 +37,9 @@ def test_sensitivity_page_updates_context_for_selected_jurisdiction() -> None:
 
 
 def test_sensitivity_page_runs_voi_metrics() -> None:
-    app = AppTest.from_file("streamlit_app/pages/2_Sensitivity.py", default_timeout=60)
+    app = AppTest.from_file(
+        PROJECT_ROOT / "streamlit_app/pages/2_Sensitivity.py", default_timeout=60
+    )
     app.run()
 
     draws_input = next(n for n in app.number_input if "Number of simulation draws" in n.label)
@@ -42,7 +52,7 @@ def test_sensitivity_page_runs_voi_metrics() -> None:
 
 
 def test_scenarios_page_runs_comparison_and_exposes_download() -> None:
-    app = AppTest.from_file("streamlit_app/pages/3_Scenarios.py", default_timeout=60)
+    app = AppTest.from_file(PROJECT_ROOT / "streamlit_app/pages/3_Scenarios.py", default_timeout=60)
     app.run()
     assert "Scenario Comparison" in app.title[0].value
     assert any(
@@ -58,7 +68,7 @@ def test_scenarios_page_runs_comparison_and_exposes_download() -> None:
 
 
 def test_scenarios_page_updates_focus_context_for_selected_scenario() -> None:
-    app = AppTest.from_file("streamlit_app/pages/3_Scenarios.py", default_timeout=60)
+    app = AppTest.from_file(PROJECT_ROOT / "streamlit_app/pages/3_Scenarios.py", default_timeout=60)
     app.run()
 
     scenario_box = next(s for s in app.selectbox if s.label == "Scenario to anchor on")
@@ -79,7 +89,9 @@ def test_scenarios_page_updates_focus_context_for_selected_scenario() -> None:
     ],
 )
 def test_extended_games_page_runs_each_game(game_name: str, expected_metric: str) -> None:
-    app = AppTest.from_file("streamlit_app/pages/4_Extended_Games.py", default_timeout=60)
+    app = AppTest.from_file(
+        PROJECT_ROOT / "streamlit_app/pages/4_Extended_Games.py", default_timeout=60
+    )
     app.run()
     assert "Extended Strategic Games" in app.title[0].value
 
@@ -93,7 +105,9 @@ def test_extended_games_page_runs_each_game(game_name: str, expected_metric: str
 
 
 def test_delta_view_page_runs_comparison_and_download() -> None:
-    app = AppTest.from_file("streamlit_app/pages/5_Delta_View.py", default_timeout=60)
+    app = AppTest.from_file(
+        PROJECT_ROOT / "streamlit_app/pages/5_Delta_View.py", default_timeout=60
+    )
     app.run()
     assert "Fairness Check" in app.title[0].value
     assert any(
@@ -107,7 +121,9 @@ def test_delta_view_page_runs_comparison_and_download() -> None:
 
 
 def test_delta_view_updates_context_for_selected_jurisdiction() -> None:
-    app = AppTest.from_file("streamlit_app/pages/5_Delta_View.py", default_timeout=60)
+    app = AppTest.from_file(
+        PROJECT_ROOT / "streamlit_app/pages/5_Delta_View.py", default_timeout=60
+    )
     app.run()
 
     jurisdiction_box = next(s for s in app.selectbox if s.label == "Jurisdiction")

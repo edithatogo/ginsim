@@ -4,12 +4,16 @@ Diamond-Standard Streamlit AppTest verification.
 Ensures no errors or warnings on any dashboard page and verifies narrative UI.
 """
 
+from pathlib import Path
+
 from streamlit.testing.v1 import AppTest
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_main_app_diamond_rigor():
     """Verify main landing page has no errors and shows headline metrics."""
-    at = AppTest.from_file("streamlit_app/app.py", default_timeout=120)
+    at = AppTest.from_file(PROJECT_ROOT / "streamlit_app/app.py", default_timeout=120)
     at.run()
 
     # 1. No initial errors
@@ -33,7 +37,7 @@ def test_main_app_diamond_rigor():
 
 def test_traceability_page_diamond_rigor():
     """Verify traceability page loads correctly."""
-    at = AppTest.from_file("streamlit_app/pages/traceability.py", default_timeout=60)
+    at = AppTest.from_file(PROJECT_ROOT / "streamlit_app/pages/traceability.py", default_timeout=60)
     at.run()
 
     assert not at.error
@@ -43,7 +47,7 @@ def test_traceability_page_diamond_rigor():
 
 def test_scenarios_page_diamond_rigor():
     """Verify scenarios page loads correctly."""
-    at = AppTest.from_file("streamlit_app/pages/3_Scenarios.py", default_timeout=60)
+    at = AppTest.from_file(PROJECT_ROOT / "streamlit_app/pages/3_Scenarios.py", default_timeout=60)
     at.run()
 
     assert not at.error
@@ -60,7 +64,7 @@ def test_scenarios_page_diamond_rigor():
 
 def test_delta_view_page_diamond_rigor():
     """Verify delta view page loads correctly."""
-    at = AppTest.from_file("streamlit_app/pages/5_Delta_View.py", default_timeout=60)
+    at = AppTest.from_file(PROJECT_ROOT / "streamlit_app/pages/5_Delta_View.py", default_timeout=60)
     at.run()
 
     assert not at.error
@@ -69,7 +73,9 @@ def test_delta_view_page_diamond_rigor():
 
 def test_extended_games_page_diamond_rigor():
     """Verify extended games page loads and runs."""
-    at = AppTest.from_file("streamlit_app/pages/4_Extended_Games.py", default_timeout=60)
+    at = AppTest.from_file(
+        PROJECT_ROOT / "streamlit_app/pages/4_Extended_Games.py", default_timeout=60
+    )
     at.run()
 
     assert not at.error

@@ -58,9 +58,7 @@ st.set_page_config(
 audience_mode = render_view_mode_sidebar()
 
 st.title("📊 Uncertainty Explorer")
-st.markdown(
-    "See how uncertain assumptions can change the result, and which unknowns matter most."
-)
+st.markdown("See how uncertain assumptions can change the result, and which unknowns matter most.")
 render_glossary(audience_mode)
 
 # Sidebar Settings

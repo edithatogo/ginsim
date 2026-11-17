@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import argparse
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 
@@ -149,7 +149,7 @@ def main() -> int:
                     playwright_timeout,
                 )
             download = download_info.value
-            timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+            timestamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
             suggested_name = download.suggested_filename or f"streamlit-cloud-logs-{timestamp}.zip"
             target_path = output_dir / suggested_name
             download.save_as(str(target_path))

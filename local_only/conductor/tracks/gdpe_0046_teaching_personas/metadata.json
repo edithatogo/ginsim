@@ -1,0 +1,9 @@
+{
+  "track_id": "gdpe_0046_teaching_personas",
+  "title": "Teaching Personas from Internal Documents",
+  "type": "feature",
+  "status": "completed",
+  "created_at": "2026-03-10T08:55:00Z",
+  "updated_at": "2026-03-10T09:04:00Z",
+  "description": "Implementation of Persona Distiller and dynamic loading for taught organizational personas."
+}

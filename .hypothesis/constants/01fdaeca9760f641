@@ -1,4 +1,0 @@
-# file: C:\Users\60217257\OneDrive - Victoria University of Wellington - STAFF\Project - 2026.03 - Economics and Genetic Discrimination\src\model\sensitivity_total.py
-# hypothesis_version: 6.151.9
-
-[0.0, 0.2, 0.25, 0.5, 0.75, 1.0, 500, 1000, '*', '...', 'base_value', 'first_order', 'high_outcome', 'high_value', 'ij', 'low_outcome', 'low_value', 'parameter', 'sobol', 'tornado', 'total_order', 'utf-8', 'w']

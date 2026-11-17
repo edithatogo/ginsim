@@ -1,11 +1,16 @@
-from __future__ import annotations
-
 import argparse
+import sys
 from pathlib import Path
 
 import jax
 import jax.numpy as jnp
 import yaml
+
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+from loguru import logger
 
 from src.model.glue_policy_eval import GlobalParams, simulate_policy
 from src.model.module_a_behavior import BehaviorParams
@@ -14,6 +19,9 @@ from src.model.module_c_insurance_eq import InsuranceParams
 from src.model.module_e_passthrough import PassThroughParams
 from src.model.module_f_data_quality import DataQualityParams
 from src.model.voi import evpi, evppi
+from src.utils.logging_config import setup_logging
+
+setup_logging(level="INFO")
 
 
 def load_yaml(path: Path):
@@ -104,9 +112,9 @@ def main():
 
     net_benefit = jax.vmap(one_draw)(jnp.arange(n_draws))
 
-    print(f"Jurisdiction: {pol_cfg.get('jurisdiction')} | Domain: {pol_cfg.get('domain')}")
-    print("EVPI:", float(evpi(net_benefit)))
-    print("EVPPI (policy_shock):", float(evppi(net_benefit, shock, n_bins=20)))
+    logger.info(f"Jurisdiction: {pol_cfg.get('jurisdiction')} | Domain: {pol_cfg.get('domain')}")
+    logger.info(f"EVPI: {float(evpi(net_benefit))}")
+    logger.info(f"EVPPI (policy_shock): {float(evppi(net_benefit, shock, n_bins=20))}")
 
 
 if __name__ == "__main__":

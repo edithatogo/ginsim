@@ -1,8 +1,10 @@
 import nox
 from nox.sessions import Session
 
+RUFF_TARGETS = ["src", "streamlit_app", "tests", "gin-sim", "scripts", "noxfile.py"]
+
 # Use uv for faster environment creation
-nox.options.sessions = ["lint", "type_check", "tests"]
+nox.options.sessions = ["quality", "tests"]
 nox.options.default_venv_backend = "uv"
 
 
@@ -23,8 +25,8 @@ def tests(session: Session) -> None:
 @nox.session(python="3.11")
 def lint(session: Session) -> None:
     session.install("ruff")
-    session.run("ruff", "check", ".")
-    session.run("ruff", "format", "--check", ".")
+    session.run("ruff", "format", "--check", *RUFF_TARGETS)
+    session.run("ruff", "check", *RUFF_TARGETS)
 
 
 @nox.session(python="3.11")
@@ -32,6 +34,12 @@ def type_check(session: Session) -> None:
     session.install(".[dev]")
     session.install("pyright")
     session.run("pyright", "src")
+
+
+@nox.session(python="3.11")
+def quality(session: Session) -> None:
+    session.install(".[dev]")
+    session.run("python", "scripts/quality_gate.py")
 
 
 @nox.session(python="3.11")

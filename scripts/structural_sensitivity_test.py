@@ -1,4 +1,17 @@
+import sys
+from pathlib import Path
+
 import jax.numpy as jnp
+
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+from loguru import logger
+
+from src.utils.logging_config import setup_logging
+
+setup_logging(level="INFO")
 
 
 def linear_deterrence(perceived_penalty, elasticity=0.18):
@@ -31,13 +44,13 @@ results = {
     "Step Result (Uptake Multiplier)": [float(step_deterrence(0.1)), float(step_deterrence(0.8))],
 }
 
-print("Structural Sensitivity Results:")
-print("-" * 60)
+logger.info("Structural Sensitivity Results:")
+logger.info("-" * 60)
 for i in range(2):
-    print(f"{results['Scenario'][i]}:")
-    print(f"  Linear: {results['Linear Result (Uptake Multiplier)'][i]:.2f}")
-    print(f"  Step:   {results['Step Result (Uptake Multiplier)'][i]:.2f}")
-print("-" * 60)
+    logger.info(f"{results['Scenario'][i]}:")
+    logger.info(f"  Linear: {results['Linear Result (Uptake Multiplier)'][i]:.2f}")
+    logger.info(f"  Step:   {results['Step Result (Uptake Multiplier)'][i]:.2f}")
+logger.info("-" * 60)
 
 # Finding: In the US scenario, the linear model predicts a 14.4% drop (0.18*0.8)
 # but the step model predicts a 20% drop (fixed base deterrence).

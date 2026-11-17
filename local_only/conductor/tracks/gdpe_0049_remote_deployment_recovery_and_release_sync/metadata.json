@@ -1,0 +1,8 @@
+{
+  "track_id": "gdpe_0049_remote_deployment_recovery_and_release_sync",
+  "type": "bugfix",
+  "status": "active",
+  "created_at": "2026-03-15T00:00:00Z",
+  "updated_at": "2026-03-15T00:00:00Z",
+  "description": "Recover the broken Streamlit Cloud deployment, synchronize validated fixes onto a mergeable release branch, and document the remaining path to production redeploy."
+}

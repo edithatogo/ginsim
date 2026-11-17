@@ -9,14 +9,24 @@ from typing import Any
 
 import pandas as pd
 
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+from loguru import logger
+
+from src.utils.logging_config import setup_logging
+
+setup_logging(level="INFO")
+
 
 def run(cmd: list[str]) -> None:
-    print("\n$ " + " ".join(cmd))
+    logger.info(f"Running: {' '.join(cmd)}")
     subprocess.check_call(cmd)
 
 
 def run_stage(cmd: list[str]) -> dict[str, Any]:
-    print("\n$ " + " ".join(cmd))
+    logger.info(f"Running stage: {' '.join(cmd)}")
     proc = subprocess.run(cmd, capture_output=True, text=True, check=False)
     result = {
         "cmd": cmd,
@@ -26,9 +36,9 @@ def run_stage(cmd: list[str]) -> dict[str, Any]:
         "ok": proc.returncode == 0,
     }
     if not result["ok"]:
-        print(f"[warn] stage failed with exit code {proc.returncode}: {' '.join(cmd)}")
+        logger.warning(f"Stage failed with exit code {proc.returncode}: {' '.join(cmd)}")
         if proc.stderr:
-            print(proc.stderr.strip())
+            logger.warning(proc.stderr.strip())
     return result
 
 
@@ -239,7 +249,7 @@ def main():
                 report.append(f"  - stderr: `{error_line}`")
     (compare_out / "REPORT.md").write_text("\n".join(report) + "\n", encoding="utf-8")
 
-    print("\nWrote meta outputs to:", base_out)
+    logger.info(f"Wrote meta outputs to: {base_out}")
 
 
 if __name__ == "__main__":

@@ -1,11 +1,14 @@
-from __future__ import annotations
-
 import argparse
+import sys
 from pathlib import Path
 
 import jax
 import yaml
 from loguru import logger
+
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
 
 from src.model.glue_policy_eval import GlobalParams, simulate_policy
 from src.model.module_a_behavior import BehaviorParams
@@ -13,6 +16,9 @@ from src.model.module_b_clinical import ClinicalParams
 from src.model.module_c_insurance_eq import InsuranceParams
 from src.model.module_e_passthrough import PassThroughParams
 from src.model.module_f_data_quality import DataQualityParams
+from src.utils.logging_config import setup_logging
+
+setup_logging(level="INFO")
 
 
 def load_yaml(path: Path):
@@ -93,11 +99,11 @@ def main():
         results.append(res)
 
     logger.info("Simulation complete. Results:")
-    print("-" * 100)
-    print(
-        f"JURISDICTION: {pol_cfg.get('jurisdiction').upper()} | DOMAIN: {pol_cfg.get('domain').upper()}"
+    logger.info("-" * 100)
+    logger.info(
+        f"JURISDICTION: {pol_cfg.get('jurisdiction', 'n/a').upper()} | DOMAIN: {pol_cfg.get('domain', 'n/a').upper()}"
     )
-    print("-" * 100)
+    logger.info("-" * 100)
 
     for r in results:
         logger.success(
@@ -106,7 +112,7 @@ def main():
             f"Avg Prem: {float(r['avg_premium']):>10.2f} | "
             f"AUC: {float(r.get('data_auc', 0.0)):>6.3f}",
         )
-    print("-" * 100)
+    logger.info("-" * 100)
 
 
 if __name__ == "__main__":

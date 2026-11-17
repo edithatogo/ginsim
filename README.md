@@ -37,7 +37,7 @@ The model is calibrated against structured evidence registers, with active assum
    ```
 2. **Install dependencies**:
    ```bash
-   pip install -e .
+   pip install -e .[dev]
    ```
 3. **Run the Dashboard**:
    ```bash
@@ -65,7 +65,8 @@ This repository is designed for bit-for-bit reproducibility using JAX and determ
 | **Full Policy Run** | `python -m scripts.run_meta_pipeline --n_draws 2000` |
 | **Figure Generation** | `python -m scripts.generate_figures` |
 | **Reference Audit** | `python -m scripts.validate_references --report` |
-| **Logic Verification** | `pytest tests/test_economic_logic.py` |
+| **Strict Quality Gate** | `python scripts/quality_gate.py` |
+| **Full Test Suite** | `pytest` |
 
 ## 📁 Repository Structure
 

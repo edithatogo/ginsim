@@ -14,12 +14,14 @@ Thank you for your interest in contributing to the Genetic Discrimination Policy
 ### Setup
 1.  Fork and clone the repository.
 2.  Create a virtual environment: `python -m venv .venv`.
-3.  Install in editable mode with development dependencies: `pip install -e .`.
+3.  Install in editable mode with development dependencies: `pip install -e .[dev]`.
 
 ### Quality Standards
-- **Linting:** Use `ruff check .`.
-- **Formatting:** Use `ruff format .`.
+- **Formatting:** Use `ruff format --check src streamlit_app tests gin-sim scripts noxfile.py`.
+- **Linting:** Use `ruff check src streamlit_app tests gin-sim scripts noxfile.py`.
+- **Typing:** Use `pyright src`.
 - **Tests:** Run `pytest` to ensure no regressions.
+- **Unified Gate:** Use `python scripts/quality_gate.py` before opening a PR.
 - **Documentation:** All new features must include docstrings and be reflected in the Formulae Inventory or Game Descriptions.
 
 ### Submitting Changes

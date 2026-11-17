@@ -1,4 +1,0 @@
-# file: C:\Users\60217257\OneDrive - Victoria University of Wellington - STAFF\Project - 2026.03 - Economics and Genetic Discrimination\src\model\module_a_behavior.py
-# hypothesis_version: 6.151.9
-
-[0.0, 1e-10, 0.1, 0.5, 0.95, 1.0, 200000.0, 500000.0, 1000000.0, 1000, '*', 'absolute_effect', 'ban', 'baseline_uptake', 'death', 'moratorium', 'reform_uptake', 'relative_effect', 'status_quo', 'tpd', 'trauma']

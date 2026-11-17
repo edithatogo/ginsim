@@ -1,0 +1,19 @@
+{
+  "track_id": "gdpe_0022_empirical_traceability_and_legacy_closure",
+  "title": "Empirical traceability and legacy analysis closure",
+  "type": "nature_depth_cycle",
+  "status": "active",
+  "aspect": "empirical grounding, assumption traceability, and closure of legacy decomposition or uncertainty-analysis surfaces",
+  "execution_mode": "autonomous_ralph_loop",
+  "review_protocol": "conductor_review",
+  "requires_remote_push": true,
+  "requires_workflow_monitoring": true,
+  "requires_streamlit_verification": true,
+  "requires_next_track_creation": true,
+  "requires_template_reflection": true,
+  "compatible_agents": [
+    "codex",
+    "gemini_cli",
+    "qwen_code"
+  ]
+}

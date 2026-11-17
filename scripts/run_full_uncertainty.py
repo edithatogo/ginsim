@@ -1,18 +1,32 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 import pandas as pd
 
-from src.model.parameters import ModelParameters, PolicyConfig
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+from loguru import logger
+
+from src.model.parameters import (
+    ModelParameters,
+    PolicyConfig,
+    load_jurisdiction_parameters,
+)
 from src.model.pipeline import evaluate_single_policy
 from src.model.policy_loader import load_policies_config
+from src.utils.logging_config import setup_logging
 from src.utils.manifest import write_manifest
 from src.utils.posterior import deterministic_subsample, load_draws_npy
 from src.utils.sampling import SamplingMode, select_draw
+
+setup_logging(level="INFO")
 
 
 def get_policies_path(jurisdiction: str) -> Path:
@@ -142,7 +156,7 @@ def main() -> None:
 
     policies_path = get_policies_path(args.jurisdiction)
     policies_config = load_policies_config(policies_path)
-    base_params = ModelParameters(jurisdiction=policies_config.jurisdiction)
+    base_params = load_jurisdiction_parameters(args.jurisdiction)
 
     n_draws = args.n_draws
     mode: SamplingMode = args.sampling_mode
@@ -244,8 +258,8 @@ def main() -> None:
     )
     summary.to_csv(out_dir / "full_uncertainty_summary.csv", index=False)
 
-    print("Wrote:", out_dir)
-    print(summary.to_string(index=False))
+    logger.info(f"Wrote results to: {out_dir}")
+    logger.info(f"\n{summary.to_string(index=False)}")
 
 
 if __name__ == "__main__":

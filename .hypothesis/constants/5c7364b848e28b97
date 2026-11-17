@@ -1,4 +1,0 @@
-# file: C:\Users\60217257\OneDrive - Victoria University of Wellington - STAFF\Project - 2026.03 - Economics and Genetic Discrimination\src\model\sensitivity.py
-# hypothesis_version: 6.151.9
-
-[1e-10, 0.2, 1.0, 'baseline_outcome', 'delta', 'percentage_change', 'reform_outcome']

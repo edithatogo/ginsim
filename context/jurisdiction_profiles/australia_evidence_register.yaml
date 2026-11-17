@@ -585,6 +585,56 @@ enforcement_compliance:
         Low observed complaints may reflect under-reporting.
         True discrimination rate uncertain.
 
+    - evidence_id: "AU_medicare_001"
+      parameter: "medicare_cost_share"
+      citation: "mbs_statistics_2023"
+      study_design: "Administrative data"
+      jurisdiction: "Australia"
+      population: "General population"
+      sample_size: null
+
+      initial_grade: "A"
+      directness: "Direct"
+      precision: "High"
+      consistency: "Consistent"
+      risk_of_bias: "Low"
+      final_grade: "High"
+
+      point_estimate: 0.75
+      confidence_interval_lower: 0.70
+      confidence_interval_upper: 0.80
+      measure_type: "Average proportion of genetic testing costs covered by Medicare"
+
+      prior_distribution: "Beta"
+      prior_alpha: 75
+      prior_beta: 25
+      prior_rationale: "High quality administrative data from MBS."
+
+    - evidence_id: "AU_enf_003"
+      parameter: "audit_intensity_apra_asic"
+      citation: "apra_asic_enforcement_report_2023"
+      study_design: "Regulatory report"
+      jurisdiction: "Australia"
+      population: "Insurance sector"
+      sample_size: null
+
+      initial_grade: "B"
+      directness: "Direct"
+      precision: "Moderate"
+      consistency: "Consistent"
+      risk_of_bias: "Moderate"
+      final_grade: "Moderate"
+
+      point_estimate: 0.65
+      confidence_interval_lower: 0.50
+      confidence_interval_upper: 0.80
+      measure_type: "Estimated regulatory audit intensity (combined APRA/ASIC)"
+
+      prior_distribution: "Beta"
+      prior_alpha: 6.5
+      prior_beta: 3.5
+      prior_rationale: "Based on recent enforcement actions and budget allocations."
+
   # Synthesis for Enforcement
   synthesis:
     enforcement_effectiveness:

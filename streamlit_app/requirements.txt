@@ -1,4 +1,4 @@
-streamlit>=1.32.0
+streamlit>=1.55.0
 plotly>=5.19.0
 jax>=0.4.25
 jaxlib>=0.4.25

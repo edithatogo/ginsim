@@ -40,6 +40,7 @@ def test_traceability_page_diamond_rigor():
     at = AppTest.from_file(PROJECT_ROOT / "streamlit_app/pages/traceability.py", default_timeout=60)
     at.run()
 
+    assert not at.exception
     assert not at.error
     assert "Evidence Explorer" in at.title[0].value
     assert len(at.selectbox) >= 1

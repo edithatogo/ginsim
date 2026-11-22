@@ -89,3 +89,14 @@ This repository is designed for bit-for-bit reproducibility using JAX and determ
 **Author:** Dylan A Mordaunt
 **Affiliation:** Research Fellow, Faculty of Health, Education and Psychology, Victoria University of Wellington
 **Live App:** [https://ginsim.streamlit.app/](https://ginsim.streamlit.app/)
+
+## Development
+
+Follow the [contribution guide](CONTRIBUTING.md) for development setup,
+focused checks and pull requests. Keep exploratory model results and
+validated policy claims distinct.
+
+## Security
+
+Follow the [security policy](SECURITY.md) to report vulnerabilities
+privately. Keep credentials and sensitive data out of public issues and pull requests.
